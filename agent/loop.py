@@ -35,7 +35,7 @@ from __future__ import annotations
 import json
 import threading
 import time
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from datetime import date
 from typing import Any, Callable, Literal, Protocol
 
@@ -71,6 +71,23 @@ StopReason = Literal[
 FINALIZE_REASONS = ("max_steps", "budget", "loop_detected")
 
 
+@dataclass(frozen=True)
+class TokenWeights:
+    """把 token 折算成"等效 token"的权重：预算按它计算，才能大致反映花费。
+
+    原始 token 总数反映不了花费：有前缀缓存时，大部分输入是命中缓存的部分，价格只有未命中的几十分之一
+    （阶段 4 实测 85% 命中，按原始 token 计的预算第 19 步就用完了）。
+    默认值比 DeepSeek 真实价格比例（命中:未命中:输出 ≈ 0.02 : 1 : 4）保守：换到别的厂商时不至于严重低估花费。
+    """
+
+    uncached: float = 1.0
+    cached: float = 0.1
+    output: float = 2.0
+
+    def equivalent(self, prompt: int, cached: int, completion: int) -> float:
+        return (prompt - cached) * self.uncached + cached * self.cached + completion * self.output
+
+
 class ChatModel(Protocol):
     """Agent 只依赖这一个方法 —— LLMClient 满足它，测试里的假模型也满足它。"""
 
@@ -84,16 +101,17 @@ class AgentEvent:
     """循环中发生的事件，交给 on_event 回调（终端展示、写 trace 日志都基于它）。
 
     kind:
-      run_start    任务开始         data: question, max_steps, token_budget, tools
+      run_start    任务开始         data: question, max_steps, token_budget, token_weights, tools
       step         新一轮开始       data: step
-      llm_call     一次模型调用完成 data: step, prompt_tokens, cached_tokens, completion_tokens, seconds, finish_reason
+      llm_call     一次模型调用完成 data: step, prompt_tokens, cached_tokens, completion_tokens, equivalent_tokens,
+                                          seconds, finish_reason
       thought      调用工具前的说明 data: text
       tool_call    模型请求调用工具 data: id, name, arguments
       tool_result  工具执行结果     data: id, name, content, is_error, seconds
       notice       系统干预说明     data: text   （预算提醒、重复拦截、截断处理……）
       compaction   上下文压缩       data: count, by_tool, tokens_before, tokens_after
       final        最终回答         data: text, stop_reason
-      run_end      任务结束         data: stop_reason, steps, total_tokens, seconds, error
+      run_end      任务结束         data: stop_reason, steps, total_tokens, equivalent_tokens, seconds, error
     """
 
     kind: str
@@ -109,8 +127,9 @@ class AgentResult:
     steps: int  # 调用模型的轮数（不含收尾调用）
     stop_reason: StopReason
     messages: list[dict[str, Any]]  # 完整对话历史，便于调试 / 复盘
-    total_tokens: int = 0
+    total_tokens: int = 0  # 原始 token 总数（输入 + 输出）
     error: str | None = None
+    equivalent_tokens: float = 0.0  # 按缓存折算的等效 token，预算按它计算
 
     @property
     def tool_calls(self) -> list[tuple[str, str]]:
@@ -130,8 +149,9 @@ class Agent:
         system_prompt: str | None = None,
         max_steps: int = 30,
         max_tool_result_chars: int = 8000,
-        token_budget: int = 500_000,
+        token_budget: int = 300_000,
         budget_warn_ratio: float = 0.8,
+        token_weights: TokenWeights | None = None,
         tool_timeout: float = 60.0,
         max_blocked_repeats: int = 3,
         compactor: ContextCompactor | None = None,
@@ -144,6 +164,7 @@ class Agent:
         self.max_tool_result_chars = max_tool_result_chars
         self.token_budget = token_budget
         self.budget_warn_ratio = budget_warn_ratio
+        self.token_weights = token_weights or TokenWeights()
         self.tool_timeout = tool_timeout
         self.max_blocked_repeats = max_blocked_repeats
         self.compactor = compactor
@@ -156,6 +177,7 @@ class Agent:
     def run(self, question: str) -> AgentResult:
         # 每次 run 的状态都重新初始化
         self._tokens = 0
+        self._equiv = 0.0  # 等效 token，预算按它计算
         self._last_prompt = 0  # 上一次调用的真实输入 token 数（接口返回）
         self._len_at_last_call = 0  # 上一次调用时 messages 的长度：之后追加的部分需要估算
         self._steps = 0
@@ -174,6 +196,7 @@ class Agent:
             question=question,
             max_steps=self.max_steps,
             token_budget=self.token_budget,
+            token_weights=asdict(self.token_weights),
             tools=self.registry.names,
         )
         started = time.perf_counter()
@@ -188,10 +211,11 @@ class Agent:
             stop_reason=stop,
             steps=self._steps,
             total_tokens=self._tokens,
+            equivalent_tokens=round(self._equiv),
             seconds=round(time.perf_counter() - started, 2),
             error=error,
         )
-        return AgentResult(answer, self._steps, stop, messages, self._tokens, error)
+        return AgentResult(answer, self._steps, stop, messages, self._tokens, error, round(self._equiv))
 
     # ------------------------------------------------------------------
     # 主循环
@@ -211,9 +235,8 @@ class Agent:
             if self.compactor:
                 context_tokens = self._compact(messages, context_tokens)
 
-            # 每次调用都要把整个历史重新发一遍。不是等超了才停，而是预估"再调用一次就会超"时就收尾
-            # （收尾调用本身仍会花掉约一次的量）。
-            if self._tokens + context_tokens >= self.token_budget:
+            # 不是等超了才停，而是预估"再调用一次就会超"时就收尾（收尾调用本身仍会花掉约一次的量）
+            if self._equiv + self._project_next_call(context_tokens) >= self.token_budget:
                 return self._finalize(messages, "budget")
 
             # ---- 1. 调用模型 ----
@@ -308,14 +331,18 @@ class Agent:
         u = resp.usage
         p = u.prompt_tokens if u else 0
         c = u.completion_tokens if u else 0
+        cached = min(_cached_tokens(u), p)
+        equiv = self.token_weights.equivalent(p, cached, c)
         self._tokens += p + c
+        self._equiv += equiv
         self._last_prompt = p
         self._emit(
             "llm_call",
             step=step,
             prompt_tokens=p,
-            cached_tokens=_cached_tokens(u),
+            cached_tokens=cached,
             completion_tokens=c,
+            equivalent_tokens=round(equiv),
             seconds=round(time.perf_counter() - started, 2),
             finish_reason=resp.choices[0].finish_reason if resp.choices else None,
         )
@@ -398,12 +425,22 @@ class Agent:
                 )
         return box["r"]
 
+    def _project_next_call(self, context_tokens: int) -> float:
+        """预估下一次调用的等效 token：上次请求的部分大概率命中缓存，新增部分不会。
+
+        刚压缩过（或第一次调用）时 _last_prompt 为 0，按全部未命中保守估计。不计输出（事先无从知道）。
+        """
+        w = self.token_weights
+        reused = min(self._last_prompt, context_tokens)
+        return reused * w.cached + (context_tokens - reused) * w.uncached
+
     def _maybe_warn_budget(self, messages: list[dict[str, Any]]) -> None:
-        if self._budget_warned or self._tokens < self.token_budget * self.budget_warn_ratio:
+        if self._budget_warned or self._equiv < self.token_budget * self.budget_warn_ratio:
             return
         self._budget_warned = True
-        messages.append({"role": "user", "content": budget_warning_prompt(self._tokens, self.token_budget)})
-        self._emit("notice", text=f"token 已用 {self._tokens}/{self.token_budget}，已提醒模型尽快收尾。")
+        used = round(self._equiv)
+        messages.append({"role": "user", "content": budget_warning_prompt(used, self.token_budget)})
+        self._emit("notice", text=f"等效 token 已用 {used}/{self.token_budget}，已提醒模型尽快收尾。")
 
     def _redact_last_tool_results(self, messages: list[dict[str, Any]]) -> bool:
         """把历史末尾那一批工具结果替换成占位说明。返回是否真的替换了内容。

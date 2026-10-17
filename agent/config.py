@@ -61,8 +61,10 @@ class Settings(BaseSettings):
 
     # ---- Agent 运行保护（阶段 3）----
     agent_max_steps: int = 30  # 记笔记会占用步数，阶段 4 实测 20 步不够
-    # 单个任务累计（输入+输出）token 上限。注意它包含缓存命中的部分（很便宜），所以只是安全网，不等于花费
-    agent_token_budget: int = 500_000
+    # 单个任务的"等效 token"上限：未命中缓存的输入 × 1 + 命中缓存的输入 × 0.1 + 输出 × 2（权重见下）
+    agent_token_budget: int = 300_000
+    token_weight_cached: float = 0.1
+    token_weight_output: float = 2.0
     tool_timeout: float = 60.0  # 单次工具执行的最长秒数
 
     # ---- 上下文管理（阶段 4）----

@@ -127,13 +127,13 @@ def test_persistent_repeats_trigger_loop_detected_and_finalize(registry):
 
 
 def test_budget_warning_then_projected_overrun_finalizes(registry):
-    """调用 1 后累计 300；调用 2 后累计 800（=80%）→ 提醒；
-    第 3 步预估 800 + 500 > 1000 → 不再开始新一轮，直接收尾。"""
+    """（无缓存时等效 token = 输入 + 2×输出）调用 1 后累计 300；调用 2 后累计 900（≥80%）→ 提醒；
+    第 3 步预估：上次输入 600 按缓存价 60 + 新增部分全价 → 900 + 60 + 新增 > 1000 → 不再开始新一轮，直接收尾。"""
     res, llm, events = run(
         [
             completion(tool_calls=[("c1", "echo", {"text": "1"})], prompt_tokens=300, completion_tokens=0),
-            completion(tool_calls=[("c2", "echo", {"text": "2"})], prompt_tokens=500, completion_tokens=0),
-            completion("收尾", prompt_tokens=520, completion_tokens=0),
+            completion(tool_calls=[("c2", "echo", {"text": "2"})], prompt_tokens=600, completion_tokens=0),
+            completion("收尾", prompt_tokens=620, completion_tokens=0),
         ],
         registry,
         token_budget=1000,
@@ -141,10 +141,43 @@ def test_budget_warning_then_projected_overrun_finalizes(registry):
     assert res.stop_reason == "budget"
     assert res.answer == "收尾"
     final_msgs = llm.requests[-1]["messages"]
-    warnings = [m for m in final_msgs if "已使用 800 / 1000" in str(m.get("content"))]
+    warnings = [m for m in final_msgs if "已使用 900 / 1000" in str(m.get("content"))]
     assert len(warnings) == 1 and warnings[0]["role"] == "user"  # 只提醒一次
     assert final_msgs[-1]["content"] == finalize_prompt("budget")
     assert llm.requests[-1]["tool_choice"] == "none"
+
+
+def _cached_completion(content=None, tool_calls=None, prompt=0, cached=0, out=0):
+    resp = completion(content, tool_calls=tool_calls, prompt_tokens=prompt, completion_tokens=out)
+    usage = type(resp.usage).model_validate(
+        {"prompt_tokens": prompt, "completion_tokens": out, "total_tokens": prompt + out, "prompt_cache_hit_tokens": cached}
+    )
+    return resp.model_copy(update={"usage": usage})
+
+
+def test_budget_counts_cached_tokens_at_discount(registry):
+    """阶段 4 实测的情形：输入大部分命中缓存。按原始 token 早就超预算了，按等效 token 还很宽裕。"""
+    responses = [
+        _cached_completion(tool_calls=[(f"c{i}", "echo", {"text": str(i)})], prompt=1000, cached=900, out=10)
+        for i in range(5)
+    ] + [_cached_completion("done", prompt=1000, cached=900, out=50)]
+    res, _, events = run(responses, registry, token_budget=2000)
+
+    assert res.stop_reason == "final_answer"
+    assert res.total_tokens == 6 * 1000 + 5 * 10 + 50  # 原始 6100，远超 2000
+    # 等效：每次 100×1 + 900×0.1 + 输出×2
+    assert res.equivalent_tokens == 5 * (100 + 90 + 20) + (100 + 90 + 100)
+    calls = [e.data for e in events if e.kind == "llm_call"]
+    assert calls[0]["equivalent_tokens"] == 210
+    assert events[-1].data["equivalent_tokens"] == res.equivalent_tokens
+
+
+def test_custom_token_weights(registry):
+    from agent.loop import TokenWeights
+
+    w = TokenWeights(uncached=1, cached=1, output=1)  # 等同于原始 token 计数
+    res, _, _ = run([_cached_completion("x", prompt=1000, cached=900, out=10)], registry, token_weights=w)
+    assert res.equivalent_tokens == res.total_tokens == 1010
 
 
 def test_budget_allows_normal_finish(registry):

@@ -19,6 +19,7 @@ from pathlib import Path
 from rich.table import Table
 
 from agent.display import STOP_REASON_LABELS, console
+from agent.loop import TokenWeights
 from agent.trace import TRACE_FILE, read_trace
 from agent.workspace import WORKSPACE_ROOT
 from tools.notes import NOTES_FILE
@@ -46,6 +47,13 @@ class RunStats:
     compactions: int = 0
     compacted_saved: int = 0
     report_chars: int = 0
+
+    @property
+    def equivalent_tokens(self) -> int | None:
+        """用默认权重统一折算（不用日志里记录的值），保证不同配置的运行可以直接比较。"""
+        if self.cached_tokens is None:
+            return None
+        return round(TokenWeights().equivalent(self.input_tokens, self.cached_tokens, self.output_tokens))
 
     @property
     def uncached_tokens(self) -> int | None:
@@ -122,6 +130,7 @@ ROWS: list[tuple[str, str, bool]] = [
     ("  其中缓存命中", "cached_tokens", False),
     ("  未命中缓存（贵）", "uncached_tokens", True),
     ("累计输出 tokens", "output_tokens", True),
+    ("等效 tokens（≈花费）", "equivalent_tokens", True),
     ("最后一次上下文", "final_context", True),
     ("峰值上下文", "peak_context", True),
     ("搜索次数", "searches", False),
@@ -156,7 +165,7 @@ def render(stats: list[RunStats]) -> Table:
                 for v, s in zip(values, stats)
             ]
             values = [None] * len(values)  # 有"未记录"时不算增减
-        elif attr == "uncached_tokens":
+        elif attr in ("uncached_tokens", "equivalent_tokens"):
             cells = ["未记录" if v is None else str(v) for v in values]
         else:
             cells = [f"{v:.1f}" if isinstance(v, float) else str(v) for v in values]

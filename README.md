@@ -41,7 +41,7 @@ python main.py "DeepSeek 最新模型支持哪些功能？"
 python main.py                         # 研究模式交互（每个问题独立运行）
 python main.py --chat                  # 纯对话模式（阶段 0，无工具）
 python main.py --provider qwen "..."   # 临时切换厂商
-python main.py --max-steps 40 --budget 800000 "..."   # 调整步数 / token 预算（默认 30 步 / 50 万）
+python main.py --max-steps 40 --budget 400000 "..."   # 调整步数 / 等效 token 预算（默认 30 步 / 30 万）
 python -m agent.replay                 # 回放最近一次任务的运行日志（不花钱）
 python -m agent.replay <任务目录> --full
 python -m agent.compare --last 2       # 对比最近两次运行的 token、缓存、笔记、引用等指标
@@ -90,7 +90,7 @@ pytest
 
 | 情况 | Agent 的反应 |
 |---|---|
-| 步数用完 / 预计下一次调用会超出 token 预算 / 反复重复调用 | 不再提供工具，强制模型基于已有资料收尾；没写报告就把收尾回答存为 `report.md` |
+| 步数用完 / 预计下一次调用会超出 token 预算 / 反复重复调用 | 禁止再调用工具，强制模型基于已有资料收尾；没写报告就把收尾回答存为 `report.md` |
 | token 用到预算 80% | 提醒模型尽快写报告 |
 | 同一工具、同样参数再次调用 | 成功过的不再执行（失败的允许重试至多 3 次） |
 | 工具执行超过 `TOOL_TIMEOUT` 秒 | 放弃本次调用，告诉模型换个方法 |
@@ -100,6 +100,17 @@ pytest
 | 网页直接下载失败（403、需 JS、PDF、网络不通） | 改用 Jina Reader 读取（`FETCH_FALLBACK=none` 可关闭） |
 
 相关参数都在 `.env` 中（见 `.env.example`）。
+
+**token 预算按“等效 token”计算**，尽量反映真实花费，而不是原始 token 数：
+
+```
+等效 token = 未命中缓存的输入 × 1 + 命中缓存的输入 × 0.1 + 输出 × 2
+```
+
+有前缀缓存的厂商上，研究任务 80% 以上的输入都命中缓存（价格只有几十分之一），按原始 token 计预算会过早用完。
+默认权重比 DeepSeek 实际价格比例（约 0.02 : 1 : 4）保守，换到其他厂商也不易低估花费；可用 `TOKEN_WEIGHT_CACHED`、`TOKEN_WEIGHT_OUTPUT` 调整。
+
+强制收尾时照常发送工具说明书、用 `tool_choice="none"` 禁止调用——这样请求开头不变，仍能命中缓存。
 
 ## 上下文管理
 

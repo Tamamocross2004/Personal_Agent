@@ -36,7 +36,7 @@ def show_event(ev: AgentEvent, full: bool = False) -> None:
         console.print(Text.assemble(("问题：", "bold"), d.get("question", "")))
         console.print(
             f"[dim]工具：{', '.join(d.get('tools', []))} | 最多 {d.get('max_steps')} 步 | "
-            f"token 预算 {d.get('token_budget')}[/]"
+            f"等效 token 预算 {d.get('token_budget')}[/]"
         )
     elif k == "step":
         console.rule(f"[dim]Step {d['step']}[/]", style="dim")
@@ -82,7 +82,7 @@ def show_event(ev: AgentEvent, full: bool = False) -> None:
         style = "green" if reason == "final_answer" else "yellow"
         line = (
             f"结束：{STOP_REASON_LABELS.get(reason, reason)} | {d.get('steps')} 步 | "
-            f"{d.get('total_tokens')} tokens | {d.get('seconds')}s"
+            f"{d.get('total_tokens')} tokens（等效 {d.get('equivalent_tokens', '—')}）| {d.get('seconds')}s"
         )
         console.print(f"[{style}]{line}[/]")
         if d.get("error"):

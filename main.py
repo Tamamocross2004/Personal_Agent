@@ -5,7 +5,7 @@
     python main.py                                     # 研究模式：交互式，每个问题独立运行
     python main.py --chat                              # 阶段 0 的纯对话模式（无工具）
     python main.py --provider qwen "..."               # 临时切换厂商
-    python main.py --max-steps 30 --budget 500000 "..."
+    python main.py --max-steps 40 --budget 400000 "..."
 
 每个问题的产物保存在 workspace/<时间>-<问题>/ 目录下：
     *.md           研究报告
@@ -31,7 +31,7 @@ from agent.config import PROVIDERS, Settings, load_llm_config
 from agent.context import ContextCompactor
 from agent.display import console, show_event, usage_table
 from agent.llm import LLMClient
-from agent.loop import FINALIZE_REASONS, Agent, AgentResult
+from agent.loop import FINALIZE_REASONS, Agent, AgentResult, TokenWeights
 from agent.prompts import CHAT_SYSTEM_PROMPT, research_system_prompt
 from agent.trace import MESSAGES_FILE, TRACE_FILE, TraceWriter, fanout, save_messages
 from agent.workspace import new_task_dir
@@ -48,7 +48,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("--provider", choices=list(PROVIDERS), help="覆盖 .env 中的 LLM_PROVIDER")
     p.add_argument("--model", help="覆盖模型名")
     p.add_argument("--max-steps", type=int, help="最大循环步数（默认取 .env 的 AGENT_MAX_STEPS，20）")
-    p.add_argument("--budget", type=int, help="token 预算（默认取 .env 的 AGENT_TOKEN_BUDGET，300000）")
+    p.add_argument("--budget", type=int, help="等效 token 预算（默认取 .env 的 AGENT_TOKEN_BUDGET，300000）")
     p.add_argument("-v", "--verbose", action="store_true", help="打印调试日志（含重试信息）")
     return p.parse_args(argv)
 
@@ -97,6 +97,7 @@ def research(llm: LLMClient, settings: Settings, question: str, max_steps: int, 
         system_prompt=research_system_prompt(date.today().isoformat()),
         max_steps=max_steps,
         token_budget=budget,
+        token_weights=TokenWeights(cached=settings.token_weight_cached, output=settings.token_weight_output),
         tool_timeout=settings.tool_timeout,
         compactor=compactor,
         on_event=fanout(show_event, tracer),

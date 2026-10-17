@@ -60,7 +60,7 @@ def finalize_prompt(reason: str) -> str:
 
 def budget_warning_prompt(used: int, budget: int) -> str:
     return (
-        f"【系统通知】本任务已使用 {used} / {budget} tokens（{used / budget:.0%}）。"
+        f"【系统通知】本任务已使用 {used} / {budget} 等效 tokens 的预算（{used / budget:.0%}）。"
         "请停止扩展搜索范围，基于已有资料尽快调用 write_report 写报告并收尾。"
     )
 
