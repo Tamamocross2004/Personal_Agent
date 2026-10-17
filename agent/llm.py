@@ -104,6 +104,8 @@ class LLMClient:
             "temperature": self.config.temperature,
             **kwargs,
         }
+        if self.config.max_tokens and "max_tokens" not in params:
+            params["max_tokens"] = self.config.max_tokens
         if tools:  # 有些厂商对 tools=[] 会报错，空时干脆不传
             params["tools"] = tools
 

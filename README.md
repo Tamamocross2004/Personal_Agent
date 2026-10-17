@@ -9,7 +9,7 @@
 - [x] 阶段 0：环境搭建 + LLM 客户端（多厂商切换、重试、token 统计）
 - [x] 阶段 1：最小 Agent 循环（工具注册表 + tool calling 循环 + 基础工具）
 - [x] 阶段 2：搜索 / 读网页 / 写报告（ddgs + trafilatura，分段阅读，报告落盘）
-- [ ] 阶段 3：错误处理与健壮性
+- [x] 阶段 3：错误处理与健壮性（运行日志与回放、循环保护、token 预算、异常回复处理、Jina 备用通道）
 - [ ] 阶段 4：笔记与上下文管理
 - [ ] 阶段 5：规划与反思
 - [ ] 阶段 6：代码执行
@@ -41,7 +41,9 @@ python main.py "DeepSeek 最新模型支持哪些功能？"
 python main.py                         # 研究模式交互（每个问题独立运行）
 python main.py --chat                  # 纯对话模式（阶段 0，无工具）
 python main.py --provider qwen "..."   # 临时切换厂商
-python main.py --max-steps 30 "..."    # 调整最大循环步数（默认 20）
+python main.py --max-steps 30 --budget 500000 "..."   # 调整步数 / token 预算
+python -m agent.replay                 # 回放最近一次任务的运行日志（不花钱）
+python -m agent.replay <任务目录> --full
 
 # 5. 测试（无需 API Key）
 pytest
@@ -67,7 +69,32 @@ pytest
 ╰──────────────────────────────────╯
 ```
 
-报告保存在 `workspace/<时间>-<问题摘要>/` 下（该目录已被 git 忽略）。
+紫色 `⚠` 是系统干预（预算提醒、拦截重复调用、截断处理等），每次模型调用下方的灰色小字是本次的 token 和耗时。
+
+每个问题有自己的目录 `workspace/<时间>-<问题摘要>/`（已被 git 忽略）：
+
+| 文件 | 内容 |
+|---|---|
+| `*.md` | 研究报告 |
+| `trace.jsonl` | 运行日志，每行一个事件（模型调用、工具调用、结果、耗时、token……），用 `python -m agent.replay` 回放 |
+| `messages.json` | 结束时完整的对话历史，排查“模型为什么这么做”时看这里 |
+
+运行中按 **Ctrl+C** 会立即停止当前任务，日志照常保存。
+
+## 运行保护
+
+| 情况 | Agent 的反应 |
+|---|---|
+| 步数用完 / token 预算用完 / 反复重复调用 | 不再提供工具，强制模型基于已有资料收尾；没写报告就把收尾回答存为 `report.md` |
+| token 用到预算 80% | 提醒模型尽快写报告 |
+| 同一工具、同样参数再次调用 | 成功过的不再执行（失败的允许重试至多 3 次） |
+| 工具执行超过 `TOOL_TIMEOUT` 秒 | 放弃本次调用，告诉模型换个方法 |
+| 回复被截断 | 写报告被截断时提示分段写（`mode="append"`）；文字回答被截断时让模型接着写 |
+| 内容审核拦截 | 移除最近读入的网页内容后重试一次 |
+| 上下文超长、Key 错误等 | 干净结束并说明原因 |
+| 网页直接下载失败（403、需 JS、PDF、网络不通） | 改用 Jina Reader 读取（`FETCH_FALLBACK=none` 可关闭） |
+
+相关参数都在 `.env` 中（见 `.env.example`）。
 
 黄色 `→` 是模型请求的工具调用，绿色 `←` 是工具结果，红色表示工具出错（错误会回传给模型，让它自行修正）。
 
@@ -89,8 +116,8 @@ pytest
 | 工具 | 作用 | 为什么需要 |
 |---|---|---|
 | `web_search(query, max_results)` | 联网搜索，返回标题 / URL / 摘要 | 模型的知识有截止日期；当前使用 ddgs（DuckDuckGo 等，免费无 Key） |
-| `fetch_url(url, start)` | 读取网页正文（去广告导航），长文分段 | 原始 HTML 太长太脏；分段阅读避免一次撑爆上下文 |
-| `write_report(content, filename)` | 把 Markdown 报告存到任务目录 | 产出最终成果；文件名经过清洗，只能写进任务目录 |
+| `fetch_url(url, start)` | 读取网页正文（去广告导航），长文分段；失败时可经 Jina Reader 读取 | 原始 HTML 太长太脏；分段阅读避免一次撑爆上下文 |
+| `write_report(content, filename, mode)` | 把 Markdown 报告存到任务目录，`mode="append"` 可分段追加 | 产出最终成果；文件名经过清洗，只能写进任务目录 |
 | `get_current_time(timezone)` | 当前日期、时间、星期 | 模型不知道"今天"是哪天 |
 | `days_between(start_date, end_date)` | 两个日期相差的天数 | 大小月、闰年容易算错 |
 | `calculator(expression)` | 安全计算数学表达式 | 模型心算不可靠；基于 AST 白名单实现，不使用 `eval` |
@@ -118,20 +145,26 @@ def word_count(text: Annotated[str, Field(description="要统计的文本")]) ->
 
 > ddgs 在国内网络下可能不稳定；如果频繁报“搜索服务出错”，可以考虑换成国内的搜索 API。
 
+> 隐私提示：`FETCH_FALLBACK=jina`（默认）时，直接读取失败的网页 URL 会发送给第三方服务 Jina（r.jina.ai）。研究涉及敏感链接时请设为 `none`。
+
 ## 目录结构
 
 ```
 agent/
   config.py    # 配置加载：预设 ← .env ← 命令行
   llm.py       # LLM 客户端：OpenAI 兼容协议、tenacity 重试、用量统计
-  loop.py      # ★ Agent 主循环：调用模型 → 执行工具 → 回传结果 → 循环
-  prompts.py   # system prompt 等提示词（研究模式会注入今天的日期）
+  loop.py      # ★ Agent 主循环：调用模型 → 执行工具 → 回传结果 → 循环，以及各种运行保护
+  errors.py    # 模型接口错误分类（上下文超长 / 内容审核 / 鉴权 / 其它）
+  prompts.py   # system prompt 与各种系统提示（研究模式会注入今天的日期）
+  trace.py     # 运行日志 trace.jsonl / messages.json
+  replay.py    # python -m agent.replay：回放运行日志
+  display.py   # 终端展示（实时与回放共用）
   workspace.py # 每个任务的工作目录
 tools/
   registry.py  # 工具注册表：@tool 装饰器、JSON Schema 生成、参数校验、错误转结果
   basic.py     # 基础工具：get_current_time / days_between / calculator
   search.py    # web_search + 可替换的搜索后端（当前 ddgs）
-  fetch.py     # fetch_url：下载、正文提取、分段、缓存
+  fetch.py     # fetch_url：下载、正文提取、分段、缓存、Jina Reader 备用通道
   report.py    # write_report：安全地写报告文件
 main.py        # CLI 入口：研究模式（默认）与纯对话模式（--chat）
 tests/         # 用假模型测试，不调用真实 API

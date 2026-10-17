@@ -5,9 +5,12 @@
     python main.py                                     # 研究模式：交互式，每个问题独立运行
     python main.py --chat                              # 阶段 0 的纯对话模式（无工具）
     python main.py --provider qwen "..."               # 临时切换厂商
-    python main.py --max-steps 30 "..."                # 调整最大步数
+    python main.py --max-steps 30 --budget 500000 "..."
 
-报告保存在 workspace/<时间>-<问题>/ 目录下。
+每个问题的产物保存在 workspace/<时间>-<问题>/ 目录下：
+    *.md           研究报告
+    trace.jsonl    运行日志（python -m agent.replay <目录> 回放）
+    messages.json  完整对话历史
 """
 
 from __future__ import annotations
@@ -19,23 +22,20 @@ from datetime import date
 from typing import Any
 
 import openai
-from rich.console import Console
 from rich.logging import RichHandler
 from rich.markdown import Markdown
 from rich.panel import Panel
-from rich.table import Table
-from rich.text import Text
 
-from agent.config import PROVIDERS, load_llm_config
+from agent.config import PROVIDERS, Settings, load_llm_config
+from agent.display import console, show_event, usage_table
 from agent.llm import LLMClient
-from agent.loop import Agent, AgentEvent, pretty_arguments
+from agent.loop import FINALIZE_REASONS, Agent, AgentResult
 from agent.prompts import CHAT_SYSTEM_PROMPT, research_system_prompt
+from agent.trace import MESSAGES_FILE, TRACE_FILE, TraceWriter, fanout, save_messages
 from agent.workspace import new_task_dir
 from tools import default_registry
 
-console = Console()
-
-RESULT_PREVIEW_CHARS = 300  # 终端里工具结果只预览前 N 个字符（模型收到的是完整结果）
+FAILED_STOPS = ("context_overflow", "content_filter", "error")
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -44,56 +44,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("--chat", action="store_true", help="纯对话模式（不使用工具，阶段 0 行为）")
     p.add_argument("--provider", choices=list(PROVIDERS), help="覆盖 .env 中的 LLM_PROVIDER")
     p.add_argument("--model", help="覆盖模型名")
-    p.add_argument("--max-steps", type=int, default=20, help="Agent 最大循环步数（默认 20）")
+    p.add_argument("--max-steps", type=int, help="最大循环步数（默认取 .env 的 AGENT_MAX_STEPS，20）")
+    p.add_argument("--budget", type=int, help="token 预算（默认取 .env 的 AGENT_TOKEN_BUDGET，300000）")
     p.add_argument("-v", "--verbose", action="store_true", help="打印调试日志（含重试信息）")
     return p.parse_args(argv)
-
-
-# ---------------------------------------------------------------------------
-# 展示
-# ---------------------------------------------------------------------------
-
-
-def show_event(ev: AgentEvent) -> None:
-    """把 Agent 循环中的每个事件打印出来 —— 读懂 Agent 的关键就是看清每一步。"""
-    d = ev.data
-    if ev.kind == "step":
-        console.rule(f"[dim]Step {d['step']}[/]", style="dim")
-    elif ev.kind == "thought":
-        console.print(Text(d["text"], style="italic dim"))
-    elif ev.kind == "tool_call":
-        console.print(
-            Text.assemble(
-                ("→ 调用 ", "yellow"),
-                (d["name"], "bold yellow"),
-                ("(", "yellow"),
-                (pretty_arguments(d["arguments"], max_value_chars=80), "cyan"),
-                (")", "yellow"),
-            )
-        )
-    elif ev.kind == "tool_result":
-        content = d["content"]
-        preview = content if len(content) <= RESULT_PREVIEW_CHARS else content[:RESULT_PREVIEW_CHARS] + "…"
-        style = "red" if d["is_error"] else "green"
-        console.print(Text.assemble(("← ", style), (preview, style)))
-    elif ev.kind == "final":
-        title = "最终回答" if d["stop_reason"] == "final_answer" else "最终回答（已达步数上限）"
-        console.print(Panel(Markdown(d["text"] or "（空）"), title=f"[bold]{title}[/]", border_style="cyan"))
-
-
-def print_usage(llm: LLMClient) -> None:
-    u = llm.usage
-    t = Table(title="Token 用量", show_header=True, header_style="bold")
-    for col in ("调用次数", "输入 tokens", "输出 tokens", "合计", "耗时(s)"):
-        t.add_column(col, justify="right")
-    t.add_row(
-        str(u.calls),
-        str(u.prompt_tokens),
-        str(u.completion_tokens),
-        str(u.total_tokens),
-        f"{u.total_seconds:.2f}",
-    )
-    console.print(t)
 
 
 def read_input() -> str | None:
@@ -111,45 +65,67 @@ def read_input() -> str | None:
 
 
 # ---------------------------------------------------------------------------
-# 两种模式
+# 研究模式
 # ---------------------------------------------------------------------------
 
 
-def research(llm: LLMClient, question: str, max_steps: int) -> None:
-    """运行一次研究任务：每个问题有独立的工作目录和工具实例。"""
+def research(llm: LLMClient, settings: Settings, question: str, max_steps: int, budget: int) -> AgentResult:
+    """运行一次研究任务：独立的工作目录、工具实例和运行日志。"""
     task_dir = new_task_dir(question)
+    tracer = TraceWriter(task_dir / TRACE_FILE)
     agent = Agent(
         llm,
-        default_registry(task_dir),
+        default_registry(task_dir, fetch_fallback=settings.fetch_fallback, jina_api_key=settings.jina_api_key),
         system_prompt=research_system_prompt(date.today().isoformat()),
         max_steps=max_steps,
-        on_event=show_event,
+        token_budget=budget,
+        tool_timeout=settings.tool_timeout,
+        on_event=fanout(show_event, tracer),
     )
-    agent.run(question)
+    try:
+        result = agent.run(question)
+    finally:
+        tracer.close()
+    save_messages(task_dir / MESSAGES_FILE, result.messages)
 
-    reports = sorted(task_dir.glob("*.md")) if task_dir.exists() else []
+    reports = sorted(task_dir.glob("*.md"))
+    # 被强制收尾且没写过报告时，收尾回答本身就是（不完整的）报告，替用户存下来
+    if not reports and result.stop_reason in FINALIZE_REASONS and result.answer.strip():
+        fallback = task_dir / "report.md"
+        fallback.write_text(result.answer, encoding="utf-8")
+        reports = [fallback]
+
     for r in reports:
-        console.print(f"[bold green]报告已保存：[/]{r}")
+        console.print(f"[bold green]报告：[/]{r}")
     if not reports:
         console.print("[dim]本次没有生成报告文件。[/]")
+    console.print(f'[dim]运行日志：{task_dir}  （回放：python -m agent.replay "{task_dir}"）[/]')
+    if result.error and "AuthenticationError" in result.error:
+        console.print("[red]鉴权失败：请检查 API Key 是否正确、是否与所选厂商匹配。[/]")
+    if result.stop_reason == "context_overflow":
+        console.print("[yellow]提示：对话历史超出了模型上下文上限。可以减少 --max-steps，阶段 4 会从根本上解决。[/]")
+    return result
 
 
-def run_agent(llm: LLMClient, question: str | None, max_steps: int) -> None:
+def run_research(llm: LLMClient, settings: Settings, question: str | None, max_steps: int, budget: int) -> int:
     if question:
-        research(llm, question, max_steps)
-        return
-    console.print("[dim]研究模式：每个问题独立运行（暂无跨问题记忆），输入 exit 退出。[/]")
+        result = research(llm, settings, question, max_steps, budget)
+        if result.stop_reason == "interrupted":
+            return 130  # 约定俗成：被 Ctrl+C 中断的进程退出码
+        return 1 if result.stop_reason in FAILED_STOPS else 0
+    console.print("[dim]研究模式：每个问题独立运行（暂无跨问题记忆）。运行中按 Ctrl+C 中断当前任务，输入 exit 退出。[/]")
     while (q := read_input()) is not None:
-        try:
-            research(llm, q, max_steps)
-        except openai.AuthenticationError:
-            raise
-        except openai.APIError as e:
-            console.print(f"[red]调用失败：{type(e).__name__}: {e}[/]")
+        research(llm, settings, q, max_steps, budget)
+    return 0
 
 
-def run_chat(llm: LLMClient, question: str | None) -> None:
-    """阶段 0 的纯对话：演示 messages 列表如何承载上下文。"""
+# ---------------------------------------------------------------------------
+# 纯对话模式（阶段 0）
+# ---------------------------------------------------------------------------
+
+
+def run_chat(llm: LLMClient, question: str | None) -> int:
+    """演示 messages 列表如何承载上下文。"""
     messages: list[dict[str, Any]] = [{"role": "system", "content": CHAT_SYSTEM_PROMPT}]
 
     def answer(q: str) -> None:
@@ -162,7 +138,7 @@ def run_chat(llm: LLMClient, question: str | None) -> None:
 
     if question:
         answer(question)
-        return
+        return 0
     console.print("[dim]纯对话模式（无工具），输入 exit 退出。[/]")
     while (q := read_input()) is not None:
         try:
@@ -172,6 +148,7 @@ def run_chat(llm: LLMClient, question: str | None) -> None:
         except openai.APIError as e:
             messages.pop()  # 失败的这轮不计入历史
             console.print(f"[red]调用失败：{e}[/]")
+    return 0
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -185,30 +162,43 @@ def main(argv: list[str] | None = None) -> int:
         logging.getLogger("agent").setLevel(logging.DEBUG)
 
     try:
-        cfg = load_llm_config(provider=args.provider, model=args.model)
+        settings = Settings()
+        cfg = load_llm_config(provider=args.provider, model=args.model, settings=settings)
     except ValueError as e:
         console.print(f"[red]配置错误：{e}[/]")
         return 2
 
     llm = LLMClient(cfg)
-    mode = "纯对话" if args.chat else f"研究 Agent（最多 {args.max_steps} 步）"
+    max_steps = args.max_steps or settings.agent_max_steps
+    budget = args.budget or settings.agent_token_budget
+    mode = "纯对话" if args.chat else "研究 Agent"
     console.print(f"[dim]厂商：{cfg.provider} | 模型：{cfg.model} | 模式：{mode}[/]")
 
+    code = 0
     try:
         if args.chat:
-            run_chat(llm, args.question)
+            code = run_chat(llm, args.question)
         else:
-            run_agent(llm, args.question, args.max_steps)
+            code = run_research(llm, settings, args.question, max_steps, budget)
     except openai.AuthenticationError:
         console.print("[red]鉴权失败：请检查 API Key 是否正确、是否与所选厂商匹配。[/]")
-        return 1
+        code = 1
     except openai.APIError as e:
         console.print(f"[red]调用失败：{type(e).__name__}: {e}[/]")
-        return 1
+        code = 1
+    except KeyboardInterrupt:
+        console.print("[yellow]已退出。[/]")
+        code = 130
     finally:
-        if llm.usage.calls:
-            print_usage(llm)
-    return 0
+        u = llm.usage
+        if u.calls:
+            console.print(
+                usage_table(
+                    [(u.calls, u.prompt_tokens, u.completion_tokens, u.total_tokens, f"{u.total_seconds:.2f}")],
+                    title="本次会话 Token 用量",
+                )
+            )
+    return code
 
 
 if __name__ == "__main__":

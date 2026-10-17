@@ -17,6 +17,8 @@ def default_registry(
     task_dir: Path,
     search_backend: SearchBackend | None = None,
     http_client: httpx.Client | None = None,
+    fetch_fallback: str = "none",
+    jina_api_key: str = "",
 ) -> ToolRegistry:
     """为一次研究任务组装全部工具。
 
@@ -26,7 +28,7 @@ def default_registry(
     return ToolRegistry(
         [
             make_web_search(search_backend or DDGSBackend()),
-            make_fetch_url(http_client),
+            make_fetch_url(http_client, fallback=fetch_fallback, jina_api_key=jina_api_key),
             make_write_report(task_dir),
             calculator,
             days_between,

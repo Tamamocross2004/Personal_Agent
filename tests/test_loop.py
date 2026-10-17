@@ -4,7 +4,7 @@ import pytest
 from fakes import ScriptedLLM, completion
 
 from agent.loop import Agent, pretty_arguments
-from agent.prompts import MAX_STEPS_PROMPT
+from agent.prompts import finalize_prompt
 from tools import ToolRegistry, tool
 
 
@@ -25,8 +25,20 @@ def registry():
     return ToolRegistry([add, echo])
 
 
+# 这些事件每次运行都有，断言事件顺序时忽略它们，聚焦在控制流上
+_BOOKKEEPING = {"run_start", "run_end", "llm_call"}
+
+
+class Events(list):
+    def kinds(self):
+        return [e.kind for e in self if e.kind not in _BOOKKEEPING]
+
+    def of(self, kind):
+        return [e.data for e in self if e.kind == kind]
+
+
 def make_agent(llm, registry, **kw):
-    events = []
+    events = Events()
     agent = Agent(llm, registry, system_prompt="SYS", on_event=events.append, **kw)
     return agent, events
 
@@ -47,7 +59,7 @@ def test_direct_answer_without_tools(registry):
         {"role": "user", "content": "hi"},
     ]
     assert [t["function"]["name"] for t in req["tools"]] == ["add", "echo"]
-    assert [e.kind for e in events] == ["step", "final"]
+    assert events.kinds() == ["step", "final"]
 
 
 def test_single_tool_call_then_answer(registry):
@@ -74,7 +86,7 @@ def test_single_tool_call_then_answer(registry):
         {"id": "call_1", "type": "function", "function": {"name": "add", "arguments": '{"a": 2, "b": 3}'}}
     ]
     assert tool_msg == {"role": "tool", "tool_call_id": "call_1", "content": "5"}
-    assert [e.kind for e in events] == ["step", "tool_call", "tool_result", "step", "final"]
+    assert events.kinds() == ["step", "tool_call", "tool_result", "step", "final"]
 
 
 def test_parallel_tool_calls_each_get_a_result_in_order(registry):
@@ -96,7 +108,7 @@ def test_parallel_tool_calls_each_get_a_result_in_order(registry):
     tool_msgs = [m for m in msgs if m["role"] == "tool"]
     assert [(m["tool_call_id"], m["content"]) for m in tool_msgs] == [("c1", "2"), ("c2", "hi")]
     # 调用前的说明文字作为 thought 事件展示
-    assert events[1].kind == "thought" and events[1].data["text"] == "我先同时算两个。"
+    assert events.of("thought") == [{"text": "我先同时算两个。"}]
 
 
 def test_tool_error_is_fed_back_and_loop_continues(registry):
@@ -113,7 +125,7 @@ def test_tool_error_is_fed_back_and_loop_continues(registry):
     res = agent.run("q")
 
     assert res.answer == "3"
-    results = [e.data for e in events if e.kind == "tool_result"]
+    results = events.of("tool_result")
     assert [r["is_error"] for r in results] == [True, True, False]
     assert "不是合法的 JSON" in results[0]["content"]
     assert "不存在名为 'nope'" in results[1]["content"]
@@ -132,8 +144,8 @@ def test_max_steps_forces_final_answer_without_tools(registry):
     assert len(llm.requests) == 4
     last = llm.requests[-1]
     assert last["tools"] is None  # 收尾调用不再提供工具
-    assert last["messages"][-1] == {"role": "user", "content": MAX_STEPS_PROMPT}
-    assert events[-1].data["stop_reason"] == "max_steps"
+    assert last["messages"][-1] == {"role": "user", "content": finalize_prompt("max_steps")}
+    assert events.of("final")[-1]["stop_reason"] == "max_steps"
 
 
 def test_long_tool_result_is_truncated(registry):

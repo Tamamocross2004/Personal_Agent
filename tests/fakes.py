@@ -14,6 +14,7 @@ def completion(
     tool_calls: list[tuple[str, str, Any]] | None = None,
     prompt_tokens: int = 10,
     completion_tokens: int = 5,
+    finish_reason: str | None = None,
 ) -> ChatCompletion:
     """构造一个 ChatCompletion。
 
@@ -41,7 +42,7 @@ def completion(
             "choices": [
                 {
                     "index": 0,
-                    "finish_reason": "tool_calls" if tool_calls else "stop",
+                    "finish_reason": finish_reason or ("tool_calls" if tool_calls else "stop"),
                     "message": message,
                 }
             ],
@@ -66,4 +67,17 @@ class ScriptedLLM:
         self.requests.append({"messages": copy.deepcopy(messages), "tools": tools})
         if not self.responses:
             raise AssertionError("剧本里的回复已用完，Agent 调用模型的次数比预期多")
-        return self.responses.pop(0)
+        item = self.responses.pop(0)
+        if isinstance(item, BaseException):
+            raise item
+        return item
+
+
+def api_error(cls, message: str = "boom", status: int = 400):
+    """构造 openai 异常实例（绕过 __init__，它需要 HTTP Response 对象）。"""
+    err = cls.__new__(cls)
+    Exception.__init__(err, f"Error code: {status} - {message}")
+    err.status_code = status
+    err.body = {"error": {"message": message}}
+    err.message = message
+    return err

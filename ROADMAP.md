@@ -100,8 +100,9 @@ def run_agent(question: str, max_steps: int = 30) -> str:
 | 0 环境与单次调用 | ✅ 已完成 | 2026-10-16 | `stage-0` |
 | 1 最小 Agent 循环 | ✅ 已完成（DeepSeek 实测通过） | 2026-10-17 | `stage-1` |
 | 2 真正的研究工具 | ✅ 已完成（DeepSeek 实测通过） | 2026-10-17 | `stage-2` |
-| 3 错误处理与健壮性 | ⏳ 下一步 | | |
-| 4–9 | 未开始 | | |
+| 3 错误处理与健壮性 | ✅ 已完成（待真实模型验收） | 2026-10-17 | `stage-3` |
+| 4 笔记与上下文管理 | ⏳ 下一步 | | |
+| 5–9 | 未开始 | | |
 
 ### 阶段 0：环境与单次调用（半天）　✅ 已完成
 - 建项目、装依赖、配 `.env`。
@@ -149,7 +150,7 @@ def run_agent(question: str, max_steps: int = 30) -> str:
     修复（在 `stage-2` 标签之后单独提交）：只使用网页搜索引擎；失败重试 3 次并轮换地区（中文优先 `cn-zh`）；失败时给出统一说明。修复后用户失败的两个查询在开发环境均能返回结果。
   - ⚠️ 引用来源质量：deepseek.ai 是**非官方**站点（页面自述 not affiliated），报告称其为“第三方核对页”尚可，但没有明确提示“非官方”。另外该页称 `deepseek-chat` 已于 2026-07-24 退役，而我们的项目当天仍用 `deepseek-chat` 调用成功——**来源本身可能有误**，单一来源的事实需要交叉验证。留给阶段 5/7：来源可信度分级、关键事实多源核对。
 
-### 阶段 3：错误处理与健壮性（1 天）
+### 阶段 3：错误处理与健壮性（1 天）　✅ 已完成
 这一步决定 Agent 是“玩具”还是“能用”。
 - **工具层**：所有异常转成字符串返回给模型（模型能自己换个 URL 或换关键词重试）；网络请求加超时。
 - **LLM 层**：`tenacity` 对 429 / 5xx / 超时做指数退避重试。
@@ -157,6 +158,26 @@ def run_agent(question: str, max_steps: int = 30) -> str:
 - **循环层**：最大步数、总 token 预算、检测“连续 3 次调用同一个工具同样参数”（死循环）。
 - **追踪**：`trace.py` 把每一步（输入、输出、耗时、token）写成 JSONL；用 `rich` 在终端实时展示。
 - ✅ 验收：故意给一个打不开的 URL、断网、塞错 key，Agent 不崩溃且行为合理。
+- 📝 实际实现（工具层 / LLM 层 / 参数层在阶段 1–2 已完成，本阶段补齐其余部分）：
+  - **运行日志**：`agent/trace.py` 把每个事件写成 `trace.jsonl`（逐行 flush，崩溃也不丢），结束时保存 `messages.json`；
+    `python -m agent.replay [目录] [--full]` 不调模型即可回放。终端展示抽到 `agent/display.py`，实时和回放共用。
+    新增事件：`run_start`、`llm_call`（每次调用的 token / 耗时 / finish_reason）、`notice`（系统干预）、`run_end`；`tool_result` 带耗时。
+  - **循环保护**（`agent/loop.py`）：
+    - 重复调用检测：同一工具 + 规范化后相同的参数，成功过就不再执行（失败的允许重试至多 3 次），累计拦截 3 次判定为循环 → 强制收尾。比路线图原定的“连续 3 次”更早拦截，也不误伤合理的失败重试。
+    - token 预算（默认 30 万）：用到 80% 注入一次收尾提醒，用完强制收尾。
+    - 单个工具超时（默认 60s）：后台线程执行，分段等待以便 Windows 上 Ctrl+C 能及时响应。
+    - Ctrl+C：立即停止并写入 `run_end(interrupted)`，实测 0.2s 内响应。
+    - 强制收尾统一为 `finalize_prompt(reason)`：没写过报告就直接输出 Markdown 报告并注明不完整；`main.py` 会把它存成 `report.md`。
+  - **模型回复异常**：
+    - `finish_reason=length` + 工具调用：不执行（参数多半是半截 JSON），告诉模型分段写；`write_report` 新增 `mode="append"` 支持分段写长报告。
+    - `finish_reason=length` + 文字回答：让模型接着写，最终拼接。
+    - 空回复：提醒一次，连续两次则结束。
+    - 内容审核（DeepSeek `Content Exists Risk`、通义 `data_inspection_failed`、GLM `1301`、`finish_reason=content_filter`）：把最近一批工具结果替换为占位说明后重试一次。
+    - 上下文超长、Key 错误、模型名错误：干净结束，给出原因。错误分类在 `agent/errors.py`（各家报错文字不同，只能靠关键词）。
+  - **Jina Reader 备用通道**：直接下载遇到 403 / 超时 / 网络不通 / JS 页面 / PDF 时改走 `r.jina.ai`，结果中注明“经第三方读取”；`.env` 中 `FETCH_FALLBACK=none` 可关闭。开发环境实测知乎专栏可经 Jina 读取。
+  - **配置**：`.env` 新增 `AGENT_MAX_STEPS`、`AGENT_TOKEN_BUDGET`、`TOOL_TIMEOUT`、`LLM_MAX_TOKENS`、`FETCH_FALLBACK`、`JINA_API_KEY`；命令行新增 `--budget`。
+  - **故障注入测试**：`tests/test_loop_robustness.py`、`tests/test_trace_and_jina.py`，覆盖上面每一种情况（共 176 个用例）。
+  - 💡 踩坑：在 bash 里用 `cmd &` 启动的后台进程会忽略 SIGINT，第一次“Ctrl+C 测试”其实没发出信号——测信号处理要确保子进程的 SIGINT 是默认行为。
 
 ### 阶段 4：笔记与上下文管理 ——“短期记忆”（1–2 天）
 - 新增 `save_note(topic, content, source_url)` / `read_notes()` 工具，笔记落盘到 `notes.md`。

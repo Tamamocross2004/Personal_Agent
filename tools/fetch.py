@@ -8,6 +8,10 @@
    已下载的页面会缓存，翻页时不重复请求。
 2. 内容隔离：正文包在 <web_content> 标签里。网页内容是不可信的数据，可能藏着
    "忽略之前的指令……"之类的提示注入；system prompt 会告诉模型标签里的内容只是资料、不是指令。
+
+阶段 3：备用通道 Jina Reader（https://r.jina.ai/<URL>）
+直接下载失败（403 反爬、超时 / 网络不通、需要 JS 渲染、PDF）时，改由 Jina 的服务器去打开网页并转成 Markdown。
+代价：URL 会发送给第三方；匿名访问有频率限制。所以只在直接下载失败时才用，并在结果里注明来源通道。
 """
 
 from __future__ import annotations
@@ -15,6 +19,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Annotated
 from urllib.parse import urlparse
+
+import re
 
 import httpx
 from pydantic import Field
@@ -27,6 +33,7 @@ USER_AGENT = (
 )
 MAX_DOWNLOAD_BYTES = 5 * 1024 * 1024  # 超过 5MB 的页面不处理
 MIN_USEFUL_CHARS = 200  # 提取结果比这还短，多半是提取失败（或需要 JS 渲染的页面）
+JINA_ENDPOINT = "https://r.jina.ai/"
 
 
 @dataclass
@@ -35,17 +42,22 @@ class Page:
     title: str
     date: str | None
     text: str
+    via: str | None = None  # 经由哪个备用通道读取（None 表示直接下载）
 
 
 class FetchError(Exception):
-    pass
+    """fallback_ok：这种失败换备用通道是否可能成功（URL 写错、文件过大之类就没必要）。"""
+
+    def __init__(self, message: str, fallback_ok: bool = True):
+        super().__init__(message)
+        self.fallback_ok = fallback_ok
 
 
 def download(client: httpx.Client, url: str) -> tuple[bytes, str, str]:
     """下载页面，返回 (内容, content-type, 最终 URL)。限制大小，防止下载超大文件。"""
     parsed = urlparse(url)
     if parsed.scheme not in ("http", "https") or not parsed.netloc:
-        raise FetchError(f"URL 无效：{url!r}（只支持 http/https 链接）")
+        raise FetchError(f"URL 无效：{url!r}（只支持 http/https 链接）", fallback_ok=False)
 
     with client.stream("GET", url) as resp:
         if resp.status_code >= 400:
@@ -55,7 +67,7 @@ def download(client: httpx.Client, url: str) -> tuple[bytes, str, str]:
         for chunk in resp.iter_bytes():
             size += len(chunk)
             if size > MAX_DOWNLOAD_BYTES:
-                raise FetchError("页面过大（超过 5MB），请换一个来源")
+                raise FetchError("页面过大（超过 5MB），请换一个来源", fallback_ok=False)
             chunks.append(chunk)
         return b"".join(chunks), ctype, str(resp.url)
 
@@ -63,11 +75,11 @@ def download(client: httpx.Client, url: str) -> tuple[bytes, str, str]:
 def extract(content: bytes, ctype: str, url: str) -> Page:
     """把原始内容变成干净正文。"""
     if "pdf" in ctype or url.lower().endswith(".pdf"):
-        raise FetchError("暂不支持 PDF，请寻找该内容的网页版本")
+        raise FetchError("暂不支持直接解析 PDF，请寻找该内容的网页版本")
     if ctype.startswith("text/plain") or "json" in ctype or "markdown" in ctype:
         return Page(url, "", None, content.decode("utf-8", errors="replace"))
     if ctype and "html" not in ctype and "xml" not in ctype:
-        raise FetchError(f"不支持的内容类型：{ctype}")
+        raise FetchError(f"不支持的内容类型：{ctype}", fallback_ok=False)
 
     import trafilatura  # 延迟导入：库较重
 
@@ -103,6 +115,48 @@ def _extract_with_bs4(content: bytes) -> str:
     return "\n".join(line for line in lines if line)
 
 
+_JINA_FIELD = re.compile(r"^(Title|URL Source|Published Time):\s*(.*)$", re.MULTILINE)
+
+
+def fetch_via_jina(client: httpx.Client, url: str, api_key: str = "") -> Page:
+    """通过 Jina Reader 读取。返回格式：若干 "字段: 值" 行，然后 "Markdown Content:" 后面是正文。"""
+    headers = {
+        "X-Return-Format": "markdown",
+        "X-Retain-Images": "none",  # 去掉图片链接，省 token
+        "X-Remove-Selector": "header, nav, footer, aside",
+    }
+    if api_key:
+        headers["Authorization"] = f"Bearer {api_key}"
+    try:
+        resp = client.get(JINA_ENDPOINT + url, headers=headers, timeout=httpx.Timeout(45.0, connect=10.0))
+    except httpx.TimeoutException as e:
+        raise FetchError("Jina 请求超时") from e
+    except httpx.HTTPError as e:
+        raise FetchError(f"Jina 网络错误：{type(e).__name__}") from e
+    if resp.status_code != 200:
+        try:
+            msg = resp.json().get("readableMessage") or resp.text
+        except ValueError:
+            msg = resp.text
+        raise FetchError(f"Jina 返回 HTTP {resp.status_code}：{msg[:200]}")
+
+    raw = resp.text
+    head, sep, body = raw.partition("Markdown Content:")
+    if not sep:
+        head, body = "", raw
+    fields = dict(_JINA_FIELD.findall(head))
+    text = body.strip()
+    if not text:
+        raise FetchError("Jina 也没能提取到正文")
+    return Page(
+        url=fields.get("URL Source") or url,
+        title=fields.get("Title", ""),
+        date=fields.get("Published Time") or None,
+        text=text,
+        via="Jina Reader",
+    )
+
+
 def format_chunk(page: Page, start: int, chunk_chars: int) -> str:
     total = len(page.text)
     if start >= total:
@@ -113,6 +167,8 @@ def format_chunk(page: Page, start: int, chunk_chars: int) -> str:
         header.append(f"标题: {page.title}")
     if page.date:
         header.append(f"发布日期: {page.date}")
+    if page.via:
+        header.append(f"读取方式: 直接下载失败，经第三方 {page.via} 读取（排版可能含少量导航残留）")
     header.append(f"正文: 第 {start}–{end} 字符，共 {total} 字符")
     footer = (
         f"（还有 {total - end} 字符未读，如需继续阅读请调用 fetch_url(url, start={end})）"
@@ -122,7 +178,12 @@ def format_chunk(page: Page, start: int, chunk_chars: int) -> str:
     return "\n".join(header) + f"\n<web_content>\n{page.text[start:end]}\n</web_content>\n" + footer
 
 
-def make_fetch_url(client: httpx.Client | None = None, chunk_chars: int = 6000) -> Tool:
+def make_fetch_url(
+    client: httpx.Client | None = None,
+    chunk_chars: int = 6000,
+    fallback: str = "none",
+    jina_api_key: str = "",
+) -> Tool:
     http = client or httpx.Client(
         headers={"User-Agent": USER_AGENT, "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"},
         follow_redirects=True,
@@ -141,13 +202,24 @@ def make_fetch_url(client: httpx.Client | None = None, chunk_chars: int = 6000) 
         page = cache.get(url)
         if page is None:
             try:
-                content, ctype, final_url = download(http, url)
-            except httpx.TimeoutException as e:
-                raise FetchError("请求超时，请换一个来源") from e
-            except httpx.HTTPError as e:
-                raise FetchError(f"网络错误：{type(e).__name__}: {e}") from e
-            page = extract(content, ctype, final_url)
+                page = _fetch_direct(url)
+            except FetchError as e:
+                if fallback != "jina" or not e.fallback_ok:
+                    raise
+                try:
+                    page = fetch_via_jina(http, url, jina_api_key)
+                except FetchError as je:
+                    raise FetchError(f"{e}；备用通道也失败：{je}。请换一个来源") from je
             cache[url] = page
         return format_chunk(page, start, chunk_chars)
+
+    def _fetch_direct(url: str) -> Page:
+        try:
+            content, ctype, final_url = download(http, url)
+        except httpx.TimeoutException as e:
+            raise FetchError("请求超时，请换一个来源") from e
+        except httpx.HTTPError as e:
+            raise FetchError(f"网络错误：{type(e).__name__}: {e}") from e
+        return extract(content, ctype, final_url)
 
     return fetch_url

@@ -76,3 +76,17 @@ def test_new_task_dir_is_unique_and_not_created(tmp_path):
     a.mkdir()
     b = new_task_dir("问题", root=tmp_path, now=now)
     assert b.name == "20261017-093000-问题-2"
+
+
+def test_write_report_append_mode(tmp_path):
+    reg = ToolRegistry([make_write_report(tmp_path)])
+    reg.execute("write_report", {"content": "# 第一部分"})
+    r = reg.execute("write_report", {"content": "## 第二部分", "mode": "append"})
+    assert "已追加" in r.content
+    assert (tmp_path / "report.md").read_text(encoding="utf-8") == "# 第一部分\n\n## 第二部分"
+
+
+def test_write_report_append_to_missing_file_creates_it(tmp_path):
+    reg = ToolRegistry([make_write_report(tmp_path)])
+    reg.execute("write_report", {"content": "x", "mode": "append"})
+    assert (tmp_path / "report.md").read_text(encoding="utf-8") == "x"

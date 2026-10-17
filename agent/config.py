@@ -56,6 +56,20 @@ class Settings(BaseSettings):
     llm_temperature: float = 0.3
     llm_timeout: float = 60.0
     llm_max_retries: int = 3
+    # 单次回复的最大输出 token。不设置则用厂商默认值（各家上限不同，设太大会报 400）
+    llm_max_tokens: int | None = None
+
+    # ---- Agent 运行保护（阶段 3）----
+    agent_max_steps: int = 20
+    agent_token_budget: int = 300_000  # 单个任务累计（输入+输出）token 上限
+    tool_timeout: float = 60.0  # 单次工具执行的最长秒数
+
+    # ---- 读网页 ----
+    # 直接下载失败（403、需 JS 渲染、PDF、网络不通等）时的备用通道：
+    #   jina：通过 r.jina.ai 读取。注意：要读的 URL 会发送给第三方服务 Jina
+    #   none：不使用备用通道
+    fetch_fallback: Literal["jina", "none"] = "jina"
+    jina_api_key: str = ""  # 可选。不填为匿名访问（有频率限制）
 
 
 @dataclass(frozen=True)
@@ -69,6 +83,7 @@ class LLMConfig:
     temperature: float
     timeout: float
     max_retries: int
+    max_tokens: int | None = None
 
 
 def load_llm_config(
@@ -106,4 +121,5 @@ def load_llm_config(
         temperature=s.llm_temperature,
         timeout=s.llm_timeout,
         max_retries=s.llm_max_retries,
+        max_tokens=s.llm_max_tokens,
     )
