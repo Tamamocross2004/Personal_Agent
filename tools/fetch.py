@@ -265,13 +265,15 @@ def make_fetch_url(
     chunk_chars: int = 6000,
     fallback: str = "none",
     jina_api_key: str = "",
+    pages: dict[str, Page] | None = None,
 ) -> Tool:
+    """pages：页面缓存，传入 ResearchSession.pages 即可与笔记等工具共享"读过哪些网页"。"""
     http = client or httpx.Client(
         headers={"User-Agent": USER_AGENT, "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"},
         follow_redirects=True,
         timeout=httpx.Timeout(15.0, connect=10.0),
     )
-    cache: dict[str, Page] = {}
+    cache: dict[str, Page] = pages if pages is not None else {}
 
     @tool(name="fetch_url")
     def fetch_url(

@@ -23,6 +23,10 @@
 - 上下文超长、Key 错误等无法恢复的错误：干净地结束并给出原因
 - Ctrl+C：立即停止，但已发生的一切都通过事件写进了日志
 
+阶段 4：上下文管理（agent/context.py）
+- 每轮调用前估算上下文大小，超过阈值时把旧的网页原文 / 搜索摘要替换成占位说明
+- 被压缩的网页允许再次 fetch_url（否则会被重复调用检测拦下）
+
 无论以哪种方式结束，run() 都会返回 AgentResult，并发出 run_end 事件，不会把异常抛给调用方。
 """
 
@@ -38,6 +42,7 @@ from typing import Any, Callable, Literal, Protocol
 import openai
 from openai.types.chat import ChatCompletion, ChatCompletionMessage
 
+from agent.context import ContextCompactor, estimate_messages, estimate_tools
 from agent.errors import classify_api_error
 from agent.prompts import (
     CONTINUE_PROMPT,
@@ -86,6 +91,7 @@ class AgentEvent:
       tool_call    模型请求调用工具 data: id, name, arguments
       tool_result  工具执行结果     data: id, name, content, is_error, seconds
       notice       系统干预说明     data: text   （预算提醒、重复拦截、截断处理……）
+      compaction   上下文压缩       data: count, by_tool, tokens_before, tokens_after
       final        最终回答         data: text, stop_reason
       run_end      任务结束         data: stop_reason, steps, total_tokens, seconds, error
     """
@@ -128,6 +134,7 @@ class Agent:
         budget_warn_ratio: float = 0.8,
         tool_timeout: float = 60.0,
         max_blocked_repeats: int = 3,
+        compactor: ContextCompactor | None = None,
         on_event: EventHandler | None = None,
     ):
         self.llm = llm
@@ -139,6 +146,7 @@ class Agent:
         self.budget_warn_ratio = budget_warn_ratio
         self.tool_timeout = tool_timeout
         self.max_blocked_repeats = max_blocked_repeats
+        self.compactor = compactor
         self.on_event = on_event
 
     # ------------------------------------------------------------------
@@ -148,11 +156,14 @@ class Agent:
     def run(self, question: str) -> AgentResult:
         # 每次 run 的状态都重新初始化
         self._tokens = 0
-        self._last_prompt = 0  # 上一次调用的输入 token 数，用来预估下一次调用的开销
+        self._last_prompt = 0  # 上一次调用的真实输入 token 数（接口返回）
+        self._len_at_last_call = 0  # 上一次调用时 messages 的长度：之后追加的部分需要估算
         self._steps = 0
         self._budget_warned = False
         self._blocked = 0
         self._call_stats: dict[tuple[str, str], list[int]] = {}  # 调用签名 → [调用次数, 成功次数]
+        if self.compactor:
+            self.compactor.reset()
 
         messages: list[dict[str, Any]] = [
             {"role": "system", "content": self.system_prompt},
@@ -195,9 +206,14 @@ class Agent:
             self._steps = step
             self._emit("step", step=step)
 
-            # 每次调用都要把整个历史重新发一遍，下一次的输入至少和上一次一样大。
-            # 所以不是等超了才停，而是预估"再调用一次就会超"时就收尾（收尾调用本身仍会花掉约一次的量）。
-            if self._tokens + self._last_prompt >= self.token_budget:
+            # 估算这次请求的上下文大小；超过阈值就先压缩
+            context_tokens = self._estimate_context(messages, tools)
+            if self.compactor:
+                context_tokens = self._compact(messages, context_tokens)
+
+            # 每次调用都要把整个历史重新发一遍。不是等超了才停，而是预估"再调用一次就会超"时就收尾
+            # （收尾调用本身仍会花掉约一次的量）。
+            if self._tokens + context_tokens >= self.token_budget:
                 return self._finalize(messages, "budget")
 
             # ---- 1. 调用模型 ----
@@ -283,6 +299,7 @@ class Agent:
         self, messages: list[dict[str, Any]], tools: list[dict[str, Any]] | None, step: int | None
     ) -> ChatCompletion:
         started = time.perf_counter()
+        self._len_at_last_call = len(messages)
         resp = self.llm.chat(messages, tools=tools)
         u = resp.usage
         p = u.prompt_tokens if u else 0
@@ -299,6 +316,38 @@ class Agent:
             finish_reason=resp.choices[0].finish_reason if resp.choices else None,
         )
         return resp
+
+    def _estimate_context(self, messages: list[dict[str, Any]], tools: list[dict[str, Any]] | None) -> int:
+        """下一次请求的输入 token 估算 = 上一次的真实输入 + 之后新增消息的估算。
+
+        以接口返回的真实数字为基准，只估算增量，比整体估算准得多。
+        """
+        if not self._last_prompt:
+            return estimate_messages(messages) + estimate_tools(tools)
+        return self._last_prompt + estimate_messages(messages[self._len_at_last_call :])
+
+    def _compact(self, messages: list[dict[str, Any]], context_tokens: int) -> int:
+        result = self.compactor.maybe_compact(messages, context_tokens)  # type: ignore[union-attr]
+        if not result:
+            return context_tokens
+        # 被压缩的网页允许再次读取：清掉它在重复调用检测里的"成功"记录
+        for name, arguments in result.compacted:
+            self._call_stats.pop((name, _normalize_args(arguments)), None)
+        # 历史中间被改动过，"上次真实值 + 增量"的基准失效，下次改为整体估算
+        self._last_prompt = 0
+        parts = "、".join(f"{n} × {c}" for n, c in result.by_tool.items())
+        self._emit(
+            "compaction",
+            count=len(result.compacted),
+            by_tool=result.by_tool,
+            tokens_before=result.tokens_before,
+            tokens_after=result.tokens_after,
+        )
+        self._emit(
+            "notice",
+            text=f"压缩上下文：移出 {parts} 的旧结果，约 {result.tokens_before} → {result.tokens_after} tokens",
+        )
+        return result.tokens_after
 
     def _run_tool(self, name: str, arguments: str) -> tuple[ToolResult, float]:
         """执行一次工具调用：先做重复检测，再带超时执行。"""

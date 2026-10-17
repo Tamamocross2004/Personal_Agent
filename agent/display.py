@@ -69,6 +69,8 @@ def show_event(ev: AgentEvent, full: bool = False) -> None:
         secs = d.get("seconds")
         suffix = f"  [{secs:.1f}s]" if secs else ""
         console.print(Text.assemble(("← ", style), (content, style), (suffix, "dim")))
+    elif k == "compaction":
+        pass  # 终端上由紧随其后的 notice 事件展示；这里只是为了让 trace 里有结构化数据
     elif k == "notice":
         console.print(Text.assemble(("⚠ ", "bold magenta"), (d["text"], "magenta")))
     elif k == "final":

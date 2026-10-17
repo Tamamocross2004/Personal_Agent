@@ -49,6 +49,8 @@ def test_default_registry_tools(tmp_path):
     assert names == [
         "web_search",
         "fetch_url",
+        "save_note",
+        "read_notes",
         "write_report",
         "calculator",
         "days_between",

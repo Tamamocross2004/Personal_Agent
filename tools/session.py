@@ -1,0 +1,58 @@
+"""一次研究任务内，各工具共享的状态。
+
+fetch_url 读过哪些网页、记了哪些笔记 —— 笔记工具要校验"来源是否真的读过"，
+上下文压缩要知道"哪些网页已经记过笔记"，所以这些状态放在一个对象里，由 default_registry 创建并注入各工具。
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
+from urllib.parse import urlsplit, urlunsplit
+
+if TYPE_CHECKING:
+    from tools.fetch import Page
+
+
+def normalize_url(url: str) -> str:
+    """用于比较的规范形式：协议和域名小写、去掉 #片段、去掉末尾斜杠、去掉 www.。"""
+    try:
+        p = urlsplit(url.strip())
+    except ValueError:
+        return url.strip()
+    host = p.netloc.lower()
+    if host.startswith("www."):
+        host = host[4:]
+    path = p.path.rstrip("/")
+    return urlunsplit((p.scheme.lower(), host, path, p.query, ""))
+
+
+@dataclass
+class Note:
+    id: int
+    content: str
+    source_url: str
+    source_title: str
+    topic: str = ""
+
+
+@dataclass
+class ResearchSession:
+    pages: dict[str, Page] = field(default_factory=dict)  # 请求的 URL → 页面（即 fetch_url 的缓存）
+    notes: list[Note] = field(default_factory=list)
+
+    def find_page(self, url: str) -> Page | None:
+        """按规范化 URL 查找读过的页面（同时匹配请求地址和重定向后的最终地址）。"""
+        key = normalize_url(url)
+        for requested, page in self.pages.items():
+            if key in (normalize_url(requested), normalize_url(page.url)):
+                return page
+        return None
+
+    def noted_urls(self) -> set[str]:
+        return {normalize_url(n.source_url) for n in self.notes}
+
+    def has_note_for(self, url: str) -> bool:
+        page = self.find_page(url)
+        keys = {normalize_url(url)} | ({normalize_url(page.url)} if page else set())
+        return bool(keys & self.noted_urls())

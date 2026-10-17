@@ -10,7 +10,7 @@
 - [x] 阶段 1：最小 Agent 循环（工具注册表 + tool calling 循环 + 基础工具）
 - [x] 阶段 2：搜索 / 读网页 / 写报告（ddgs + trafilatura，分段阅读，报告落盘）
 - [x] 阶段 3：错误处理与健壮性（运行日志与回放、循环保护、token 预算、异常回复处理、Jina 备用通道）
-- [ ] 阶段 4：笔记与上下文管理
+- [x] 阶段 4：笔记与上下文管理（save_note / read_notes、旧网页原文压缩、运行对比）
 - [ ] 阶段 5：规划与反思
 - [ ] 阶段 6：代码执行
 - [ ] 阶段 7：报告质量
@@ -44,6 +44,7 @@ python main.py --provider qwen "..."   # 临时切换厂商
 python main.py --max-steps 30 --budget 500000 "..."   # 调整步数 / token 预算
 python -m agent.replay                 # 回放最近一次任务的运行日志（不花钱）
 python -m agent.replay <任务目录> --full
+python -m agent.compare --last 2       # 对比最近两次运行的 token、笔记、引用等指标
 
 # 5. 测试（无需 API Key）
 pytest
@@ -76,6 +77,7 @@ pytest
 | 文件 | 内容 |
 |---|---|
 | `*.md` | 研究报告 |
+| `notes.md` | 研究笔记（`save_note` 记录的要点和来源） |
 | `trace.jsonl` | 运行日志，每行一个事件（模型调用、工具调用、结果、耗时、token……），用 `python -m agent.replay` 回放 |
 | `messages.json` | 结束时完整的对话历史，排查“模型为什么这么做”时看这里 |
 
@@ -95,6 +97,16 @@ pytest
 | 网页直接下载失败（403、需 JS、PDF、网络不通） | 改用 Jina Reader 读取（`FETCH_FALLBACK=none` 可关闭） |
 
 相关参数都在 `.env` 中（见 `.env.example`）。
+
+## 上下文管理
+
+研究任务的每一轮都要把全部历史重新发给模型，网页原文是最大的开销。所以：
+
+1. 模型每读完一个网页就用 `save_note` 记要点；
+2. 上下文估算超过 `CONTEXT_COMPACT_THRESHOLD`（默认 15000 tokens）时，较早的网页原文会被替换成一行说明（终端显示紫色“压缩上下文”提示），搜索结果只保留标题和 URL；
+3. 需要时模型可以再次 `fetch_url` 读原文（有缓存，不会重新下载）。
+
+阈值是在一次真实运行的历史上离线模拟选出来的（累计输入约减少一半），详见 ROADMAP 阶段 4。设为 0 可关闭压缩。
 
 黄色 `→` 是模型请求的工具调用，绿色 `←` 是工具结果，红色表示工具出错（错误会回传给模型，让它自行修正）。
 
@@ -117,6 +129,8 @@ pytest
 |---|---|---|
 | `web_search(query, max_results)` | 联网搜索，返回标题 / URL / 摘要 | 模型的知识有截止日期；当前使用 ddgs（DuckDuckGo 等，免费无 Key） |
 | `fetch_url(url, start)` | 读取网页正文（去广告导航），长文分段；失败时可经 Jina Reader 读取 | 原始 HTML 太长太脏；分段阅读避免一次撑爆上下文 |
+| `save_note(content, source_url, topic)` | 记录从网页提炼的要点 | 网页原文稍后会被移出上下文，只有笔记保留；来源必须是读过的网页 |
+| `read_notes()` | 读取全部笔记 | 写报告前回顾，报告以笔记为依据 |
 | `write_report(content, filename, mode)` | 把 Markdown 报告存到任务目录，`mode="append"` 可分段追加 | 产出最终成果；文件名经过清洗，只能写进任务目录 |
 | `get_current_time(timezone)` | 当前日期、时间、星期 | 模型不知道"今天"是哪天 |
 | `days_between(start_date, end_date)` | 两个日期相差的天数 | 大小月、闰年容易算错 |
@@ -154,10 +168,12 @@ agent/
   config.py    # 配置加载：预设 ← .env ← 命令行
   llm.py       # LLM 客户端：OpenAI 兼容协议、tenacity 重试、用量统计
   loop.py      # ★ Agent 主循环：调用模型 → 执行工具 → 回传结果 → 循环，以及各种运行保护
+  context.py   # 上下文估算与压缩
   errors.py    # 模型接口错误分类（上下文超长 / 内容审核 / 鉴权 / 其它）
   prompts.py   # system prompt 与各种系统提示（研究模式会注入今天的日期）
   trace.py     # 运行日志 trace.jsonl / messages.json
   replay.py    # python -m agent.replay：回放运行日志
+  compare.py   # python -m agent.compare：对比多次运行的指标
   display.py   # 终端展示（实时与回放共用）
   workspace.py # 每个任务的工作目录
 tools/
@@ -166,6 +182,8 @@ tools/
   search.py    # web_search + 可替换的搜索后端（当前 ddgs）
   fetch.py     # fetch_url：下载、正文提取、分段、缓存、Jina Reader 备用通道
   report.py    # write_report：安全地写报告文件
+  notes.py     # save_note / read_notes
+  session.py   # 一个任务内各工具共享的状态（读过的网页、笔记）
 main.py        # CLI 入口：研究模式（默认）与纯对话模式（--chat）
 tests/         # 用假模型测试，不调用真实 API
   fakes.py     # 剧本化的假模型 ScriptedLLM

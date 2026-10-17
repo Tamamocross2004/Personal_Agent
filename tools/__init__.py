@@ -9,8 +9,10 @@ import httpx
 from tools.basic import calculator, days_between, get_current_time
 from tools.fetch import make_fetch_url
 from tools.registry import Tool, ToolRegistry, ToolResult, tool
+from tools.notes import make_notes_tools
 from tools.report import make_write_report
 from tools.search import DDGSBackend, SearchBackend, make_web_search
+from tools.session import ResearchSession
 
 
 def default_registry(
@@ -19,16 +21,20 @@ def default_registry(
     http_client: httpx.Client | None = None,
     fetch_fallback: str = "none",
     jina_api_key: str = "",
+    session: ResearchSession | None = None,
 ) -> ToolRegistry:
     """为一次研究任务组装全部工具。
 
     search / fetch / report 依赖外部资源（搜索后端、HTTP 客户端、任务目录），
     所以用工厂函数创建，而不是写死成全局函数 —— 测试时可以注入假的后端。
+    session：本任务内工具共享的状态（读过的网页、笔记）。调用方传入后可以在外部读取，例如上下文压缩时。
     """
+    session = session if session is not None else ResearchSession()
     return ToolRegistry(
         [
             make_web_search(search_backend or DDGSBackend()),
-            make_fetch_url(http_client, fallback=fetch_fallback, jina_api_key=jina_api_key),
+            make_fetch_url(http_client, fallback=fetch_fallback, jina_api_key=jina_api_key, pages=session.pages),
+            *make_notes_tools(task_dir, session),
             make_write_report(task_dir),
             calculator,
             days_between,
@@ -37,4 +43,4 @@ def default_registry(
     )
 
 
-__all__ = ["Tool", "ToolRegistry", "ToolResult", "tool", "default_registry"]
+__all__ = ["Tool", "ToolRegistry", "ToolResult", "ResearchSession", "tool", "default_registry"]

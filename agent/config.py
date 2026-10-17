@@ -64,6 +64,11 @@ class Settings(BaseSettings):
     agent_token_budget: int = 300_000  # 单个任务累计（输入+输出）token 上限
     tool_timeout: float = 60.0  # 单次工具执行的最长秒数
 
+    # ---- 上下文管理（阶段 4）----
+    # 估算的上下文超过这个 token 数时，把旧的网页原文 / 搜索摘要移出上下文。设为 0 关闭压缩
+    context_compact_threshold: int = 15_000  # 用阶段 3 真实运行离线模拟选定，见 ROADMAP
+    context_keep_recent_turns: int = 2  # 最近几轮的工具结果不压缩
+
     # ---- 读网页 ----
     # 直接下载失败（403、需 JS 渲染、PDF、网络不通等）时的备用通道：
     #   jina：通过 r.jina.ai 读取。注意：要读的 URL 会发送给第三方服务 Jina

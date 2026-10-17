@@ -1,6 +1,6 @@
 [project]
 name = "personal-agent"
-version = "0.3.0"
+version = "0.4.0"
 description = "从零手写的个人研究助理 Agent（不依赖 LangChain）"
 readme = "README.md"
 requires-python = ">=3.10"

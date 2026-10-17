@@ -9,6 +9,7 @@
 
 每个问题的产物保存在 workspace/<时间>-<问题>/ 目录下：
     *.md           研究报告
+    notes.md       研究笔记
     trace.jsonl    运行日志（python -m agent.replay <目录> 回放）
     messages.json  完整对话历史
 """
@@ -27,13 +28,15 @@ from rich.markdown import Markdown
 from rich.panel import Panel
 
 from agent.config import PROVIDERS, Settings, load_llm_config
+from agent.context import ContextCompactor
 from agent.display import console, show_event, usage_table
 from agent.llm import LLMClient
 from agent.loop import FINALIZE_REASONS, Agent, AgentResult
 from agent.prompts import CHAT_SYSTEM_PROMPT, research_system_prompt
 from agent.trace import MESSAGES_FILE, TRACE_FILE, TraceWriter, fanout, save_messages
 from agent.workspace import new_task_dir
-from tools import default_registry
+from tools import ResearchSession, default_registry
+from tools.notes import NOTES_FILE
 
 FAILED_STOPS = ("context_overflow", "content_filter", "error")
 
@@ -73,13 +76,29 @@ def research(llm: LLMClient, settings: Settings, question: str, max_steps: int, 
     """运行一次研究任务：独立的工作目录、工具实例和运行日志。"""
     task_dir = new_task_dir(question)
     tracer = TraceWriter(task_dir / TRACE_FILE)
+    session = ResearchSession()  # 本任务内工具共享的状态：读过的网页、笔记
+    compactor = (
+        ContextCompactor(
+            threshold=settings.context_compact_threshold,
+            keep_recent_turns=settings.context_keep_recent_turns,
+            has_note=session.has_note_for,
+        )
+        if settings.context_compact_threshold > 0
+        else None
+    )
     agent = Agent(
         llm,
-        default_registry(task_dir, fetch_fallback=settings.fetch_fallback, jina_api_key=settings.jina_api_key),
+        default_registry(
+            task_dir,
+            fetch_fallback=settings.fetch_fallback,
+            jina_api_key=settings.jina_api_key,
+            session=session,
+        ),
         system_prompt=research_system_prompt(date.today().isoformat()),
         max_steps=max_steps,
         token_budget=budget,
         tool_timeout=settings.tool_timeout,
+        compactor=compactor,
         on_event=fanout(show_event, tracer),
     )
     try:
@@ -88,7 +107,7 @@ def research(llm: LLMClient, settings: Settings, question: str, max_steps: int, 
         tracer.close()
     save_messages(task_dir / MESSAGES_FILE, result.messages)
 
-    reports = sorted(task_dir.glob("*.md"))
+    reports = sorted(p for p in task_dir.glob("*.md") if p.name != NOTES_FILE)
     # 被强制收尾且没写过报告时，收尾回答本身就是（不完整的）报告，替用户存下来
     if not reports and result.stop_reason in FINALIZE_REASONS and result.answer.strip():
         fallback = task_dir / "report.md"
@@ -99,6 +118,8 @@ def research(llm: LLMClient, settings: Settings, question: str, max_steps: int, 
         console.print(f"[bold green]报告：[/]{r}")
     if not reports:
         console.print("[dim]本次没有生成报告文件。[/]")
+    if session.notes:
+        console.print(f"[dim]笔记：{task_dir / NOTES_FILE}（{len(session.notes)} 条）[/]")
     console.print(f'[dim]运行日志：{task_dir}  （回放：python -m agent.replay "{task_dir}"）[/]')
     if result.error and "AuthenticationError" in result.error:
         console.print("[red]鉴权失败：请检查 API Key 是否正确、是否与所选厂商匹配。[/]")
