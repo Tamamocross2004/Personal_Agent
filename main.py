@@ -1,10 +1,11 @@
-"""命令行入口（阶段 0：纯 LLM 对话，尚无工具）。
+"""命令行入口。
 
 用法：
-    python main.py "介绍一下你自己"            # 单次提问
-    python main.py                              # 进入多轮对话，输入 exit 退出
-    python main.py --provider qwen "你好"       # 临时切换厂商
-    python main.py --model deepseek-reasoner "1+1=?"
+    python main.py "现在距离 2027 年元旦还有多少天？"   # Agent 模式：单个问题
+    python main.py                                     # Agent 模式：交互式，每个问题独立运行
+    python main.py --chat                              # 阶段 0 的纯对话模式（无工具）
+    python main.py --provider qwen "..."               # 临时切换厂商
+    python main.py --max-steps 5 "..."                 # 调整最大步数
 """
 
 from __future__ import annotations
@@ -20,32 +21,67 @@ from rich.logging import RichHandler
 from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.table import Table
+from rich.text import Text
 
 from agent.config import PROVIDERS, load_llm_config
 from agent.llm import LLMClient
+from agent.loop import Agent, AgentEvent, pretty_arguments
+from agent.prompts import CHAT_SYSTEM_PROMPT
+from tools import default_registry
 
 console = Console()
 
-SYSTEM_PROMPT = "你是一名严谨的个人研究助理。回答使用中文，条理清晰，不确定的内容要明确说明。"
+RESULT_PREVIEW_CHARS = 300  # 终端里工具结果只预览前 N 个字符（模型收到的是完整结果）
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="个人研究助理 Agent（阶段 0）")
-    p.add_argument("question", nargs="?", help="要提问的问题；省略则进入多轮对话")
+    p = argparse.ArgumentParser(description="个人研究助理 Agent")
+    p.add_argument("question", nargs="?", help="要提问的问题；省略则进入交互模式")
+    p.add_argument("--chat", action="store_true", help="纯对话模式（不使用工具，阶段 0 行为）")
     p.add_argument("--provider", choices=list(PROVIDERS), help="覆盖 .env 中的 LLM_PROVIDER")
     p.add_argument("--model", help="覆盖模型名")
+    p.add_argument("--max-steps", type=int, default=10, help="Agent 最大循环步数（默认 10）")
     p.add_argument("-v", "--verbose", action="store_true", help="打印调试日志（含重试信息）")
     return p.parse_args(argv)
+
+
+# ---------------------------------------------------------------------------
+# 展示
+# ---------------------------------------------------------------------------
+
+
+def show_event(ev: AgentEvent) -> None:
+    """把 Agent 循环中的每个事件打印出来 —— 读懂 Agent 的关键就是看清每一步。"""
+    d = ev.data
+    if ev.kind == "step":
+        console.rule(f"[dim]Step {d['step']}[/]", style="dim")
+    elif ev.kind == "thought":
+        console.print(Text(d["text"], style="italic dim"))
+    elif ev.kind == "tool_call":
+        console.print(
+            Text.assemble(
+                ("→ 调用 ", "yellow"),
+                (d["name"], "bold yellow"),
+                ("(", "yellow"),
+                (pretty_arguments(d["arguments"]), "cyan"),
+                (")", "yellow"),
+            )
+        )
+    elif ev.kind == "tool_result":
+        content = d["content"]
+        preview = content if len(content) <= RESULT_PREVIEW_CHARS else content[:RESULT_PREVIEW_CHARS] + "…"
+        style = "red" if d["is_error"] else "green"
+        console.print(Text.assemble(("← ", style), (preview, style)))
+    elif ev.kind == "final":
+        title = "最终回答" if d["stop_reason"] == "final_answer" else "最终回答（已达步数上限）"
+        console.print(Panel(Markdown(d["text"] or "（空）"), title=f"[bold]{title}[/]", border_style="cyan"))
 
 
 def print_usage(llm: LLMClient) -> None:
     u = llm.usage
     t = Table(title="Token 用量", show_header=True, header_style="bold")
-    t.add_column("调用次数", justify="right")
-    t.add_column("输入 tokens", justify="right")
-    t.add_column("输出 tokens", justify="right")
-    t.add_column("合计", justify="right")
-    t.add_column("耗时(s)", justify="right")
+    for col in ("调用次数", "输入 tokens", "输出 tokens", "合计", "耗时(s)"):
+        t.add_column(col, justify="right")
     t.add_row(
         str(u.calls),
         str(u.prompt_tokens),
@@ -56,41 +92,69 @@ def print_usage(llm: LLMClient) -> None:
     console.print(t)
 
 
-def answer(llm: LLMClient, messages: list[dict[str, Any]]) -> str:
-    with console.status("思考中…"):
-        resp = llm.chat(messages)
-    text = resp.choices[0].message.content or ""
-    console.print(Panel(Markdown(text), title=f"[bold]{llm.config.model}[/]", border_style="cyan"))
-    return text
-
-
-def repl(llm: LLMClient) -> None:
-    """多轮对话：演示 messages 列表如何承载上下文 —— 这正是 Agent 记忆的起点。"""
-    messages: list[dict[str, Any]] = [{"role": "system", "content": SYSTEM_PROMPT}]
-    console.print("[dim]进入多轮对话，输入 exit / quit 退出。[/]")
+def read_input() -> str | None:
+    """读取一行输入；遇到 exit/quit/Ctrl+C/EOF 返回 None。"""
     while True:
         try:
             q = console.input("[bold green]你> [/]").strip()
         except (EOFError, KeyboardInterrupt):
-            break
+            return None
         if not q:
             continue
         if q.lower() in {"exit", "quit"}:
-            break
-        messages.append({"role": "user", "content": q})
+            return None
+        return q
+
+
+# ---------------------------------------------------------------------------
+# 两种模式
+# ---------------------------------------------------------------------------
+
+
+def run_agent(agent: Agent, question: str | None) -> None:
+    if question:
+        agent.run(question)
+        return
+    console.print("[dim]Agent 交互模式：每个问题独立运行（暂无跨问题记忆），输入 exit 退出。[/]")
+    while (q := read_input()) is not None:
         try:
-            text = answer(llm, messages)
+            agent.run(q)
+        except openai.AuthenticationError:
+            raise
+        except openai.APIError as e:
+            console.print(f"[red]调用失败：{type(e).__name__}: {e}[/]")
+
+
+def run_chat(llm: LLMClient, question: str | None) -> None:
+    """阶段 0 的纯对话：演示 messages 列表如何承载上下文。"""
+    messages: list[dict[str, Any]] = [{"role": "system", "content": CHAT_SYSTEM_PROMPT}]
+
+    def answer(q: str) -> None:
+        messages.append({"role": "user", "content": q})
+        with console.status("思考中…"):
+            resp = llm.chat(messages)
+        text = resp.choices[0].message.content or ""
+        console.print(Panel(Markdown(text), title=f"[bold]{llm.config.model}[/]", border_style="cyan"))
+        messages.append({"role": "assistant", "content": text})
+
+    if question:
+        answer(question)
+        return
+    console.print("[dim]纯对话模式（无工具），输入 exit 退出。[/]")
+    while (q := read_input()) is not None:
+        try:
+            answer(q)
+        except openai.AuthenticationError:
+            raise
         except openai.APIError as e:
             messages.pop()  # 失败的这轮不计入历史
             console.print(f"[red]调用失败：{e}[/]")
-            continue
-        messages.append({"role": "assistant", "content": text})
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     logging.basicConfig(
-        level=logging.WARNING,  # 第三方库（httpx 等）只显示警告以上，避免刷屏
+        level=logging.WARNING,  # 第三方库只显示警告以上，避免刷屏
         format="%(message)s",
         handlers=[RichHandler(console=console, show_path=False)],
     )
@@ -104,19 +168,17 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     llm = LLMClient(cfg)
-    console.print(f"[dim]厂商：{cfg.provider} | 模型：{cfg.model} | 接口：{cfg.base_url}[/]")
+    mode = "纯对话" if args.chat else f"Agent（最多 {args.max_steps} 步）"
+    console.print(f"[dim]厂商：{cfg.provider} | 模型：{cfg.model} | 模式：{mode}[/]")
 
     try:
-        if args.question:
-            answer(
-                llm,
-                [
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": args.question},
-                ],
-            )
+        if args.chat:
+            run_chat(llm, args.question)
         else:
-            repl(llm)
+            registry = default_registry()
+            console.print(f"[dim]可用工具：{', '.join(registry.names)}[/]")
+            agent = Agent(llm, registry, max_steps=args.max_steps, on_event=show_event)
+            run_agent(agent, args.question)
     except openai.AuthenticationError:
         console.print("[red]鉴权失败：请检查 API Key 是否正确、是否与所选厂商匹配。[/]")
         return 1

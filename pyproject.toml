@@ -1,6 +1,6 @@
 [project]
 name = "personal-agent"
-version = "0.0.1"
+version = "0.1.0"
 description = "从零手写的个人研究助理 Agent（不依赖 LangChain）"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -10,6 +10,8 @@ dependencies = [
     "pydantic-settings>=2.2",
     "tenacity>=8.2",
     "rich>=13.7",
+    # Windows 不自带 IANA 时区数据库，zoneinfo 需要这个包
+    "tzdata; sys_platform == 'win32'",
 ]
 
 [project.optional-dependencies]
