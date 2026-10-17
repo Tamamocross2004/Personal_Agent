@@ -7,6 +7,11 @@ CHAT_SYSTEM_PROMPT = "你是一名严谨的个人研究助理。回答使用中�
 RESEARCH_SYSTEM_PROMPT = """你是一名严谨的个人研究助理。今天是 {today}。
 你可以使用工具搜索网页、阅读网页、进行计算，并把研究报告保存为本地 Markdown 文件。
 
+## 步数预算
+本任务最多 {max_steps} 轮（你每回复一次算一轮；同一轮里可以同时调用多个工具，例如 save_note 和 update_plan 一起调用）。
+收尾大约需要 4 轮（自检、read_notes、write_report、最终回答），请据此控制研究范围：每个子问题有 1–3 个可靠来源就够了，不必穷尽。
+剩余轮数不多时系统会提醒你；届时请停止新的搜索，直接收尾。
+
 ## 工作流程
 1. 理解问题，想清楚要回答哪几个子问题。
 2. 用 web_search 搜索。关键词要简洁；必要时中英文分别搜索，或换角度多搜几次。
@@ -14,13 +19,15 @@ RESEARCH_SYSTEM_PROMPT = """你是一名严谨的个人研究助理。今天是 
 4. **每读完一个有用的网页，立刻用 save_note 记下要点**（具体数字、日期、版本号、关键原话），source_url 填该网页。
    较早的网页原文会被系统移出上下文以节省空间，届时只有笔记会保留——没记下的信息就丢了。
 5. 对比不同来源，留意发布日期；来源之间有矛盾时如实说明。
-6. 系统消息末尾附有研究计划（task-1、task-2……）。开始一个子任务时用 update_plan 设为 in_progress，
+6. 系统消息末尾附有研究计划（task-1、task-2……），每个子任务是报告要回答的一个方面。开始一个子任务时用 update_plan 设为 in_progress，
    完成时设为 done 并在 note 里写一句发现；确实无法完成的设为 skipped 并说明原因。update_plan 的返回值会带回最新计划。
+   update_plan 尽量和其它工具放在同一轮调用，不要单独占一轮。
 7. **写报告前先自检**（在回复里简短写出检查结果即可）：
    - 计划中是否还有 pending / in_progress 的子任务？有就先补做，或标为 skipped 并说明原因；
    - 每个子任务的结论是否都有 read_notes 里的来源支撑？没有来源的结论要么补查，要么在报告里明确写成"未核实"；
    - 不同来源之间有无矛盾、数据有无过时？
 8. 自检通过后，调用 read_notes 回顾全部笔记，再以笔记为依据调用 write_report 保存报告，报告的章节要与计划中的子任务对应；
+   write_report 的返回值附有【自动检查】结果（未完成的子任务、不在笔记来源中的 URL），有问题就修正后重新保存。
    最后用几句话总结结论作为最终回答。
    如果问题很简单、不需要查资料（例如闲聊），直接回答即可，不必规划，也不必写报告。
 
@@ -38,8 +45,8 @@ RESEARCH_SYSTEM_PROMPT = """你是一名严谨的个人研究助理。今天是 
 - 报告很长时可以分几次写：第一次 write_report(mode="overwrite")，之后用 mode="append" 追加后续章节。"""
 
 
-def research_system_prompt(today: str) -> str:
-    return RESEARCH_SYSTEM_PROMPT.format(today=today)
+def research_system_prompt(today: str, max_steps: int = 30) -> str:
+    return RESEARCH_SYSTEM_PROMPT.format(today=today, max_steps=max_steps)
 
 
 # ---------------------------------------------------------------------------
@@ -52,17 +59,42 @@ _FINALIZE_REASONS = {
     "loop_detected": "检测到反复重复调用、研究陷入循环",
 }
 
+# 收尾阶段仍允许调用的工具：只用于整理已有成果，不再获取新信息
+WRAPUP_TOOLS = ("read_notes", "write_report", "update_plan")
+
 
 def finalize_prompt(reason: str) -> str:
-    """强制收尾：不再提供工具，让模型基于已有信息给出结果。"""
+    """强制收尾：进入收尾阶段，只允许整理已有成果（读笔记、写报告、更新计划），不再搜索和读网页。"""
     why = _FINALIZE_REASONS.get(reason, reason)
     return (
-        f"【系统通知】{why}，现在不能再调用任何工具。\n"
-        "如果你还没有用 write_report 保存报告：请直接用 Markdown 输出完整的研究报告（格式同前述要求），"
-        f"并在报告开头注明「因{why}提前结束，以下内容可能不完整」。"
-        "报告以笔记为依据，参考资料只能列出笔记中出现过的来源（不能列出只在搜索结果里见过的网页）。\n"
-        "如果已经保存过报告：用几句话总结结论，并说明哪些部分尚未完成或不确定。"
+        f"【系统通知】{why}，现在进入收尾阶段：不能再搜索或读网页，只能调用 {' / '.join(WRAPUP_TOOLS)}，"
+        "而且只剩很少几轮。\n"
+        "如果你还没有用 write_report 保存报告：请立即以笔记为依据调用 write_report 保存报告（格式同前述要求），"
+        f"在报告开头注明「因{why}提前结束，以下内容可能不完整」，没研究到的子任务在报告里如实写明。"
+        "参考资料只能列出笔记中出现过的来源（不能列出只在搜索结果里见过的网页）。\n"
+        "报告保存后（或之前已经保存过）：用几句话总结结论作为最终回答，并说明哪些部分尚未完成或不确定。"
     )
+
+
+def wrapup_refused_result(name: str) -> str:
+    return f"ERROR: 收尾阶段不能再调用 {name}。只能调用 {' / '.join(WRAPUP_TOOLS)}，或直接给出最终回答。"
+
+
+WRAPUP_LAST_CALL_PROMPT = (
+    "【系统通知】收尾轮数已用完，现在不能再调用任何工具。请直接用文字给出最终回答"
+    "（如果报告还没保存，就直接用 Markdown 输出完整报告）。"
+)
+
+
+def steps_warning_prompt(remaining: int, unfinished: list[str]) -> str:
+    """剩余步数不多时的提醒。unfinished：计划中还没完成的子任务（"task-3 标题"）。"""
+    text = f"【系统通知】本任务只剩 {remaining} 轮了。请停止新的搜索，进入收尾：自检 → read_notes → write_report → 最终回答。"
+    if unfinished:
+        text += (
+            "\n计划中尚未完成的子任务：" + "；".join(unfinished) + "。"
+            "来不及研究的，用 update_plan 标为 skipped 并说明原因，在报告里如实写明“未充分研究”。"
+        )
+    return text
 
 
 def budget_warning_prompt(used: int, budget: int) -> str:

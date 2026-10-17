@@ -11,7 +11,7 @@
 - [x] 阶段 2：搜索 / 读网页 / 写报告（ddgs + trafilatura，分段阅读，报告落盘）
 - [x] 阶段 3：错误处理与健壮性（运行日志与回放、循环保护、token 预算、异常回复处理、Jina 备用通道）
 - [x] 阶段 4：笔记与上下文管理（save_note / read_notes、旧网页原文压缩、运行对比）
-- [x] 阶段 5：规划与反思（开局拆解计划、update_plan 跟踪进度、写报告前自检；待真实模型验收）
+- [x] 阶段 5：规划与反思（开局按维度拆解计划、update_plan 跟踪进度、写报告后自动检查、剩余步数提醒与收尾阶段；首轮实测问题已修复，待复测）
 - [ ] 阶段 6：代码执行
 - [ ] 阶段 7：报告质量
 - [ ] 阶段 8：长期记忆
@@ -46,6 +46,7 @@ python -m agent.replay                 # 回放最近一次任务的运行日志
 python -m agent.replay <任务目录> --full
 python -m agent.compare --last 2       # 对比最近两次运行的 token、缓存、笔记、引用等指标
 python -m agent.simulate <任务目录>    # 离线评估不同压缩阈值的成本
+python -m agent.cache_probe            # 测试不同请求写法能否命中厂商的前缀缓存（约 2 万 token）
 
 # 5. 测试（无需 API Key）
 pytest
@@ -81,7 +82,7 @@ pytest
 |---|---|
 | `*.md` | 研究报告 |
 | `notes.md` | 研究笔记（`save_note` 记录的要点和来源） |
-| `plan.json` | 研究计划（开局拆成 3–6 个子任务，`update_plan` 更新状态） |
+| `plan.json` | 研究计划（开局按报告要回答的方面拆成 3–6 个子任务，`update_plan` 更新状态） |
 | `trace.jsonl` | 运行日志，每行一个事件（模型调用、工具调用、结果、耗时、token……），用 `python -m agent.replay` 回放 |
 | `messages.json` | 结束时完整的对话历史，排查“模型为什么这么做”时看这里 |
 
@@ -91,8 +92,10 @@ pytest
 
 | 情况 | Agent 的反应 |
 |---|---|
-| 步数用完 / 预计下一次调用会超出 token 预算 / 反复重复调用 | 禁止再调用工具，强制模型基于已有资料收尾；没写报告就把收尾回答存为 `report.md` |
+| 步数用完 / 预计下一次调用会超出 token 预算 / 反复重复调用 | 进入收尾阶段：只允许 `read_notes` / `write_report` / `update_plan`，最多再调用 3 次模型；仍没写报告就把收尾回答存为 `report.md` |
 | token 用到预算 80% | 提醒模型尽快写报告 |
+| 只剩 6 步 | 提醒模型停止搜索、开始收尾，并列出计划中未完成的子任务（步数上限也写在 system prompt 里） |
+| 调用 `write_report` 后 | 自动检查：计划中未完成的子任务、报告里不在笔记来源中的 URL，结果附在返回值里交给模型修正 |
 | 同一工具、同样参数再次调用 | 成功过的不再执行（失败的允许重试至多 3 次） |
 | 工具执行超过 `TOOL_TIMEOUT` 秒 | 放弃本次调用，告诉模型换个方法 |
 | 回复被截断 | 写报告被截断时提示分段写（`mode="append"`）；文字回答被截断时让模型接着写 |
@@ -111,7 +114,9 @@ pytest
 有前缀缓存的厂商上，研究任务 80% 以上的输入都命中缓存（价格只有几十分之一），按原始 token 计预算会过早用完。
 默认权重比 DeepSeek 实际价格比例（约 0.02 : 1 : 4）保守，换到其他厂商也不易低估花费；可用 `TOKEN_WEIGHT_CACHED`、`TOKEN_WEIGHT_OUTPUT` 调整。
 
-强制收尾时照常发送工具说明书、用 `tool_choice="none"` 禁止调用——这样请求开头不变，仍能命中缓存。
+收尾阶段的请求与平时**完全相同**（同样的工具说明书、不加 `tool_choice`），由代码拒绝不允许的工具——这样请求开头不变，仍能命中缓存。
+实测在 DeepSeek 上，“不发工具”和“工具 + `tool_choice="none"`”这两种写法都几乎不命中缓存；`tool_choice="none"` 现在只在收尾轮数用完时作为最后手段。
+换厂商时可以先跑 `python -m agent.cache_probe` 看看哪种写法能命中。
 
 ## 上下文管理
 
@@ -191,12 +196,14 @@ agent/
   llm.py       # LLM 客户端：OpenAI 兼容协议、tenacity 重试、用量统计
   loop.py      # ★ Agent 主循环：调用模型 → 执行工具 → 回传结果 → 循环，以及各种运行保护
   context.py   # 上下文估算与压缩
+  planner.py   # 开局拆解研究计划（plan.json）
   errors.py    # 模型接口错误分类（上下文超长 / 内容审核 / 鉴权 / 其它）
   prompts.py   # system prompt 与各种系统提示（研究模式会注入今天的日期）
   trace.py     # 运行日志 trace.jsonl / messages.json
   replay.py    # python -m agent.replay：回放运行日志
   compare.py   # python -m agent.compare：对比多次运行的指标
   simulate.py  # python -m agent.simulate：在真实历史上离线评估压缩阈值（含缓存成本模型）
+  cache_probe.py # python -m agent.cache_probe：测试不同请求写法对前缀缓存的影响
   display.py   # 终端展示（实时与回放共用）
   workspace.py # 每个任务的工作目录
 tools/
@@ -204,7 +211,8 @@ tools/
   basic.py     # 基础工具：get_current_time / days_between / calculator
   search.py    # web_search + 可替换的搜索后端（当前 ddgs）
   fetch.py     # fetch_url：下载、正文提取、分段、缓存、Jina Reader 备用通道
-  report.py    # write_report：安全地写报告文件
+  report.py    # write_report：安全地写报告文件，并自动检查计划完成度与引用来源
+  plan.py      # update_plan：更新计划中子任务的状态
   notes.py     # save_note / read_notes
   session.py   # 一个任务内各工具共享的状态（读过的网页、笔记）
 main.py        # CLI 入口：研究模式（默认）与纯对话模式（--chat）

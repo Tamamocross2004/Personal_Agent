@@ -28,11 +28,48 @@ def chat_from(llm):
 
 def test_generate_plan_saves_and_fills_defaults(tmp_path):
     llm = ScriptedLLM([completion(PLAN_JSON)])
-    plan = generate_plan("问题", chat_from(llm), tmp_path)
-    assert [t["status"] for t in plan["tasks"]] == ["pending"] * 3
+    plan = generate_plan("问题", chat_from(llm), tmp_path, today="2026-10-17")
+    # "写报告"是流程步骤，不是报告要回答的方面，被过滤掉
+    assert [t["title"] for t in plan["tasks"]] == ["搜索工具调用能力", "搜索价格"]
+    assert [t["status"] for t in plan["tasks"]] == ["pending"] * 2
     assert all(t["note"] == "" for t in plan["tasks"])
     assert load_plan(tmp_path) == plan
     assert llm.requests[0]["response_format"] == {"type": "json_object"}
+    assert "今天是 2026-10-17" in llm.requests[0]["messages"][0]["content"]  # 模型知道今天的日期
+
+
+def test_planner_prompt_asks_for_dimensions_not_process():
+    from agent.planner import PLANNER_PROMPT
+
+    text = PLANNER_PROMPT.format(today="x")
+    assert "不要按\"怎么做\"拆" in text
+    assert "写报告" in text and "不要单独列为子任务" in text
+
+
+def test_normalize_tasks():
+    from agent.planner import MAX_TASKS, normalize_tasks
+
+    raw = [
+        {"id": "a", "title": "价格"},
+        {"title": ""},
+        "不是 dict",
+        {"id": "x", "title": "撰写对比报告，总结各自优势与不足"},
+        {"title": "报告中常见的误区"},  # 不是以"写报告"开头，保留
+    ] + [{"title": f"维度 {i}"} for i in range(10)]
+    tasks = normalize_tasks(raw)
+    assert len(tasks) == MAX_TASKS
+    assert [t["id"] for t in tasks] == [f"task-{i}" for i in range(1, MAX_TASKS + 1)]  # 重新编号
+    assert tasks[0]["title"] == "价格" and tasks[1]["title"] == "报告中常见的误区"
+    assert len(normalize_tasks(None)) == 3  # 兜底计划
+    assert len(normalize_tasks([{"title": "写报告"}])) == 3
+
+
+def test_unfinished_tasks():
+    from agent.planner import unfinished_tasks
+
+    plan = {"tasks": [{"id": "1", "status": "done"}, {"id": "2", "status": "in_progress"}, {"id": "3"}]}
+    assert [t["id"] for t in unfinished_tasks(plan)] == ["2", "3"]
+    assert unfinished_tasks(None) == []
 
 
 def test_generate_plan_falls_back_on_bad_json(tmp_path):
@@ -97,3 +134,17 @@ def test_agent_without_task_dir_does_not_plan():
     llm = ScriptedLLM([completion("hi")])
     Agent(llm, ToolRegistry([])).run("问题")
     assert len(llm.requests) == 1
+
+
+def test_steps_warning_lists_unfinished_plan_tasks(tmp_path):
+    from tools.basic import get_current_time
+
+    calls = [completion(tool_calls=[(f"c{i}", "get_current_time", {})]) for i in range(2)]
+    update = completion(tool_calls=[("u1", "update_plan", {"task_id": "task-1", "status": "done"})])
+    llm = ScriptedLLM([completion(PLAN_JSON), update, *calls, completion("完成")])
+    reg = ToolRegistry([make_update_plan(tmp_path), get_current_time])
+    Agent(llm, reg, task_dir=tmp_path, max_steps=6, steps_warn_remaining=3).run("问题")
+
+    warning = llm.requests[4]["messages"][-1]  # 第 3 步结束后（剩 3 步）提醒
+    assert warning["role"] == "user" and "只剩 3 轮" in warning["content"]
+    assert "task-2 搜索价格" in warning["content"] and "task-1" not in warning["content"]  # 只列未完成的

@@ -47,7 +47,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("--chat", action="store_true", help="纯对话模式（不使用工具，阶段 0 行为）")
     p.add_argument("--provider", choices=list(PROVIDERS), help="覆盖 .env 中的 LLM_PROVIDER")
     p.add_argument("--model", help="覆盖模型名")
-    p.add_argument("--max-steps", type=int, help="最大循环步数（默认取 .env 的 AGENT_MAX_STEPS，20）")
+    p.add_argument("--max-steps", type=int, help="最大循环步数（默认取 .env 的 AGENT_MAX_STEPS，30）")
     p.add_argument("--budget", type=int, help="等效 token 预算（默认取 .env 的 AGENT_TOKEN_BUDGET，300000）")
     p.add_argument("-v", "--verbose", action="store_true", help="打印调试日志（含重试信息）")
     return p.parse_args(argv)
@@ -94,7 +94,7 @@ def research(llm: LLMClient, settings: Settings, question: str, max_steps: int, 
             jina_api_key=settings.jina_api_key,
             session=session,
         ),
-        system_prompt=research_system_prompt(date.today().isoformat()),
+        system_prompt=research_system_prompt(date.today().isoformat(), max_steps),
         max_steps=max_steps,
         token_budget=budget,
         token_weights=TokenWeights(cached=settings.token_weight_cached, output=settings.token_weight_output),

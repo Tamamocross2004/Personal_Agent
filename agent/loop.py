@@ -14,8 +14,9 @@
 - 工具出错不中断循环：错误信息交给模型，由它决定如何补救。
 
 阶段 3 加上的保护（每一项都对应 tests/test_loop_robustness.py 里的故障测试）：
-- 步数上限 / token 预算 / 重复调用检测 → 触发后"强制收尾"：再请求一次但不提供工具，让模型基于已有信息作答
-- token 用到 80% 时提醒模型尽快收尾
+- 步数上限 / token 预算 / 重复调用检测 → 触发后"强制收尾"（阶段 5 改为收尾阶段：只允许读笔记、写报告、更新计划，
+  最多再调用几次模型；请求格式与平时完全相同，以保住前缀缓存）
+- token 用到 80% 时提醒模型尽快收尾；剩余 6 步时也提醒一次（阶段 5）
 - 单个工具执行超时
 - 回复被截断（finish_reason=length）：工具参数不完整就不执行并告知原因；文字回答则让模型接着写
 - 空回复：提醒一次
@@ -45,16 +46,20 @@ from openai.types.chat import ChatCompletion, ChatCompletionMessage
 
 from agent.context import ContextCompactor, estimate_messages, estimate_tools
 from agent.errors import classify_api_error
-from agent.planner import format_plan_for_prompt, generate_plan, load_plan
+from agent.planner import format_plan_for_prompt, generate_plan, load_plan, unfinished_tasks
 from agent.prompts import (
     CONTINUE_PROMPT,
     EMPTY_REPLY_PROMPT,
     REDACTED_TOOL_RESULT,
     REPEAT_BLOCKED_RESULT,
     TRUNCATED_TOOL_CALL_RESULT,
+    WRAPUP_LAST_CALL_PROMPT,
+    WRAPUP_TOOLS,
     budget_warning_prompt,
     finalize_prompt,
     research_system_prompt,
+    steps_warning_prompt,
+    wrapup_refused_result,
 )
 from tools.registry import ToolRegistry, ToolResult
 
@@ -156,13 +161,15 @@ class Agent:
         token_weights: TokenWeights | None = None,
         tool_timeout: float = 60.0,
         max_blocked_repeats: int = 3,
+        steps_warn_remaining: int = 6,
+        wrapup_max_calls: int = 3,
         compactor: ContextCompactor | None = None,
         on_event: EventHandler | None = None,
         task_dir: Path | None = None,
     ):
         self.llm = llm
         self.registry = registry
-        self.system_prompt = system_prompt or research_system_prompt(date.today().isoformat())
+        self.system_prompt = system_prompt or research_system_prompt(date.today().isoformat(), max_steps)
         self.max_steps = max_steps
         self.max_tool_result_chars = max_tool_result_chars
         self.token_budget = token_budget
@@ -170,6 +177,10 @@ class Agent:
         self.token_weights = token_weights or TokenWeights()
         self.tool_timeout = tool_timeout
         self.max_blocked_repeats = max_blocked_repeats
+        # 剩余这么多步时提醒模型收尾（阶段 5 实测：模型不知道还剩几步，30 步用完还在搜索）
+        self.steps_warn_remaining = steps_warn_remaining
+        # 强制收尾后最多再调用几次模型（让它有机会 read_notes → write_report → 最终回答）
+        self.wrapup_max_calls = wrapup_max_calls
         self.compactor = compactor
         self.on_event = on_event
         self.task_dir = task_dir
@@ -287,42 +298,59 @@ class Agent:
 
             # ---- 3. 有工具调用：逐个执行，结果写回历史 ----
             empty_replies = 0
-            messages.append(_assistant_message_to_dict(msg))
-            if msg.content:
-                self._emit("thought", text=msg.content)
-
-            for call in msg.tool_calls:
-                name, arguments = call.function.name, call.function.arguments
-                self._emit("tool_call", id=call.id, name=name, arguments=arguments)
-                if truncated:
-                    # 参数大概率是半截 JSON；即使碰巧能解析，内容也不完整（例如半篇报告）
-                    result, seconds = ToolResult(TRUNCATED_TOOL_CALL_RESULT, True), 0.0
-                else:
-                    result, seconds = self._run_tool(name, arguments)
-                content = _truncate(result.content, self.max_tool_result_chars)
-                self._emit(
-                    "tool_result",
-                    id=call.id,
-                    name=name,
-                    content=content,
-                    is_error=result.is_error,
-                    seconds=round(seconds, 2),
-                )
-                messages.append({"role": "tool", "tool_call_id": call.id, "content": content})
-
-            if truncated:
-                self._emit("notice", text="回复因输出长度上限被截断，工具调用未执行，已告知模型分段处理。")
+            self._execute_calls(messages, msg, truncated)
 
             # ---- 4. 本轮结束后的检查 ----
             if self._blocked >= self.max_blocked_repeats:
                 return self._finalize(messages, "loop_detected")
             self._maybe_warn_budget(messages)
+            self._maybe_warn_steps(messages, step)
 
         return self._finalize(messages, "max_steps")
 
     # ------------------------------------------------------------------
     # 各个环节
     # ------------------------------------------------------------------
+
+    def _execute_calls(
+        self,
+        messages: list[dict[str, Any]],
+        msg: ChatCompletionMessage,
+        truncated: bool,
+        allowed: tuple[str, ...] | None = None,
+    ) -> None:
+        """执行模型这一轮要求的全部工具调用，结果逐条追加到历史。
+
+        allowed：只允许调用这些工具（收尾阶段用）；其它调用不执行，返回说明。
+        注意即使拒绝也必须回一条 tool 消息：每个 tool_call 都要有对应的结果，否则下次请求报 400。
+        """
+        messages.append(_assistant_message_to_dict(msg))
+        if msg.content:
+            self._emit("thought", text=msg.content)
+
+        for call in msg.tool_calls or []:
+            name, arguments = call.function.name, call.function.arguments
+            self._emit("tool_call", id=call.id, name=name, arguments=arguments)
+            if truncated:
+                # 参数大概率是半截 JSON；即使碰巧能解析，内容也不完整（例如半篇报告）
+                result, seconds = ToolResult(TRUNCATED_TOOL_CALL_RESULT, True), 0.0
+            elif allowed is not None and name not in allowed:
+                result, seconds = ToolResult(wrapup_refused_result(name), True), 0.0
+            else:
+                result, seconds = self._run_tool(name, arguments)
+            content = _truncate(result.content, self.max_tool_result_chars)
+            self._emit(
+                "tool_result",
+                id=call.id,
+                name=name,
+                content=content,
+                is_error=result.is_error,
+                seconds=round(seconds, 2),
+            )
+            messages.append({"role": "tool", "tool_call_id": call.id, "content": content})
+
+        if truncated:
+            self._emit("notice", text="回复因输出长度上限被截断，工具调用未执行，已告知模型分段处理。")
 
     def _call_llm(
         self,
@@ -364,7 +392,12 @@ class Agent:
         if not self.task_dir:
             return
         try:
-            plan = generate_plan(question, lambda m, **kw: self._call_llm(m, None, None, **kw), self.task_dir)
+            plan = generate_plan(
+                question,
+                lambda m, **kw: self._call_llm(m, None, None, **kw),
+                self.task_dir,
+                today=date.today().isoformat(),
+            )
         except openai.APIError as e:
             self._emit("notice", text=f"生成计划失败（{type(e).__name__}），将不带计划继续。")
             return
@@ -472,6 +505,19 @@ class Agent:
         messages.append({"role": "user", "content": budget_warning_prompt(used, self.token_budget)})
         self._emit("notice", text=f"等效 token 已用 {used}/{self.token_budget}，已提醒模型尽快收尾。")
 
+    def _maybe_warn_steps(self, messages: list[dict[str, Any]], step: int) -> None:
+        """剩余步数到达 steps_warn_remaining 时提醒一次，并列出计划中还没完成的子任务。
+
+        提醒追加在历史末尾，不影响前缀缓存。步数上限本身已写在 system prompt 里（开局一次性写入）。
+        """
+        remaining = self.max_steps - step
+        if remaining != self.steps_warn_remaining or remaining <= 0:
+            return
+        plan = load_plan(self.task_dir) if self.task_dir else None
+        unfinished = [f"{t.get('id', '')} {t.get('title', '')}" for t in unfinished_tasks(plan)]
+        messages.append({"role": "user", "content": steps_warning_prompt(remaining, unfinished)})
+        self._emit("notice", text=f"只剩 {remaining} 步，已提醒模型收尾（未完成子任务 {len(unfinished)} 个）。")
+
     def _redact_last_tool_results(self, messages: list[dict[str, Any]]) -> bool:
         """把历史末尾那一批工具结果替换成占位说明。返回是否真的替换了内容。
 
@@ -489,15 +535,44 @@ class Agent:
     def _finalize(
         self, messages: list[dict[str, Any]], reason: StopReason
     ) -> tuple[StopReason, str, str | None]:
-        """强制收尾：禁止调用工具，让模型基于已有信息作答。
+        """强制收尾：进入"收尾阶段"，只允许读笔记、写报告、更新计划，最多再调用 wrapup_max_calls 次模型。
 
-        注意是"照常发送工具说明书 + tool_choice=none"，而不是不发工具：
-        厂商的前缀缓存把工具说明书也算在请求开头，去掉它会让整段历史都无法命中缓存。
-        阶段 4 实测：不发工具的收尾调用 4.2 万输入只命中了 384 个 token。
-        个别厂商不支持 tool_choice=none 时（仍返回工具调用或报错），退回到不发工具的老做法。
+        为什么不直接禁止调用工具：
+        - 阶段 5 实测：模型在 30 步内没写报告，强制收尾只能把一篇回答当报告存下，
+          而它本来可以再用一两轮 read_notes → write_report 写出正式报告；
+        - 前缀缓存：收尾请求和平时的请求必须"长得一样"（同样的工具说明书、不加 tool_choice）。
+          实测"不发工具"（4.2 万输入命中 384）和"tools + tool_choice=none"（3.5 万输入命中 640）都几乎不命中，
+          推测厂商按 tool_choice 渲染出的提示开头不同。所以收尾阶段照常请求，由代码拒绝不允许的工具。
+        收尾轮数用完仍没有文字回答时，才退回到老办法（tool_choice=none，再不行就不发工具）。
+        预算不在收尾阶段检查：收尾最多几次调用，超出量有限。
         """
-        self._emit("notice", text=f"触发强制收尾（{reason}），不再调用工具。")
+        self._emit("notice", text=f"触发强制收尾（{reason}），进入收尾阶段：只能读笔记、写报告、更新计划。")
         messages.append({"role": "user", "content": finalize_prompt(reason)})
+        tools = getattr(self, "_tools", None) or None
+        allowed = tuple(n for n in WRAPUP_TOOLS if n in self.registry.names)
+
+        for _ in range(self.wrapup_max_calls):
+            try:
+                resp = self._call_llm(messages, tools, None)
+            except openai.APIError as e:
+                return reason, "", f"收尾调用失败：{type(e).__name__}: {e}"
+            choice = resp.choices[0]
+            msg = choice.message
+            if not msg.tool_calls:
+                messages.append(_assistant_message_to_dict(msg))
+                answer = msg.content or ""
+                self._emit("final", text=answer, stop_reason=reason)
+                return reason, answer, None
+            self._execute_calls(messages, msg, choice.finish_reason == "length", allowed)
+
+        return self._finalize_without_tools(messages, reason)
+
+    def _finalize_without_tools(
+        self, messages: list[dict[str, Any]], reason: StopReason
+    ) -> tuple[StopReason, str, str | None]:
+        """最后手段：禁止调用工具，逼模型直接用文字作答（这次调用基本不命中缓存，但只发生在收尾轮数用完时）。"""
+        self._emit("notice", text="收尾轮数已用完，禁止调用工具，要求模型直接作答。")
+        messages.append({"role": "user", "content": WRAPUP_LAST_CALL_PROMPT})
         try:
             resp = self._call_llm(messages, getattr(self, "_tools", None) or None, None, tool_choice="none")
             if resp.choices[0].message.tool_calls and not resp.choices[0].message.content:

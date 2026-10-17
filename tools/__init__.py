@@ -38,7 +38,7 @@ def default_registry(
             make_fetch_url(http_client, fallback=fetch_fallback, jina_api_key=jina_api_key, pages=session.pages),
             *make_notes_tools(task_dir, session),
             make_update_plan(task_dir, on_update=on_plan_update),
-            make_write_report(task_dir),
+            make_write_report(task_dir, session),
             calculator,
             days_between,
             get_current_time,

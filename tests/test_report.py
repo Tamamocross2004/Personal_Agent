@@ -90,3 +90,64 @@ def test_write_report_append_to_missing_file_creates_it(tmp_path):
     reg = ToolRegistry([make_write_report(tmp_path)])
     reg.execute("write_report", {"content": "x", "mode": "append"})
     assert (tmp_path / "report.md").read_text(encoding="utf-8") == "x"
+
+
+# ---------------------------------------------------------------------------
+# 阶段 5：保存报告后的自动检查
+# ---------------------------------------------------------------------------
+
+
+def _session_with_note(url="https://a.com/x"):
+    from tools.fetch import Page
+    from tools.session import Note, ResearchSession
+
+    s = ResearchSession()
+    s.pages["https://a.com/old"] = Page(url=url, title="A", date=None, text="t")  # 请求地址重定向到了 url
+    s.notes.append(Note(1, "要点", url, "A"))
+    return s
+
+
+def test_report_urls():
+    from tools.report import report_urls
+
+    text = "见 [1](https://a.com/x)。另见 <https://b.com/y>，以及 https://c.com/z. 重复 https://a.com/x"
+    assert report_urls(text) == ["https://a.com/x", "https://b.com/y", "https://c.com/z"]
+
+
+def test_write_report_checks_unnoted_urls_and_unfinished_plan(tmp_path):
+    import json
+
+    from tools import ToolRegistry
+    from tools.report import make_write_report
+
+    (tmp_path / "plan.json").write_text(
+        json.dumps({"tasks": [{"id": "task-1", "title": "价格", "status": "done"},
+                              {"id": "task-2", "title": "生态", "status": "pending"}]}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    reg = ToolRegistry([make_write_report(tmp_path, _session_with_note())])
+    r = reg.execute("write_report", {"content": "[1] https://a.com/old\n[2] https://www.a.com/x/\n[3] https://b.com/y"})
+    assert not r.is_error and "报告已保存" in r.content
+    assert "【自动检查】发现以下问题" in r.content
+    assert "task-2 生态（pending）" in r.content and "task-1" not in r.content
+    # 跳转前地址、www/末尾斜杠不同的写法都算笔记来源；只有 b.com 没记过笔记
+    assert "https://b.com/y" in r.content and "a.com" not in r.content.split("不在笔记来源中")[1]
+
+
+def test_write_report_check_passes(tmp_path):
+    from tools import ToolRegistry
+    from tools.report import make_write_report
+
+    reg = ToolRegistry([make_write_report(tmp_path, _session_with_note())])
+    r = reg.execute("write_report", {"content": "[1] https://a.com/x"})
+    assert "【自动检查】通过" in r.content
+
+
+def test_write_report_check_uses_whole_file_in_append_mode(tmp_path):
+    from tools import ToolRegistry
+    from tools.report import make_write_report
+
+    reg = ToolRegistry([make_write_report(tmp_path, _session_with_note())])
+    reg.execute("write_report", {"content": "第一部分 https://b.com/y"})
+    r = reg.execute("write_report", {"content": "## 参考资料\n[1] https://a.com/x", "mode": "append"})
+    assert "https://b.com/y" in r.content  # 前一部分里的问题仍然会报出来

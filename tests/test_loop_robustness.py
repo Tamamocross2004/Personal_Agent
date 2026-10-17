@@ -117,7 +117,7 @@ def test_persistent_repeats_trigger_loop_detected_and_finalize(registry):
     assert res.answer == "收尾回答"
     assert res.steps == 4  # 第 1 次执行，第 2-4 次被拦截，拦截 3 次后收尾
     last = llm.requests[-1]
-    assert last["tool_choice"] == "none"
+    assert "tool_choice" not in last
     assert last["messages"][-1]["content"] == finalize_prompt("loop_detected")
 
 
@@ -144,7 +144,7 @@ def test_budget_warning_then_projected_overrun_finalizes(registry):
     warnings = [m for m in final_msgs if "已使用 900 / 1000" in str(m.get("content"))]
     assert len(warnings) == 1 and warnings[0]["role"] == "user"  # 只提醒一次
     assert final_msgs[-1]["content"] == finalize_prompt("budget")
-    assert llm.requests[-1]["tool_choice"] == "none"
+    assert "tool_choice" not in llm.requests[-1]
 
 
 def _cached_completion(content=None, tool_calls=None, prompt=0, cached=0, out=0):
@@ -204,7 +204,7 @@ def test_budget_exhausted_forces_finalize(registry):
     assert res.stop_reason == "budget"
     assert res.answer == "预算内的收尾"
     assert len(llm.requests) == 2
-    assert llm.requests[-1]["tool_choice"] == "none"
+    assert "tool_choice" not in llm.requests[-1]
     assert llm.requests[-1]["messages"][-1]["content"] == finalize_prompt("budget")
 
 
@@ -426,17 +426,84 @@ def test_cached_tokens_from_openai_and_deepseek_fields():
 
 
 # ---------------------------------------------------------------------------
-# 强制收尾保持前缀缓存（阶段 4 实测：不发工具的收尾调用几乎完全没命中缓存）
+# 收尾阶段（阶段 5）
+# 实测：不发工具（4.2 万输入命中 384）和 tools + tool_choice=none（3.5 万输入命中 640）都几乎不命中缓存。
+# 现在收尾请求与平时完全相同，由代码拒绝不允许的工具；tool_choice=none 只作为最后手段。
 # ---------------------------------------------------------------------------
 
+WRITES: list[str] = []
 
-def test_finalize_keeps_same_tools_prefix_for_cache(registry):
+
+@tool(name="write_report")
+def fake_write_report(content: str) -> str:
+    """假的写报告工具。"""
+    WRITES.append(content)
+    return "报告已保存"
+
+
+@pytest.fixture
+def wrapup_registry():
+    WRITES.clear()
+    return ToolRegistry([echo, fake_write_report])
+
+
+def test_finalize_keeps_same_request_shape_for_cache(registry):
     res, llm, _ = run(
         [completion(tool_calls=[("c1", "echo", {"text": "1"})]), completion("收尾")], registry, max_steps=1
     )
     assert res.answer == "收尾"
     assert llm.requests[-1]["tools"] == llm.requests[0]["tools"]  # 与正常调用完全相同的工具说明书
+    assert "tool_choice" not in llm.requests[-1]
+
+
+def test_wrapup_lets_model_write_report_then_answer(wrapup_registry):
+    res, llm, events = run(
+        [
+            completion(tool_calls=[("c1", "echo", {"text": "1"})]),
+            completion(tool_calls=[("c2", "write_report", {"content": "# 报告"})]),
+            completion("总结"),
+        ],
+        wrapup_registry,
+        max_steps=1,
+    )
+    assert res.stop_reason == "max_steps" and res.answer == "总结"
+    assert WRITES == ["# 报告"]  # 收尾阶段真的执行了 write_report
+    assert res.steps == 1  # 收尾调用不计入步数
+    assert all("tool_choice" not in r for r in llm.requests)
+
+
+def test_wrapup_refuses_research_tools(wrapup_registry):
+    res, _, events = run(
+        [
+            completion(tool_calls=[("c1", "echo", {"text": "1"})]),
+            completion(tool_calls=[("c2", "echo", {"text": "还想再查"})]),
+            completion("总结"),
+        ],
+        wrapup_registry,
+        max_steps=1,
+    )
+    refused = tool_results(events)[-1]
+    assert refused["is_error"] and "收尾阶段不能再调用 echo" in refused["content"]
+    assert res.answer == "总结"
+    # 每个工具调用都有对应的 tool 消息，历史合法
+    assert res.messages[-2] == {"role": "tool", "tool_call_id": "c2", "content": refused["content"]}
+
+
+def test_wrapup_exhausted_falls_back_to_tool_choice_none(wrapup_registry):
+    from agent.prompts import WRAPUP_LAST_CALL_PROMPT
+
+    res, llm, _ = run(
+        [completion(tool_calls=[("c1", "echo", {"text": "1"})])]
+        + [completion(tool_calls=[(f"w{i}", "echo", {"text": str(i)})]) for i in range(2)]
+        + [completion("最后的回答")],
+        wrapup_registry,
+        max_steps=1,
+        wrapup_max_calls=2,
+    )
+    assert res.answer == "最后的回答"
+    assert len(llm.requests) == 4
     assert llm.requests[-1]["tool_choice"] == "none"
+    assert llm.requests[-1]["messages"][-1]["content"] == WRAPUP_LAST_CALL_PROMPT
 
 
 def test_finalize_falls_back_when_tool_choice_ignored(registry):
@@ -448,6 +515,7 @@ def test_finalize_falls_back_when_tool_choice_ignored(registry):
         ],
         registry,
         max_steps=1,
+        wrapup_max_calls=0,
     )
     assert res.answer == "不带工具的收尾"
     assert llm.requests[-1]["tools"] is None
@@ -463,6 +531,7 @@ def test_finalize_falls_back_when_tool_choice_rejected(registry):
         ],
         registry,
         max_steps=1,
+        wrapup_max_calls=0,
     )
     assert res.answer == "不带工具的收尾" and res.stop_reason == "max_steps"
     assert llm.requests[-1]["tools"] is None
@@ -470,3 +539,26 @@ def test_finalize_falls_back_when_tool_choice_rejected(registry):
 
 def test_finalize_prompt_restricts_references_to_notes():
     assert "参考资料只能列出笔记中出现过的来源" in finalize_prompt("budget")
+    assert "write_report" in finalize_prompt("max_steps")
+
+
+# ---------------------------------------------------------------------------
+# 剩余步数提醒（阶段 5）
+# ---------------------------------------------------------------------------
+
+
+def test_steps_warning_once_when_few_steps_remain(registry):
+    responses = [completion(tool_calls=[(f"c{i}", "echo", {"text": str(i)})]) for i in range(4)]
+    res, llm, events = run(responses + [completion("done")], registry, max_steps=8, steps_warn_remaining=5)
+    assert res.stop_reason == "final_answer"
+    warned = [r for r in llm.requests if "只剩 5 轮" in str(r["messages"][-1].get("content"))]
+    assert len(warned) == 1  # 第 3 步结束后提醒，只提醒一次
+    assert len(llm.requests[3]["messages"]) == len(llm.requests[2]["messages"]) + 3  # assistant + tool + 提醒
+    assert any("只剩 5 步" in n for n in notices(events))
+
+
+def test_no_steps_warning_when_max_steps_is_small(registry):
+    res, llm, _ = run(
+        [completion(tool_calls=[("c1", "echo", {"text": "1"})]), completion("done")], registry, max_steps=3
+    )
+    assert not any("只剩" in str(m.get("content")) for m in llm.requests[-1]["messages"])

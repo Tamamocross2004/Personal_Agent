@@ -131,7 +131,7 @@ def test_tool_error_is_fed_back_and_loop_continues(registry):
     assert "不存在名为 'nope'" in results[1]["content"]
 
 
-def test_max_steps_forces_final_answer_without_tools(registry):
+def test_max_steps_forces_final_answer(registry):
     looping = [completion(tool_calls=[(f"c{i}", "echo", {"text": "again"})]) for i in range(3)]
     llm = ScriptedLLM(looping + [completion("只能先回答到这里")])
     agent, events = make_agent(llm, registry, max_steps=3)
@@ -143,7 +143,8 @@ def test_max_steps_forces_final_answer_without_tools(registry):
     assert res.answer == "只能先回答到这里"
     assert len(llm.requests) == 4
     last = llm.requests[-1]
-    assert last["tools"] and last["tool_choice"] == "none"  # 收尾：照常发工具说明书（保住缓存），但禁止调用
+    # 收尾阶段：请求格式与平时完全相同（同样的工具说明书、不加 tool_choice），以保住前缀缓存
+    assert last["tools"] == llm.requests[0]["tools"] and "tool_choice" not in last
     assert last["messages"][-1] == {"role": "user", "content": finalize_prompt("max_steps")}
     assert events.of("final")[-1]["stop_reason"] == "max_steps"
 
