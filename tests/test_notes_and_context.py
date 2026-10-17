@@ -349,3 +349,20 @@ def test_compare_cli(tmp_path, capsys):
 
 def test_compare_no_dirs(tmp_path):
     assert compare_main([str(tmp_path / "missing")]) == 1
+
+
+def test_compare_old_trace_without_cache_field_is_not_zero(tmp_path, capsys):
+    """阶段 3 修复之前的日志没有 cached_tokens 字段：应显示"未记录"，而不是 0%。"""
+    old = tmp_path / "old"
+    t = TraceWriter(old / TRACE_FILE)
+    from agent.loop import AgentEvent as E
+
+    t(E("llm_call", {"prompt_tokens": 100, "completion_tokens": 1}))
+    t(E("run_end", {"stop_reason": "final_answer", "steps": 1, "seconds": 1.0}))
+    t.close()
+    assert collect(old).cached_tokens is None
+    new = tmp_path / "new"
+    fake_run(new, [100], "# r")
+    assert compare_main([str(old), str(new)]) == 0
+    out = capsys.readouterr().out
+    assert "未记录" in out and "未命中缓存" in out

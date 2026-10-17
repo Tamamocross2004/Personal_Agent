@@ -36,7 +36,7 @@ class RunStats:
     seconds: float = 0.0
     llm_calls: int = 0
     input_tokens: int = 0
-    cached_tokens: int = 0
+    cached_tokens: int | None = None  # None：日志里没有缓存字段（阶段 3 修复之前的运行），不是 0
     output_tokens: int = 0
     final_context: int = 0
     peak_context: int = 0
@@ -46,6 +46,11 @@ class RunStats:
     compactions: int = 0
     compacted_saved: int = 0
     report_chars: int = 0
+
+    @property
+    def uncached_tokens(self) -> int | None:
+        """未命中缓存的输入 —— 按全价计费，是输入成本的主体（DeepSeek 命中价约为未命中的 1/50）。"""
+        return None if self.cached_tokens is None else self.input_tokens - self.cached_tokens
     refs: int = 0
     refs_unread: list[str] = field(default_factory=list)
 
@@ -64,7 +69,8 @@ def collect(task_dir: Path) -> RunStats:
             st.llm_calls += 1
             p = d.get("prompt_tokens", 0)
             st.input_tokens += p
-            st.cached_tokens += d.get("cached_tokens", 0) or 0
+            if "cached_tokens" in d:
+                st.cached_tokens = (st.cached_tokens or 0) + (d["cached_tokens"] or 0)
             st.output_tokens += d.get("completion_tokens", 0)
             st.final_context = p
             st.peak_context = max(st.peak_context, p)
@@ -114,6 +120,7 @@ ROWS: list[tuple[str, str, bool]] = [
     ("模型调用次数", "llm_calls", True),
     ("累计输入 tokens", "input_tokens", True),
     ("  其中缓存命中", "cached_tokens", False),
+    ("  未命中缓存（贵）", "uncached_tokens", True),
     ("累计输出 tokens", "output_tokens", True),
     ("最后一次上下文", "final_context", True),
     ("峰值上下文", "peak_context", True),
@@ -144,7 +151,13 @@ def render(stats: list[RunStats]) -> Table:
             values = [len(v) for v in values]
             cells = [str(v) for v in values]
         elif attr == "cached_tokens":
-            cells = [f"{v} ({v / s.input_tokens:.0%})" if s.input_tokens else str(v) for v, s in zip(values, stats)]
+            cells = [
+                "未记录" if v is None else (f"{v} ({v / s.input_tokens:.0%})" if s.input_tokens else str(v))
+                for v, s in zip(values, stats)
+            ]
+            values = [None] * len(values)  # 有"未记录"时不算增减
+        elif attr == "uncached_tokens":
+            cells = ["未记录" if v is None else str(v) for v in values]
         else:
             cells = [f"{v:.1f}" if isinstance(v, float) else str(v) for v in values]
         row = [label, *cells]
