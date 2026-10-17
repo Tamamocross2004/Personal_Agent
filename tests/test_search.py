@@ -76,3 +76,57 @@ def test_schema_bounds_visible_to_model():
     props = make_web_search(FakeBackend()).schema()["function"]["parameters"]["properties"]
     assert props["max_results"]["minimum"] == 1
     assert props["max_results"]["maximum"] == 10
+
+
+# ---------- DDGSBackend 重试与地区轮换（注入假的 text 函数，不访问网络） ----------
+
+from tools.search import DDGS_WEB_ENGINES, DDGSBackend  # noqa: E402
+
+
+class FakeText:
+    def __init__(self, outcomes):
+        self.outcomes = list(outcomes)
+        self.calls = []
+
+    def __call__(self, query, region, max_results, backend):
+        self.calls.append((region, backend))
+        item = self.outcomes.pop(0)
+        if isinstance(item, Exception):
+            raise item
+        return item
+
+
+HIT = [{"title": "t", "href": "https://x.com", "body": "b"}]
+
+
+def make_backend(outcomes, **kw):
+    fake = FakeText(outcomes)
+    sleeps = []
+    return DDGSBackend(text_fn=fake, sleep=sleeps.append, **kw), fake, sleeps
+
+
+def test_ddgs_success_first_try_uses_web_engines_only():
+    backend, fake, sleeps = make_backend([HIT])
+    assert backend.search("hello", 5) == [SearchResult("t", "https://x.com", "b")]
+    assert fake.calls == [("wt-wt", DDGS_WEB_ENGINES)]
+    assert "wikipedia" not in DDGS_WEB_ENGINES
+    assert sleeps == []
+
+
+def test_ddgs_chinese_query_prefers_cn_region_and_rotates_on_retry():
+    backend, fake, sleeps = make_backend([Exception("No results found."), [], HIT])
+    assert backend.search("国产大模型", 5)[0].url == "https://x.com"
+    assert [r for r, _ in fake.calls] == ["cn-zh", "wt-wt", "cn-zh"]
+    assert sleeps == [1.0, 2.0]
+
+
+def test_ddgs_gives_clear_error_after_all_attempts():
+    backend, fake, _ = make_backend([Exception("boom")] * 3)
+    with pytest.raises(RuntimeError, match="尝试 3 次均未得到结果"):
+        backend.search("x", 5)
+    assert len(fake.calls) == 3
+
+
+def test_ddgs_skips_results_without_url():
+    backend, _, _ = make_backend([[{"title": "no url"}], HIT])
+    assert len(backend.search("x", 5)) == 1
