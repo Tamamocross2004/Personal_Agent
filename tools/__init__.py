@@ -10,6 +10,7 @@ from tools.basic import calculator, days_between, get_current_time
 from tools.fetch import make_fetch_url
 from tools.registry import Tool, ToolRegistry, ToolResult, tool
 from tools.notes import make_notes_tools
+from tools.plan import make_update_plan
 from tools.report import make_write_report
 from tools.search import DDGSBackend, SearchBackend, make_web_search
 from tools.session import ResearchSession
@@ -22,6 +23,7 @@ def default_registry(
     fetch_fallback: str = "none",
     jina_api_key: str = "",
     session: ResearchSession | None = None,
+    on_plan_update: callable = None,
 ) -> ToolRegistry:
     """为一次研究任务组装全部工具。
 
@@ -35,6 +37,7 @@ def default_registry(
             make_web_search(search_backend or DDGSBackend()),
             make_fetch_url(http_client, fallback=fetch_fallback, jina_api_key=jina_api_key, pages=session.pages),
             *make_notes_tools(task_dir, session),
+            make_update_plan(task_dir, on_update=on_plan_update),
             make_write_report(task_dir),
             calculator,
             days_between,

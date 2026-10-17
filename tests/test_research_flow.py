@@ -51,6 +51,7 @@ def test_default_registry_tools(tmp_path):
         "fetch_url",
         "save_note",
         "read_notes",
+        "update_plan",
         "write_report",
         "calculator",
         "days_between",

@@ -37,6 +37,7 @@ import threading
 import time
 from dataclasses import asdict, dataclass, field
 from datetime import date
+from pathlib import Path
 from typing import Any, Callable, Literal, Protocol
 
 import openai
@@ -44,6 +45,7 @@ from openai.types.chat import ChatCompletion, ChatCompletionMessage
 
 from agent.context import ContextCompactor, estimate_messages, estimate_tools
 from agent.errors import classify_api_error
+from agent.planner import format_plan_for_prompt, generate_plan, load_plan
 from agent.prompts import (
     CONTINUE_PROMPT,
     EMPTY_REPLY_PROMPT,
@@ -156,6 +158,7 @@ class Agent:
         max_blocked_repeats: int = 3,
         compactor: ContextCompactor | None = None,
         on_event: EventHandler | None = None,
+        task_dir: Path | None = None,
     ):
         self.llm = llm
         self.registry = registry
@@ -169,6 +172,7 @@ class Agent:
         self.max_blocked_repeats = max_blocked_repeats
         self.compactor = compactor
         self.on_event = on_event
+        self.task_dir = task_dir
 
     # ------------------------------------------------------------------
     # 对外接口
@@ -201,6 +205,7 @@ class Agent:
         )
         started = time.perf_counter()
         try:
+            self._plan(messages, question)
             stop, answer, error = self._loop(messages)
         except KeyboardInterrupt:
             self._emit("notice", text="用户中断（Ctrl+C），任务停止。")
@@ -304,6 +309,7 @@ class Agent:
                     seconds=round(seconds, 2),
                 )
                 messages.append({"role": "tool", "tool_call_id": call.id, "content": content})
+
             if truncated:
                 self._emit("notice", text="回复因输出长度上限被截断，工具调用未执行，已告知模型分段处理。")
 
@@ -347,6 +353,30 @@ class Agent:
             finish_reason=resp.choices[0].finish_reason if resp.choices else None,
         )
         return resp
+
+    def _plan(self, messages: list[dict[str, Any]], question: str) -> None:
+        """任务开始时先拆解计划，一次性写进 system 消息。
+
+        之后 system 消息不再改动（改动开头会让整段历史的前缀缓存失效）；
+        计划的进展由 update_plan 工具的返回值带回，只往历史末尾追加。
+        规划本身走 _call_llm，所以计入预算并写进 trace。规划失败不影响主流程。
+        """
+        if not self.task_dir:
+            return
+        try:
+            plan = generate_plan(question, lambda m, **kw: self._call_llm(m, None, None, **kw), self.task_dir)
+        except openai.APIError as e:
+            self._emit("notice", text=f"生成计划失败（{type(e).__name__}），将不带计划继续。")
+            return
+        finally:
+            # 规划请求的 prompt 与主循环无关，基准作废
+            self._last_prompt = 0
+            self._len_at_last_call = 0
+        text = format_plan_for_prompt(plan)
+        if text:
+            messages[0]["content"] += "\n\n" + text
+            self._emit("plan", plan=plan)
+            self._emit("notice", text="已生成研究计划（plan.json）。")
 
     def _estimate_context(self, messages: list[dict[str, Any]], tools: list[dict[str, Any]] | None) -> int:
         """下一次请求的输入 token 估算 = 上一次的真实输入 + 之后新增消息的估算。

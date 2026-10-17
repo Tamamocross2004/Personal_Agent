@@ -101,6 +101,7 @@ def research(llm: LLMClient, settings: Settings, question: str, max_steps: int, 
         tool_timeout=settings.tool_timeout,
         compactor=compactor,
         on_event=fanout(show_event, tracer),
+        task_dir=task_dir,
     )
     try:
         result = agent.run(question)
