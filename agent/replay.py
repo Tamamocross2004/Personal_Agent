@@ -41,7 +41,7 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     console.print(f"[dim]回放：{path}[/]")
-    calls = prompt = completion = 0
+    calls = prompt = completion = cached = 0
     seconds = 0.0
     for ev in events:
         show_event(ev, full=args.full)
@@ -49,9 +49,12 @@ def main(argv: list[str] | None = None) -> int:
             calls += 1
             prompt += ev.data.get("prompt_tokens", 0)
             completion += ev.data.get("completion_tokens", 0)
+            cached += ev.data.get("cached_tokens", 0) or 0
             seconds += ev.data.get("seconds", 0)
     if calls:
         console.print(usage_table([(calls, prompt, completion, prompt + completion, f"{seconds:.2f}")]))
+        if cached:
+            console.print(f"[dim]其中输入命中缓存 {cached} tokens（{cached / prompt:.0%}），这部分按缓存价计费。[/]")
     if not any(ev.kind == "run_end" for ev in events):
         console.print("[yellow]日志没有 run_end 事件：这次运行可能被强制终止了。[/]")
     return 0

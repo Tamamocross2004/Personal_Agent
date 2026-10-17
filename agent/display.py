@@ -43,8 +43,10 @@ def show_event(ev: AgentEvent, full: bool = False) -> None:
     elif k == "llm_call":
         finish = d.get("finish_reason")
         extra = f" · finish={finish}" if finish not in (None, "stop", "tool_calls") else ""
+        cached = d.get("cached_tokens") or 0
+        cache = f"（缓存命中 {cached}）" if cached else ""
         console.print(
-            f"[dim]  模型调用 {d.get('seconds', 0):.1f}s · 输入 {d.get('prompt_tokens', 0)} / "
+            f"[dim]  模型调用 {d.get('seconds', 0):.1f}s · 输入 {d.get('prompt_tokens', 0)}{cache} / "
             f"输出 {d.get('completion_tokens', 0)} tokens{extra}[/]"
         )
     elif k == "thought":

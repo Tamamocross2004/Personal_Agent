@@ -102,7 +102,11 @@ def extract(content: bytes, ctype: str, url: str) -> Page:
             text = fallback
     if not text or not text.strip():
         raise FetchError("没能从页面提取到正文（可能需要登录或依赖 JavaScript 渲染），请换一个来源")
-    return Page(url, title, date, text.strip())
+    text = text.strip()
+    missing = _recover_tables(content, text)
+    if missing:
+        text += "\n\n## （以下表格由备用解析器补充提取；空白格表示与左侧单元格合并）\n\n" + "\n\n".join(missing)
+    return Page(url, title, date, text)
 
 
 def _extract_with_bs4(content: bytes) -> str:
@@ -113,6 +117,84 @@ def _extract_with_bs4(content: bytes) -> str:
         tag.decompose()
     lines = (line.strip() for line in soup.get_text("\n").splitlines())
     return "\n".join(line for line in lines if line)
+
+
+# ---------------------------------------------------------------------------
+# 表格补救
+#
+# 实测发现：trafilatura 会整张丢掉带合并单元格（colspan / rowspan）的表格，
+# 而文档站的"模型 & 价格"之类最关键的信息恰恰常用这种表格（例：DeepSeek 定价页）。
+# 这里用 BeautifulSoup 找出正文里没出现的表格，按合并单元格展开成普通 Markdown 表格补在末尾。
+# ---------------------------------------------------------------------------
+
+MAX_RECOVERED_TABLES = 5
+
+
+def _cell_text(cell) -> str:
+    return " ".join(cell.get_text(" ", strip=True).split()).replace("|", "/")
+
+
+def table_to_markdown(table) -> str:
+    """把 HTML 表格展开成 Markdown，保证每一列对齐。
+
+    - rowspan（纵向合并）：每一行都重复写上该值，这样每行单独看也能读懂（例如每行都标明"价格"）
+    - colspan（横向合并）：值写在第一格，其余格留空。不能重复写——否则相邻两列真实的相同值
+      （比如两个模型都"支持"）就和合并单元格分不清了
+    """
+    grid: dict[tuple[int, int], str] = {}
+    for r, tr in enumerate(table.find_all("tr")):
+        c = 0
+        for cell in tr.find_all(["td", "th"]):
+            while (r, c) in grid:  # 跳过被上方 rowspan 占住的格子
+                c += 1
+            text = _cell_text(cell)
+            rs = min(_int_attr(cell, "rowspan"), 50)
+            cs = min(_int_attr(cell, "colspan"), 20)
+            for dr in range(rs):
+                for dc in range(cs):
+                    grid[(r + dr, c + dc)] = text if dc == 0 else ""
+            c += cs
+    if not grid:
+        return ""
+    n_rows = max(r for r, _ in grid) + 1
+    n_cols = max(c for _, c in grid) + 1
+    rows = ["| " + " | ".join(grid.get((r, c), "") for c in range(n_cols)) + " |" for r in range(n_rows)]
+    rows.insert(1, "|" + "---|" * n_cols)
+    return "\n".join(rows)
+
+
+def _int_attr(cell, name: str) -> int:
+    try:
+        return max(int(cell.get(name, 1) or 1), 1)
+    except ValueError:
+        return 1
+
+
+def _recover_tables(content: bytes, text: str) -> list[str]:
+    if b"<table" not in content:
+        return []
+    from bs4 import BeautifulSoup
+
+    soup = BeautifulSoup(content, "lxml")
+    # 只在已有的 Markdown 表格行里找：单元格文字散落在正文里（例如 bs4 兜底提取的逐行文本）不算"表格已存在"
+    table_rows = " ".join(" ".join(line.split()) for line in text.splitlines() if line.lstrip().startswith("|"))
+    out = []
+    for table in soup.find_all("table"):
+        if table.find_parent("table"):  # 嵌套表格交给外层处理
+            continue
+        cells = [_cell_text(c) for c in table.find_all(["td", "th"])]
+        cells = [c for c in cells if len(c) >= 2]
+        if len(cells) < 4:  # 太小的多半是排版用表格
+            continue
+        present = sum(1 for c in cells if c in table_rows)
+        if present / len(cells) >= 0.5:  # 正文里已经有这张表
+            continue
+        md = table_to_markdown(table)
+        if md:
+            out.append(md)
+        if len(out) >= MAX_RECOVERED_TABLES:
+            break
+    return out
 
 
 _JINA_FIELD = re.compile(r"^(Title|URL Source|Published Time):\s*(.*)$", re.MULTILINE)

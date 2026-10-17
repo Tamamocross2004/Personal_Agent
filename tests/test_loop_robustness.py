@@ -126,21 +126,37 @@ def test_persistent_repeats_trigger_loop_detected_and_finalize(registry):
 # ---------------------------------------------------------------------------
 
 
-def test_budget_warning_injected_once_at_80_percent(registry):
+def test_budget_warning_then_projected_overrun_finalizes(registry):
+    """调用 1 后累计 300；调用 2 后累计 800（=80%）→ 提醒；
+    第 3 步预估 800 + 500 > 1000 → 不再开始新一轮，直接收尾。"""
     res, llm, events = run(
         [
-            completion(tool_calls=[("c1", "echo", {"text": "1"})], prompt_tokens=850, completion_tokens=0),
-            completion(tool_calls=[("c2", "echo", {"text": "2"})], prompt_tokens=50, completion_tokens=0),
-            completion("done", prompt_tokens=10, completion_tokens=0),
+            completion(tool_calls=[("c1", "echo", {"text": "1"})], prompt_tokens=300, completion_tokens=0),
+            completion(tool_calls=[("c2", "echo", {"text": "2"})], prompt_tokens=500, completion_tokens=0),
+            completion("收尾", prompt_tokens=520, completion_tokens=0),
         ],
         registry,
         token_budget=1000,
     )
-    assert res.stop_reason == "final_answer"
-    assert res.total_tokens == 910
-    warnings = [m for m in llm.requests[-1]["messages"] if "已使用 850 / 1000" in str(m.get("content"))]
-    assert len(warnings) == 1  # 只提醒一次
-    assert warnings[0]["role"] == "user"
+    assert res.stop_reason == "budget"
+    assert res.answer == "收尾"
+    final_msgs = llm.requests[-1]["messages"]
+    warnings = [m for m in final_msgs if "已使用 800 / 1000" in str(m.get("content"))]
+    assert len(warnings) == 1 and warnings[0]["role"] == "user"  # 只提醒一次
+    assert final_msgs[-1]["content"] == finalize_prompt("budget")
+    assert llm.requests[-1]["tools"] is None
+
+
+def test_budget_allows_normal_finish(registry):
+    res, _, _ = run(
+        [
+            completion(tool_calls=[("c1", "echo", {"text": "1"})], prompt_tokens=100, completion_tokens=0),
+            completion("done", prompt_tokens=150, completion_tokens=0),
+        ],
+        registry,
+        token_budget=1000,
+    )
+    assert res.stop_reason == "final_answer" and res.total_tokens == 250
 
 
 def test_budget_exhausted_forces_finalize(registry):
@@ -327,6 +343,7 @@ def test_run_start_and_end_events_and_token_total(registry):
     assert [(c["prompt_tokens"], c["completion_tokens"]) for c in llm_calls] == [(100, 10), (200, 20)]
     end = events[-1].data
     assert end["stop_reason"] == "final_answer" and end["total_tokens"] == 330 == res.total_tokens
+    assert all(c["cached_tokens"] == 0 for c in llm_calls)
     assert "seconds" in tool_results(events)[0]
 
 
@@ -352,3 +369,24 @@ def test_run_start_and_end_events_and_token_total(registry):
 )
 def test_classify_api_error(cls, message, expected):
     assert classify_api_error(api_error(cls, message)) == expected
+
+
+# ---------------------------------------------------------------------------
+# 缓存命中统计
+# ---------------------------------------------------------------------------
+
+
+def test_cached_tokens_from_openai_and_deepseek_fields():
+    from agent.loop import _cached_tokens
+
+    std = completion("x").usage.model_copy(update={"prompt_tokens_details": {"cached_tokens": 70}})
+    std = type(completion("x").usage).model_validate(
+        {"prompt_tokens": 100, "completion_tokens": 1, "total_tokens": 101, "prompt_tokens_details": {"cached_tokens": 70}}
+    )
+    ds = type(completion("x").usage).model_validate(
+        {"prompt_tokens": 100, "completion_tokens": 1, "total_tokens": 101, "prompt_cache_hit_tokens": 90}
+    )
+    assert _cached_tokens(std) == 70
+    assert _cached_tokens(ds) == 90
+    assert _cached_tokens(None) == 0
+    assert _cached_tokens(completion("x").usage) == 0

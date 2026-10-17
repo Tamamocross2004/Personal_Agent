@@ -86,11 +86,12 @@ class DDGSBackend:
             results = [
                 SearchResult(
                     title=(r.get("title") or "").strip(),
-                    url=(r.get("href") or r.get("url") or "").strip(),
+                    url=url,
                     snippet=(r.get("body") or "").strip(),
                 )
                 for r in raw
-                if r.get("href") or r.get("url")
+                # 个别引擎会返回 "/clev?event=..." 这种站内跳转的相对链接，模型拿去 fetch 只会失败
+                if (url := (r.get("href") or r.get("url") or "").strip()).startswith(("http://", "https://"))
             ]
             if results:
                 return results

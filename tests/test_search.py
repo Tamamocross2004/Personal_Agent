@@ -130,3 +130,12 @@ def test_ddgs_gives_clear_error_after_all_attempts():
 def test_ddgs_skips_results_without_url():
     backend, _, _ = make_backend([[{"title": "no url"}], HIT])
     assert len(backend.search("x", 5)) == 1
+
+
+def test_ddgs_drops_relative_redirect_urls():
+    raw = [
+        {"title": "知乎", "href": "/clev?event=Sp_x9&sc=abc", "body": ""},
+        {"title": "ok", "href": "https://ok.com", "body": ""},
+    ]
+    backend, _, _ = make_backend([raw])
+    assert [r.url for r in backend.search("x", 5)] == ["https://ok.com"]

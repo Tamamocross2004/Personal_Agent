@@ -81,7 +81,7 @@ class AgentEvent:
     kind:
       run_start    任务开始         data: question, max_steps, token_budget, tools
       step         新一轮开始       data: step
-      llm_call     一次模型调用完成 data: step, prompt_tokens, completion_tokens, seconds, finish_reason
+      llm_call     一次模型调用完成 data: step, prompt_tokens, cached_tokens, completion_tokens, seconds, finish_reason
       thought      调用工具前的说明 data: text
       tool_call    模型请求调用工具 data: id, name, arguments
       tool_result  工具执行结果     data: id, name, content, is_error, seconds
@@ -148,6 +148,7 @@ class Agent:
     def run(self, question: str) -> AgentResult:
         # 每次 run 的状态都重新初始化
         self._tokens = 0
+        self._last_prompt = 0  # 上一次调用的输入 token 数，用来预估下一次调用的开销
         self._steps = 0
         self._budget_warned = False
         self._blocked = 0
@@ -194,7 +195,9 @@ class Agent:
             self._steps = step
             self._emit("step", step=step)
 
-            if self._tokens >= self.token_budget:
+            # 每次调用都要把整个历史重新发一遍，下一次的输入至少和上一次一样大。
+            # 所以不是等超了才停，而是预估"再调用一次就会超"时就收尾（收尾调用本身仍会花掉约一次的量）。
+            if self._tokens + self._last_prompt >= self.token_budget:
                 return self._finalize(messages, "budget")
 
             # ---- 1. 调用模型 ----
@@ -285,10 +288,12 @@ class Agent:
         p = u.prompt_tokens if u else 0
         c = u.completion_tokens if u else 0
         self._tokens += p + c
+        self._last_prompt = p
         self._emit(
             "llm_call",
             step=step,
             prompt_tokens=p,
+            cached_tokens=_cached_tokens(u),
             completion_tokens=c,
             seconds=round(time.perf_counter() - started, 2),
             finish_reason=resp.choices[0].finish_reason if resp.choices else None,
@@ -391,6 +396,20 @@ def _stop_for(kind: str) -> StopReason:
     return {"context_overflow": "context_overflow", "content_filter": "content_filter"}.get(
         kind, "error"
     )  # type: ignore[return-value]
+
+
+def _cached_tokens(usage: Any) -> int:
+    """输入中命中厂商缓存的 token 数（命中部分通常只收 1/10～1/50 的价格）。
+
+    各家字段不同：OpenAI 标准是 prompt_tokens_details.cached_tokens，DeepSeek 是 prompt_cache_hit_tokens。
+    """
+    if usage is None:
+        return 0
+    details = getattr(usage, "prompt_tokens_details", None)
+    cached = getattr(details, "cached_tokens", None) if details else None
+    if cached is None:
+        cached = (getattr(usage, "model_extra", None) or {}).get("prompt_cache_hit_tokens")
+    return int(cached or 0)
 
 
 def _normalize_args(arguments: str) -> str:

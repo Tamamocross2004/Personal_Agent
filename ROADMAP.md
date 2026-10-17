@@ -100,7 +100,7 @@ def run_agent(question: str, max_steps: int = 30) -> str:
 | 0 环境与单次调用 | ✅ 已完成 | 2026-10-16 | `stage-0` |
 | 1 最小 Agent 循环 | ✅ 已完成（DeepSeek 实测通过） | 2026-10-17 | `stage-1` |
 | 2 真正的研究工具 | ✅ 已完成（DeepSeek 实测通过） | 2026-10-17 | `stage-2` |
-| 3 错误处理与健壮性 | ✅ 已完成（待真实模型验收） | 2026-10-17 | `stage-3` |
+| 3 错误处理与健壮性 | ✅ 已完成（DeepSeek 实测通过） | 2026-10-17 | `stage-3` |
 | 4 笔记与上下文管理 | ⏳ 下一步 | | |
 | 5–9 | 未开始 | | |
 
@@ -178,6 +178,17 @@ def run_agent(question: str, max_steps: int = 30) -> str:
   - **配置**：`.env` 新增 `AGENT_MAX_STEPS`、`AGENT_TOKEN_BUDGET`、`TOOL_TIMEOUT`、`LLM_MAX_TOKENS`、`FETCH_FALLBACK`、`JINA_API_KEY`；命令行新增 `--budget`。
   - **故障注入测试**：`tests/test_loop_robustness.py`、`tests/test_trace_and_jina.py`，覆盖上面每一种情况（共 176 个用例）。
   - 💡 踩坑：在 bash 里用 `cmd &` 启动的后台进程会忽略 SIGINT，第一次“Ctrl+C 测试”其实没发出信号——测信号处理要确保子进程的 SIGINT 是默认行为。
+- 🔍 DeepSeek 实测 + replay 复盘（2026-10-17，问题“对比 DeepSeek、智谱 GLM 和 Kimi 的 Agent 能力”）：
+  - 15 步正常完成，6 次搜索轮、14 次读网页全部成功（本次没触发 Jina），一次写出 8589 字报告；模型会主动识别“SEO 内容农场”并转向官方文档、并行发起多个工具调用。
+  - **token 曲线**：每次调用的输入从 1.5k 涨到 42k，累计 **33.5 万输入 tokens**——最后上下文只有 4.2 万，但因为每轮重发全部历史，累计量是它的 8 倍。这就是阶段 4 要解决的问题。
+  - **预算超了 14%**（341,599 / 300,000）：原来的检查是“开始新一轮前是否已超”，而单次调用就有 4 万，检查通过后一次调用就冲过了线。
+    → 修复：改为**预估**——“已用 + 上一次的输入量 ≥ 预算”就收尾（下一次输入至少和上一次一样大）。
+  - **引用问题**：17 条参考资料中有 **4 条没有读过**（只在搜索摘要里见过），其中两条还承载了价格数据。prompt 里写了“只能列出读过的网页”，模型仍然违反 → 光靠 prompt 不够，阶段 7 要做**程序化的引用校验**（比对 trace 中实际 fetch 过的 URL）。
+  - **工具缺陷：表格丢失**。模型报告“DeepSeek 官方定价页的价格表格没能提取”，排查发现 trafilatura 会整张丢掉被包在 `<b>` 等标签里的表格；同样问题还出现在智谱文档的 Coding Plan 额度表上——这正是模型找不到、转而引用未读的第三方页面的原因。
+    → 修复：`_recover_tables()` 用 BeautifulSoup 找出正文里缺失的表格，按 colspan/rowspan 展开成对齐的 Markdown 表格补在末尾。
+  - 搜索结果混进了 `/clev?event=...` 这种相对跳转链接 → 修复：只保留 http(s) 链接。
+  - 新增：`llm_call` 事件记录**缓存命中 token**（DeepSeek `prompt_cache_hit_tokens` / OpenAI `cached_tokens`），终端与回放显示。多轮 Agent 每次请求的前缀都相同，命中部分只按缓存价计费，实际花费远低于 token 总量看起来的样子。
+  - 其它观察：搜索每次约 4.5s（多引擎聚合），工具串行执行；一轮里多个工具调用可以并行，留作后续优化。
 
 ### 阶段 4：笔记与上下文管理 ——“短期记忆”（1–2 天）
 - 新增 `save_note(topic, content, source_url)` / `read_notes()` 工具，笔记落盘到 `notes.md`。

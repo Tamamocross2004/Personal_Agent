@@ -129,3 +129,53 @@ def test_failed_fetch_is_not_cached():
     routes["https://a.com/flaky"] = html(ARTICLE)
     assert not fetch(reg, "https://a.com/flaky").is_error
     assert hits["n"] == 2
+
+
+# ---------- 表格补救 ----------
+# 复现 DeepSeek 定价页的真实结构：表格被包在 <div><b>…</b></div> 里，trafilatura 会整张丢掉。
+
+PRICING = """<html><head><title>模型 & 价格</title></head><body><article>
+<h1>模型 & 价格</h1>
+<p>下表所列模型价格以百万 tokens 为单位。我们将根据模型输入和输出的总 token 数进行计量计费，费用从余额中扣减。</p>
+<p>空闲时段价格为高峰时段价格的一半。北京时间周一至周五 9:00-12:00、14:00-18:00 为高峰时段，其余为空闲时段。</p>
+<div><b><table>
+<tr><td colspan="2">模型</td><td>flash</td><td>pro</td></tr>
+<tr><td colspan="2">上下文长度</td><td colspan="2">1M</td></tr>
+<tr><td rowspan="2">功能</td><td>Tool Calls</td><td>支持</td><td>支持</td></tr>
+<tr><td>图像理解</td><td>支持</td><td>不支持</td></tr>
+<tr><td rowspan="2">价格</td><td>输入</td><td>1元</td><td>4.5元</td></tr>
+<tr><td>输出</td><td>4元</td><td>13.5元</td></tr>
+</table></b></div>
+<p>产品价格可能发生变动，请定期查看此页面以获知最新价格信息。</p>
+</article></body></html>"""
+
+
+def test_recovers_table_dropped_by_trafilatura():
+    reg, _ = make_tool({"https://a.com/pricing": html(PRICING)})
+    c = fetch(reg, "https://a.com/pricing").content
+    assert "备用解析器补充提取" in c
+    assert "| 模型 |  | flash | pro |" in c
+    assert "| 上下文长度 |  | 1M |  |" in c  # colspan：值在首格，其余留空
+    assert "| 功能 | Tool Calls | 支持 | 支持 |" in c  # 两列真实相同的值都保留
+    assert "| 功能 | 图像理解 | 支持 | 不支持 |" in c  # rowspan：每行重复"功能"
+    assert "| 价格 | 输出 | 4元 | 13.5元 |" in c
+
+
+def test_table_already_extracted_is_not_duplicated():
+    simple = ARTICLE.replace(
+        "</article>",
+        "<table><tr><th>模型</th><th>价格</th></tr><tr><td>flash</td><td>1元</td></tr>"
+        "<tr><td>pro</td><td>4元</td></tr></table></article>",
+    )
+    reg, _ = make_tool({"https://a.com/s": html(simple)})
+    c = fetch(reg, "https://a.com/s").content
+    assert "flash" in c and "备用解析器" not in c
+
+
+def test_table_to_markdown_bad_span_attributes():
+    from bs4 import BeautifulSoup
+
+    from tools.fetch import table_to_markdown
+
+    t = BeautifulSoup('<table><tr><td colspan="abc">a</td><td rowspan="0">b</td></tr></table>', "lxml").table
+    assert table_to_markdown(t) == "| a | b |\n|---|---|"
