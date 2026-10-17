@@ -64,7 +64,7 @@ class ScriptedLLM:
 
     def chat(self, messages, tools=None, **kwargs):
         # 深拷贝：Agent 会继续往同一个 list 里追加消息
-        self.requests.append({"messages": copy.deepcopy(messages), "tools": tools})
+        self.requests.append({"messages": copy.deepcopy(messages), "tools": tools, **kwargs})
         if not self.responses:
             raise AssertionError("剧本里的回复已用完，Agent 调用模型的次数比预期多")
         item = self.responses.pop(0)

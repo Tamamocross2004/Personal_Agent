@@ -143,7 +143,7 @@ def test_max_steps_forces_final_answer_without_tools(registry):
     assert res.answer == "只能先回答到这里"
     assert len(llm.requests) == 4
     last = llm.requests[-1]
-    assert last["tools"] is None  # 收尾调用不再提供工具
+    assert last["tools"] and last["tool_choice"] == "none"  # 收尾：照常发工具说明书（保住缓存），但禁止调用
     assert last["messages"][-1] == {"role": "user", "content": finalize_prompt("max_steps")}
     assert events.of("final")[-1]["stop_reason"] == "max_steps"
 

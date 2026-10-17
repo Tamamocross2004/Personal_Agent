@@ -75,7 +75,7 @@ class ChatModel(Protocol):
     """Agent 只依赖这一个方法 —— LLMClient 满足它，测试里的假模型也满足它。"""
 
     def chat(
-        self, messages: list[dict[str, Any]], tools: list[dict[str, Any]] | None = None
+        self, messages: list[dict[str, Any]], tools: list[dict[str, Any]] | None = None, **kwargs: Any
     ) -> ChatCompletion: ...
 
 
@@ -198,7 +198,7 @@ class Agent:
     # ------------------------------------------------------------------
 
     def _loop(self, messages: list[dict[str, Any]]) -> tuple[StopReason, str, str | None]:
-        tools = self.registry.schemas()
+        tools = self._tools = self.registry.schemas()
         pending_text: list[str] = []  # 被截断、正在续写的回答
         empty_replies = 0
 
@@ -296,11 +296,15 @@ class Agent:
     # ------------------------------------------------------------------
 
     def _call_llm(
-        self, messages: list[dict[str, Any]], tools: list[dict[str, Any]] | None, step: int | None
+        self,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]] | None,
+        step: int | None,
+        **kwargs: Any,
     ) -> ChatCompletion:
         started = time.perf_counter()
         self._len_at_last_call = len(messages)
-        resp = self.llm.chat(messages, tools=tools)
+        resp = self.llm.chat(messages, tools=tools, **kwargs)
         u = resp.usage
         p = u.prompt_tokens if u else 0
         c = u.completion_tokens if u else 0
@@ -418,14 +422,27 @@ class Agent:
     def _finalize(
         self, messages: list[dict[str, Any]], reason: StopReason
     ) -> tuple[StopReason, str, str | None]:
-        """强制收尾：不提供工具，让模型基于已有信息作答。"""
+        """强制收尾：禁止调用工具，让模型基于已有信息作答。
+
+        注意是"照常发送工具说明书 + tool_choice=none"，而不是不发工具：
+        厂商的前缀缓存把工具说明书也算在请求开头，去掉它会让整段历史都无法命中缓存。
+        阶段 4 实测：不发工具的收尾调用 4.2 万输入只命中了 384 个 token。
+        个别厂商不支持 tool_choice=none 时（仍返回工具调用或报错），退回到不发工具的老做法。
+        """
         self._emit("notice", text=f"触发强制收尾（{reason}），不再调用工具。")
         messages.append({"role": "user", "content": finalize_prompt(reason)})
         try:
-            resp = self._call_llm(messages, None, None)
+            resp = self._call_llm(messages, getattr(self, "_tools", None) or None, None, tool_choice="none")
+            if resp.choices[0].message.tool_calls and not resp.choices[0].message.content:
+                raise _ToolChoiceIgnored
+        except (openai.BadRequestError, _ToolChoiceIgnored):
+            try:
+                resp = self._call_llm(messages, None, None)
+            except openai.APIError as e:
+                return reason, "", f"收尾调用失败：{type(e).__name__}: {e}"
         except openai.APIError as e:
             return reason, "", f"收尾调用失败：{type(e).__name__}: {e}"
-        msg = resp.choices[0].message
+        msg = resp.choices[0].message.model_copy(update={"tool_calls": None})
         messages.append(_assistant_message_to_dict(msg))
         answer = msg.content or ""
         self._emit("final", text=answer, stop_reason=reason)
@@ -439,6 +456,10 @@ class Agent:
 # ----------------------------------------------------------------------
 # 工具函数
 # ----------------------------------------------------------------------
+
+
+class _ToolChoiceIgnored(Exception):
+    """收尾时模型无视 tool_choice=none，仍然只返回了工具调用。"""
 
 
 def _stop_for(kind: str) -> StopReason:

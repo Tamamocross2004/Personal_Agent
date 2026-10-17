@@ -117,7 +117,7 @@ def test_persistent_repeats_trigger_loop_detected_and_finalize(registry):
     assert res.answer == "收尾回答"
     assert res.steps == 4  # 第 1 次执行，第 2-4 次被拦截，拦截 3 次后收尾
     last = llm.requests[-1]
-    assert last["tools"] is None
+    assert last["tool_choice"] == "none"
     assert last["messages"][-1]["content"] == finalize_prompt("loop_detected")
 
 
@@ -144,7 +144,7 @@ def test_budget_warning_then_projected_overrun_finalizes(registry):
     warnings = [m for m in final_msgs if "已使用 800 / 1000" in str(m.get("content"))]
     assert len(warnings) == 1 and warnings[0]["role"] == "user"  # 只提醒一次
     assert final_msgs[-1]["content"] == finalize_prompt("budget")
-    assert llm.requests[-1]["tools"] is None
+    assert llm.requests[-1]["tool_choice"] == "none"
 
 
 def test_budget_allows_normal_finish(registry):
@@ -171,7 +171,7 @@ def test_budget_exhausted_forces_finalize(registry):
     assert res.stop_reason == "budget"
     assert res.answer == "预算内的收尾"
     assert len(llm.requests) == 2
-    assert llm.requests[-1]["tools"] is None
+    assert llm.requests[-1]["tool_choice"] == "none"
     assert llm.requests[-1]["messages"][-1]["content"] == finalize_prompt("budget")
 
 
@@ -390,3 +390,50 @@ def test_cached_tokens_from_openai_and_deepseek_fields():
     assert _cached_tokens(ds) == 90
     assert _cached_tokens(None) == 0
     assert _cached_tokens(completion("x").usage) == 0
+
+
+# ---------------------------------------------------------------------------
+# 强制收尾保持前缀缓存（阶段 4 实测：不发工具的收尾调用几乎完全没命中缓存）
+# ---------------------------------------------------------------------------
+
+
+def test_finalize_keeps_same_tools_prefix_for_cache(registry):
+    res, llm, _ = run(
+        [completion(tool_calls=[("c1", "echo", {"text": "1"})]), completion("收尾")], registry, max_steps=1
+    )
+    assert res.answer == "收尾"
+    assert llm.requests[-1]["tools"] == llm.requests[0]["tools"]  # 与正常调用完全相同的工具说明书
+    assert llm.requests[-1]["tool_choice"] == "none"
+
+
+def test_finalize_falls_back_when_tool_choice_ignored(registry):
+    res, llm, _ = run(
+        [
+            completion(tool_calls=[("c1", "echo", {"text": "1"})]),
+            completion(tool_calls=[("c2", "echo", {"text": "2"})]),  # 无视 tool_choice=none
+            completion("不带工具的收尾"),
+        ],
+        registry,
+        max_steps=1,
+    )
+    assert res.answer == "不带工具的收尾"
+    assert llm.requests[-1]["tools"] is None
+    assert "tool_calls" not in res.messages[-1]  # 历史里不留下没有回应的工具调用
+
+
+def test_finalize_falls_back_when_tool_choice_rejected(registry):
+    res, llm, _ = run(
+        [
+            completion(tool_calls=[("c1", "echo", {"text": "1"})]),
+            api_error(openai.BadRequestError, "tool_choice none is not supported"),
+            completion("不带工具的收尾"),
+        ],
+        registry,
+        max_steps=1,
+    )
+    assert res.answer == "不带工具的收尾" and res.stop_reason == "max_steps"
+    assert llm.requests[-1]["tools"] is None
+
+
+def test_finalize_prompt_restricts_references_to_notes():
+    assert "参考资料只能列出笔记中出现过的来源" in finalize_prompt("budget")
