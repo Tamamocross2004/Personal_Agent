@@ -8,7 +8,7 @@
 
 - [x] 阶段 0：环境搭建 + LLM 客户端（多厂商切换、重试、token 统计）
 - [x] 阶段 1：最小 Agent 循环（工具注册表 + tool calling 循环 + 基础工具）
-- [ ] 阶段 2：搜索 / 读网页 / 写报告
+- [x] 阶段 2：搜索 / 读网页 / 写报告（ddgs + trafilatura，分段阅读，报告落盘）
 - [ ] 阶段 3：错误处理与健壮性
 - [ ] 阶段 4：笔记与上下文管理
 - [ ] 阶段 5：规划与反思
@@ -37,11 +37,11 @@ cp .env.example .env      # Windows 可用: copy .env.example .env
 # 编辑 .env，填入 LLM_PROVIDER 和对应的 API Key
 
 # 4. 运行
-python main.py "现在距离 2027 年元旦还有多少天？如果每天读 3 篇论文，到那时一共能读多少篇？"
-python main.py                         # Agent 交互模式（每个问题独立运行）
+python main.py "DeepSeek 最新模型支持哪些功能？"
+python main.py                         # 研究模式交互（每个问题独立运行）
 python main.py --chat                  # 纯对话模式（阶段 0，无工具）
 python main.py --provider qwen "..."   # 临时切换厂商
-python main.py --max-steps 5 "..."     # 调整最大循环步数（默认 10）
+python main.py --max-steps 30 "..."    # 调整最大循环步数（默认 20）
 
 # 5. 测试（无需 API Key）
 pytest
@@ -51,19 +51,23 @@ pytest
 
 ```
 ──────────── Step 1 ────────────
-→ 调用 get_current_time()
-← 2026-10-17 12:01:09 星期六（Asia/Shanghai，UTC+08:00）
+→ 调用 web_search(query='DeepSeek GLM Kimi Agent 对比', max_results=5)
+← 搜索「DeepSeek GLM Kimi Agent 对比」的结果（共 5 条）：…
 ──────────── Step 2 ────────────
-→ 调用 days_between(start_date='2026-10-17', end_date='2027-01-01')
-← 从 2026-10-17 到 2027-01-01 相差 76 天
+→ 调用 fetch_url(url='https://blog.example.com/llm-comparison')
+← URL: … 标题: … 发布日期: 2026-08-13 正文: 第 0–2911 字符…
+→ 调用 fetch_url(url='https://zhuanlan.zhihu.com/p/…')
+← ERROR: FetchError: HTTP 403：页面无法访问，请换一个来源
 ──────────── Step 3 ────────────
-→ 调用 calculator(expression='76 * 3')
-← 76 * 3 = 228
+→ 调用 write_report(content='# DeepSeek、GLM、Kimi Agent 能力对比\n\n## 摘要…(共 3120 字符), filename='report.md')
+← 报告已保存：workspace/20261017-132319-对比-DeepSeek-GLM-Kimi-的-Agent-能/report.md
 ──────────── Step 4 ────────────
 ╭──────────── 最终回答 ────────────╮
-│ 距离 2027 年元旦还有 76 天……       │
+│ ……                                │
 ╰──────────────────────────────────╯
 ```
+
+报告保存在 `workspace/<时间>-<问题摘要>/` 下（该目录已被 git 忽略）。
 
 黄色 `→` 是模型请求的工具调用，绿色 `←` 是工具结果，红色表示工具出错（错误会回传给模型，让它自行修正）。
 
@@ -84,13 +88,16 @@ pytest
 
 | 工具 | 作用 | 为什么需要 |
 |---|---|---|
+| `web_search(query, max_results)` | 联网搜索，返回标题 / URL / 摘要 | 模型的知识有截止日期；当前使用 ddgs（DuckDuckGo 等，免费无 Key） |
+| `fetch_url(url, start)` | 读取网页正文（去广告导航），长文分段 | 原始 HTML 太长太脏；分段阅读避免一次撑爆上下文 |
+| `write_report(content, filename)` | 把 Markdown 报告存到任务目录 | 产出最终成果；文件名经过清洗，只能写进任务目录 |
 | `get_current_time(timezone)` | 当前日期、时间、星期 | 模型不知道"今天"是哪天 |
 | `days_between(start_date, end_date)` | 两个日期相差的天数 | 大小月、闰年容易算错 |
 | `calculator(expression)` | 安全计算数学表达式 | 模型心算不可靠；基于 AST 白名单实现，不使用 `eval` |
 
 ### 如何添加一个新工具
 
-写一个带类型标注和 docstring 的函数，加上 `@tool`，再放进 `tools/__init__.py` 的 `default_registry()` 即可：
+写一个带类型标注和 docstring 的函数，加上 `@tool`，再放进 `tools/__init__.py` 的 `default_registry()` 即可。需要依赖外部资源（HTTP 客户端、目录等）的工具，参考 `tools/search.py` 写成 `make_xxx(...)` 工厂函数：
 
 ```python
 from typing import Annotated
@@ -105,6 +112,12 @@ def word_count(text: Annotated[str, Field(description="要统计的文本")]) ->
 
 注册表会自动根据签名生成 JSON Schema，并在执行前用 pydantic 校验模型给的参数。
 
+### 更换搜索服务
+
+`tools/search.py` 里的 `SearchBackend` 是搜索后端接口，只需实现 `search(query, max_results) -> list[SearchResult]`。写一个新类（例如博查、Tavily），在 `default_registry()` 里换掉 `DDGSBackend()` 即可，Agent 和 prompt 都不用改。
+
+> ddgs 在国内网络下可能不稳定；如果频繁报“搜索服务出错”，可以考虑换成国内的搜索 API。
+
 ## 目录结构
 
 ```
@@ -112,11 +125,15 @@ agent/
   config.py    # 配置加载：预设 ← .env ← 命令行
   llm.py       # LLM 客户端：OpenAI 兼容协议、tenacity 重试、用量统计
   loop.py      # ★ Agent 主循环：调用模型 → 执行工具 → 回传结果 → 循环
-  prompts.py   # system prompt 等提示词
+  prompts.py   # system prompt 等提示词（研究模式会注入今天的日期）
+  workspace.py # 每个任务的工作目录
 tools/
   registry.py  # 工具注册表：@tool 装饰器、JSON Schema 生成、参数校验、错误转结果
   basic.py     # 基础工具：get_current_time / days_between / calculator
-main.py        # CLI 入口：Agent 模式（默认）与纯对话模式（--chat）
+  search.py    # web_search + 可替换的搜索后端（当前 ddgs）
+  fetch.py     # fetch_url：下载、正文提取、分段、缓存
+  report.py    # write_report：安全地写报告文件
+main.py        # CLI 入口：研究模式（默认）与纯对话模式（--chat）
 tests/         # 用假模型测试，不调用真实 API
   fakes.py     # 剧本化的假模型 ScriptedLLM
 workspace/     # 运行产物（已 gitignore）

@@ -1,11 +1,13 @@
 """命令行入口。
 
 用法：
-    python main.py "现在距离 2027 年元旦还有多少天？"   # Agent 模式：单个问题
-    python main.py                                     # Agent 模式：交互式，每个问题独立运行
+    python main.py "对比一下 DeepSeek 和通义千问的 Agent 能力"   # 研究模式：单个问题
+    python main.py                                     # 研究模式：交互式，每个问题独立运行
     python main.py --chat                              # 阶段 0 的纯对话模式（无工具）
     python main.py --provider qwen "..."               # 临时切换厂商
-    python main.py --max-steps 5 "..."                 # 调整最大步数
+    python main.py --max-steps 30 "..."                # 调整最大步数
+
+报告保存在 workspace/<时间>-<问题>/ 目录下。
 """
 
 from __future__ import annotations
@@ -13,6 +15,7 @@ from __future__ import annotations
 import argparse
 import logging
 import sys
+from datetime import date
 from typing import Any
 
 import openai
@@ -26,7 +29,8 @@ from rich.text import Text
 from agent.config import PROVIDERS, load_llm_config
 from agent.llm import LLMClient
 from agent.loop import Agent, AgentEvent, pretty_arguments
-from agent.prompts import CHAT_SYSTEM_PROMPT
+from agent.prompts import CHAT_SYSTEM_PROMPT, research_system_prompt
+from agent.workspace import new_task_dir
 from tools import default_registry
 
 console = Console()
@@ -40,7 +44,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("--chat", action="store_true", help="纯对话模式（不使用工具，阶段 0 行为）")
     p.add_argument("--provider", choices=list(PROVIDERS), help="覆盖 .env 中的 LLM_PROVIDER")
     p.add_argument("--model", help="覆盖模型名")
-    p.add_argument("--max-steps", type=int, default=10, help="Agent 最大循环步数（默认 10）")
+    p.add_argument("--max-steps", type=int, default=20, help="Agent 最大循环步数（默认 20）")
     p.add_argument("-v", "--verbose", action="store_true", help="打印调试日志（含重试信息）")
     return p.parse_args(argv)
 
@@ -63,7 +67,7 @@ def show_event(ev: AgentEvent) -> None:
                 ("→ 调用 ", "yellow"),
                 (d["name"], "bold yellow"),
                 ("(", "yellow"),
-                (pretty_arguments(d["arguments"]), "cyan"),
+                (pretty_arguments(d["arguments"], max_value_chars=80), "cyan"),
                 (")", "yellow"),
             )
         )
@@ -111,14 +115,33 @@ def read_input() -> str | None:
 # ---------------------------------------------------------------------------
 
 
-def run_agent(agent: Agent, question: str | None) -> None:
+def research(llm: LLMClient, question: str, max_steps: int) -> None:
+    """运行一次研究任务：每个问题有独立的工作目录和工具实例。"""
+    task_dir = new_task_dir(question)
+    agent = Agent(
+        llm,
+        default_registry(task_dir),
+        system_prompt=research_system_prompt(date.today().isoformat()),
+        max_steps=max_steps,
+        on_event=show_event,
+    )
+    agent.run(question)
+
+    reports = sorted(task_dir.glob("*.md")) if task_dir.exists() else []
+    for r in reports:
+        console.print(f"[bold green]报告已保存：[/]{r}")
+    if not reports:
+        console.print("[dim]本次没有生成报告文件。[/]")
+
+
+def run_agent(llm: LLMClient, question: str | None, max_steps: int) -> None:
     if question:
-        agent.run(question)
+        research(llm, question, max_steps)
         return
-    console.print("[dim]Agent 交互模式：每个问题独立运行（暂无跨问题记忆），输入 exit 退出。[/]")
+    console.print("[dim]研究模式：每个问题独立运行（暂无跨问题记忆），输入 exit 退出。[/]")
     while (q := read_input()) is not None:
         try:
-            agent.run(q)
+            research(llm, q, max_steps)
         except openai.AuthenticationError:
             raise
         except openai.APIError as e:
@@ -168,17 +191,14 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     llm = LLMClient(cfg)
-    mode = "纯对话" if args.chat else f"Agent（最多 {args.max_steps} 步）"
+    mode = "纯对话" if args.chat else f"研究 Agent（最多 {args.max_steps} 步）"
     console.print(f"[dim]厂商：{cfg.provider} | 模型：{cfg.model} | 模式：{mode}[/]")
 
     try:
         if args.chat:
             run_chat(llm, args.question)
         else:
-            registry = default_registry()
-            console.print(f"[dim]可用工具：{', '.join(registry.names)}[/]")
-            agent = Agent(llm, registry, max_steps=args.max_steps, on_event=show_event)
-            run_agent(agent, args.question)
+            run_agent(llm, args.question, args.max_steps)
     except openai.AuthenticationError:
         console.print("[red]鉴权失败：请检查 API Key 是否正确、是否与所选厂商匹配。[/]")
         return 1

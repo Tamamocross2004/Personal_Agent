@@ -2,7 +2,7 @@ import re
 
 import pytest
 
-from tools import default_registry
+from tools import ToolRegistry
 from tools.basic import calculator, days_between, get_current_time
 
 
@@ -56,7 +56,7 @@ def test_calculator_rejects(expr, msg):
 
 
 def test_calculator_division_by_zero_surfaces_through_registry():
-    r = default_registry().execute("calculator", '{"expression": "1/0"}')
+    r = ToolRegistry([calculator]).execute("calculator", '{"expression": "1/0"}')
     assert r.is_error and "ZeroDivisionError" in r.content
 
 
@@ -91,7 +91,3 @@ def test_get_current_time_utc_and_default():
 def test_get_current_time_unknown_zone():
     with pytest.raises(ValueError, match="未知时区"):
         get_current_time("Mars/Olympus")
-
-
-def test_default_registry_contents():
-    assert default_registry().names == ["get_current_time", "days_between", "calculator"]

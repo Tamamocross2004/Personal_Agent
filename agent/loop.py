@@ -19,11 +19,12 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
+from datetime import date
 from typing import Any, Callable, Literal, Protocol
 
 from openai.types.chat import ChatCompletion, ChatCompletionMessage
 
-from agent.prompts import AGENT_SYSTEM_PROMPT, MAX_STEPS_PROMPT
+from agent.prompts import MAX_STEPS_PROMPT, research_system_prompt
 from tools.registry import ToolRegistry
 
 StopReason = Literal["final_answer", "max_steps"]
@@ -78,14 +79,14 @@ class Agent:
         self,
         llm: ChatModel,
         registry: ToolRegistry,
-        system_prompt: str = AGENT_SYSTEM_PROMPT,
-        max_steps: int = 10,
+        system_prompt: str | None = None,
+        max_steps: int = 20,
         max_tool_result_chars: int = 8000,
         on_event: EventHandler | None = None,
     ):
         self.llm = llm
         self.registry = registry
-        self.system_prompt = system_prompt
+        self.system_prompt = system_prompt or research_system_prompt(date.today().isoformat())
         self.max_steps = max_steps
         self.max_tool_result_chars = max_tool_result_chars
         self.on_event = on_event
@@ -165,12 +166,21 @@ def _truncate(text: str, limit: int) -> str:
     return text[:limit] + f"\n…[结果过长已截断，原文共 {len(text)} 字符]"
 
 
-def pretty_arguments(arguments: str) -> str:
-    """把 JSON 参数格式化成一行便于阅读的文本；解析失败就原样返回。"""
+def pretty_arguments(arguments: str, max_value_chars: int | None = None) -> str:
+    """把 JSON 参数格式化成一行便于阅读的文本；解析失败就原样返回。
+
+    max_value_chars：终端展示时截断过长的参数值（例如 write_report 的整篇报告）。
+    """
     try:
         obj = json.loads(arguments) if arguments else {}
     except json.JSONDecodeError:
         return arguments
-    if isinstance(obj, dict):
-        return ", ".join(f"{k}={v!r}" for k, v in obj.items())
-    return arguments
+    if not isinstance(obj, dict):
+        return arguments
+    parts = []
+    for k, v in obj.items():
+        text = repr(v)
+        if max_value_chars and len(text) > max_value_chars:
+            text = text[:max_value_chars] + f"…(共 {len(str(v))} 字符)"
+        parts.append(f"{k}={text}")
+    return ", ".join(parts)

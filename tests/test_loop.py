@@ -172,3 +172,9 @@ def test_without_event_handler(registry):
 )
 def test_pretty_arguments(raw, expected):
     assert pretty_arguments(raw) == expected
+
+
+def test_pretty_arguments_truncates_long_values():
+    out = pretty_arguments('{"content": "' + "x" * 500 + '", "filename": "r.md"}', max_value_chars=20)
+    assert out.startswith("content='xxxxxxxxxxxxxxxxxxx…(共 500 字符)")
+    assert out.endswith("filename='r.md'")
