@@ -77,7 +77,7 @@ class CompactionResult:
 class ContextCompactor:
     def __init__(
         self,
-        threshold: int = 15_000,
+        threshold: int = 60_000,
         keep_recent_turns: int = 2,
         min_chars: int = 600,
         min_saving: int = 2_000,

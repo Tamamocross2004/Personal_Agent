@@ -41,10 +41,11 @@ python main.py "DeepSeek 最新模型支持哪些功能？"
 python main.py                         # 研究模式交互（每个问题独立运行）
 python main.py --chat                  # 纯对话模式（阶段 0，无工具）
 python main.py --provider qwen "..."   # 临时切换厂商
-python main.py --max-steps 30 --budget 500000 "..."   # 调整步数 / token 预算
+python main.py --max-steps 40 --budget 800000 "..."   # 调整步数 / token 预算（默认 30 步 / 50 万）
 python -m agent.replay                 # 回放最近一次任务的运行日志（不花钱）
 python -m agent.replay <任务目录> --full
-python -m agent.compare --last 2       # 对比最近两次运行的 token、笔记、引用等指标
+python -m agent.compare --last 2       # 对比最近两次运行的 token、缓存、笔记、引用等指标
+python -m agent.simulate <任务目录>    # 离线评估不同压缩阈值的成本
 
 # 5. 测试（无需 API Key）
 pytest
@@ -69,6 +70,8 @@ pytest
 │ ……                                │
 ╰──────────────────────────────────╯
 ```
+
+黄色 `→` 是模型请求的工具调用，绿色 `←` 是工具结果，红色表示工具出错（错误会回传给模型，让它自行修正）。
 
 紫色 `⚠` 是系统干预（预算提醒、拦截重复调用、截断处理等），每次模型调用下方的灰色小字是本次的 token、缓存命中量和耗时。
 
@@ -100,15 +103,22 @@ pytest
 
 ## 上下文管理
 
-研究任务的每一轮都要把全部历史重新发给模型，网页原文是最大的开销。所以：
+研究任务的每一轮都要把全部历史重新发给模型，其中网页原文占大头。
 
-1. 模型每读完一个网页就用 `save_note` 记要点；
-2. 上下文估算超过 `CONTEXT_COMPACT_THRESHOLD`（默认 15000 tokens）时，较早的网页原文会被替换成一行说明（终端显示紫色“压缩上下文”提示），搜索结果只保留标题和 URL；
+1. 模型每读完一个网页就用 `save_note` 记要点，报告以笔记为依据（笔记的来源必须是读过的网页）；
+2. 上下文估算超过 `CONTEXT_COMPACT_THRESHOLD`（默认 60000 tokens）时，较早的网页原文会被替换成一行说明（终端显示紫色“压缩上下文”提示），搜索结果只保留标题和 URL；
 3. 需要时模型可以再次 `fetch_url` 读原文（有缓存，不会重新下载）。
 
-阈值是在一次真实运行的历史上离线模拟选出来的（累计输入约减少一半），详见 ROADMAP 阶段 4。设为 0 可关闭压缩。
+**压缩是为了控制上下文大小，不是为了省钱。** DeepSeek 等厂商有自动前缀缓存：历史只往后追加时几乎全部命中缓存（命中价约为未命中的 1/50），而压缩会改动历史、让之后的缓存失效。实测在 DeepSeek 上，按 15000 压缩虽然让累计 token 少了一半，按缓存计价的输入成本反而高了 24%～35%。所以默认阈值设得较高，只在上下文真的很大时才起作用；没有自动缓存的厂商可以调低。
 
-黄色 `→` 是模型请求的工具调用，绿色 `←` 是工具结果，红色表示工具出错（错误会回传给模型，让它自行修正）。
+在自己的运行上评估不同阈值（离线重放，不花钱）：
+
+```bash
+python -m agent.simulate <任务目录>
+python -m agent.simulate <任务目录> --thresholds 0 20000 60000 --hit-price 0.02 --miss-price 1
+```
+
+详见 ROADMAP 阶段 4。设为 0 可关闭压缩。
 
 ## 支持的模型厂商
 
@@ -174,6 +184,7 @@ agent/
   trace.py     # 运行日志 trace.jsonl / messages.json
   replay.py    # python -m agent.replay：回放运行日志
   compare.py   # python -m agent.compare：对比多次运行的指标
+  simulate.py  # python -m agent.simulate：在真实历史上离线评估压缩阈值（含缓存成本模型）
   display.py   # 终端展示（实时与回放共用）
   workspace.py # 每个任务的工作目录
 tools/

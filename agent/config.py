@@ -60,13 +60,17 @@ class Settings(BaseSettings):
     llm_max_tokens: int | None = None
 
     # ---- Agent 运行保护（阶段 3）----
-    agent_max_steps: int = 20
-    agent_token_budget: int = 300_000  # 单个任务累计（输入+输出）token 上限
+    agent_max_steps: int = 30  # 记笔记会占用步数，阶段 4 实测 20 步不够
+    # 单个任务累计（输入+输出）token 上限。注意它包含缓存命中的部分（很便宜），所以只是安全网，不等于花费
+    agent_token_budget: int = 500_000
     tool_timeout: float = 60.0  # 单次工具执行的最长秒数
 
     # ---- 上下文管理（阶段 4）----
     # 估算的上下文超过这个 token 数时，把旧的网页原文 / 搜索摘要移出上下文。设为 0 关闭压缩
-    context_compact_threshold: int = 15_000  # 用阶段 3 真实运行离线模拟选定，见 ROADMAP
+    # 默认 6 万：压缩只作为"上下文太大"的保护，不作为省钱手段。
+    # 有前缀缓存的厂商（DeepSeek 等）上，只追加的历史几乎全部命中缓存、非常便宜，频繁压缩反而更贵（见 ROADMAP 阶段 4）。
+    # 没有自动缓存的厂商可以调低（如 15000）。用 python -m agent.simulate 在真实运行上离线评估。
+    context_compact_threshold: int = 60_000
     context_keep_recent_turns: int = 2  # 最近几轮的工具结果不压缩
 
     # ---- 读网页 ----

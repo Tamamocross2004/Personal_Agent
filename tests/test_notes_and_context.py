@@ -366,3 +366,81 @@ def test_compare_old_trace_without_cache_field_is_not_zero(tmp_path, capsys):
     assert compare_main([str(old), str(new)]) == 0
     out = capsys.readouterr().out
     assert "未记录" in out and "未命中缓存" in out
+
+
+# ---------------------------------------------------------------------------
+# 离线模拟（agent.simulate）与默认配置
+# 防止再犯阶段 4 的错误：用"累计 token"而不是"按缓存计价的成本"来选压缩阈值
+# ---------------------------------------------------------------------------
+
+from agent.simulate import main as simulate_main  # noqa: E402
+from agent.simulate import restore_original_history, simulate  # noqa: E402
+
+
+def research_history(turns=12):
+    """模拟一次研究：每轮读一个长网页，历史只追加。"""
+    msgs = [{"role": "system", "content": "SYS"}, {"role": "user", "content": "q"}]
+    for i in range(turns):
+        msgs.append({"role": "assistant", "content": None, "tool_calls": [
+            {"id": f"f{i}", "type": "function", "function": {"name": "fetch_url", "arguments": json.dumps({"url": f"https://a.com/{i}"})}}]})
+        msgs.append({"role": "tool", "tool_call_id": f"f{i}", "content": PAGE.replace("https://a.com/p", f"https://a.com/{i}")})
+    msgs.append({"role": "assistant", "content": "done"})
+    return msgs
+
+
+def test_simulate_append_only_history_is_fully_cached_except_new_part():
+    msgs = research_history(5)
+    r = simulate(msgs, threshold=0)
+    assert r.compactions == 0
+    # 只追加：未命中缓存的总量 ≈ 最后一次请求的大小（每次只有新增部分未命中）
+    assert abs(r.uncached_input - r.final_context) < 50
+    assert r.total_input > 3 * r.uncached_input
+
+
+def test_simulate_low_threshold_saves_tokens_but_costs_more_with_prefix_cache():
+    msgs = research_history(12)
+    none = simulate(msgs, threshold=0)
+    low = simulate(msgs, threshold=8_000)
+    assert low.compactions >= 2
+    assert low.total_input < none.total_input * 0.7  # 累计 token 明显减少……
+    assert low.uncached_input > none.uncached_input  # ……但未命中缓存的 token 反而增加
+    assert low.cost(0.02, 1.0) > none.cost(0.02, 1.0)  # 按 DeepSeek 计价更贵
+    # 没有前缀缓存（命中与未命中同价）时，压缩确实省钱
+    assert low.cost(1.0, 1.0) < none.cost(1.0, 1.0)
+
+
+def test_default_threshold_is_a_size_guard_not_a_cost_optimizer():
+    from agent.config import Settings
+
+    s = Settings(_env_file=None)
+    assert s.context_compact_threshold >= 40_000
+    assert s.agent_max_steps >= 30
+    assert ContextCompactor().threshold == s.context_compact_threshold
+
+
+def test_restore_original_history_from_trace(tmp_path):
+    from agent.loop import AgentEvent as E
+    from agent.trace import save_messages
+
+    msgs = research_history(3)
+    original = msgs[3]["content"]
+    ContextCompactor(threshold=1, keep_recent_turns=1, min_saving=1).maybe_compact(msgs, 10**6)
+    assert msgs[3]["content"].startswith(COMPACTED_MARKER)
+    save_messages(tmp_path / "messages.json", msgs)
+    t = TraceWriter(tmp_path / TRACE_FILE)
+    t(E("tool_result", {"id": "f0", "name": "fetch_url", "content": original, "is_error": False}))
+    t.close()
+
+    restored, n = restore_original_history(tmp_path)
+    assert restored[3]["content"] == original
+    assert n == 1  # f1 在 trace 里没有记录，无法还原
+
+
+def test_simulate_cli(tmp_path, capsys):
+    from agent.trace import save_messages
+
+    save_messages(tmp_path / "messages.json", research_history(8))
+    assert simulate_main([str(tmp_path), "--thresholds", "0", "8000"]) == 0
+    out = capsys.readouterr().out
+    assert "不压缩" in out and "8000" in out
+    assert simulate_main([str(tmp_path / "nope")]) == 1
