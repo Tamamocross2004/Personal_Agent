@@ -1,0 +1,109 @@
+"""配置加载。
+
+所有可调参数都从环境变量 / .env 读取，代码里不写死任何 Key。
+国产主流大模型都提供 OpenAI 兼容接口，因此"切换厂商"只是换 base_url + api_key + model。
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Literal
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
+ProviderName = Literal["deepseek", "qwen", "glm", "kimi", "custom"]
+
+
+@dataclass(frozen=True)
+class ProviderPreset:
+    base_url: str
+    default_model: str
+    key_field: str  # Settings 中存放该厂商 Key 的字段名
+
+
+# 默认模型名仅作起点 —— 各家迭代很快，请以官方文档为准，并用 LLM_MODEL 覆盖。
+PROVIDERS: dict[str, ProviderPreset] = {
+    "deepseek": ProviderPreset("https://api.deepseek.com", "deepseek-chat", "deepseek_api_key"),
+    "qwen": ProviderPreset(
+        "https://dashscope.aliyuncs.com/compatible-mode/v1", "qwen-plus", "dashscope_api_key"
+    ),
+    "glm": ProviderPreset("https://open.bigmodel.cn/api/paas/v4/", "glm-4-plus", "zhipu_api_key"),
+    "kimi": ProviderPreset("https://api.moonshot.cn/v1", "moonshot-v1-32k", "moonshot_api_key"),
+    "custom": ProviderPreset("http://localhost:8000/v1", "", "custom_api_key"),
+}
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=PROJECT_ROOT / ".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
+
+    llm_provider: ProviderName = "deepseek"
+    llm_model: str | None = None
+    llm_base_url: str | None = None
+
+    deepseek_api_key: str = ""
+    dashscope_api_key: str = ""
+    zhipu_api_key: str = ""
+    moonshot_api_key: str = ""
+    custom_api_key: str = ""
+
+    llm_temperature: float = 0.3
+    llm_timeout: float = 60.0
+    llm_max_retries: int = 3
+
+
+@dataclass(frozen=True)
+class LLMConfig:
+    """解析完成、可直接用来创建客户端的配置。"""
+
+    provider: str
+    base_url: str
+    api_key: str
+    model: str
+    temperature: float
+    timeout: float
+    max_retries: int
+
+
+def load_llm_config(
+    provider: str | None = None,
+    model: str | None = None,
+    settings: Settings | None = None,
+) -> LLMConfig:
+    """合并 预设 ← .env ← 函数参数（命令行），优先级从低到高。"""
+    s = settings or Settings()
+    name = provider or s.llm_provider
+    if name not in PROVIDERS:
+        raise ValueError(f"未知厂商 {name!r}，可选：{', '.join(PROVIDERS)}")
+    preset = PROVIDERS[name]
+
+    api_key = getattr(s, preset.key_field)
+    if not api_key:
+        env_name = preset.key_field.upper()
+        raise ValueError(f"未配置 {env_name}。请在 .env 中填写（参考 .env.example）。")
+
+    # .env 里的 LLM_MODEL / LLM_BASE_URL 是针对 LLM_PROVIDER 写的；
+    # 如果命令行临时切换到别的厂商，就不再沿用它们，改用该厂商预设。
+    same_provider = name == s.llm_provider
+    env_model = s.llm_model if same_provider else None
+    env_base_url = s.llm_base_url if same_provider else None
+
+    final_model = model or env_model or preset.default_model
+    if not final_model:
+        raise ValueError("未指定模型名，请设置 LLM_MODEL 或使用 --model。")
+
+    return LLMConfig(
+        provider=name,
+        base_url=env_base_url or preset.base_url,
+        api_key=api_key,
+        model=final_model,
+        temperature=s.llm_temperature,
+        timeout=s.llm_timeout,
+        max_retries=s.llm_max_retries,
+    )

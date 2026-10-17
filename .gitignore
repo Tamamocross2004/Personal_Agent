@@ -1,0 +1,23 @@
+# 密钥：绝不提交
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# 运行产物：每次研究任务的笔记、代码、报告、日志
+workspace/*
+!workspace/.gitkeep
+logs/
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
