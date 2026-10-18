@@ -39,9 +39,15 @@ class TaskContract(BaseModel):
         "仅明确要求正文时排除参考资料，全文限制包含参考资料；URL 隐藏目标不计、可见 URL 计入。")
 
     def prompt(self) -> str:
-        return ("【本次任务约定】以下仅为当前用户请求的有限规则提取，不来自网页或历史。"
+        text = ("【本次任务约定】以下仅为当前用户请求的有限规则提取，不来自网页或历史。"
                 "原始问题仍有效；未识别项不代表允许忽略。明确约束优先，软目标不能冒充硬上限。\n"
                 + json.dumps(self.model_dump(exclude={'request_excerpt'}), ensure_ascii=False))
+        if self.soft_body_target:
+            text += ("\n【简述写作策略】先围绕必答问题写短稿：每节通常一两句，直接给结论、必要依据、必要做法和局限。"
+                     "不要逐段翻译原文、重复摘要/正文/结论中的长引文，或增加相邻对象、版本沿革和背景小节。"
+                     f"默认正文目标约{self.soft_body_target}个可见非空白字符，含英文引文；能中文转述的依据用简短转述并保留引用。"
+                     "若用户明确要求或完整回答确实需要更长，保留必要信息；这不是硬截断上限，也不能删掉关键条件来凑长度。")
+        return text
 
     @property
     def active(self) -> bool:
