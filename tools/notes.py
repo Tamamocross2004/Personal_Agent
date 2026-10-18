@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Annotated
 
 from pydantic import Field
+from agent.quality import source_kind, SOURCE_LABELS
 
 from tools.registry import Tool, tool
 from tools.session import Note, ResearchSession
@@ -69,4 +70,4 @@ def make_notes_tools(task_dir: Path, session: ResearchSession) -> list[Tool]:
 def _format_note(n: Note) -> str:
     title = f"#{n.id}" + (f" {n.topic}" if n.topic else "")
     source = f"{n.source_title} — {n.source_url}" if n.source_title else n.source_url
-    return f"### {title}\n来源：{source}\n\n{n.content}"
+    return f"### {title}\n来源：{source}\n来源类型：{SOURCE_LABELS[source_kind(n.source_url)]}\n\n{n.content}"

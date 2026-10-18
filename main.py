@@ -33,6 +33,8 @@ from agent.display import console, show_event, usage_table
 from agent.llm import LLMClient
 from agent.loop import FINALIZE_REASONS, Agent, AgentResult, TokenWeights
 from agent.prompts import CHAT_SYSTEM_PROMPT, research_system_prompt
+from agent.quality import inspect_report, save_check
+from agent.review import save_review
 from agent.trace import MESSAGES_FILE, TRACE_FILE, TraceWriter, fanout, save_messages
 from agent.workspace import new_task_dir
 from tools import ResearchSession, default_registry
@@ -103,6 +105,10 @@ def research(llm: LLMClient, settings: Settings, question: str, max_steps: int, 
         compactor=compactor,
         on_event=fanout(show_event, tracer),
         task_dir=task_dir,
+        review_reports=settings.report_review_enabled,
+        review_max_calls=settings.report_review_max_calls,
+        review_max_tokens=settings.report_review_max_tokens,
+        research_session=session,
     )
     try:
         result = agent.run(question)
@@ -115,6 +121,8 @@ def research(llm: LLMClient, settings: Settings, question: str, max_steps: int, 
     if not reports and result.stop_reason in FINALIZE_REASONS and result.answer.strip():
         fallback = task_dir / "report.md"
         fallback.write_text(result.answer, encoding="utf-8")
+        save_check(fallback, inspect_report(result.answer, task_dir, session))
+        save_review(fallback, result.answer, "not_reviewed", [], reason="最终文字兜底保存，未经过报告审稿")
         reports = [fallback]
 
     for r in reports:

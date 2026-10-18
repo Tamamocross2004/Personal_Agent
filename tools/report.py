@@ -3,10 +3,8 @@
 文件名来自模型，属于不可信输入：只取文件名部分、过滤非法字符，
 确保它只能写进任务目录，不能用 "../../" 之类的路径写到别处。
 
-阶段 5：保存后附上【自动检查】结果。提示词里要求模型写报告前自检，但实测它不一定做（或没机会做）；
-能用代码检查的部分就用代码检查，把结果交给模型处理：
-- 计划中还有哪些子任务没完成；
-- 报告里出现的 URL 有哪些不在笔记来源中（阶段 3、4 实测模型会引用没读过的网页）。
+保存后附上计划、引用编号、来源身份和本地图片的机械检查，并保存 .quality.json。
+阶段 7 的独立模型审稿由 Agent 调度，不在工具线程中偷偷调用模型，保证用量计入预算。
 """
 
 from __future__ import annotations
@@ -17,7 +15,7 @@ from typing import Annotated, Literal
 
 from pydantic import Field
 
-from agent.planner import load_plan, unfinished_tasks
+from agent.quality import inspect_report, save_check
 from tools.registry import Tool, tool
 from tools.session import ResearchSession
 
@@ -45,30 +43,8 @@ def report_urls(text: str) -> list[str]:
 
 
 def check_report(text: str, task_dir: Path, session: ResearchSession | None) -> str:
-    """对已保存的完整报告做机械检查，返回给模型看的文字。"""
-    problems = []
-    unfinished = unfinished_tasks(load_plan(task_dir))
-    if unfinished:
-        items = "；".join(f"{t.get('id')} {t.get('title', '')}（{t.get('status')}）" for t in unfinished)
-        problems.append(
-            f"计划中还有未完成的子任务：{items}。"
-            "如果报告已覆盖，用 update_plan 标为 done；来不及研究的标为 skipped，并在报告里写明。"
-        )
-    if session is not None:
-        # has_note_for 同时匹配请求地址和重定向后的地址：模型引用的可能是跳转前的 URL
-        missing = [u for u in report_urls(text) if not session.has_note_for(u)]
-        if missing:
-            problems.append(
-                "以下 URL 不在笔记来源中（没读过原文，或读过但没记笔记）："
-                + "、".join(missing)
-                + "。请从参考资料中删除，或先 fetch_url 阅读并 save_note 后再引用。"
-            )
-    if not problems:
-        return "【自动检查】通过：计划中的子任务都已处理，报告中的 URL 都来自笔记。"
-    return (
-        "【自动检查】发现以下问题（分段写报告、后面还要追加时，与尚未写的部分有关的问题可以先忽略）：\n"
-        + "\n".join(f"- {p}" for p in problems)
-    )
+    """对完整报告做机械检查；语义问题另由审稿模型检查。"""
+    return inspect_report(text, task_dir, session).feedback()
 
 
 def make_write_report(task_dir: Path, session: ResearchSession | None = None) -> Tool:
@@ -98,6 +74,8 @@ def make_write_report(task_dir: Path, session: ResearchSession | None = None) ->
             path.write_text(content, encoding="utf-8")
             full = content
             saved = f"报告已保存：{path}（{len(content)} 字符）"
-        return saved + "\n\n" + check_report(full, task_dir, session)
+        check = inspect_report(full, task_dir, session)
+        save_check(path, check)
+        return saved + "\n\n" + check.feedback()
 
     return write_report

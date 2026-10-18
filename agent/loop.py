@@ -47,6 +47,8 @@ from openai.types.chat import ChatCompletion, ChatCompletionMessage
 from agent.context import ContextCompactor, estimate_messages, estimate_tools
 from agent.errors import classify_api_error
 from agent.planner import format_plan_for_prompt, generate_plan, load_plan, unfinished_tasks
+from agent.quality import inspect_report, save_check
+from agent.review import build_review_messages, fingerprint, parse_verdict, review_feedback, save_review
 from agent.prompts import (
     CONTINUE_PROMPT,
     EMPTY_REPLY_PROMPT,
@@ -166,6 +168,10 @@ class Agent:
         compactor: ContextCompactor | None = None,
         on_event: EventHandler | None = None,
         task_dir: Path | None = None,
+        review_reports: bool = False,
+        review_max_calls: int = 2,
+        review_max_tokens: int = 2048,
+        research_session=None,
     ):
         self.llm = llm
         self.registry = registry
@@ -184,6 +190,10 @@ class Agent:
         self.compactor = compactor
         self.on_event = on_event
         self.task_dir = task_dir
+        self.review_reports = review_reports
+        self.review_max_calls = review_max_calls
+        self.review_max_tokens = review_max_tokens
+        self.research_session = research_session
 
     # ------------------------------------------------------------------
     # 对外接口
@@ -198,6 +208,8 @@ class Agent:
         self._steps = 0
         self._budget_warned = False
         self._blocked = 0
+        self._review_count = 0
+        self._reviewed_hashes = set()
         self._call_stats: dict[tuple[str, str], list[int]] = {}  # 调用签名 → [调用次数, 成功次数]
         if self.compactor:
             self.compactor.reset()
@@ -222,6 +234,7 @@ class Agent:
             self._emit("notice", text="用户中断（Ctrl+C），任务停止。")
             stop, answer, error = "interrupted", "", "用户中断"
 
+        self._refresh_report_checks()
         self._emit(
             "run_end",
             stop_reason=stop,
@@ -325,6 +338,7 @@ class Agent:
         注意即使拒绝也必须回一条 tool 消息：每个 tool_call 都要有对应的结果，否则下次请求报 400。
         """
         messages.append(_assistant_message_to_dict(msg))
+        reports_written = []
         if msg.content:
             self._emit("thought", text=msg.content)
 
@@ -348,15 +362,90 @@ class Agent:
                 seconds=round(seconds, 2),
             )
             messages.append({"role": "tool", "tool_call_id": call.id, "content": content})
+            if name == "write_report" and not result.is_error:
+                reports_written.append(json.loads(arguments).get("filename", "report.md"))
+
+        for filename in dict.fromkeys(reports_written):
+            self._review_saved_report(messages, filename)
 
         if truncated:
             self._emit("notice", text="回复因输出长度上限被截断，工具调用未执行，已告知模型分段处理。")
+
+    def _review_saved_report(self, messages: list[dict[str, Any]], filename: str) -> None:
+        if not self.review_reports or not self.task_dir:
+            return
+        from tools.report import safe_filename
+
+        path = self.task_dir / safe_filename(filename)
+        if not path.is_file() or path.is_symlink():
+            return
+        report = path.read_text(encoding="utf-8")
+        digest = (path.name, fingerprint(report))
+        if digest in self._reviewed_hashes:
+            return
+        if self._review_count >= self.review_max_calls:
+            record = save_review(path, report, "skipped_limit", [])
+        else:
+            review_messages, truncated = build_review_messages(report, self.task_dir, self.research_session)
+            projected = estimate_messages(review_messages) + self.review_max_tokens * self.token_weights.output
+            if self._equiv + projected >= self.token_budget:
+                record = save_review(path, report, "skipped_budget", [])
+            else:
+                self._review_count += 1
+                self._reviewed_hashes.add(digest)
+                self._emit("notice", text=f"开始报告审稿：{path.name}（{self._review_count}/{self.review_max_calls}），用量计入预算。")
+                raw_review = ""
+                try:
+                    response = self._call_llm(review_messages, None, None,
+                                              response_format={"type": "json_object"}, max_tokens=self.review_max_tokens,
+                                              purpose="report_review")
+                    choice = response.choices[0]
+                    raw_review = choice.message.content or ""
+                    if choice.finish_reason != "stop":
+                        raise ValueError("审稿回复不完整")
+                    issues = parse_verdict(raw_review, report)
+                    record = save_review(path, report, "partial" if truncated else "reviewed", issues)
+                except (openai.APIError, ValueError, IndexError) as exc:
+                    record = save_review(path, report, "failed", [], error_type=type(exc).__name__,
+                                         error_detail=str(exc)[:2000] if isinstance(exc, ValueError) else "模型服务调用失败",
+                                         raw_response=raw_review[:12000])
+                finally:
+                    # 审稿是独立上下文，不能把其 token 数当作主对话下一轮的基准。
+                    self._last_prompt = 0
+                    self._len_at_last_call = 0
+        feedback = review_feedback(record)
+        self._emit("notice", text=feedback)
+        messages.append({"role": "user", "content": feedback})
+
+    def _refresh_report_checks(self) -> None:
+        """收尾时刷新计划检查；模型可能在写报告之后才标记计划完成。"""
+        if not self.task_dir or not self.task_dir.exists():
+            return
+        for path in self.task_dir.glob("*.md"):
+            if path.name == "notes.md" or path.is_symlink():
+                continue
+            report = path.read_text(encoding="utf-8")
+            check = inspect_report(report, self.task_dir, self.research_session)
+            save_check(path, check)
+            if check.issues:
+                self._emit("notice", text=f"最终报告 {path.name} 仍有 {len(check.issues)} 项机械检查问题，见 {path.stem}.quality.json。")
+            if self.review_reports:
+                review_path = path.with_suffix(".review.json")
+                try:
+                    review = json.loads(review_path.read_text(encoding="utf-8"))
+                except (OSError, ValueError):
+                    review = save_review(path, report, "not_reviewed", [])
+                if review.get("report_sha256") != fingerprint(report):
+                    review = save_review(path, report, "stale", [])
+                if review["status"] != "reviewed" or review["issues"]:
+                    self._emit("notice", text=f"最终报告 {path.name} 审稿状态：{review['status']}，{len(review['issues'])} 项问题；未获得无问题审稿结论。")
 
     def _call_llm(
         self,
         messages: list[dict[str, Any]],
         tools: list[dict[str, Any]] | None,
         step: int | None,
+        purpose: str = "agent",
         **kwargs: Any,
     ) -> ChatCompletion:
         started = time.perf_counter()
@@ -372,6 +461,7 @@ class Agent:
         self._last_prompt = p
         self._emit(
             "llm_call",
+            purpose=purpose,
             step=step,
             prompt_tokens=p,
             cached_tokens=cached,
@@ -394,7 +484,7 @@ class Agent:
         try:
             plan = generate_plan(
                 question,
-                lambda m, **kw: self._call_llm(m, None, None, **kw),
+                lambda m, **kw: self._call_llm(m, None, None, purpose="planning", **kw),
                 self.task_dir,
                 today=date.today().isoformat(),
             )

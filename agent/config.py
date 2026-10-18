@@ -68,6 +68,9 @@ class Settings(BaseSettings):
     token_weight_output: float = 2.0
     tool_timeout: float = 60.0  # 单次工具执行的最长秒数
     code_exec_timeout: float = Field(default=30.0, gt=0)  # 入口同时限制在通用工具时限以内
+    report_review_enabled: bool = True
+    report_review_max_calls: int = Field(default=2, ge=1, le=5)
+    report_review_max_tokens: int = Field(default=2048, ge=256, le=8192)
 
     # ---- 上下文管理（阶段 4）----
     # 估算的上下文超过这个 token 数时，把旧的网页原文 / 搜索摘要移出上下文。设为 0 关闭压缩
