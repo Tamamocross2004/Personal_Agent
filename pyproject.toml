@@ -10,6 +10,7 @@ dependencies = [
     "pydantic-settings>=2.2",
     "tenacity>=8.2",
     "rich>=13.7",
+    "markdown-it-py>=2.2",
     # Windows 不自带 IANA 时区数据库，zoneinfo 需要这个包
     "tzdata; sys_platform == 'win32'",
     # 阶段 2：搜索与网页读取

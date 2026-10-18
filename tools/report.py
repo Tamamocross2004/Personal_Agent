@@ -16,6 +16,7 @@ from typing import Annotated, Literal
 from pydantic import Field
 
 from agent.quality import inspect_report, save_check
+from agent.markdown_tables import markdown_tables
 from agent.numeric_evidence import arithmetic_errors, price_ratio_errors, report_cost_errors
 from tools.registry import Tool, tool
 from tools.session import ResearchSession
@@ -57,15 +58,7 @@ def required_table_headers(question: str) -> list[tuple[str, ...]]:
 
 
 def missing_table_headers(text: str, required: list[tuple[str, ...]]) -> list[tuple[str, ...]]:
-    # 代码示例里的表格不算正文表格；必须紧跟 Markdown 分隔行。
-    text = re.sub(r"(?ms)^\s*(`{3,}|~{3,}).*?^\s*\1[^\n]*$", "", text)
-    lines = text.splitlines()
-    headers = set()
-    for row, separator in zip(lines, lines[1:]):
-        cells = tuple(c.strip().strip('`') for c in row.strip().strip('|').split('|'))
-        dividers = separator.strip().strip('|').split('|')
-        if len(cells) > 1 and len(cells) == len(dividers) and all(re.fullmatch(r"\s*:?-{3,}:?\s*", c) for c in dividers):
-            headers.add(cells)
+    headers = {header for header, _ in markdown_tables(text)}
     return [header for header in required if header not in headers]
 
 

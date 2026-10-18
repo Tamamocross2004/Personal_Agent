@@ -10,6 +10,7 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 from agent.quality import inspect_report
+from agent.markdown_tables import markdown_tables
 from agent.review import fingerprint
 from agent.numeric_evidence import arithmetic_errors, price_ratio_errors
 from tools.fetch import Page
@@ -36,17 +37,8 @@ def decimal_value(text: str) -> Decimal:
 
 
 def table_rows(report: str) -> list[dict]:
-    headers, rows = None, []
-    for line in report.splitlines():
-        if not line.strip().startswith("|"):
-            headers = None
-            continue
-        cells = [c.strip().strip("`* ") for c in line.strip().strip("|").split("|")]
-        if set(TABLE_COLUMNS).issubset(cells):
-            headers = cells
-        elif headers and len(cells) == len(headers) and not all(re.fullmatch(r"[-: ]+", c) for c in cells):
-            rows.append(dict(zip(headers, cells)))
-    return rows
+    return [dict(zip(header, row)) for header, rows in markdown_tables(report)
+            if set(TABLE_COLUMNS).issubset(header) for row in rows]
 
 
 def numeric_checks(task_dir: Path, report: str, specification: dict) -> list[dict]:
@@ -104,18 +96,20 @@ def unsupported_claims(report: str, pattern: str) -> list[str]:
     """有限规则：按句子/转折分开判定，表格否定列保留列语境；不是通用语义认证。"""
     report = re.sub(r"(?ms)^\s*(`{3,}|~{3,}).*?^\s*\1[^\n]*$", "", report)
     lines = report.splitlines()
-    rejected_columns: set[int] = set()
+    table_fragments = []
+    # 与保存检查共用语法，包括无外侧竖线的表格；保留否定列的语境。
+    from markdown_it import MarkdownIt
+    for token in MarkdownIt("commonmark").enable("table").parse(report):
+        if token.type == "table_open" and token.map:
+            start, end = token.map
+            for header, rows in markdown_tables("\n".join(lines[start:end])):
+                rejected = {i for i, cell in enumerate(header) if re.search(r"不可|不能|不支持|不应|无法", cell)}
+                table_fragments.extend(cell for row in rows for i, cell in enumerate(row) if i not in rejected)
+            lines[start:end] = [""] * (end - start)
     findings = []
     negative = r"不能|无法|不足|不支持|不应|不代表|未能|编造|不予采用|不成立|不可|无从"
-    for index, line in enumerate(lines):
-        cells = [c.strip() for c in line.strip().strip('|').split('|')]
-        is_table = line.strip().startswith('|')
-        if is_table and index + 1 < len(lines) and re.fullmatch(r"[|\s:-]+", lines[index + 1]):
-            rejected_columns = {i for i, cell in enumerate(cells) if re.search(r"不可|不能|不支持|不应|无法", cell)}
-            continue
-        if not is_table:
-            rejected_columns = set()
-        fragments = [cell for i, cell in enumerate(cells) if i not in rejected_columns] if is_table else [line]
+    for line in lines + table_fragments:
+        fragments = [line]
         for fragment in fragments:
             plain = fragment.replace('**', '').strip()
             rejected_list = re.match(r"^(?:[-*]\s*)?(?:不能得出|不可支持|不应断言|不能认定|不支持的结论)\s*[：:]", plain)
@@ -125,12 +119,25 @@ def unsupported_claims(report: str, pattern: str) -> list[str]:
                 if not re.search(pattern, sentence):
                     continue
                 normalized = sentence.replace("不是不能", "可以").replace("并非不能", "可以")
-                question = re.search(r"能否|是否|[？?]|若要|如果要|需补齐", normalized)
-                rejection = re.search(negative, normalized)
+                claims = list(re.finditer(pattern, normalized))
+                # 逐个命题检查局部从句，不能用同句中对 B 的否定掩盖对 A 的肯定。
+                contexts = []
+                for claim in claims:
+                    left = max(normalized.rfind(mark, 0, claim.start()) for mark in ("，", ",", "：", ":")) + 1
+                    right = min((p for mark in ("，", ",") if (p := normalized.find(mark, claim.end())) >= 0), default=len(normalized))
+                    contexts.append(normalized[left:right])
+                question = all(re.search(r"能否|是否|[？?]|若要|如果要|需补齐", context) for context in contexts)
+                rejection = all(re.search(negative, context) for context in contexts)
+                # 否定必须支配这个命题；“不对B评价，因此A最稳定”不能借用前半句的否定。
+                for claim in re.finditer(pattern, normalized):
+                    before, after = normalized[:claim.start()], normalized[claim.end():]
+                    if (re.search(r"不对\s*[\"“‘「]?\s*$", before)
+                            and re.match(r"[\"”’」]?\s*作(?:任何)?(?:倾向性)?(?:暗示|判断|评价|断言)", after)):
+                        rejection = True
                 quoted_discussion = (re.search(r'''["“‘「]''', normalized)
                                      and re.search(r"表述|说法|判断|命题|强行", normalized)
                                      and re.search(r"缺少|缺乏|尚缺|无对照|未知|不存在|不具备", normalized))
-                conditions = re.search(r"(?:成立|认定).{0,8}(?:需要|前提|条件)|(?:所需|需要).{0,8}(?:证据|数据)", normalized)
+                conditions = re.search(r"(?:成立|认定).{0,8}(?:需要|前提|条件)|(?:所需|需要).{0,8}(?:证据|数据)|命题.{0,12}要求.{0,12}条件.*成立", normalized)
                 if question or rejection or quoted_discussion or conditions:
                     continue
                 findings.append(sentence.strip())

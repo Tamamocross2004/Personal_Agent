@@ -5,6 +5,7 @@ import ast
 import io
 import re
 from decimal import Decimal, InvalidOperation, localcontext
+from agent.markdown_tables import markdown_tables
 
 
 def number(value: str) -> Decimal:
@@ -156,16 +157,13 @@ def report_cost_errors(report: str, csv_content: str) -> list[str]:
             expected[row["model"]] = tuple(number(row[key]) for key in fields[1:])
     except (InvalidOperation, ValueError, KeyError, TypeError):
         return []
-    report = re.sub(r"(?ms)^\s*(`{3,}|~{3,}).*?^\s*\1[^\n]*$", "", report)
-    errors, header = [], None
-    for line in report.splitlines():
-        if not line.strip().startswith('|'):
-            header = None
+    errors = []
+    for header, rows in markdown_tables(report):
+        if header != fields:
             continue
-        cells = tuple(cell.strip().strip('`* ') for cell in line.strip().strip('|').split('|'))
-        if cells == fields:
-            header = cells
-        elif header and len(cells) == len(fields) and cells[0] in expected:
+        for cells in rows:
+            if cells[0] not in expected:
+                continue
             try:
                 amounts = [re.fullmatch(rf"(?:¥|￥)?\s*({_NUM})\s*(?:元|CNY)?", cell, re.I) for cell in cells[1:]]
                 if not all(amounts):

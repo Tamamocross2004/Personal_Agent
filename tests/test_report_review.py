@@ -3,7 +3,7 @@ import json
 import pytest
 
 from agent.loop import Agent
-from agent.review import build_review_messages, fingerprint, parse_verdict
+from agent.review import ReviewValidationError, build_review_messages, fingerprint, parse_verdict
 from fakes import ScriptedLLM, api_error, completion
 from tools.registry import ToolRegistry
 from tools.report import make_write_report
@@ -12,6 +12,42 @@ BAD = "# 对比\n\n## 摘要\nKimi 唯一支持视觉。\n\n## 方法与范围\n
 FIXED = BAD.replace("Kimi 唯一支持视觉。", "Kimi 和 Qwen 均支持视觉。")
 ISSUE = {"category": "contradiction", "severity": "error", "quote": "Kimi 唯一支持视觉。",
          "message": "与能力表中 Qwen 也支持视觉相矛盾。", "suggestion": "修正摘要和结论。"}
+
+
+def test_note_only_quote_preserves_real_report_issue_without_passing():
+    note_issue = {**ISSUE, "quote": "这句话仅存在于笔记"}
+    with pytest.raises(ReviewValidationError) as error:
+        parse_verdict(json.dumps({"issues": [note_issue, ISSUE]}, ensure_ascii=False), BAD)
+    assert error.value.valid_issues == [ISSUE]
+    assert "只能从 report" in str(error.value)
+
+
+@pytest.mark.parametrize("extra", [0, 24])
+def test_successful_calculator_evidence_reaches_independent_reviewer(tmp_path, extra):
+    from tools.basic import calculator
+    llm = ScriptedLLM([
+        completion('{"tasks": []}'),
+        completion(tool_calls=[("bad", "calculator", {"expression": "1/0"}),
+                               ("calc", "calculator", {"expression": "49/51*100"})]
+                              + [(f"c{i}", "calculator", {"expression": f"{i}+1"}) for i in range(extra)]),
+        completion(tool_calls=[("save", "write_report", {"content": FIXED})]),
+        completion('{"issues": []}'), completion("完成"),
+    ])
+    agent = Agent(llm, ToolRegistry([calculator, make_write_report(tmp_path)]),
+                  task_dir=tmp_path, review_reports=True)
+    agent.run("计算成功率")
+    request = next(r for r in llm.requests if r.get("response_format") and r["tools"] is None
+                   and len(r["messages"]) == 2)
+    payload = json.loads(request["messages"][1]["content"])
+    records = payload["calculation_results"]
+    assert all(item["tool_call_id"] != "bad" for item in records)
+    if not extra:
+        assert len(records) == 1 and records[0]["tool_call_id"] == "calc"
+        assert "49/51*100" in records[0]["arguments"] and "96.078" in records[0]["result"]
+        assert records[0]["possibly_truncated"] is False
+    else:
+        assert len(records) == 20 and payload["calculations_omitted"] == 5
+        assert records[0]["tool_call_id"] == "c4" and records[-1]["tool_call_id"] == "c23"
 
 
 def agent_for(tmp_path, responses, **kwargs):

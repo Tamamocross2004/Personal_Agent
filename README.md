@@ -367,7 +367,8 @@ agent/
   memory.py    # SQLite/FTS5 研究记忆、历史背景格式化与管理 CLI
   evaluate.py  # 离线/真实题集执行、结果保存、只读复查与基线比较
   eval_checks.py # 独立数值校验、引用/图片/审稿/记忆检查与 trace 指标
-  eval_cases.json # 版本化固定题集（离线 8 组、真实 8 题）
+  eval_cases.json # 版本化固定题集（v2：离线 8 组、真实 9 题，含明确/歧义样本）
+  markdown_tables.py # 保存检查、数值核对和评分共用的 Markdown 表格解析
   planner.py   # 开局拆解研究计划（plan.json）
   quality.py   # 引用、来源、结构、本地图片机械检查
   review.py    # 独立报告审稿提示、证据打包、结构校验与结果记录

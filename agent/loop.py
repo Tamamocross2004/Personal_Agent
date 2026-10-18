@@ -211,6 +211,8 @@ class Agent:
         self._budget_warned = False
         self._blocked = 0
         self._review_count = 0
+        self._calculation_results: list[dict] = []
+        self._calculations_omitted = 0
         self._reviewed_hashes = set()
         self._last_reviews: dict[str, dict] = {}
         self._call_stats: dict[tuple[str, str], list[int]] = {}  # 调用签名 → [调用次数, 成功次数]
@@ -361,6 +363,15 @@ class Agent:
             else:
                 result, seconds = self._run_tool(name, arguments)
             content = _truncate(result.content, self.max_tool_result_chars)
+            if name in ("calculator", "days_between", "run_python") and not result.is_error:
+                # 独立于主对话压缩；只保留真实成功调用，有界记录并明确截断/省略。
+                self._calculation_results.append({"tool_call_id": call.id, "tool": name,
+                    "arguments": arguments[:4000], "result": result.content[:4000],
+                    "possibly_truncated": len(arguments) > 4000 or len(result.content) > 4000})
+                while (len(self._calculation_results) > 20
+                       or sum(len(i["arguments"]) + len(i["result"]) for i in self._calculation_results) > 16000):
+                    self._calculation_results.pop(0)
+                    self._calculations_omitted += 1
             self._emit(
                 "tool_result",
                 id=call.id,
@@ -401,7 +412,9 @@ class Agent:
             review_messages, truncated = build_review_messages(report, self.task_dir, self.research_session,
                                                                question=self._question,
                                                                memory_context=self.memory_context,
-                                                               previous_review=self._last_reviews.get(path.name))
+                                                               previous_review=self._last_reviews.get(path.name),
+                                                               calculation_results=self._calculation_results,
+                                                               calculations_omitted=self._calculations_omitted)
             while True:
                 projected = estimate_messages(review_messages) + self.review_max_tokens * self.token_weights.output
                 if self._equiv + projected >= self.token_budget:

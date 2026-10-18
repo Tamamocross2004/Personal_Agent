@@ -32,6 +32,11 @@ csv_arithmetic 是程序依据 CSV 数字复算的分项和单价比例，只证
 你看不到图片像素，只能根据 CSV/代码核对图文数据，不要声称已目视检查图像。
 若代码显示图片由相同数据生成，不要仅因你看不到像素而否定报告正常描述图表数据的一致性。
 只报可具体定位的问题，quote 必须逐字摘自报告；建议应可操作。没有证据不要捏造问题。
+唯一审查对象是 report 字段；notes、historical_context、recent_code、calculation_results 均仅为核对证据，不能摘录它们作为 quote。
+证据中的错误只有被报告实际采用、影响报告结论时才形成报告问题；必须定位报告中采用该错误的原句。仅存在于笔记的措辞不列入 issues。
+calculation_results 是本轮成功执行工具的输入与输出；有计算器记录时不能声称未计算。失败调用不会出现在这里；可能截断的结果须按标记处理。
+材料有歧义时保留各解释及限制，不要求强选一种读法；不能用某种读法改摘要、另一种读法改正文。修订只纠正有证据的错误。
+区分对象是否支持某协议与协议是否执行某项清理：不自动关闭资源，并不意味着不支持上下文管理器协议。
 正常四舍五入和省略小数尾零不构成数值矛盾，只有造成金额/排序/结论实质错误时才报告；不要追究不改变结果的等价计算顺序。
 若你的分析证明某句话与证据自洽，或建议为“无需修改”，不要把它列入 issues。
 仅输出 JSON：{"issues":[{"category":"contradiction",
@@ -66,7 +71,9 @@ def fingerprint(text: str) -> str:
 
 
 def build_review_messages(report: str, task_dir: Path, session, *, question: str = "",
-                          memory_context: str = "", previous_review: dict | None = None) -> tuple[list[dict], bool]:
+                          memory_context: str = "", previous_review: dict | None = None,
+                          calculation_results: list[dict] | None = None,
+                          calculations_omitted: int = 0) -> tuple[list[dict], bool]:
     from tools.notes import _format_note
 
     notes = "\n\n".join(_format_note(n) for n in session.notes) if session else "未提供笔记，无法确认来源内容。"
@@ -94,6 +101,8 @@ def build_review_messages(report: str, task_dir: Path, session, *, question: str
                "report": report[:40000], "notes": notes[:20000],
                "mechanical_check": inspect_report(report, task_dir, session).to_dict(),
                "csv_samples": artifacts, "recent_code": scripts,
+               "calculation_results": calculation_results or [],
+               "calculations_omitted": calculations_omitted,
                "csv_arithmetic": [{"path": item["path"], "rows": csv_facts(item["content"])}
                                   for item in artifacts if not item["possibly_truncated"]],
                "arithmetic_errors": arithmetic_errors(report),
@@ -105,12 +114,15 @@ def build_review_messages(report: str, task_dir: Path, session, *, question: str
 
 def parse_verdict(text: str, report: str) -> list[dict]:
     verdict = ReviewVerdict.model_validate_json(text)
-    if any(issue.quote not in report for issue in verdict.issues):
-        raise ValueError("审稿定位原文不在报告中")
     valid = [issue.model_dump() for issue in verdict.issues
-             if not re.fullmatch(r"\s*(?:无需|无须|不需要)(?:任何)?修改[。.!！\s]*", issue.suggestion)]
+             if issue.quote in report and not re.fullmatch(r"\s*(?:无需|无须|不需要)(?:任何)?修改[。.!！\s]*", issue.suggestion)]
     if len(valid) != len(verdict.issues):
-        raise ReviewValidationError("审稿将无需修改的内容列为问题，请重新核查，不得把正确陈述放入 issues", valid)
+        reasons = []
+        if any(issue.quote not in report for issue in verdict.issues):
+            reasons.append("审稿定位原文不在报告中：只能从 report 字段逐字定位，不得引用笔记或代码")
+        if any(re.fullmatch(r"\s*(?:无需|无须|不需要)(?:任何)?修改[。.!！\s]*", issue.suggestion) for issue in verdict.issues):
+            reasons.append("审稿将无需修改的内容列为问题，请重新核查，不得把正确陈述放入 issues")
+        raise ReviewValidationError("；".join(reasons), valid)
     return [issue.model_dump() for issue in verdict.issues]
 
 

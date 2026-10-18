@@ -166,10 +166,18 @@ def test_invalid_review_record_never_passes(tmp_path):
     ('结论："A最稳定"。', False),
     ('B和C的表现未知，A最稳定。', False),
     ('缺少B的数据，结论：A最稳定。', False),
+    ('"A在A/B/C中最稳定"这一命题在逻辑上要求三个条件同时成立：', True),
+    ('- 未提供B、C数据，因此报告不对B、C作任何评价，也不对"A最稳定"作任何倾向性暗示。', True),
+    ('不对B作评价，因此A最稳定。', False),
+    ('不能评价B，因此A最稳定。', False),
+    ('是否B最强，结论：A最稳定。', False),
+    ('不对"A最稳定"作任何暗示，但结论是A最稳定。', False),
     ('- **不能得出**：A比B稳定；A是三者中最稳定的；A优于任何未测试产品。', True),
     ('- **不能得出**：B最强；但A是三者中最稳定的。', False),
     ('| 可支持结论 | 不可支持结论 |\n|---|---|\n| A两个版本得分接近 | A最稳定 |', True),
     ('| 不可支持结论 | 可支持结论 |\n|---|---|\n| B最强 | A最稳定 |', False),
+    ('不可支持结论 | 可支持结论\n---|---\nB最强 | A最稳定', False),
+    ('可支持结论 | 不可支持结论\n---|---\nA两个版本接近 | A最稳定', True),
 ])
 def test_questions_and_rejected_claims_are_not_affirmative_winners(tmp_path, statement, passed):
     evaluation_task(tmp_path)
