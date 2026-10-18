@@ -179,3 +179,54 @@ def test_table_to_markdown_bad_span_attributes():
 
     t = BeautifulSoup('<table><tr><td colspan="abc">a</td><td rowspan="0">b</td></tr></table>', "lxml").table
     assert table_to_markdown(t) == "| a | b |\n|---|---|"
+
+
+def test_locate_deep_passage_then_read_uses_same_cache():
+    url = "https://a.com/long"
+    body = "无关正文\n" * 5000 + "Context manager: commits transactions, does not close connections." + "尾部\n" * 1000
+    reg, hits = make_tool({url: html(body, "text/plain")})
+    result = reg.execute("fetch_url", {"url": url, "query": "CONTEXT MANAGER"})
+    assert not result.is_error
+    assert "does not close connections" in result.content
+    assert "局部片段" in result.content and "<web_content>" in result.content
+    assert len(result.content) < 1800
+    offset = body.index("Context manager")
+    read = reg.execute("fetch_url", {"url": url, "start": offset, "length": 200})
+    assert f"正文: 第 {offset}–{offset + 200} 字符" in read.content
+    assert "does not close connections" in read.content
+    assert hits["n"] == 1
+
+
+def test_search_windows_bounded_and_pagination_preserves_offsets():
+    import re
+    from tools.fetch import Page, format_matches
+
+    body = ("x" * 1500 + "TARGET") * 12
+    page = Page("https://a.com", "标题", "2026-01-01", body, "Jina Reader")
+    first = format_matches(page, "target", 0)
+    assert first.count("<web_content>") == 4
+    assert len(first) < 6000
+    assert "Jina Reader" in first and "发布日期" in first
+    offset = int(re.search(r"start=(\d+)", first).group(1))
+    assert body[offset:offset + 6] == "TARGET"
+    second = format_matches(page, "target", offset)
+    assert f"正文: 第 {offset}–" in second
+    assert second.count("<web_content>") == 4
+
+
+def test_dense_matches_are_bounded_and_missing_query_is_not_evidence_of_absence():
+    from tools.fetch import Page, format_matches
+
+    page = Page("https://a.com", "", None, "a+b " * 10000)
+    found = format_matches(page, "a+b", 0)
+    assert len(found) < 6000 and "还有命中" in found
+    assert "未找到" in format_matches(page, "a.*b", 0)  # literal, not regex
+    assert "字面未命中" in format_matches(page, "absent", 0)
+    assert "未找到" in format_matches(page, "a+b", len(page.text))
+
+
+@pytest.mark.parametrize("args", [{"length": 0}, {"length": 6001}, {"query": "a" * 121}])
+def test_search_arguments_rejected_before_network(args):
+    reg, hits = make_tool({})
+    assert reg.execute("fetch_url", {"url": "https://a.com", **args}).is_error
+    assert hits["n"] == 0

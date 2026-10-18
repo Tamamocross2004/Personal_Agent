@@ -47,8 +47,31 @@ def check_report(text: str, task_dir: Path, session: ResearchSession | None) -> 
     return inspect_report(text, task_dir, session).feedback()
 
 
-def make_write_report(task_dir: Path, session: ResearchSession | None = None) -> Tool:
+def required_table_headers(question: str) -> list[tuple[str, ...]]:
+    """仅识别明确写在“表头/列名”后的管道分隔英文字段，不猜测任意自然语言格式。"""
+    field = r"`?[A-Za-z_][A-Za-z0-9_]*`?"
+    pattern = rf"(?:表头|列名)[^|\n]{{0,24}}?({field}(?:\s*\|\s*{field})+)"
+    return list(dict.fromkeys(tuple(c.strip().strip('`') for c in m.split('|'))
+                              for m in re.findall(pattern, question)))
+
+
+def missing_table_headers(text: str, required: list[tuple[str, ...]]) -> list[tuple[str, ...]]:
+    # 代码示例里的表格不算正文表格；必须紧跟 Markdown 分隔行。
+    text = re.sub(r"(?ms)^\s*(`{3,}|~{3,}).*?^\s*\1[^\n]*$", "", text)
+    lines = text.splitlines()
+    headers = set()
+    for row, separator in zip(lines, lines[1:]):
+        cells = tuple(c.strip().strip('`') for c in row.strip().strip('|').split('|'))
+        dividers = separator.strip().strip('|').split('|')
+        if len(cells) > 1 and len(cells) == len(dividers) and all(re.fullmatch(r"\s*:?-{3,}:?\s*", c) for c in dividers):
+            headers.add(cells)
+    return [header for header in required if header not in headers]
+
+
+def make_write_report(task_dir: Path, session: ResearchSession | None = None, *, question: str = "") -> Tool:
     """session：本任务的笔记等状态，用于自动检查报告引用。不传则只检查计划。"""
+
+    required = required_table_headers(question)
 
     @tool(name="write_report")
     def write_report(
@@ -58,6 +81,7 @@ def make_write_report(task_dir: Path, session: ResearchSession | None = None) ->
             Literal["overwrite", "append"],
             Field(description="overwrite 覆盖写入（默认）；append 追加到文件末尾，用于分段写长报告"),
         ] = "overwrite",
+        complete: Annotated[bool, Field(description="是否为完整报告。分段写作的中间段用 false，最后一段用 true；完整稿须满足用户指定表头并接受审稿")] = True,
     ) -> str:
         """把研究报告（Markdown）保存到本地。报告较长时可分多次写：先 overwrite 写开头，再 append 追加后续章节。
         返回值附有对报告的自动检查结果。"""
@@ -65,6 +89,13 @@ def make_write_report(task_dir: Path, session: ResearchSession | None = None) ->
             raise ValueError("报告内容为空")
         task_dir.mkdir(parents=True, exist_ok=True)
         path = task_dir / safe_filename(filename)
+        full = (path.read_text(encoding="utf-8") + "\n\n" + content
+                if mode == "append" and path.exists() else content)
+        missing = missing_table_headers(full, required) if complete else []
+        if missing:
+            raise ValueError("尚未保存：完整报告缺少用户指定表头（原文及列顺序必须一致）："
+                             + "；".join(" | ".join(header) for header in missing)
+                             + "。请修正后重试；分段写作中间段请设 complete=false，最后一段设 true。")
         if mode == "append" and path.exists():
             with path.open("a", encoding="utf-8") as f:
                 f.write("\n\n" + content)
@@ -76,6 +107,6 @@ def make_write_report(task_dir: Path, session: ResearchSession | None = None) ->
             saved = f"报告已保存：{path}（{len(content)} 字符）"
         check = inspect_report(full, task_dir, session)
         save_check(path, check)
-        return saved + "\n\n" + check.feedback()
+        return saved + ("\n【分段草稿】尚未完成，不执行语义审稿；最后一段须 complete=true。" if not complete else "") + "\n\n" + check.feedback()
 
     return write_report

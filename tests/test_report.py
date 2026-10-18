@@ -48,6 +48,32 @@ def test_write_report_rejects_empty(tmp_path):
     assert r.is_error and "为空" in r.content
 
 
+def test_required_header_rejects_translated_or_reordered_revision_without_mutating(tmp_path):
+    question = "报告英文表头 model | input_cost | output_cost | total_cost，行名沿用历史型号。"
+    reg = ToolRegistry([make_write_report(tmp_path, question=question)])
+    good = "| model | input_cost | output_cost | total_cost |\n|---|---|---|---|\n| A | 1 | 2 | 3 |"
+    assert not reg.execute("write_report", {"content": good}).is_error
+    quality = (tmp_path / "report.quality.json").read_bytes()
+    for bad in [good.replace("input_cost", "输入费"), good.replace("model | input_cost", "input_cost | model"), "```markdown\n" + good + "\n```"]:
+        result = reg.execute("write_report", {"content": bad})
+        assert result.is_error and "尚未保存" in result.content
+        assert (tmp_path / "report.md").read_text(encoding="utf-8") == good
+        assert (tmp_path / "report.quality.json").read_bytes() == quality
+
+
+def test_required_headers_support_partial_append_and_reject_incomplete_final(tmp_path):
+    from tools.report import required_table_headers
+    assert required_table_headers("英文表头 `model` | `cost`。") == [("model", "cost")]
+    assert required_table_headers("比较 A | B，报告用中文。") == []
+    reg = ToolRegistry([make_write_report(tmp_path, question="表头 model | cost")])
+    assert reg.execute("write_report", {"content": "# 完整报告"}).is_error
+    assert not (tmp_path / "report.md").exists()
+    assert not reg.execute("write_report", {"content": "# 草稿", "complete": False}).is_error
+    assert reg.execute("write_report", {"content": "## 结论", "mode": "append"}).is_error
+    assert (tmp_path / "report.md").read_text(encoding="utf-8") == "# 草稿"
+    assert not reg.execute("write_report", {"content": "| model | cost |\n|---|---|\n| A | 1 |", "mode": "append"}).is_error
+
+
 # ---------- workspace ----------
 
 

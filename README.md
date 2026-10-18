@@ -86,7 +86,7 @@ pytest
 |---|---|
 | `*.md` | 研究报告 |
 | `notes.md` | 研究笔记（`save_note` 记录的要点和来源） |
-| `plan.json` | 研究计划（开局按报告要回答的方面拆成 3–6 个子任务，`update_plan` 更新状态） |
+| `plan.json` | 研究计划（按问题复杂度拆成 1–6 个子任务，简单问题优先 1–2 个；`update_plan` 更新状态） |
 | `trace.jsonl` | 运行日志，每行一个事件（模型调用、工具调用、结果、耗时、token……），用 `python -m agent.replay` 回放 |
 | `messages.json` | 结束时完整的对话历史，排查“模型为什么这么做”时看这里 |
 | `memory_context.json` | 本次召回的历史记录 ID 与实际注入的背景；无历史命中时不生成 |
@@ -163,14 +163,25 @@ python -m agent.simulate <任务目录> --thresholds 0 20000 60000 --hit-price 0
 | 工具 | 作用 | 为什么需要 |
 |---|---|---|
 | `web_search(query, max_results)` | 联网搜索，返回标题 / URL / 摘要 | 模型的知识有截止日期；当前使用 ddgs（DuckDuckGo 等，免费无 Key） |
-| `fetch_url(url, start)` | 读取网页正文（去广告导航），长文分段；失败时可经 Jina Reader 读取 | 原始 HTML 太长太脏；分段阅读避免一次撑爆上下文 |
+| `fetch_url(url, start, query, length)` | 读取网页正文；用关键词定位，再按偏移精读；失败时可经 Jina Reader 读取 | 缓存全文，定位时只返回最多 4 个有界片段，减少长文逐页阅读 |
 | `save_note(content, source_url, topic)` | 记录从网页提炼的要点 | 网页原文稍后会被移出上下文，只有笔记保留；来源必须是读过的网页 |
 | `read_notes()` | 读取全部笔记 | 写报告前回顾，报告以笔记为依据 |
-| `write_report(content, filename, mode)` | 把 Markdown 报告存到任务目录，`mode="append"` 可分段追加 | 产出最终成果；文件名经过清洗，只能写进任务目录 |
+| `write_report(content, filename, mode, complete)` | 把 Markdown 报告存到任务目录，`mode="append"` 可分段追加 | 完整稿保存前核对明确指定的英文字段表头；中间草稿 `complete=false` 不消耗审稿次数 |
 | `run_python(code)` | 用独立 Python 子进程计算数据、生成 CSV / PNG，返回退出码和有界 stdout/stderr | 复杂计算可复现，报告可引用实际生成的图表 |
 | `get_current_time(timezone)` | 当前日期、时间、星期 | 模型不知道"今天"是哪天 |
 | `days_between(start_date, end_date)` | 两个日期相差的天数 | 大小月、闰年容易算错 |
 | `calculator(expression)` | 安全计算数学表达式 | 模型心算不可靠；基于 AST 白名单实现，不使用 `eval` |
+
+长网页可以直接调用 `fetch_url(url, query="context manager")`，无需先读第一页。关键词按字面匹配、忽略大小写；返回正文字符偏移和附近上下文。
+需要更多细节时，用 `fetch_url(url, start=命中附近偏移, length=2000)` 精读，`length` 为 200–6000；继续定位用返回的 `start` 与相同关键词。
+同一 URL 的定位与精读共享下载缓存。命中片段不代表已阅读全文，未命中不证明该事实不存在，应换同义词或分段核对。
+
+报告修订保留用户指定的文件名、表头和列顺序；审稿同时接收本次原始问题、有界历史背景及本次运行中同一报告的前轮意见，聚焦有实质影响的事实、证据与计算问题。
+历史背景和前轮意见仍是待核对数据，不能当作当前事实或强制修改指令；复审不会载入其他任务的审稿记录。
+自动检查和语义审稿均无问题后直接收尾，避免为润色反复改写。审稿失败、额度耗尽或最终文件哈希改变时仍如实标记，不视为通过。
+对于问题中“表头/列名”后以 `|` 分隔的明确英文字段（如 `model | input_cost | output_cost | total_cost`），完整报告保存前会核对正文 Markdown 表头及列顺序。
+缺失、翻译或重排会拒绝本次保存，保留原文件并返回修正提示；代码块中的示例表格不能代替正文。该规则不推断任意中文或自然语言格式约定。
+分段写作中间段用 `complete=false`，最后一次追加用 `complete=true`；草稿标记为未审稿，不能使用旧版本的通过状态。
 
 ### 固定题集评估
 

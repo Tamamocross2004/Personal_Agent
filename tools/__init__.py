@@ -26,6 +26,7 @@ def default_registry(
     session: ResearchSession | None = None,
     on_plan_update: callable = None,
     code_exec_timeout: float = 30.0,
+    question: str = "",
 ) -> ToolRegistry:
     """为一次研究任务组装全部工具。
 
@@ -40,7 +41,7 @@ def default_registry(
             make_fetch_url(http_client, fallback=fetch_fallback, jina_api_key=jina_api_key, pages=session.pages),
             *make_notes_tools(task_dir, session),
             make_update_plan(task_dir, on_update=on_plan_update),
-            make_write_report(task_dir, session),
+            make_write_report(task_dir, session, question=question),
             make_run_python(task_dir, timeout=code_exec_timeout),
             calculator,
             days_between,

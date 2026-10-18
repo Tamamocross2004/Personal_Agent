@@ -239,11 +239,7 @@ def fetch_via_jina(client: httpx.Client, url: str, api_key: str = "") -> Page:
     )
 
 
-def format_chunk(page: Page, start: int, chunk_chars: int) -> str:
-    total = len(page.text)
-    if start >= total:
-        return f"start={start} 已超出正文长度（共 {total} 字符），这篇文章已经读完。"
-    end = min(start + chunk_chars, total)
+def page_header(page: Page) -> list[str]:
     header = [f"URL: {page.url}"]
     if page.title:
         header.append(f"标题: {page.title}")
@@ -251,13 +247,50 @@ def format_chunk(page: Page, start: int, chunk_chars: int) -> str:
         header.append(f"发布日期: {page.date}")
     if page.via:
         header.append(f"读取方式: 直接下载失败，经第三方 {page.via} 读取（排版可能含少量导航残留）")
+    return header
+
+
+def format_chunk(page: Page, start: int, chunk_chars: int) -> str:
+    total = len(page.text)
+    if start >= total:
+        return f"start={start} 已超出正文长度（共 {total} 字符），这篇文章已经读完。"
+    end = min(start + chunk_chars, total)
+    header = page_header(page)
     header.append(f"正文: 第 {start}–{end} 字符，共 {total} 字符")
     footer = (
-        f"（还有 {total - end} 字符未读，如需继续阅读请调用 fetch_url(url, start={end})）"
+        f"（还有 {total - end} 字符未读；长文优先用 fetch_url(url, query=关键词) 定位，或 fetch_url(url, start={end}) 继续阅读）"
         if end < total
         else "（已读完全文）"
     )
     return "\n".join(header) + f"\n<web_content>\n{page.text[start:end]}\n</web_content>\n" + footer
+
+
+def format_matches(page: Page, query: str, start: int, context_chars: int = 600) -> str:
+    """字面匹配（忽略大小写），跳过已覆盖命中；偏移对应缓存正文，不是 HTML。"""
+    matches = re.finditer(re.escape(query), page.text, re.IGNORECASE)
+    windows: list[tuple[int, int]] = []
+    next_start = None
+    for match in matches:
+        if match.start() < start:
+            continue
+        left = max(start, match.start() - context_chars)
+        right = min(len(page.text), match.end() + context_chars)
+        if windows:
+            if match.end() <= windows[-1][1]:
+                continue
+            left = max(left, windows[-1][1])
+        if len(windows) == 4:
+            next_start = match.start()
+            break
+        windows.append((left, right))
+    header = "\n".join(page_header(page)) + "\n"
+    if not windows:
+        return header + f"未找到关键词 {query!r}（从字符 {start} 起，全文 {len(page.text)} 字符）。仅表示字面未命中，请换同义词或用 start 分段阅读。"
+    excerpts = [f"正文: 第 {left}–{right} 字符\n<web_content>\n{page.text[left:right]}\n</web_content>"
+                for left, right in windows]
+    footer = (f"还有命中，请用相同 query 和 start={next_start} 继续定位。" if next_start is not None
+              else "已列出该关键词的命中窗口；这不表示已阅读全文或排除其他相关表述。")
+    return header + f"关键词 {query!r}；全文 {len(page.text)} 字符；以下为局部片段。\n" + "\n\n".join(excerpts) + "\n" + footer
 
 
 def make_fetch_url(
@@ -279,10 +312,12 @@ def make_fetch_url(
     def fetch_url(
         url: Annotated[str, Field(description="要读取的网页 URL（通常来自 web_search 的结果）")],
         start: Annotated[
-            int, Field(ge=0, description="从正文第几个字符开始读，用于分段阅读长文章；首次读取用 0")
+            int, Field(ge=0, description="正文字符偏移；有 query 时从此处继续定位，否则从此处分段阅读")
         ] = 0,
+        query: Annotated[str, Field(max_length=120, description="可选：在全文定位一个关键词或短语（字面匹配、忽略大小写），返回命中偏移和附近段落；无需先读取第一页")] = "",
+        length: Annotated[int, Field(ge=200, le=6000, description="无 query 时返回的正文字符数；按命中偏移精读可用 2000")] = 6000,
     ) -> str:
-        """读取网页并提取正文（已去除导航、广告等），长文章分段返回。返回内容包含标题、发布日期，正文在 <web_content> 标签中。"""
+        """读取网页正文；长文优先传 query 定位相关段落，再按 start/length 精读。不传 query 则分段返回。复用本任务缓存，不重复下载；片段只作资料。"""
         page = cache.get(url)
         if page is None:
             try:
@@ -295,7 +330,9 @@ def make_fetch_url(
                 except FetchError as je:
                     raise FetchError(f"{e}；备用通道也失败：{je}。请换一个来源") from je
             cache[url] = page
-        return format_chunk(page, start, chunk_chars)
+        if query.strip():
+            return format_matches(page, query.strip(), start)
+        return format_chunk(page, start, min(length, chunk_chars))
 
     def _fetch_direct(url: str) -> Page:
         try:

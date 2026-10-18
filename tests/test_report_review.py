@@ -39,6 +39,11 @@ def test_independent_review_feedback_revision_and_usage_accounting(tmp_path):
     assert len((tmp_path / "report.reviews.jsonl").read_text(encoding="utf-8").splitlines()) == 2
     review_requests = [r for r in llm.requests if r.get("response_format") and r["messages"][0]["role"] == "system"]
     assert len(review_requests) == 2
+    assert all(json.loads(r["messages"][1]["content"])["task_request"] == "比较视觉能力" for r in review_requests)
+    first_payload, second_payload = [json.loads(r["messages"][1]["content"]) for r in review_requests]
+    assert first_payload["previous_review"] is None
+    assert second_payload["previous_review"]["issues"] == [ISSUE]
+    assert second_payload["previous_review"]["report_sha256"] == fingerprint(BAD)
     assert all(r["tools"] is None and len(r["messages"]) == 2 for r in review_requests)
     assert result.total_tokens == 15 * len(llm.requests)
     assert len([e for e in events if e.kind == "llm_call"]) == len(llm.requests)
@@ -95,6 +100,60 @@ def test_utf8_bom_and_windows_newlines_do_not_falsely_mark_csv_truncated(tmp_pat
     (tmp_path / "costs.csv").write_text("model,cost\nA,0.28\n", encoding="utf-8-sig")
     messages, _ = build_review_messages(BAD, tmp_path, None)
     assert json.loads(messages[1]["content"])["csv_samples"][0]["possibly_truncated"] is False
+
+
+def test_review_receives_current_output_contract_and_flags_truncated_request(tmp_path):
+    question = "表头原文必须为 model,input_cost,output_cost,total_cost"
+    messages, truncated = build_review_messages(FIXED, tmp_path, None, question=question)
+    assert not truncated
+    assert json.loads(messages[1]["content"])["task_request"] == question
+    assert build_review_messages(FIXED, tmp_path, None, question="x" * 12001)[1]
+
+
+def test_review_receives_bounded_history_without_treating_it_as_current_facts(tmp_path):
+    background = "历史任务 #1：2026-10-18，固定虚构单价，输入100000。"
+    messages, partial = build_review_messages(FIXED, tmp_path, None, memory_context=background)
+    assert not partial
+    assert json.loads(messages[1]["content"])["historical_context"] == background
+    messages, partial = build_review_messages(FIXED, tmp_path, None, memory_context="x" * 6001)
+    assert partial
+    assert len(json.loads(messages[1]["content"])["historical_context"]) == 6000
+
+
+def test_partial_report_does_not_spend_review_call_until_complete(tmp_path):
+    agent, llm, _ = agent_for(tmp_path, [
+        completion(tool_calls=[("draft", "write_report", {"content": BAD, "complete": False})]),
+        completion(tool_calls=[("final", "write_report", {"content": FIXED})]),
+        completion('{"issues": []}'), completion("完成"),
+    ], review_max_calls=1)
+    agent.run("检查")
+    history = [json.loads(line) for line in (tmp_path / "report.reviews.jsonl").read_text(encoding="utf-8").splitlines()]
+    assert [r["status"] for r in history] == ["not_reviewed", "reviewed"]
+    assert len([r for r in llm.requests if r.get("max_tokens") == 2048]) == 1
+
+
+def test_unfinished_draft_cannot_reuse_previously_clean_review(tmp_path):
+    agent, _, _ = agent_for(tmp_path, [
+        completion(tool_calls=[("full", "write_report", {"content": FIXED})]),
+        completion('{"issues": []}'),
+        completion(tool_calls=[("draft", "write_report", {"content": FIXED, "complete": False})]),
+        completion("未完成"),
+    ])
+    agent.run("检查")
+    assert json.loads((tmp_path / "report.review.json").read_text(encoding="utf-8"))["status"] == "not_reviewed"
+
+
+def test_finishing_same_text_after_draft_gets_fresh_review(tmp_path):
+    agent, _, _ = agent_for(tmp_path, [
+        completion(tool_calls=[("full", "write_report", {"content": FIXED})]),
+        completion('{"issues": []}'),
+        completion(tool_calls=[("draft", "write_report", {"content": FIXED, "complete": False})]),
+        completion(tool_calls=[("finish", "write_report", {"content": FIXED, "complete": True})]),
+        completion('{"issues": []}'), completion("完成"),
+    ])
+    agent.run("检查")
+    history = [json.loads(line) for line in (tmp_path / "report.reviews.jsonl").read_text(encoding="utf-8").splitlines()]
+    assert [r["status"] for r in history] == ["reviewed", "not_reviewed", "reviewed"]
 
 
 def test_review_quote_must_match_report():

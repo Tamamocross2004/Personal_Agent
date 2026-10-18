@@ -212,10 +212,12 @@ class Agent:
         self._blocked = 0
         self._review_count = 0
         self._reviewed_hashes = set()
+        self._last_reviews: dict[str, dict] = {}
         self._call_stats: dict[tuple[str, str], list[int]] = {}  # 调用签名 → [调用次数, 成功次数]
         if self.compactor:
             self.compactor.reset()
 
+        self._question = question
         messages: list[dict[str, Any]] = [
             {"role": "system", "content": self.system_prompt},
             {"role": "user", "content": question},
@@ -344,7 +346,7 @@ class Agent:
         注意即使拒绝也必须回一条 tool 消息：每个 tool_call 都要有对应的结果，否则下次请求报 400。
         """
         messages.append(_assistant_message_to_dict(msg))
-        reports_written = []
+        reports_written = {}
         if msg.content:
             self._emit("thought", text=msg.content)
 
@@ -369,15 +371,16 @@ class Agent:
             )
             messages.append({"role": "tool", "tool_call_id": call.id, "content": content})
             if name == "write_report" and not result.is_error:
-                reports_written.append(json.loads(arguments).get("filename", "report.md"))
+                args = json.loads(arguments)
+                reports_written[args.get("filename", "report.md")] = args.get("complete", True)
 
-        for filename in dict.fromkeys(reports_written):
-            self._review_saved_report(messages, filename)
+        for filename, complete in reports_written.items():
+            self._review_saved_report(messages, filename, complete=complete)
 
         if truncated:
             self._emit("notice", text="回复因输出长度上限被截断，工具调用未执行，已告知模型分段处理。")
 
-    def _review_saved_report(self, messages: list[dict[str, Any]], filename: str) -> None:
+    def _review_saved_report(self, messages: list[dict[str, Any]], filename: str, *, complete: bool = True) -> None:
         if not self.review_reports or not self.task_dir:
             return
         from tools.report import safe_filename
@@ -387,12 +390,18 @@ class Agent:
             return
         report = path.read_text(encoding="utf-8")
         digest = (path.name, fingerprint(report))
-        if digest in self._reviewed_hashes:
+        if complete and digest in self._reviewed_hashes:
             return
-        if self._review_count >= self.review_max_calls:
+        if not complete:
+            self._reviewed_hashes.discard(digest)
+            record = save_review(path, report, "not_reviewed", [], reason="分段草稿尚未完成")
+        elif self._review_count >= self.review_max_calls:
             record = save_review(path, report, "skipped_limit", [])
         else:
-            review_messages, truncated = build_review_messages(report, self.task_dir, self.research_session)
+            review_messages, truncated = build_review_messages(report, self.task_dir, self.research_session,
+                                                               question=self._question,
+                                                               memory_context=self.memory_context,
+                                                               previous_review=self._last_reviews.get(path.name))
             projected = estimate_messages(review_messages) + self.review_max_tokens * self.token_weights.output
             if self._equiv + projected >= self.token_budget:
                 record = save_review(path, report, "skipped_budget", [])
@@ -419,6 +428,8 @@ class Agent:
                     # 审稿是独立上下文，不能把其 token 数当作主对话下一轮的基准。
                     self._last_prompt = 0
                     self._len_at_last_call = 0
+        # 只携带当前运行、同一文件的上次意见，不加载磁盘上的任意旧记录或失败回复全文。
+        self._last_reviews[path.name] = {k: record[k] for k in ("report_sha256", "status", "issues")}
         feedback = review_feedback(record)
         self._emit("notice", text=feedback)
         messages.append({"role": "user", "content": feedback})
