@@ -48,6 +48,47 @@ def test_write_report_rejects_empty(tmp_path):
     assert r.is_error and "为空" in r.content
 
 
+def test_patch_changes_all_requested_occurrences_without_rewriting_other_text(tmp_path):
+    from agent.review import fingerprint
+    reg = ToolRegistry([make_write_report(tmp_path)])
+    original = "# 标题\n摘要：错误。\n\n正文原样保留。\n结论：错误。"
+    reg.execute("write_report", {"content": original})
+    result = reg.execute("write_report", {"mode": "patch", "base_sha256": fingerprint(original),
+        "replacements": [{"old": "错误。", "new": "正确。", "expected_occurrences": 2}]})
+    assert not result.is_error, result.content
+    assert (tmp_path / "report.md").read_text(encoding="utf-8") == original.replace("错误。", "正确。")
+
+
+@pytest.mark.parametrize("changes,stale", [
+    ([{"old": "正文", "new": "已改"}, {"old": "不存在", "new": "坏"}], False),
+    ([{"old": "正文", "new": "已改"}], True),
+    ([{"old": "正文", "new": "已改"}, {"old": "正文原样", "new": "重叠"}], False),
+    ([{"old": "重复", "new": "已改"}], False),
+    ([{"old": "# 标题\n正文原样。重复重复", "new": ""}], False),
+])
+def test_invalid_patch_is_atomic_and_preserves_quality_record(tmp_path, changes, stale):
+    from agent.review import fingerprint
+    original = "# 标题\n正文原样。重复重复"
+    reg = ToolRegistry([make_write_report(tmp_path)])
+    reg.execute("write_report", {"content": original})
+    quality = (tmp_path / "report.quality.json").read_bytes()
+    result = reg.execute("write_report", {"mode": "patch", "base_sha256": "0" * 64 if stale else fingerprint(original), "replacements": changes})
+    assert result.is_error
+    assert (tmp_path / "report.md").read_text(encoding="utf-8") == original
+    assert (tmp_path / "report.quality.json").read_bytes() == quality
+
+
+def test_patch_still_runs_numeric_and_header_guards(tmp_path):
+    from agent.review import fingerprint
+    original = "model | cost\n---|---\nA | 3\n\n1+2=3"
+    reg = ToolRegistry([make_write_report(tmp_path, question="表头 model | cost")])
+    reg.execute("write_report", {"content": original})
+    for old,new in [("cost", "费用"), ("1+2=3", "1+2=8")]:
+        result = reg.execute("write_report", {"mode": "patch", "base_sha256": fingerprint(original), "replacements": [{"old": old, "new": new}]})
+        assert result.is_error
+        assert (tmp_path / "report.md").read_text(encoding="utf-8") == original
+
+
 def test_required_header_rejects_translated_or_reordered_revision_without_mutating(tmp_path):
     question = "报告英文表头 model | input_cost | output_cost | total_cost，行名沿用历史型号。"
     reg = ToolRegistry([make_write_report(tmp_path, question=question)])

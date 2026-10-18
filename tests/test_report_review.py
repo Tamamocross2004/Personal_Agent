@@ -22,6 +22,59 @@ def test_note_only_quote_preserves_real_report_issue_without_passing():
     assert "只能从 report" in str(error.value)
 
 
+def test_patch_revision_is_reaudited_with_exact_diff_and_original_feedback(tmp_path):
+    agent, llm, _ = agent_for(tmp_path, [
+        completion(tool_calls=[("w1", "write_report", {"content": BAD})]),
+        completion(json.dumps({"issues": [ISSUE]}, ensure_ascii=False)),
+        completion(tool_calls=[("w2", "write_report", {"mode": "patch", "base_sha256": fingerprint(BAD),
+            "replacements": [{"old": ISSUE["quote"], "new": "Kimi 和 Qwen 均支持视觉。", "expected_occurrences": 2}]})]),
+        completion('{"issues": []}'), completion("完成"),
+    ])
+    agent.run("比较")
+    reviews = [r for r in llm.requests if r.get("response_format") and len(r["messages"]) == 2]
+    payload = json.loads(reviews[-1]["messages"][1]["content"])
+    assert payload["report"] == FIXED and payload["previous_review"]["issues"] == [ISSUE]
+    assert payload["revision"]["previous_report_sha256"] == fingerprint(BAD)
+    assert not payload["revision"]["possibly_truncated"]
+    assert all("Kimi 唯一支持视觉" in change["old"] and "Kimi 和 Qwen" in change["new"] for change in payload["revision"]["changed_passages"])
+    record = json.loads((tmp_path / "report.review.json").read_text(encoding="utf-8"))
+    assert record["status"] == "reviewed" and record["issues"] == [] and agent._review_count == 2
+
+
+@pytest.mark.parametrize("length,kept", [(20, 8), (5000, 3), (10000, 2)])
+def test_successful_readings_are_preserved_as_evidence_not_lossy_notes(tmp_path, length, kept):
+    from tools.registry import tool
+    @tool
+    def fetch_url(url: str) -> str:
+        """测试读取来源。"""
+        if url == "bad":
+            raise ValueError("读取失败")
+        return "URL: https://example.com\n原文：机制甲提交后开启事务；机制乙本身不打开事务。" + "x" * length
+    llm = ScriptedLLM([completion('{"tasks": []}'),
+        completion(tool_calls=[("bad", "fetch_url", {"url": "bad"})]
+                              + [(f"read{i}", "fetch_url", {"url": f"good{i}"}) for i in range(10)]),
+        completion(tool_calls=[("w", "write_report", {"content": FIXED})]),
+        completion('{"issues": []}'), completion("完成")])
+    agent = Agent(llm, ToolRegistry([fetch_url, make_write_report(tmp_path)]), task_dir=tmp_path, review_reports=True)
+    agent.run("核对两种机制")
+    request = next(r for r in llm.requests if r.get("response_format") and len(r["messages"]) == 2)
+    payload = json.loads(request["messages"][1]["content"])
+    evidence = payload["source_readings"]
+    assert len(evidence) == kept and evidence[-1]["tool_call_id"] == "read9"
+    assert payload["source_readings_omitted"] == 10 - kept
+    assert "机制甲" in evidence[0]["content"]
+    assert evidence[0]["possibly_truncated"] is (length == 10000)
+    assert sum(len(i["arguments"]) + len(i["content"]) for i in evidence) <= 20000
+
+
+def test_revision_diff_is_bounded_without_removing_current_report(tmp_path):
+    from agent.review import revision_changes
+    diff = revision_changes("a" * 7000, "b" * 7000, {"report_sha256": "old"})
+    assert diff["omitted_changes"] == 1 and diff["possibly_truncated"]
+    messages, _ = build_review_messages("b" * 7000, tmp_path, None, previous_report="a" * 7000)
+    assert json.loads(messages[1]["content"])["report"] == "b" * 7000
+
+
 @pytest.mark.parametrize("extra", [0, 24])
 def test_successful_calculator_evidence_reaches_independent_reviewer(tmp_path, extra):
     from tools.basic import calculator

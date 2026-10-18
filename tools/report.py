@@ -13,7 +13,7 @@ import re
 from pathlib import Path
 from typing import Annotated, Literal
 
-from pydantic import Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from agent.quality import inspect_report, save_check
 from agent.markdown_tables import markdown_tables
@@ -24,6 +24,32 @@ from tools.session import ResearchSession
 _ILLEGAL = re.compile(r'[<>:"/\\|?*\x00-\x1f]')  # Windows 文件名非法字符
 # 报告里的 URL：遇到空白、Markdown 的括号/尖括号、引号或中文标点就结束
 _URL = re.compile(r"https?://[^\s<>()\[\]\"'`，。；、）】》]+")
+
+
+class ReportReplacement(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    old: str = Field(min_length=1, max_length=6000)
+    new: str = Field(max_length=6000)
+    expected_occurrences: int = Field(default=1, ge=1, le=20)
+
+
+def patch_report(original: str, replacements: list[ReportReplacement], base_sha256: str) -> str:
+    """所有定位均基于原稿；任一定位失败就拒绝整批，不保存半份修订。"""
+    from agent.review import fingerprint
+    if base_sha256 != fingerprint(original):
+        raise ValueError("报告版本已变化：base_sha256 必须是当前报告的 SHA-256，请核对最新审稿反馈。")
+    spans = []
+    for replacement in replacements:
+        starts = [m.start() for m in re.finditer(re.escape(replacement.old), original)]
+        if len(starts) != replacement.expected_occurrences:
+            raise ValueError(f"替换原文实际匹配 {len(starts)} 次，预期 {replacement.expected_occurrences} 次；请提供精确原文。")
+        spans.extend((start, start + len(replacement.old), replacement.new) for start in starts)
+    spans.sort()
+    if any(a[1] > b[0] for a, b in zip(spans, spans[1:])):
+        raise ValueError("替换范围重叠，请合并为一个明确的替换。")
+    for start, end, new in reversed(spans):
+        original = original[:start] + new + original[end:]
+    return original
 
 
 def safe_filename(name: str, default: str = "report.md") -> str:
@@ -69,22 +95,33 @@ def make_write_report(task_dir: Path, session: ResearchSession | None = None, *,
 
     @tool(name="write_report")
     def write_report(
-        content: Annotated[str, Field(description="完整的 Markdown 报告内容")],
+        content: Annotated[str, Field(description="完整的 Markdown 报告内容；patch 模式留空")] = "",
         filename: Annotated[str, Field(description="文件名，例如 report.md")] = "report.md",
         mode: Annotated[
-            Literal["overwrite", "append"],
-            Field(description="overwrite 覆盖写入（默认）；append 追加到文件末尾，用于分段写长报告"),
+            Literal["overwrite", "append", "patch"],
+            Field(description="overwrite 新稿；append 分段追加；审稿后优先 patch 精确替换原文，保留无关内容"),
         ] = "overwrite",
         complete: Annotated[bool, Field(description="是否为完整报告。分段写作的中间段用 false，最后一段用 true；完整稿须满足用户指定表头并接受审稿")] = True,
+        replacements: Annotated[list[ReportReplacement], Field(max_length=16, description="patch 模式的原文/新文替换列表；定位均基于修订前原稿")] = [],
+        base_sha256: Annotated[str, Field(description="patch 模式必填：最新审稿反馈中的报告 SHA-256")] = "",
     ) -> str:
         """把研究报告（Markdown）保存到本地。报告较长时可分多次写：先 overwrite 写开头，再 append 追加后续章节。
         返回值附有对报告的自动检查结果。"""
-        if not content.strip():
+        if mode != "patch" and not content.strip():
             raise ValueError("报告内容为空")
         task_dir.mkdir(parents=True, exist_ok=True)
         path = task_dir / safe_filename(filename)
-        full = (path.read_text(encoding="utf-8") + "\n\n" + content
-                if mode == "append" and path.exists() else content)
+        if mode == "patch":
+            if content or not replacements or not complete or not path.is_file() or path.is_symlink():
+                raise ValueError("patch 要求已有报告、非空 replacements、complete=true，且 content 留空。")
+            full = patch_report(path.read_text(encoding="utf-8"), replacements, base_sha256)
+            if not full.strip():
+                raise ValueError("报告内容为空")
+        else:
+            if replacements or base_sha256:
+                raise ValueError("replacements/base_sha256 仅用于 patch 模式。")
+            full = (path.read_text(encoding="utf-8") + "\n\n" + content
+                    if mode == "append" and path.exists() else content)
         missing = missing_table_headers(full, required) if complete else []
         if missing:
             raise ValueError("尚未保存：完整报告缺少用户指定表头（原文及列顺序必须一致）："
@@ -106,9 +143,8 @@ def make_write_report(task_dir: Path, session: ResearchSession | None = None, *,
             full = path.read_text(encoding="utf-8")
             saved = f"已追加到报告：{path}（本次 {len(content)} 字符，文件共 {len(full)} 字符）"
         else:
-            path.write_text(content, encoding="utf-8")
-            full = content
-            saved = f"报告已保存：{path}（{len(content)} 字符）"
+            path.write_text(full, encoding="utf-8")
+            saved = f"报告已保存：{path}（{len(full)} 字符）"
         check = inspect_report(full, task_dir, session)
         save_check(path, check)
         return saved + ("\n【分段草稿】尚未完成，不执行语义审稿；最后一段须 complete=true。" if not complete else "") + "\n\n" + check.feedback()

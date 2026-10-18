@@ -213,6 +213,9 @@ class Agent:
         self._review_count = 0
         self._calculation_results: list[dict] = []
         self._calculations_omitted = 0
+        self._source_readings: list[dict] = []
+        self._source_readings_omitted = 0
+        self._last_report_texts: dict[str, str] = {}
         self._reviewed_hashes = set()
         self._last_reviews: dict[str, dict] = {}
         self._call_stats: dict[tuple[str, str], list[int]] = {}  # 调用签名 → [调用次数, 成功次数]
@@ -363,6 +366,12 @@ class Agent:
             else:
                 result, seconds = self._run_tool(name, arguments)
             content = _truncate(result.content, self.max_tool_result_chars)
+            if name == "fetch_url" and not result.is_error:
+                self._source_readings.append({"tool_call_id": call.id, "arguments": arguments[:2000],
+                    "content": content[:8000], "possibly_truncated": len(result.content) > min(self.max_tool_result_chars, 8000) or len(arguments) > 2000})
+                while (len(self._source_readings) > 8 or sum(len(i["arguments"]) + len(i["content"]) for i in self._source_readings) > 20000):
+                    self._source_readings.pop(0)
+                    self._source_readings_omitted += 1
             if name in ("calculator", "days_between", "run_python") and not result.is_error:
                 # 独立于主对话压缩；只保留真实成功调用，有界记录并明确截断/省略。
                 self._calculation_results.append({"tool_call_id": call.id, "tool": name,
@@ -414,7 +423,10 @@ class Agent:
                                                                memory_context=self.memory_context,
                                                                previous_review=self._last_reviews.get(path.name),
                                                                calculation_results=self._calculation_results,
-                                                               calculations_omitted=self._calculations_omitted)
+                                                               calculations_omitted=self._calculations_omitted,
+                                                               source_readings=self._source_readings,
+                                                               source_readings_omitted=self._source_readings_omitted,
+                                                               previous_report=self._last_report_texts.get(path.name))
             while True:
                 projected = estimate_messages(review_messages) + self.review_max_tokens * self.token_weights.output
                 if self._equiv + projected >= self.token_budget:
@@ -456,6 +468,7 @@ class Agent:
                     self._len_at_last_call = 0
         # 只携带当前运行、同一文件的上次意见，不加载磁盘上的任意旧记录或失败回复全文。
         self._last_reviews[path.name] = {k: record[k] for k in ("report_sha256", "status", "issues")}
+        self._last_report_texts[path.name] = report[:40000]
         feedback = review_feedback(record)
         self._emit("notice", text=feedback)
         messages.append({"role": "user", "content": feedback})
