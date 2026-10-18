@@ -19,7 +19,7 @@
 
 每个阶段完成后打一个 git 标签（`stage-0`、`stage-1`…），可以用 `git diff stage-0 stage-1` 查看某一阶段具体改了什么。
 
-2026-10-18 修复复检：单测 **413 passed**、离线 **8/8**；v2 真实题集三轮原始 **24/27**，修正评分误判后只读复查 **26/27**。仍有一次审稿额度耗尽，尚未达到全通过稳定性门槛，见 [修复复检记录](docs/fix-acceptance-20261018.md)。
+2026-10-18 审稿收敛修复：单测 **433 passed**、离线 **8/8**；原失败联网题另测 **3/3**，完整三轮原始 **24/27**，修正条件/否定语境误判后只读复查 **27/27**。27 份最终报告均完成审稿、无问题项；两次审稿上限未放宽。见 [最新复检记录](docs/review-convergence-20261018.md)，此前失败基线见 [上一轮记录](docs/fix-acceptance-20261018.md)。
 
 ## 快速开始
 
@@ -168,7 +168,7 @@ python -m agent.simulate <任务目录> --thresholds 0 20000 60000 --hit-price 0
 | `fetch_url(url, start, query, length)` | 读取网页正文；用关键词定位，再按偏移精读；失败时可经 Jina Reader 读取 | 缓存全文，定位时只返回最多 4 个有界片段，减少长文逐页阅读 |
 | `save_note(content, source_url, topic)` | 记录从网页提炼的要点 | 网页原文稍后会被移出上下文，只有笔记保留；来源必须是读过的网页 |
 | `read_notes()` | 读取全部笔记 | 写报告前回顾，报告以笔记为依据 |
-| `write_report(content, filename, mode, complete)` | 把 Markdown 报告存到任务目录，`mode="append"` 可分段追加 | 完整稿保存前核对明确指定的英文字段表头；中间草稿 `complete=false` 不消耗审稿次数 |
+| `write_report(content, filename, mode, complete, replacements, base_sha256)` | 保存报告，append 分段追加，patch 按报告版本精确替换 | 完整稿保存前核对表头和数值；中间草稿 `complete=false` 不消耗审稿次数 |
 | `run_python(code)` | 用独立 Python 子进程计算数据、生成 CSV / PNG，返回退出码和有界 stdout/stderr | 复杂计算可复现，报告可引用实际生成的图表 |
 | `get_current_time(timezone)` | 当前日期、时间、星期 | 模型不知道"今天"是哪天 |
 | `days_between(start_date, end_date)` | 两个日期相差的天数 | 大小月、闰年容易算错 |
@@ -180,6 +180,8 @@ python -m agent.simulate <任务目录> --thresholds 0 20000 60000 --hit-price 0
 
 报告修订保留用户指定的文件名、表头和列顺序；审稿同时接收本次原始问题、有界历史背景及本次运行中同一报告的前轮意见，聚焦有实质影响的事实、证据与计算问题。
 历史背景和前轮意见仍是待核对数据，不能当作当前事实或强制修改指令；复审不会载入其他任务的审稿记录。
+审稿另接收本轮成功读取的网页原文片段与实际修订差异，减少仅凭笔记摘要误判、反复要求相反修改。网页片段与差异均有容量上限和省略标记，不表示已读完整网页。
+修订优先使用 `mode="patch"`：content 留空，base_sha256 使用最新审稿反馈中的哈希，replacements 为 `[{"old":"原文","new":"修正文本","expected_occurrences":1}]`。版本过期、匹配次数不符或范围重叠会整批拒绝；通过后仍执行机械检查及独立审稿，不复用旧稿通过状态。
 自动检查和语义审稿均无问题后直接收尾，避免为润色反复改写。审稿失败、额度耗尽或最终文件哈希改变时仍如实标记，不视为通过。
 对于问题中“表头/列名”后以 `|` 分隔的明确英文字段（如 `model | input_cost | output_cost | total_cost`），完整报告保存前会核对正文 Markdown 表头及列顺序。
 缺失、翻译或重排会拒绝本次保存，保留原文件并返回修正提示；代码块中的示例表格不能代替正文。该规则不推断任意中文或自然语言格式约定。
