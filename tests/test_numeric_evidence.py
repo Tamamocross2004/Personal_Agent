@@ -25,6 +25,24 @@ def test_full_chained_expression_is_checked_not_suffix():
     assert not arithmetic_errors("200000 token ÷ 1000000 × 2 = 0.4")  # 未支持的单位表达式不能截后缀误判。
 
 
+@pytest.mark.parametrize('text', [
+    '0.9 + 3.8416/40 = 0.9 + 0.096040 = 0.996040',
+    '2 * 3 = 1 + 5', '2 × (3 + 4) = 7 * 2', '(2 + 3) = (4 + 1)',
+    '2 * 3 = 2 * sqrt(9)',
+])
+def test_complete_rhs_and_correct_equality_chains_are_not_prefix_errors(text):
+    assert not arithmetic_errors(text)
+
+
+@pytest.mark.parametrize('text', [
+    '0.9 + 3.8416/40 = 0.9 + 0.096040 = 0.9',
+    '0.8 + 3.8416/40 = 0.9 + 0.096040 = 0.996040',
+    '2 * 3 = 1 + 8', '2 * 3 = 27 / 4',
+])
+def test_full_rhs_mismatch_and_incorrect_chain_members_still_fail(text):
+    assert arithmetic_errors(text)
+
+
 def test_wrong_equation_cannot_overwrite_saved_report(tmp_path):
     registry = ToolRegistry([make_write_report(tmp_path)])
     assert not registry.execute("write_report", {"content": "27/8=3.375"}).is_error

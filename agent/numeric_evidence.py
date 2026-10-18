@@ -84,7 +84,8 @@ def price_ratio_errors(report: str, csv_content: str) -> list[str]:
 
 _NUM = r"(?:\d{1,3}(?:[, \u202f\u00a0]\d{3})+|\d+)(?:\.\d+)?"
 _ATOM = rf"\(*\s*[+-]?{_NUM}\s*\)*"
-_EQUATION = re.compile(rf"(?<![\w.,/÷×*+−-])({_ATOM}(?:\s*[÷/×*+−-]\s*{_ATOM})+)\s*(?:=|≈|≃|＝)\s*(?:约\s*)?({_NUM})(\s*%)?")
+_RIGHT = rf"{_ATOM}(?:\s*[÷/×*+−-]\s*{_ATOM})*"
+_EQUATION = re.compile(rf"(?<![\w.,/÷×*+−-])({_ATOM}(?:\s*[÷/×*+−-]\s*{_ATOM})+)\s*(?:=|≈|≃|＝)\s*(?:约\s*)?({_RIGHT})(\s*%)?")
 
 
 def _calculate(expression: str) -> Decimal:
@@ -124,16 +125,25 @@ def arithmetic_errors(report: str) -> list[str]:
         if line.lstrip().startswith(">"):
             continue
         line = re.sub(r"`[^`]*`", "", line).replace('**', '')
-        for match in _EQUATION.finditer(line):
+        position = 0
+        while (match := _EQUATION.search(line, position)) is not None:
+            # 连等式两边可共享中间表达式，继续从下一字符查找，不能只核对最右侧。
+            position = match.start() + 1
             expression, claimed, percent = match.groups()
-            if re.search(r"[÷/×*+−-]\s*$", line[:match.start()]):
+            if re.search(r"[÷/×*+−(\-]\s*$", line[:match.start()]):
                 continue  # 未识别完整左式时不可仅核对后缀。
+            if re.search(r"\d[, \u202f\u00a0]+$", line[:match.start()]):
+                continue  # 不能从空格/逗号千分位数字内部开始另一个算式。
+            if re.match(r"\s*[÷/×*+−-]", line[match.end():]):
+                continue  # 未支持的右式不得仅把开头数字当成完整结果。
             try:
-                stated = number(claimed)
                 with localcontext() as ctx:
                     ctx.prec = 28
+                    stated = _calculate(claimed)
                     actual = _calculate(expression)
-                    tolerance = Decimal(5).scaleb(stated.as_tuple().exponent - 1)
+                    literal = re.fullmatch(rf"\(*\s*[+-]?({_NUM})\s*\)*", claimed)
+                    tolerance = (Decimal(5).scaleb(number(literal[1]).as_tuple().exponent - 1)
+                                 if literal else Decimal('1e-12'))
                     if percent:
                         stated, tolerance = stated / 100, tolerance / 100
                     if abs(actual - stated) > tolerance:
