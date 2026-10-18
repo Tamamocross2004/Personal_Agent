@@ -9,8 +9,8 @@
 而平时每一步都能命中 85% 以上。推测：厂商把工具说明书渲染在提示开头，tool_choice 不同时开头就不同。
 这个脚本直接验证这一点，换厂商时也可以先跑一遍，看哪种写法能保住缓存。
 
-做法：开头放一个随机串，保证第 1 次请求一定不命中（不受以前运行的影响）；之后各变体与它对比。
-每次请求只要 1 个输出 token，总花费约 2 万输入 token。
+做法：每组使用独立随机前缀，依次发送基准、相同基准、变体，避免不同变体互相预热缓存。
+每次请求只要 1 个输出 token，共 9 次请求，约 5 万输入 token。
 """
 
 from __future__ import annotations
@@ -58,36 +58,38 @@ def main(argv: list[str] | None = None) -> int:
     llm = LLMClient(cfg)
     with tempfile.TemporaryDirectory() as d:
         tools = default_registry(Path(d)).schemas()
-    base = build_messages()
-    extra = base + [{"role": "user", "content": "【系统通知】进入收尾阶段。"}]
-
-    # (说明, messages, tools, 额外参数)
-    variants: list[tuple[str, list, Any, dict]] = [
-        ("1 首次请求（工具 + auto，冷启动）", base, tools, {}),
-        ("2 完全相同的请求", base, tools, {}),
-        ("3 工具 + tool_choice=none（旧收尾写法）", base, tools, {"tool_choice": "none"}),
-        ("4 不发工具（更早的收尾写法）", base, None, {}),
-        ("5 工具 + auto，末尾追加一条 user（新收尾写法）", extra, tools, {}),
+    variants: list[tuple[str, Any, dict, bool]] = [
+        ("工具 + tool_choice=none（旧收尾）", tools, {"tool_choice": "none"}, False),
+        ("不发工具（更早收尾）", None, {}, False),
+        ("工具 + auto，追加 user（新收尾）", tools, {}, True),
     ]
 
     table = Table(title=f"前缀缓存探针：{cfg.provider} / {cfg.model}")
     for col in ("请求写法", "输入 tokens", "命中缓存", "命中率"):
         table.add_column(col, justify="left" if col == "请求写法" else "right")
-    for i, (label, messages, t, kw) in enumerate(variants):
-        if i:
-            time.sleep(args.sleep)
-        try:
-            resp = llm.chat(messages, tools=t, max_tokens=1, **kw)
-        except Exception as e:  # noqa: BLE001 —— 某种写法不被支持也是有用的结论
-            table.add_row(label, "-", "-", f"[red]{type(e).__name__}[/]")
-            continue
-        prompt = resp.usage.prompt_tokens if resp.usage else 0
-        cached = _cached_tokens(resp.usage)
-        table.add_row(label, str(prompt), str(cached), f"{cached / prompt:.0%}" if prompt else "-")
+    for i, (label, variant_tools, variant_kw, append_user) in enumerate(variants, 1):
+        base = build_messages()  # 每组独立前缀，旧变体不会预热下一组
+        changed = base + [{"role": "user", "content": "【系统通知】进入收尾阶段。"}] if append_user else base
+        requests = [
+            (f"{i} 冷基准", base, tools, {}),
+            (f"{i} 热基准", base, tools, {}),
+            (f"{i} {label}", changed, variant_tools, variant_kw),
+        ]
+        for j, (row_label, messages, t, kw) in enumerate(requests):
+            if j:
+                time.sleep(args.sleep)
+            try:
+                resp = llm.chat(messages, tools=t, max_tokens=1, **kw)
+            except Exception as e:  # 某种写法不被支持也是有用的结论
+                table.add_row(row_label, "-", "-", f"[red]{type(e).__name__}[/]")
+                continue
+            prompt = resp.usage.prompt_tokens if resp.usage else 0
+            cached = _cached_tokens(resp.usage)
+            table.add_row(row_label, str(prompt), str(cached), f"{cached / prompt:.0%}" if prompt else "-")
     console.print(table)
     console.print(
-        "[dim]第 2 行命中率高说明缓存正常工作；第 3、4 行明显偏低，说明 tool_choice / 工具说明书会改变提示开头；"
-        "第 5 行应接近第 2 行。[/]"
+        "[dim]各组使用独立随机前缀。先确认热基准命中率高，再比较该组变体；"
+        "变体明显低于热基准说明请求变化破坏了前缀缓存。新收尾写法应接近本组热基准。[/]"
     )
     return 0
 
