@@ -110,13 +110,16 @@ def _nonasserted_claim(sentence: str, claim: re.Match) -> bool:
             continue
         tail = sentence[quote.end():]
         lead = re.split(r"[，,]", tail, maxsplit=1)[0]
+        # 引述命题后的“所需条件/成立前提”是条件议题，不是命题本身的肯定。
+        if re.match(r"\s*(?:所需(?:要)?的?|成立(?:所需)?的?)(?:条件|证据|数据|前提)", tail):
+            return True
         # 回指必须出现在引号后第一个从句；不能用另一对象的否定覆盖引述的肯定。
-        meta = re.search(r"结论|命题|判断|说法|表述", lead)
+        meta = re.search(r"结论|命题|判断|说法|表述|比较|排序", lead)
         affirmed = re.search(r"正确|准确|已证实|已成立|毫无疑问|事实", lead)
         if meta and not affirmed:
             if re.search(r"缺少|缺乏|尚缺|无对照|未知|不存在|不具备|无法成立|不能成立|不成立", tail):
                 return True
-            if re.search(r"(?:需要|要求|前提).*(?:证据|数据|条件)", tail):
+            if re.search(r"(?:需要|要求|前提).*(?:证据|数据|条件|测试结果)", tail):
                 return True
         if re.search(r"(?:若|如果).*强行", sentence[:quote.start()]) and re.search(r"无对照|缺少|缺乏", tail):
             return True
@@ -142,13 +145,13 @@ def unsupported_claims(report: str, pattern: str) -> list[str]:
         fragments = [line]
         for fragment in fragments:
             plain = fragment.replace('**', '').strip()
-            rejected_list = re.match(r"^(?:[-*]\s*)?(?:(?:不能|不可|不应|无法|不足以)(?:说|得出|支持|断言|认定|推导|认为|判断|证明|暗示|成立)(?:的(?:结论|表述|说法|判断))?|不支持的结论)(?:包括|有)?\s*[：:]", plain)
+            rejected_list = re.match(r"^(?:[-*]\s*)?(?:(?:不能|不可(?:以)?|不应(?:该)?|无法|不足以)(?:说|得出|支持|断言|认定|推导|认为|判断|证明|暗示|成立)(?:的(?:结论|表述|说法|判断))?|不支持的结论)(?:包括|有)?\s*[：:]", plain)
             if rejected_list and not re.search(r"但是|但|然而|不过", plain):
                 continue  # 明确的否定标签支配同一列表中的分号项。
             for sentence in re.split(r"(?<=[。！？?；;])|但是|但|然而|不过", fragment):
                 if not re.search(pattern, sentence):
                     continue
-                normalized = sentence.replace('**', '').replace("不是不能", "可以").replace("并非不能", "可以")
+                normalized = re.sub(r"(?:不是|并非)(?:不能|不可(?:以)?|不应(?:该)?)", "可以", sentence.replace('**', ''))
                 claims = list(re.finditer(pattern, normalized))
                 if all(_nonasserted_claim(normalized, claim) for claim in claims):
                     continue
