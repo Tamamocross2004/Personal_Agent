@@ -1,0 +1,1360 @@
+{
+  "identity": {
+    "git_revision": "9f62fe49c710002dfc03f98b2cc169cbdb63c5ea",
+    "code_sha256": "de0cc31240e6dca5419ad10c933bcbac91cfbafe94e16228491e8ae5a80cad30",
+    "grader_sha256": "3ffbae528011a44e910c54e14af946b527613f77d9c015afddaf0ecf43ace612",
+    "config": {
+      "provider": "deepseek",
+      "model": "deepseek-chat",
+      "max_steps": 15,
+      "per_case_budget": 80000,
+      "suite_budget": 400000,
+      "review_max_calls": 2,
+      "repeat": 1,
+      "temperature": 0.3,
+      "token_weights": {
+        "cached": 0.1,
+        "output": 2.0
+      }
+    }
+  },
+  "suite_hashes": [
+    "b478e191150525ccc0505333a55b28e6ca24008cc19e599b19a9f1a9847bc8ae",
+    "4359b2fd528afc6d049c15d3397bb819abf483268568998c04d8ed7ddae25b64",
+    "4359b2fd528afc6d049c15d3397bb819abf483268568998c04d8ed7ddae25b64",
+    "4359b2fd528afc6d049c15d3397bb819abf483268568998c04d8ed7ddae25b64"
+  ],
+  "summaries": [
+    {
+      "selected": 9,
+      "passed": 8,
+      "failed": 1,
+      "unfinished": 0,
+      "pass_rate": 0.8888888888888888,
+      "steps": 55,
+      "seconds": 139.62,
+      "equivalent_tokens": 161114,
+      "review_calls": 12
+    },
+    {
+      "selected": 7,
+      "passed": 6,
+      "failed": 1,
+      "unfinished": 0,
+      "pass_rate": 0.8571428571428571,
+      "steps": 42,
+      "seconds": 127.73,
+      "equivalent_tokens": 130219,
+      "review_calls": 7
+    },
+    {
+      "selected": 7,
+      "passed": 7,
+      "failed": 0,
+      "unfinished": 0,
+      "pass_rate": 1.0,
+      "steps": 35,
+      "seconds": 93.41,
+      "equivalent_tokens": 95978,
+      "review_calls": 8
+    },
+    {
+      "selected": 7,
+      "passed": 7,
+      "failed": 0,
+      "unfinished": 0,
+      "pass_rate": 1.0,
+      "steps": 36,
+      "seconds": 118.37,
+      "equivalent_tokens": 114258,
+      "review_calls": 7
+    }
+  ],
+  "case_details": [
+    {
+      "group": "v2",
+      "id": "official_research",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "scope": "body",
+          "unit": "characters",
+          "actual": 999,
+          "soft_target": 500
+        }
+      ],
+      "observations": [
+        {
+          "kind": "soft_length",
+          "message": "正文 999 个可见非空白字符，超过默认简述目标 500；这不是用户硬上限。"
+        }
+      ],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 3,
+      "metrics": {
+        "steps": 8,
+        "seconds": 20.88,
+        "equivalent_tokens": 30523,
+        "input_tokens": 81307,
+        "cached_tokens": 63616,
+        "output_tokens": 3235,
+        "llm_calls": 11,
+        "review_calls": 2,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "v2",
+      "id": "cost_plot",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "observations": [],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 5,
+        "seconds": 14.18,
+        "equivalent_tokens": 14866,
+        "input_tokens": 35542,
+        "cached_tokens": 27904,
+        "output_tokens": 2219,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "v2",
+      "id": "cost_components",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "observations": [],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 7,
+        "seconds": 15.72,
+        "equivalent_tokens": 17747,
+        "input_tokens": 49994,
+        "cached_tokens": 41088,
+        "output_tokens": 2366,
+        "llm_calls": 9,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "v2",
+      "id": "conflicting_sources",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "scope": "body",
+          "unit": "characters",
+          "actual": 857,
+          "soft_target": 500
+        }
+      ],
+      "observations": [
+        {
+          "kind": "soft_length",
+          "message": "正文 857 个可见非空白字符，超过默认简述目标 500；这不是用户硬上限。"
+        }
+      ],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 6,
+        "seconds": 14.9,
+        "equivalent_tokens": 12813,
+        "input_tokens": 36435,
+        "cached_tokens": 31360,
+        "output_tokens": 2301,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "v2",
+      "id": "limited_evidence",
+      "status": "fail",
+      "failed_checks": [
+        {
+          "name": "no_unsupported_winner",
+          "passed": false,
+          "detail": "不可以说：A 比 B、C 更稳定、A 是三者中最稳定的、两版本差异具有统计显著性，或该成功率代表总体表现。"
+        }
+      ],
+      "measurements": [
+        {
+          "scope": "body",
+          "unit": "characters",
+          "actual": 720,
+          "soft_target": 500
+        }
+      ],
+      "observations": [
+        {
+          "kind": "soft_length",
+          "message": "正文 720 个可见非空白字符，超过默认简述目标 500；这不是用户硬上限。"
+        }
+      ],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 6,
+        "seconds": 13.68,
+        "equivalent_tokens": 13130,
+        "input_tokens": 37032,
+        "cached_tokens": 31744,
+        "output_tokens": 2334,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "v2",
+      "id": "ambiguous_evidence",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "scope": "body",
+          "unit": "characters",
+          "actual": 934,
+          "soft_target": 500
+        }
+      ],
+      "observations": [
+        {
+          "kind": "soft_length",
+          "message": "正文 934 个可见非空白字符，超过默认简述目标 500；这不是用户硬上限。"
+        }
+      ],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 4,
+        "seconds": 9.91,
+        "equivalent_tokens": 10886,
+        "input_tokens": 26756,
+        "cached_tokens": 21120,
+        "output_tokens": 1569,
+        "llm_calls": 6,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "v2",
+      "id": "source_channels",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "scope": "body",
+          "unit": "characters",
+          "actual": 599,
+          "soft_target": 500
+        }
+      ],
+      "observations": [
+        {
+          "kind": "soft_length",
+          "message": "正文 599 个可见非空白字符，超过默认简述目标 500；这不是用户硬上限。"
+        }
+      ],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 6,
+        "seconds": 15.09,
+        "equivalent_tokens": 16716,
+        "input_tokens": 43275,
+        "cached_tokens": 34941,
+        "output_tokens": 2444,
+        "llm_calls": 9,
+        "review_calls": 2,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "v2",
+      "id": "memory_seed",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "observations": [],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 6,
+        "seconds": 15.59,
+        "equivalent_tokens": 20045,
+        "input_tokens": 46965,
+        "cached_tokens": 35840,
+        "output_tokens": 2668,
+        "llm_calls": 9,
+        "review_calls": 2,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "v2",
+      "id": "memory_followup",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "observations": [],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 7,
+        "seconds": 19.67,
+        "equivalent_tokens": 24388,
+        "input_tokens": 60162,
+        "cached_tokens": 49280,
+        "output_tokens": 4289,
+        "llm_calls": 9,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "scope-1",
+      "id": "brief_fixed",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 300,
+          "unit": "characters",
+          "scope": "full",
+          "explicit_text": "不超过300字",
+          "actual": 287
+        }
+      ],
+      "observations": [],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 4,
+        "seconds": 7.37,
+        "equivalent_tokens": 8357,
+        "input_tokens": 24363,
+        "cached_tokens": 19840,
+        "output_tokens": 925,
+        "llm_calls": 6,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "scope-1",
+      "id": "han_limit",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 120,
+          "unit": "han_characters",
+          "scope": "full",
+          "explicit_text": "不超过120个中文字符",
+          "actual": 104
+        }
+      ],
+      "observations": [],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 4,
+        "seconds": 6.61,
+        "equivalent_tokens": 7260,
+        "input_tokens": 22398,
+        "cached_tokens": 18304,
+        "output_tokens": 668,
+        "llm_calls": 6,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "scope-1",
+      "id": "english_words",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 100,
+          "unit": "english_words",
+          "scope": "full",
+          "explicit_text": "最多100个英文单词",
+          "actual": 66
+        }
+      ],
+      "observations": [],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 3,
+        "seconds": 5.76,
+        "equivalent_tokens": 6356,
+        "input_tokens": 17523,
+        "cached_tokens": 13568,
+        "output_tokens": 522,
+        "llm_calls": 5,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "scope-1",
+      "id": "requested_statistics",
+      "status": "fail",
+      "failed_checks": [
+        {
+          "name": "normal_completion",
+          "passed": false,
+          "detail": "max_steps"
+        },
+        {
+          "name": "review_complete_and_clean",
+          "passed": false,
+          "detail": "skipped_budget"
+        }
+      ],
+      "measurements": [],
+      "observations": [
+        {
+          "kind": "assumption",
+          "quote": "在题设给定的前提下——20 次**独立同分布**的伯努利试验、成功 18 次、z = 1.96——成功概率 p 的点估计为 p̂ = 18/20 = 0.90，**Wilson 95% 置信区间为 [0.69896, 0.97213]，即约 69.9% 至 97.2%**（半宽 0.13659）",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        },
+        {
+          "kind": "assumption",
+          "quote": "** 用户给定\"20 次独立同分布的伯努利试验\"，Wilson 区间的全部推导都在这个前提下进行",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        },
+        {
+          "kind": "assumption",
+          "quote": "**试验相互独立**：无序列相关、无批次聚集、无重复测量同一单元",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        }
+      ],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "skipped_budget",
+      "review_clean_and_current": false,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 15,
+        "seconds": 68.89,
+        "equivalent_tokens": 69863,
+        "input_tokens": 217923,
+        "cached_tokens": 193920,
+        "output_tokens": 13234,
+        "llm_calls": 19,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "max_steps"
+      },
+      "rescored_status": "fail",
+      "manual_scope_status": "fail",
+      "manual_scope_reason": "扩展了未要求的其他区间方法；自动通过不覆盖人工范围失败。"
+    },
+    {
+      "group": "scope-1",
+      "id": "unknown_assumptions",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 350,
+          "unit": "characters",
+          "scope": "body",
+          "explicit_text": "最多350字",
+          "actual": 339
+        }
+      ],
+      "observations": [],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 6,
+        "seconds": 10.61,
+        "equivalent_tokens": 11681,
+        "input_tokens": 36802,
+        "cached_tokens": 31232,
+        "output_tokens": 1494,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "scope-1",
+      "id": "revised_limit",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 220,
+          "unit": "characters",
+          "scope": "full",
+          "explicit_text": "不超过220字",
+          "actual": 215
+        }
+      ],
+      "observations": [],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 5,
+        "seconds": 8.99,
+        "equivalent_tokens": 8857,
+        "input_tokens": 28685,
+        "cached_tokens": 24320,
+        "output_tokens": 1030,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 2,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "scope-1",
+      "id": "detailed_scope",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "observations": [],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 5,
+        "seconds": 19.5,
+        "equivalent_tokens": 17845,
+        "input_tokens": 38462,
+        "cached_tokens": 30208,
+        "output_tokens": 3285,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "scope-2",
+      "id": "brief_fixed",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 300,
+          "unit": "characters",
+          "scope": "full",
+          "explicit_text": "不超过300字",
+          "actual": 288
+        }
+      ],
+      "observations": [],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 4,
+        "seconds": 7.92,
+        "equivalent_tokens": 8434,
+        "input_tokens": 24562,
+        "cached_tokens": 20096,
+        "output_tokens": 979,
+        "llm_calls": 6,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "scope-2",
+      "id": "han_limit",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 120,
+          "unit": "han_characters",
+          "scope": "full",
+          "explicit_text": "不超过120个中文字符",
+          "actual": 92
+        }
+      ],
+      "observations": [],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 4,
+        "seconds": 6.58,
+        "equivalent_tokens": 6861,
+        "input_tokens": 22364,
+        "cached_tokens": 18688,
+        "output_tokens": 658,
+        "llm_calls": 6,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "scope-2",
+      "id": "english_words",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 100,
+          "unit": "english_words",
+          "scope": "full",
+          "explicit_text": "最多100个英文单词",
+          "actual": 93
+        }
+      ],
+      "observations": [],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 4,
+        "seconds": 6.56,
+        "equivalent_tokens": 7203,
+        "input_tokens": 23071,
+        "cached_tokens": 19200,
+        "output_tokens": 706,
+        "llm_calls": 6,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "scope-2",
+      "id": "requested_statistics",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "observations": [
+        {
+          "kind": "assumption",
+          "quote": "**（1）独立同分布来自题设，不是外部证明",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        },
+        {
+          "kind": "assumption",
+          "quote": "** 本题明确给定\"20 次独立同分布的伯努利试验\"",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        },
+        {
+          "kind": "assumption",
+          "quote": "各次试验相互独立",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        },
+        {
+          "kind": "assumption",
+          "quote": "\"独立同分布\"是本题给定的前提，不是本次计算证明的结论",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        }
+      ],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 6,
+        "seconds": 32.66,
+        "equivalent_tokens": 36925,
+        "input_tokens": 65799,
+        "cached_tokens": 46080,
+        "output_tokens": 6299,
+        "llm_calls": 9,
+        "review_calls": 2,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass",
+      "manual_scope_status": "fail",
+      "manual_scope_reason": "扩展了未要求的其他区间方法；自动通过不覆盖人工范围失败。"
+    },
+    {
+      "group": "scope-2",
+      "id": "unknown_assumptions",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 350,
+          "unit": "characters",
+          "scope": "body",
+          "explicit_text": "最多350字",
+          "actual": 325
+        }
+      ],
+      "observations": [],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 6,
+        "seconds": 9.98,
+        "equivalent_tokens": 10004,
+        "input_tokens": 34767,
+        "cached_tokens": 30208,
+        "output_tokens": 1212,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "scope-2",
+      "id": "revised_limit",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 220,
+          "unit": "characters",
+          "scope": "full",
+          "explicit_text": "不超过220字",
+          "actual": 217
+        }
+      ],
+      "observations": [],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 7,
+        "seconds": 10.93,
+        "equivalent_tokens": 10708,
+        "input_tokens": 40816,
+        "cached_tokens": 36480,
+        "output_tokens": 1362,
+        "llm_calls": 9,
+        "review_calls": 1,
+        "tool_errors": 3,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "scope-2",
+      "id": "detailed_scope",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "observations": [],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 4,
+        "seconds": 18.78,
+        "equivalent_tokens": 15843,
+        "input_tokens": 31393,
+        "cached_tokens": 24320,
+        "output_tokens": 3169,
+        "llm_calls": 6,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "scope-3",
+      "id": "brief_fixed",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 300,
+          "unit": "characters",
+          "scope": "full",
+          "explicit_text": "不超过300字",
+          "actual": 296
+        }
+      ],
+      "observations": [],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 5,
+        "seconds": 9.25,
+        "equivalent_tokens": 9074,
+        "input_tokens": 29315,
+        "cached_tokens": 25088,
+        "output_tokens": 1169,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "scope-3",
+      "id": "han_limit",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 120,
+          "unit": "han_characters",
+          "scope": "full",
+          "explicit_text": "不超过120个中文字符",
+          "actual": 116
+        }
+      ],
+      "observations": [],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 4,
+        "seconds": 5.84,
+        "equivalent_tokens": 6969,
+        "input_tokens": 22613,
+        "cached_tokens": 18944,
+        "output_tokens": 703,
+        "llm_calls": 6,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "scope-3",
+      "id": "english_words",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 100,
+          "unit": "english_words",
+          "scope": "full",
+          "explicit_text": "最多100个英文单词",
+          "actual": 85
+        }
+      ],
+      "observations": [],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 4,
+        "seconds": 5.6,
+        "equivalent_tokens": 7154,
+        "input_tokens": 22972,
+        "cached_tokens": 19200,
+        "output_tokens": 731,
+        "llm_calls": 6,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "scope-3",
+      "id": "requested_statistics",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "observations": [
+        {
+          "kind": "assumption",
+          "quote": "**独立同分布是本题给定的前提，不是从这 20 次观测中检验或证明出来的",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        },
+        {
+          "kind": "assumption",
+          "quote": "** 用户明确给定\"20 次独立同分布的伯努利试验\"，本报告把它作为计算的条件直接使用",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        },
+        {
+          "kind": "assumption",
+          "quote": "**独立同分布**：各次试验相互独立，且成功概率恒为同一 p（本题给定）",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        },
+        {
+          "kind": "assumption",
+          "quote": "**适用边界**：结论依赖二分类、独立同分布、n 固定非序贯、单一简单随机样本等条件",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        }
+      ],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 9,
+        "seconds": 63.32,
+        "equivalent_tokens": 58597,
+        "input_tokens": 124545,
+        "cached_tokens": 110976,
+        "output_tokens": 16965,
+        "llm_calls": 11,
+        "review_calls": 1,
+        "tool_errors": 4,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass",
+      "manual_scope_status": "fail",
+      "manual_scope_reason": "扩展了未要求的其他区间方法；自动通过不覆盖人工范围失败。"
+    },
+    {
+      "group": "scope-3",
+      "id": "unknown_assumptions",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 350,
+          "unit": "characters",
+          "scope": "body",
+          "explicit_text": "最多350字",
+          "actual": 309
+        }
+      ],
+      "observations": [],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 5,
+        "seconds": 8.86,
+        "equivalent_tokens": 9596,
+        "input_tokens": 30026,
+        "cached_tokens": 25216,
+        "output_tokens": 1132,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "scope-3",
+      "id": "revised_limit",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 220,
+          "unit": "characters",
+          "scope": "full",
+          "explicit_text": "不超过220字",
+          "actual": 198
+        }
+      ],
+      "observations": [],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 4,
+        "seconds": 7.01,
+        "equivalent_tokens": 7227,
+        "input_tokens": 22984,
+        "cached_tokens": 19328,
+        "output_tokens": 819,
+        "llm_calls": 6,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    },
+    {
+      "group": "scope-3",
+      "id": "detailed_scope",
+      "status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "observations": [],
+      "hard_errors": [],
+      "brief_reason_present_if_required": true,
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "network_tool_attempts": 0,
+      "metrics": {
+        "steps": 5,
+        "seconds": 18.49,
+        "equivalent_tokens": 15641,
+        "input_tokens": 34538,
+        "cached_tokens": 27648,
+        "output_tokens": 2993,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "rescored_status": "pass"
+    }
+  ],
+  "wilson_independent_oracle": {
+    "lower": 0.6989617935882066,
+    "upper": 0.9721341060158468
+  },
+  "passed": 28,
+  "selected": 30,
+  "hard_errors": 0,
+  "clean_current_reviews": 29,
+  "review_statuses": {
+    "reviewed": 29,
+    "skipped_budget": 1
+  },
+  "totals": {
+    "steps": 168,
+    "seconds": 479.13,
+    "equivalent_tokens": 501569,
+    "review_calls": 34
+  },
+  "artifact_hashes": {
+    "stage10-check-v2-live\\cases\\01-official_research\\report.md": "6f556591deee258d198171c7baf0c5d6ecfa72b3cabdd01feed5ce7e308f66e7",
+    "stage10-check-v2-live\\cases\\01-official_research\\trace.jsonl": "8f87a2c740abefee558cb8812efbf9b9a384f0e7289d949217134d9b35bde5bf",
+    "stage10-check-v2-live\\cases\\01-official_research\\report.review.json": "c85b3608723230486b936adb6ae140d81c143864dc33a04f359a6f87cfaf6619",
+    "stage10-check-v2-live\\cases\\01-official_research\\report.contract.json": "fd7812446c0863e7574ec0fa635bd85cf8303793108501d0dc8f03758b4d0e01",
+    "stage10-check-v2-live\\cases\\01-official_research\\task_contract.json": "09141bd38ebeb1a4acbf8e80f27a8301962403f3bf3d666f7103acc888cbff93",
+    "stage10-check-v2-live\\cases\\01-cost_plot\\report.md": "18f463c169bcfa238478f5aee2fb72a0dec410a5035ac30be02cbff4c8be6d90",
+    "stage10-check-v2-live\\cases\\01-cost_plot\\trace.jsonl": "132c6e92650bbf75afa6321b08d929368ff15c6458188578ae5aa397f3181677",
+    "stage10-check-v2-live\\cases\\01-cost_plot\\report.review.json": "371e67b7ff55e69f4376760dd9df2434798b4c877a8c579fb71b99aee26708c8",
+    "stage10-check-v2-live\\cases\\01-cost_plot\\report.contract.json": "037ca90e0472af717ba3eb56c24ccfb75807a49b6392edd0f1d09c02ce828ff5",
+    "stage10-check-v2-live\\cases\\01-cost_plot\\task_contract.json": "cbb5eebef23616b41bd29e1077d691a04b1a2bcfbfabe9483d798cbb029bd29a",
+    "stage10-check-v2-live\\cases\\01-cost_components\\report.md": "c649e4ff4acd963fc754077d9c7f23b1738f34eb411370f7a7c202c689ef0599",
+    "stage10-check-v2-live\\cases\\01-cost_components\\trace.jsonl": "0db262155f81bbb6242a5fd1a92fabf8cb9871d764f267aa8fba68f1ecb4df34",
+    "stage10-check-v2-live\\cases\\01-cost_components\\report.review.json": "3658a6c4a324069322397c24fb7c298106658ac61c7f3d4094f07a5f60ba7823",
+    "stage10-check-v2-live\\cases\\01-cost_components\\report.contract.json": "0192fcd502770f5ac8663bb97f1bb5f4b20a9db846c2dd305c918bb4b518bc40",
+    "stage10-check-v2-live\\cases\\01-cost_components\\task_contract.json": "e9eb05ad5e8e1cc89f3543349fa6203b88b58a6db322b7ec6d9da1c881d21662",
+    "stage10-check-v2-live\\cases\\01-conflicting_sources\\report.md": "d115268dd6ac65e883edf1c08743239c3863b27b3533143fcafd82e637a4281a",
+    "stage10-check-v2-live\\cases\\01-conflicting_sources\\trace.jsonl": "379d954a2a054ae250688727bfdc96a84c4ec2a08d6f4d184a8cc2818230aba4",
+    "stage10-check-v2-live\\cases\\01-conflicting_sources\\report.review.json": "32da10a61fb1df02c4cadca23d347c9fe5ca789bba455e3872c353358a3d1968",
+    "stage10-check-v2-live\\cases\\01-conflicting_sources\\report.contract.json": "38ffdf07fadd5aacd5205c88ac4c82358dd1b7161b85ec74eef59bf4099a3a91",
+    "stage10-check-v2-live\\cases\\01-conflicting_sources\\task_contract.json": "4a7e04e5e191a1fd3bba6c489ed9f6ea0d4864c3462d3bc19fd30a3df16dc2c6",
+    "stage10-check-v2-live\\cases\\01-limited_evidence\\report.md": "c412e8c68124d54a1f8926eea77322b58bb9e4c8f9710b00a3a57998751455b1",
+    "stage10-check-v2-live\\cases\\01-limited_evidence\\trace.jsonl": "90df7cd1ddea87e8d675b0419f4ce8583e42d02b0f1d87bc4ca5a075d839b37d",
+    "stage10-check-v2-live\\cases\\01-limited_evidence\\report.review.json": "123e68b5277de5a14ddd35755b3b35dad8aafb468a1a6a6968f7e61ca7486f24",
+    "stage10-check-v2-live\\cases\\01-limited_evidence\\report.contract.json": "f299726fa171b974570ae493ac4ff991fc666a0da72746d0774e95bd70c0b821",
+    "stage10-check-v2-live\\cases\\01-limited_evidence\\task_contract.json": "00a654f964b519d7066e423913598b4e9d491148628fa073b1103797027db51c",
+    "stage10-check-v2-live\\cases\\01-ambiguous_evidence\\report.md": "a69c4e47b97d6aba0410e1f48b5c0ac9833ce5e8f8eec2be5a47d775007448a7",
+    "stage10-check-v2-live\\cases\\01-ambiguous_evidence\\trace.jsonl": "f8efe940e8285705a13afd92409e8d8e84ecd53d4c59e82fbf6255ea72c00e3b",
+    "stage10-check-v2-live\\cases\\01-ambiguous_evidence\\report.review.json": "5e0f3d2ae9ac40ba8541ec8e6118f1c6d79e3c3c92133bdc30461a8d9aaa8813",
+    "stage10-check-v2-live\\cases\\01-ambiguous_evidence\\report.contract.json": "05cfb88a65f65d36cabb56b89a54bcd66311b2bc906dfc0161c9d6dd079e12e1",
+    "stage10-check-v2-live\\cases\\01-ambiguous_evidence\\task_contract.json": "a7d993df6136f0de1c1234dc055d3607c4f1bca27f2049990bbca1feed4d127c",
+    "stage10-check-v2-live\\cases\\01-source_channels\\report.md": "3a1a84614c65b9b6f2342460c7f2662a6d2883e06169417024514cd866429928",
+    "stage10-check-v2-live\\cases\\01-source_channels\\trace.jsonl": "3c299f7762c7146dd95a538f1e1f8a713bb76587888c4dd4c6a1ed4ce8a496e0",
+    "stage10-check-v2-live\\cases\\01-source_channels\\report.review.json": "00d0a8e704803870ed8c268dbd8c9a458b1deed166f321aad8620823fc037261",
+    "stage10-check-v2-live\\cases\\01-source_channels\\report.contract.json": "5fa83ce3da932ae756a9fce00edd141e57e61bb942d94f19c91d85fbf429305c",
+    "stage10-check-v2-live\\cases\\01-source_channels\\task_contract.json": "c47ae501f14cc0cc57d16d423ebeccdd34dfe3c19fe185e0b95218fd3adc3dbc",
+    "stage10-check-v2-live\\cases\\01-memory_seed\\report.md": "cf1316da73b48e17e706ab86ca4d46e040786a2be8a8812e12f538d1b3e283aa",
+    "stage10-check-v2-live\\cases\\01-memory_seed\\trace.jsonl": "2191a61db9308f163f18f81caccdc431263896a4b49fecf8cdaad1028bb1759f",
+    "stage10-check-v2-live\\cases\\01-memory_seed\\report.review.json": "2d7a03ac0a9348a1e3fc72642e3507c910c6bbfc91ac7673d34eeebecef3221d",
+    "stage10-check-v2-live\\cases\\01-memory_seed\\report.contract.json": "f1033e8dcc3d275f8129445106fc46d454f37c411aca13b359e1f03ed2672f74",
+    "stage10-check-v2-live\\cases\\01-memory_seed\\task_contract.json": "b29586a4d0ec3e4b9f28c731e0b1e7e4df24c4131aede5455da5daacf0db3864",
+    "stage10-check-v2-live\\cases\\01-memory_followup\\report.md": "6ccb2d8bfefe64e60fec9dcbd0edecb999c506c773ae0d4109edf1b681522fd0",
+    "stage10-check-v2-live\\cases\\01-memory_followup\\trace.jsonl": "e674a24d1e229b99568e80c72b87a396ec0a97b34c0c35090353b73457eff203",
+    "stage10-check-v2-live\\cases\\01-memory_followup\\report.review.json": "e9770b58511591962eec13c6012d0028845975f1ba592968207c176373755a90",
+    "stage10-check-v2-live\\cases\\01-memory_followup\\report.contract.json": "7f55ea86db6af5745ffc393ee9fe78bd2a8802a0d451cc58cdf9d7f14b72bdc2",
+    "stage10-check-v2-live\\cases\\01-memory_followup\\task_contract.json": "fe39bca31268e129315cbf4ce6a9dd2078fdaf8a12ad265f5d30f38bfb189dc0",
+    "stage10-check-scope-round1\\cases\\01-brief_fixed\\report.md": "7dba4e70f8b7c687519872836bc27b0c7a1f6fb06e30c9dfe12151f76a85c818",
+    "stage10-check-scope-round1\\cases\\01-brief_fixed\\trace.jsonl": "0a964b32da70bd49c770299e025d78ea91cbec620c5292d9fbb232411e4da3d4",
+    "stage10-check-scope-round1\\cases\\01-brief_fixed\\report.review.json": "b17daa9d5257da5cf94f4438ee69d4896a653d9a5193a0974c1b17a3d0ddfea7",
+    "stage10-check-scope-round1\\cases\\01-brief_fixed\\report.contract.json": "aaf81c5bc734b41608065c161383fb642930ce40405d44a94e236b5ad94e8108",
+    "stage10-check-scope-round1\\cases\\01-brief_fixed\\task_contract.json": "efbdabdab21497ce18ae56f0b7d6c9b7bfac2b9561d660caa35c9563555a4c72",
+    "stage10-check-scope-round1\\cases\\01-han_limit\\report.md": "5a7e61da6a0b85f943d2d661cb3c85ba34c3c36f9607cd9c94fbd13206622412",
+    "stage10-check-scope-round1\\cases\\01-han_limit\\trace.jsonl": "00c5e42a5a36d937511cfe2497a39826078601ff970207bd35c4852cd4aef726",
+    "stage10-check-scope-round1\\cases\\01-han_limit\\report.review.json": "3af74d60254fd8adfbfb8e8796774ebb1add15694689bd31615391d6549d56ae",
+    "stage10-check-scope-round1\\cases\\01-han_limit\\report.contract.json": "727c06182cd541a87852cdd615d5d9b6790860c28cfe5fc429143b53f04e13c1",
+    "stage10-check-scope-round1\\cases\\01-han_limit\\task_contract.json": "a937faf500ac770bb8a0e3866f4c772c8856a5379bf24412dbb18da446c1eb5a",
+    "stage10-check-scope-round1\\cases\\01-english_words\\report.md": "63a9ef90b620dde0b36b14dd73d8d12fbb3fa6deb05f5ee2800d62392f0e2a7d",
+    "stage10-check-scope-round1\\cases\\01-english_words\\trace.jsonl": "9961418b287645cf70afc32807bffb8574f796a86a194985b68cf860ef93cf15",
+    "stage10-check-scope-round1\\cases\\01-english_words\\report.review.json": "5e8c2c3795cc351f33cf84274d1fc60233eeff8df948e78bb4ead75594ae851b",
+    "stage10-check-scope-round1\\cases\\01-english_words\\report.contract.json": "8ae90e813848fadd3324e928a0611e37dfa1fd31c39e4ef1391e9cc99c4bbc16",
+    "stage10-check-scope-round1\\cases\\01-english_words\\task_contract.json": "a26fe4dbeee40a522292f0111dec6cd9c18f618c28d591951aa1da867e987fc6",
+    "stage10-check-scope-round1\\cases\\01-requested_statistics\\report.md": "58c87b1fa72799381d73c76fc5e2e1b76bd75f95eb7e4d549617a1a55c641c58",
+    "stage10-check-scope-round1\\cases\\01-requested_statistics\\trace.jsonl": "0182f962e0b96dfbec1a879a7005ba04702dc6f779c9f868e9180b5490cd680a",
+    "stage10-check-scope-round1\\cases\\01-requested_statistics\\report.review.json": "dcd8731b6afee619a74a94a91b7911ad21955480cb09883d58a6ac14c3f5a194",
+    "stage10-check-scope-round1\\cases\\01-requested_statistics\\report.contract.json": "84c1e478aa43e4f1c856aeffd6e24443cf66df445dc6e27abb89088bbbe998e3",
+    "stage10-check-scope-round1\\cases\\01-requested_statistics\\task_contract.json": "0c179dff3b117435c901dfb2b080f1e0e6fc3e6bdd262132b715cc6c9468221a",
+    "stage10-check-scope-round1\\cases\\01-unknown_assumptions\\report.md": "85ce4d0b255373ad5a858162f50b56015636c5997d76f5b988f5ca5c156da087",
+    "stage10-check-scope-round1\\cases\\01-unknown_assumptions\\trace.jsonl": "6b818e57bad922e5d234b8a6a2ad002349ed9b06c705e7e8c1cea5cf1007922d",
+    "stage10-check-scope-round1\\cases\\01-unknown_assumptions\\report.review.json": "6edb805490ae3b5a0e0142aa96a069bb02c7be193b1a160fc1d51a4c3c21d790",
+    "stage10-check-scope-round1\\cases\\01-unknown_assumptions\\report.contract.json": "5709bfcc6429ec79523d73ab488c204b14f9631105924bed7e8ebc7f9c4bb78b",
+    "stage10-check-scope-round1\\cases\\01-unknown_assumptions\\task_contract.json": "f1d9061e6bf41ccbb9fde9f69c1ae07df392bf38b4252bfd22e237eb33062bda",
+    "stage10-check-scope-round1\\cases\\01-revised_limit\\report.md": "2006127fe71c7a409e24c0650230fa1d4001c1119eb9a946b19da986f8fe94fa",
+    "stage10-check-scope-round1\\cases\\01-revised_limit\\trace.jsonl": "003c0ab9f87b544563189052bcb27b6d3a86a228c4c6fb06acea927a67744e2f",
+    "stage10-check-scope-round1\\cases\\01-revised_limit\\report.review.json": "e96af272da9ac8e8468820e1e8cef23952a42a93a6a76e7243cb8fe15cea7ed8",
+    "stage10-check-scope-round1\\cases\\01-revised_limit\\report.contract.json": "597b10e225bdef3e6ebe4ace382450b9e19c54940bd7d290935b60462dbd40d6",
+    "stage10-check-scope-round1\\cases\\01-revised_limit\\task_contract.json": "4792446605690120880190b70a6e7deb572f2b866d7a3ce164db1ee9c7792630",
+    "stage10-check-scope-round1\\cases\\01-detailed_scope\\report.md": "038009385cebb6e52ee81fe3b5ac008e0739d1303d39900df633919ce086ca40",
+    "stage10-check-scope-round1\\cases\\01-detailed_scope\\trace.jsonl": "ad76e34170a17a59ba387a71ac0e7fb2faec9b8f7ce36e2e535f3f249e34057f",
+    "stage10-check-scope-round1\\cases\\01-detailed_scope\\report.review.json": "5a68046fb32567e288377c326c181d58a1b2a696df37909fd7c8baba36c96d9e",
+    "stage10-check-scope-round1\\cases\\01-detailed_scope\\report.contract.json": "077e9d0950d8f849118b40e7997ce92e674934203af90d3a03828f76205b4f15",
+    "stage10-check-scope-round1\\cases\\01-detailed_scope\\task_contract.json": "c6563b3f73afa38d4e9ae28943de0fc78fe16c8ba010b5407e9a23659542a821",
+    "stage10-check-scope-round2\\cases\\01-brief_fixed\\report.md": "31fd234687574f74800fca9291e7f747d606cf7f5fcf1dba9578383773cacf29",
+    "stage10-check-scope-round2\\cases\\01-brief_fixed\\trace.jsonl": "7e16ab09837152b912e0c656e4de8e09b6d3ede2ba15bb37489bc091da7f8c69",
+    "stage10-check-scope-round2\\cases\\01-brief_fixed\\report.review.json": "dce6720ca278caa006fef4411bba0d8a325fdefb4a5936c1e0082ad02e032863",
+    "stage10-check-scope-round2\\cases\\01-brief_fixed\\report.contract.json": "b68f4d541aefb9185575875e5b97346c9bf98e2b54cfbb0a7172039a0549931b",
+    "stage10-check-scope-round2\\cases\\01-brief_fixed\\task_contract.json": "efbdabdab21497ce18ae56f0b7d6c9b7bfac2b9561d660caa35c9563555a4c72",
+    "stage10-check-scope-round2\\cases\\01-han_limit\\report.md": "3e1817ac5f9a00360aaefe72f9900e219e60143a2098a28cbfd0c1b316841072",
+    "stage10-check-scope-round2\\cases\\01-han_limit\\trace.jsonl": "81ea552bb2aed3deece93363e68b7272f2e95a6c476dbbfc6f970ce1275b4b25",
+    "stage10-check-scope-round2\\cases\\01-han_limit\\report.review.json": "078679e05dd6e6d4251de6984b20d70130793522b016854cf6c568ddd392d345",
+    "stage10-check-scope-round2\\cases\\01-han_limit\\report.contract.json": "51ea00513693156e2bf193b54ea990a64f64bd34bd5d1a64b74242a0999f85ec",
+    "stage10-check-scope-round2\\cases\\01-han_limit\\task_contract.json": "a937faf500ac770bb8a0e3866f4c772c8856a5379bf24412dbb18da446c1eb5a",
+    "stage10-check-scope-round2\\cases\\01-english_words\\report.md": "8eb70c7f046b76d1ad58fe56900fda2a3eb4aad813814d7e78a5355a16f3f7ba",
+    "stage10-check-scope-round2\\cases\\01-english_words\\trace.jsonl": "b6e3e9513a6c2232a14006a79260e5ba2c251ddb1116895e72bdea7cd466865c",
+    "stage10-check-scope-round2\\cases\\01-english_words\\report.review.json": "cb9f21164a5fbb99a7c3b8aa59a3bb8f5e9247a90cb72c9d30bcdb9f8a1c8db5",
+    "stage10-check-scope-round2\\cases\\01-english_words\\report.contract.json": "134e4534c966cf5b6789d6f5d59345434397d46097768aed8dc6680dc0415d49",
+    "stage10-check-scope-round2\\cases\\01-english_words\\task_contract.json": "a26fe4dbeee40a522292f0111dec6cd9c18f618c28d591951aa1da867e987fc6",
+    "stage10-check-scope-round2\\cases\\01-requested_statistics\\report.md": "9ef0640089eb60a81a4410836f2707d46b019db1737e3e3bee26f5b6d15f8c52",
+    "stage10-check-scope-round2\\cases\\01-requested_statistics\\trace.jsonl": "f8396cea118a5eb94042fab42da7eef037218258c9084e4fddcbaab1795ecb1c",
+    "stage10-check-scope-round2\\cases\\01-requested_statistics\\report.review.json": "64238dbe3c85cc99c0f6507ddcc86b2a44103f2b9a25604f75b3f2fe2f541994",
+    "stage10-check-scope-round2\\cases\\01-requested_statistics\\report.contract.json": "9aadf341e096891b7c6d5a176cdc0f74e4680d9c1c6f430b0df00f21d766bed1",
+    "stage10-check-scope-round2\\cases\\01-requested_statistics\\task_contract.json": "0c179dff3b117435c901dfb2b080f1e0e6fc3e6bdd262132b715cc6c9468221a",
+    "stage10-check-scope-round2\\cases\\01-unknown_assumptions\\report.md": "f29c4f8486a4f8713de9a779687593907a22a2a87a1cfe21c36f0380f8e7d584",
+    "stage10-check-scope-round2\\cases\\01-unknown_assumptions\\trace.jsonl": "45329ec32724aea71143b229ee34fe6903a4fea1b4885d30ef54ed0a80984020",
+    "stage10-check-scope-round2\\cases\\01-unknown_assumptions\\report.review.json": "683c4ff8f396bd886a139734957ef504dabf11796eec5324a14233710b1f0e9e",
+    "stage10-check-scope-round2\\cases\\01-unknown_assumptions\\report.contract.json": "0e2a95dde2a3f3637c76eb8cdcc2015646726a170f07233d566350cc4df16c94",
+    "stage10-check-scope-round2\\cases\\01-unknown_assumptions\\task_contract.json": "f1d9061e6bf41ccbb9fde9f69c1ae07df392bf38b4252bfd22e237eb33062bda",
+    "stage10-check-scope-round2\\cases\\01-revised_limit\\report.md": "efc65419aba95871ae339201e2cab87656750ba93833ac8aba417e723c1d67f6",
+    "stage10-check-scope-round2\\cases\\01-revised_limit\\trace.jsonl": "de73bb1b40ceedb32063383122668ee337a6c4875f14dd468641316b33166ab5",
+    "stage10-check-scope-round2\\cases\\01-revised_limit\\report.review.json": "42ef545a6b7df43ebaf0287dfec939df7534be2ffc67bd1f30c76a7310d74e6c",
+    "stage10-check-scope-round2\\cases\\01-revised_limit\\report.contract.json": "25cfeee0333eb4d719f0983fe0c72f0c1e7ccc5f65fdb52c5aff93723ddb60f0",
+    "stage10-check-scope-round2\\cases\\01-revised_limit\\task_contract.json": "4792446605690120880190b70a6e7deb572f2b866d7a3ce164db1ee9c7792630",
+    "stage10-check-scope-round2\\cases\\01-detailed_scope\\report.md": "8004b1c0b153af107201b29b750f35b4fd62ad24f6a92f31aa7d493351abea58",
+    "stage10-check-scope-round2\\cases\\01-detailed_scope\\trace.jsonl": "33e92310844e39ed0ae7082c2592392a7c1e777a4fcbae37621bed8009e94d0f",
+    "stage10-check-scope-round2\\cases\\01-detailed_scope\\report.review.json": "aede9d78a1480f1dc859b69026541ba8bdc4b7d738b61065c3c3bc212b6c5774",
+    "stage10-check-scope-round2\\cases\\01-detailed_scope\\report.contract.json": "85bac7e1eb0ea62f3d8a52761ce74f3d82dd14a82951c5fb41fe0eefa1d6879b",
+    "stage10-check-scope-round2\\cases\\01-detailed_scope\\task_contract.json": "c6563b3f73afa38d4e9ae28943de0fc78fe16c8ba010b5407e9a23659542a821",
+    "stage10-check-scope-round3\\cases\\01-brief_fixed\\report.md": "e834630734a8b2d3c3831441e1f17d47b7eeb58da9785ea48730e9afb8914d0f",
+    "stage10-check-scope-round3\\cases\\01-brief_fixed\\trace.jsonl": "fbae9c48dbeb805faaac4e2c8a0ca97d2121d29c686c0d16926511d80a23d7f5",
+    "stage10-check-scope-round3\\cases\\01-brief_fixed\\report.review.json": "95bb68dc2db45ab5729bf645f30ffc9ca9cfcb9290d182aae96e9fdffe97c4e7",
+    "stage10-check-scope-round3\\cases\\01-brief_fixed\\report.contract.json": "f3a0b6589a54e0021f850a2db37176d21c54b696c2937aef9c3867bae4ccbd00",
+    "stage10-check-scope-round3\\cases\\01-brief_fixed\\task_contract.json": "efbdabdab21497ce18ae56f0b7d6c9b7bfac2b9561d660caa35c9563555a4c72",
+    "stage10-check-scope-round3\\cases\\01-han_limit\\report.md": "d5336fc15dcafdf311f608f0724217d4fd3d2077bcc897d528f93d879d51a6c4",
+    "stage10-check-scope-round3\\cases\\01-han_limit\\trace.jsonl": "e9111ace8f9e73d81f53e7959190df2a541bf0b8dbcfe67c959bcf70ae4a4bc4",
+    "stage10-check-scope-round3\\cases\\01-han_limit\\report.review.json": "54ef642c10373f02b819dc1729f6c4db2eb96176b154c203e2561500d6ff77dc",
+    "stage10-check-scope-round3\\cases\\01-han_limit\\report.contract.json": "1276acb4d9133e914b80f1735d64deea4235f8ab5eb626ccefe45e354b9b1755",
+    "stage10-check-scope-round3\\cases\\01-han_limit\\task_contract.json": "a937faf500ac770bb8a0e3866f4c772c8856a5379bf24412dbb18da446c1eb5a",
+    "stage10-check-scope-round3\\cases\\01-english_words\\report.md": "323ccd7054d5c73be71c363be2aa044c42322f4daf74e6d289f66f0f63f1f30d",
+    "stage10-check-scope-round3\\cases\\01-english_words\\trace.jsonl": "7abf6120339267ea39b953e54b44de55427fa9c375e42e57e9e9ed240d94bdce",
+    "stage10-check-scope-round3\\cases\\01-english_words\\report.review.json": "ac8bb2b6a5d3dd669755d0ac82e4fdbbbb8bf46098e734786939206336f18c6e",
+    "stage10-check-scope-round3\\cases\\01-english_words\\report.contract.json": "56886f2be9fac247a752d0e8e662e98d44b026cd5a71676cadad31cd469d71da",
+    "stage10-check-scope-round3\\cases\\01-english_words\\task_contract.json": "a26fe4dbeee40a522292f0111dec6cd9c18f618c28d591951aa1da867e987fc6",
+    "stage10-check-scope-round3\\cases\\01-requested_statistics\\report.md": "ec0056a5e41c348acaf4685c9b2a10dd75771d0a91d198811e28122d081e3342",
+    "stage10-check-scope-round3\\cases\\01-requested_statistics\\trace.jsonl": "02d62d19ffecc74c3ab903aba0a9d5ebc706be0b8c56d0a1595abc2cdb5c4cb0",
+    "stage10-check-scope-round3\\cases\\01-requested_statistics\\report.review.json": "46d7a3622e185208a126247dd89d788c09c41adf8092f023ad4623f27409cd8a",
+    "stage10-check-scope-round3\\cases\\01-requested_statistics\\report.contract.json": "0987b3b1d90070f93fb300c83f4ef7765c1fc036726c5b0319d949f512b64bdc",
+    "stage10-check-scope-round3\\cases\\01-requested_statistics\\task_contract.json": "0c179dff3b117435c901dfb2b080f1e0e6fc3e6bdd262132b715cc6c9468221a",
+    "stage10-check-scope-round3\\cases\\01-unknown_assumptions\\report.md": "39cb56657b059a028253d1809fdf5cbebe9f3f46a48199b8c360afa85538b16b",
+    "stage10-check-scope-round3\\cases\\01-unknown_assumptions\\trace.jsonl": "b4e8dc8aebbfb3deab023126b28a53aaaf4f21ac216c3e73c76b1f3f684e3350",
+    "stage10-check-scope-round3\\cases\\01-unknown_assumptions\\report.review.json": "e57dfeec0483f6571df393a1ab05b8d1e10d406f269ee6c9a286bf23666c1321",
+    "stage10-check-scope-round3\\cases\\01-unknown_assumptions\\report.contract.json": "7a7f37176e5f93d7a5d9ed6a5f91fc6a5831f11007dc47c4ef2322a731ee42c1",
+    "stage10-check-scope-round3\\cases\\01-unknown_assumptions\\task_contract.json": "f1d9061e6bf41ccbb9fde9f69c1ae07df392bf38b4252bfd22e237eb33062bda",
+    "stage10-check-scope-round3\\cases\\01-revised_limit\\report.md": "de51a19158337b2fff1db3a189fbfab06c55a513674d432deb3c8a175901c5b9",
+    "stage10-check-scope-round3\\cases\\01-revised_limit\\trace.jsonl": "0a7ce924b6e7a6186c3caa56adc5e923942147877971dc7ad84df439ccbb1e4a",
+    "stage10-check-scope-round3\\cases\\01-revised_limit\\report.review.json": "656f04c866468967a8b397fe0b912155df6c6fc054fda054831b6008c0211c9d",
+    "stage10-check-scope-round3\\cases\\01-revised_limit\\report.contract.json": "219492a33759c00429217ae18b56911acc90a664e3f61f7ce751ac6598414056",
+    "stage10-check-scope-round3\\cases\\01-revised_limit\\task_contract.json": "4792446605690120880190b70a6e7deb572f2b866d7a3ce164db1ee9c7792630",
+    "stage10-check-scope-round3\\cases\\01-detailed_scope\\report.md": "13c0c2c99f14d6b85fef84ef43d471fc6d00777bce3cfd3f5bb91e4e7573fedd",
+    "stage10-check-scope-round3\\cases\\01-detailed_scope\\trace.jsonl": "8dc55445585d822e1c71b4880d694db36ec71e7a664752a7d61f76ff14a9c25e",
+    "stage10-check-scope-round3\\cases\\01-detailed_scope\\report.review.json": "a7c7057429735c57c43a297e7d24df7ca07f4d027270c6ebe07768fe45251e99",
+    "stage10-check-scope-round3\\cases\\01-detailed_scope\\report.contract.json": "97a57a002e95ab0baedb58c4103b94cfa8667c8daa374d7e80502d4a89e70d70",
+    "stage10-check-scope-round3\\cases\\01-detailed_scope\\task_contract.json": "c6563b3f73afa38d4e9ae28943de0fc78fe16c8ba010b5407e9a23659542a821"
+  },
+  "scope": "程序与状态核对；不等同人工范围验收或独立事实认证。",
+  "stage": 10,
+  "acceptance_status": "not_accepted",
+  "unit_tests_passed": 505,
+  "offline_groups": {
+    "original_v2": [
+      8,
+      8
+    ],
+    "scope_v1": [
+      5,
+      5
+    ]
+  },
+  "rescored_summaries": [
+    {
+      "selected": 9,
+      "passed": 9,
+      "failed": 0,
+      "unfinished": 0,
+      "pass_rate": 1.0,
+      "steps": 55,
+      "seconds": 139.62,
+      "equivalent_tokens": 161114,
+      "review_calls": 12
+    },
+    {
+      "selected": 7,
+      "passed": 6,
+      "failed": 1,
+      "unfinished": 0,
+      "pass_rate": 0.8571428571428571,
+      "steps": 42,
+      "seconds": 127.73,
+      "equivalent_tokens": 130219,
+      "review_calls": 7
+    },
+    {
+      "selected": 7,
+      "passed": 7,
+      "failed": 0,
+      "unfinished": 0,
+      "pass_rate": 1.0,
+      "steps": 35,
+      "seconds": 93.41,
+      "equivalent_tokens": 95978,
+      "review_calls": 8
+    },
+    {
+      "selected": 7,
+      "passed": 7,
+      "failed": 0,
+      "unfinished": 0,
+      "pass_rate": 1.0,
+      "steps": 36,
+      "seconds": 118.37,
+      "equivalent_tokens": 114258,
+      "review_calls": 7
+    }
+  ],
+  "rescore_identity": {
+    "git_revision": "ccfad6ae3be9e2c1a636bfd6b9896c04b7247506",
+    "git_dirty": true,
+    "code_sha256": "bf431bd582d2fda46ca5c3d508ed9278d2be0223ed2901751e29adfe403ece3b",
+    "grader_sha256": "2a0fa5343db84971b95432b96a9e71773adce74717715a9c223c4a03e149f309"
+  },
+  "raw_artifacts_verified_unchanged_after_rescore": true,
+  "manual_findings": [
+    "三份 requested_statistics 范围核对均失败：新增未要求区间方法；第一轮 max_steps 且最终 skipped_budget。",
+    "软简述目标尚不稳定；部分报告达到599至999可见正文字符。",
+    "memory_followup主费用正确，但文字倍数解释用本次占比替代历史占比。",
+    "独立Wilson主区间核对不认证报告中的其他方法、事实或文字公式。"
+  ],
+  "raw_artifact_availability": "完整模型输出与trace仅保存在本地忽略的workspace/evaluations目录；本摘要随Git发布。"
+}
