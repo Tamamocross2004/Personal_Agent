@@ -19,6 +19,8 @@
 
 每个阶段完成后打一个 git 标签（`stage-0`、`stage-1`…），可以用 `git diff stage-0 stage-1` 查看某一阶段具体改了什么。
 
+2026-10-18 修复复检：单测 **413 passed**、离线 **8/8**；v2 真实题集三轮原始 **24/27**，修正评分误判后只读复查 **26/27**。仍有一次审稿额度耗尽，尚未达到全通过稳定性门槛，见 [修复复检记录](docs/fix-acceptance-20261018.md)。
+
 ## 快速开始
 
 ```bash
@@ -195,7 +197,7 @@ python -m agent.simulate <任务目录> --thresholds 0 20000 60000 --hit-price 0
 # 不调用 API：8 组固定回归（需要安装 dev 测试依赖）
 .\.venv\Scripts\python.exe -m agent.evaluate offline
 
-# 显式触发真实 API：8 题完整评估，默认 DeepSeek 或 .env 指定厂商
+# 显式触发真实 API：v2 共 9 题完整评估，默认 DeepSeek 或 .env 指定厂商
 .\.venv\Scripts\python.exe -m agent.evaluate live --provider deepseek
 
 # 只跑一题；记忆追问会自动先运行 memory_seed
