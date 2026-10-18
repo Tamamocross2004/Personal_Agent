@@ -199,3 +199,20 @@ def test_alternative_suite_has_separate_versioned_identity(capsys):
     assert len(load_suite(path)['live'])==7 and len(load_suite()['live'])==9
     assert main(['--suite',str(path),'list'])==0
     assert 'brief_fixed' in capsys.readouterr().out
+
+
+def test_new_research_request_replaces_previous_length_contract(tmp_path):
+    from main import research
+    from agent.config import Settings
+    settings=Settings(_env_file=None,memory_enabled=False,report_review_enabled=False)
+    for index,(question,text,maximum) in enumerate([
+        ('不联网，全文最多20字','旧稿',20),
+        ('现在更正为全文最多200字，不联网','新内容。'*30,200),
+    ]):
+        folder=tmp_path/str(index)
+        llm=ScriptedLLM([completion('{"tasks":[]}'),
+            completion(tool_calls=[('save','write_report',{'content':text})]),completion('完成')])
+        research(llm,settings,question,10,300000,task_dir=folder)
+        assert (folder/'report.md').read_text(encoding='utf-8')==text
+        saved=json.loads((folder/'task_contract.json').read_text(encoding='utf-8'))
+        assert saved['length_rules'][0]['maximum']==maximum
