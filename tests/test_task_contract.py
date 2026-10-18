@@ -216,3 +216,42 @@ def test_new_research_request_replaces_previous_length_contract(tmp_path):
         assert (folder/'report.md').read_text(encoding='utf-8')==text
         saved=json.loads((folder/'task_contract.json').read_text(encoding='utf-8'))
         assert saved['length_rules'][0]['maximum']==maximum
+
+
+def test_brief_default_allows_justified_extension_but_not_hard_limit_override(tmp_path):
+    long='必要内容。'*250
+    session=ResearchSession(task_contract=extract_contract('简述给定资料的全部必答问题。'))
+    reg=ToolRegistry([make_write_report(tmp_path,session)])
+    assert reg.execute('write_report',{'content':long}).is_error
+    assert not (tmp_path/'report.md').exists()
+    reason='用户要求的多个必答维度需要逐项保留条件与证据，本文保留这些必要内容供审稿核对。'
+    assert not reg.execute('write_report',{'content':long,'brief_extension_reason':reason}).is_error
+    from agent.task_contract import brief_extension_reason, save_contract_check
+    assert brief_extension_reason(tmp_path/'report.md',long,session.task_contract)==reason
+    refreshed=save_contract_check(tmp_path/'report.md',long,session.task_contract)
+    assert refreshed['brief_extension_reason']==reason and refreshed['brief_scope_review_needed']
+    session.task_contract=extract_contract('全文不超过100字，简述资料。')
+    assert reg.execute('write_report',{'content':long,'brief_extension_reason':reason}).is_error
+
+
+def test_explicit_detailed_request_needs_no_brief_extension_reason(tmp_path):
+    reg=ToolRegistry([make_write_report(tmp_path,question='详细分析，不设字数上限')])
+    assert not reg.execute('write_report',{'content':'必要的多维解释。'*250}).is_error
+
+
+def test_limit_feedback_explains_unit_and_margin_without_changing_limit(tmp_path):
+    reg=ToolRegistry([make_write_report(tmp_path,question='全文不超过10个中文字符')])
+    result=reg.execute('write_report',{'content':'中文'*8})
+    assert result.is_error and '至少需减少6' in result.content and '删空白、英文' in result.content
+    # 建议的80%余量不能变成新的硬上限。
+    assert not reg.execute('write_report',{'content':'中文'*5}).is_error
+
+
+def test_custom_report_brief_reason_reaches_reviewer(tmp_path):
+    c=extract_contract('简述全部必答问题')
+    report='必要内容。'*250
+    reason='本次要求逐项解释多个必答维度，保留各项适用条件与必要证据，提交审稿核对。'
+    reg=ToolRegistry([make_write_report(tmp_path,contract=c)])
+    assert not reg.execute('write_report',{'filename':'custom.md','content':report,'brief_extension_reason':reason}).is_error
+    messages,_=build_review_messages(report,tmp_path,None,task_contract=c,report_filename='custom.md')
+    assert json.loads(messages[1]['content'])['brief_extension_reason']==reason

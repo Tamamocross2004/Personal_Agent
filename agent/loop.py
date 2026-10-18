@@ -439,7 +439,7 @@ class Agent:
                                                                source_readings=self._source_readings,
                                                                source_readings_omitted=self._source_readings_omitted,
                                                                previous_report=self._last_report_texts.get(path.name),
-                                                               task_contract=self._contract)
+                                                               task_contract=self._contract, report_filename=path.name)
             while True:
                 projected = estimate_messages(review_messages) + self.review_max_tokens * self.token_weights.output
                 if self._equiv + projected >= self.token_budget:

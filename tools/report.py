@@ -17,7 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from agent.quality import inspect_report, save_check
 from agent.markdown_tables import markdown_tables
-from agent.task_contract import TaskContract, check_contract, explicit_headers, extract_contract, save_contract_check
+from agent.task_contract import TaskContract, check_contract, explicit_headers, extract_contract, length_repair_hint, needs_brief_reason, save_contract_check
 from agent.numeric_evidence import arithmetic_errors, price_ratio_errors, report_cost_errors
 from tools.registry import Tool, tool
 from tools.session import ResearchSession
@@ -102,6 +102,7 @@ def make_write_report(task_dir: Path, session: ResearchSession | None = None, *,
         complete: Annotated[bool, Field(description="是否为完整报告。分段写作的中间段用 false，最后一段用 true；完整稿须满足用户指定表头并接受审稿")] = True,
         replacements: Annotated[list[ReportReplacement], Field(max_length=16, description="patch 模式的原文/新文替换列表；定位均基于修订前原稿")] = [],
         base_sha256: Annotated[str, Field(description="patch 模式必填：最新审稿反馈中的报告 SHA-256")] = "",
+        brief_extension_reason: Annotated[str, Field(max_length=600, description="简述稿明显超过默认软目标时，说明具体必答项为何需要这些内容；非硬上限豁免，泛称全面完整不充分")] = "",
     ) -> str:
         """把研究报告（Markdown）保存到本地。报告较长时可分多次写：先 overwrite 写开头，再 append 追加后续章节。
         返回值附有对报告的自动检查结果。"""
@@ -124,7 +125,10 @@ def make_write_report(task_dir: Path, session: ResearchSession | None = None, *,
         contract_check = check_contract(full, active_contract)
         if complete and contract_check['hard_errors']:
             raise ValueError("尚未保存：任务约定检查失败：" + "；".join(contract_check['hard_errors'])
-                             + "请保留必答结论、依据及局限，按已声明计量口径精简；草稿不等于完整交付。")
+                             + length_repair_hint(contract_check) + "草稿不等于完整交付。")
+        if complete and needs_brief_reason(contract_check, active_contract) and len(brief_extension_reason.strip()) < 20:
+            raise ValueError("尚未保存：用户要求简述，正文明显超过默认软目标。请先删除重复引文、无关背景或额外分析，保留必答结论、依据和局限。"
+                             "默认目标不是用户硬上限；如确实需要较长内容，可在 brief_extension_reason 中说明具体必答项与必要性（至少20字符），由审稿核对，不能只称更全面。")
         missing = missing_table_headers(full, list(active_contract.required_headers)) if complete else []
         if missing:
             raise ValueError("尚未保存：完整报告缺少用户指定表头（原文及列顺序必须一致）："
@@ -150,7 +154,7 @@ def make_write_report(task_dir: Path, session: ResearchSession | None = None, *,
             saved = f"报告已保存：{path}（{len(full)} 字符）"
         check = inspect_report(full, task_dir, session, contract=active_contract)
         save_check(path, check)
-        save_contract_check(path, full, active_contract)
+        save_contract_check(path, full, active_contract, extension_reason=brief_extension_reason)
         scope_feedback = ""
         if contract_check['observations']:
             scope_feedback = "\n【范围核对线索】" + str(contract_check['observations']) + "\n线索不等于已判违规；结合任务与资料核对，软目标不作为硬上限，不为润色无限改稿。"

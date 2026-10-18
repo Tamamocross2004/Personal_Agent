@@ -47,6 +47,9 @@ class TaskContract(BaseModel):
                      "不要逐段翻译原文、重复摘要/正文/结论中的长引文，或增加相邻对象、版本沿革和背景小节。"
                      f"默认正文目标约{self.soft_body_target}个可见非空白字符，含英文引文；能中文转述的依据用简短转述并保留引用。"
                      "若用户明确要求或完整回答确实需要更长，保留必要信息；这不是硬截断上限，也不能删掉关键条件来凑长度。")
+        if self.length_rules:
+            text += ("\n【明确上限写作策略】先按上限约80%起草以留计量余量，这只是建议、不是更小的硬上限。"
+                     "全文限制包括标题、章节名与参考资料；先删重复解释，不要只删不参与本次计量的字符，也不要增加自称合规的字数说明。")
         return text
 
     @property
@@ -221,7 +224,42 @@ def check_contract(report: str, contract: TaskContract) -> dict:
             "semantic_scope": "范围、遗漏和假设须结合原始问题与证据审稿，观察线索不直接等同违规。"}
 
 
-def save_contract_check(path: Path, report: str, contract: TaskContract) -> dict:
+def brief_extension_reason(path: Path, report: str, contract: TaskContract) -> str:
+    sidecar = path.with_suffix('.contract.json')
+    if not sidecar.is_file() or sidecar.is_symlink():
+        return ''
+    try:
+        if sidecar.stat().st_size > 40000:
+            return ''
+        record = json.loads(sidecar.read_text(encoding='utf-8'))
+        if (record.get('report_sha256') == hashlib.sha256(report.encode()).hexdigest()
+                and record.get('request_sha256') == contract.request_sha256):
+            return str(record.get('brief_extension_reason', ''))[:600]
+    except (OSError, ValueError, AttributeError):
+        pass
+    return ''
+
+
+def needs_brief_reason(result: dict, contract: TaskContract) -> bool:
+    return bool(contract.soft_body_target and any(m.get('soft_target') and m['actual'] > 2*m['soft_target'] for m in result['measurements']))
+
+
+def length_repair_hint(result: dict) -> str:
+    advice = []
+    for m in result['measurements']:
+        if 'maximum' not in m or m['actual'] <= m['maximum']:
+            continue
+        unit = {'han_characters':'汉字（删空白、英文、数字或标点不会降低汉字数）',
+                'english_words':'英文单词（删中文或仅删标点不会降低英文词数）',
+                'characters':'可见非空白字符（删空白不会降低数量；英文、数字和标点也计入）'}[m['unit']]
+        advice.append(f"本次计量是{unit}，至少需减少{m['actual']-m['maximum']}；建议下一稿写到约{int(m['maximum']*.8)}以留余量，仍按原上限{m['maximum']}检查。")
+    return '；'.join(advice) + '全文范围含标题和参考资料，正文范围也含章节名；合并重复解释，保留必答结论、依据及局限。'
+
+
+def save_contract_check(path: Path, report: str, contract: TaskContract, *, extension_reason: str | None = None) -> dict:
+    reason = brief_extension_reason(path, report, contract) if extension_reason is None else extension_reason
     result = check_contract(report, contract)
+    result['brief_extension_reason'] = reason
+    result['brief_scope_review_needed'] = needs_brief_reason(result, contract)
     path.with_suffix('.contract.json').write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding='utf-8')
     return result

@@ -118,7 +118,7 @@ def _nonasserted_claim(sentence: str, claim: re.Match) -> bool:
         meta = re.search(r"结论|命题|判断|说法|表述|比较|排序", lead)
         affirmed = re.search(r"正确|准确|已证实|已成立|毫无疑问|事实", lead)
         if meta and not affirmed:
-            if re.search(r"缺少|缺乏|尚缺|无对照|未知|不存在|不具备|无法成立|不能成立|不成立", tail):
+            if re.search(r"缺少|缺乏|尚缺|无对照|未知|不存在|不具备|不成立|(?:无法|不能|无从)(?:成立|比较|排序|谈起|建立)", tail):
                 return True
             if re.search(r"(?:需要|要求|前提).*(?:证据|数据|条件|测试结果)", tail):
                 return True
