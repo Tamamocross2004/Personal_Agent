@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-import re
 
 import httpx
 
@@ -16,6 +15,7 @@ from tools.plan import make_update_plan
 from tools.report import make_write_report
 from tools.search import DDGSBackend, SearchBackend, make_web_search
 from tools.session import ResearchSession
+from agent.task_contract import TaskContract, extract_contract
 
 
 def default_registry(
@@ -28,6 +28,7 @@ def default_registry(
     on_plan_update: callable = None,
     code_exec_timeout: float = 30.0,
     question: str = "",
+    contract: TaskContract | None = None,
 ) -> ToolRegistry:
     """为一次研究任务组装全部工具。
 
@@ -37,7 +38,9 @@ def default_registry(
     """
     session = session if session is not None else ResearchSession()
     # 只依据当前用户明确约束；不从历史背景推断权限。非联网研究不需要伪造网页笔记。
-    offline = bool(re.search(r"无需联网|不需(?:要)?联网|不必联网|不要联网|禁止联网", question))
+    contract = contract or session.task_contract or extract_contract(question)
+    session.task_contract = contract
+    offline = contract.network_allowed is False
     notes = make_notes_tools(task_dir, session)
     network_tools = [] if offline else [
         make_web_search(search_backend or DDGSBackend()),
@@ -48,7 +51,7 @@ def default_registry(
             *network_tools,
             *[t for t in notes if not offline or t.name != "save_note"],
             make_update_plan(task_dir, on_update=on_plan_update),
-            make_write_report(task_dir, session, question=question),
+            make_write_report(task_dir, session, contract=contract),
             make_run_python(task_dir, timeout=code_exec_timeout),
             calculator,
             days_between,

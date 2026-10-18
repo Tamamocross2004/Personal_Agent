@@ -39,6 +39,7 @@ from agent.memory import MemoryStore, format_context, save_research
 from agent.prompts import CHAT_SYSTEM_PROMPT, research_system_prompt
 from agent.quality import inspect_report, save_check
 from agent.review import save_review
+from agent.task_contract import extract_contract, save_contract_check
 from agent.trace import MESSAGES_FILE, TRACE_FILE, TraceWriter, fanout, save_messages
 from agent.workspace import new_task_dir
 from tools import ResearchSession, default_registry
@@ -83,7 +84,8 @@ def research(llm: LLMClient, settings: Settings, question: str, max_steps: int, 
     """运行一次研究任务：独立的工作目录、工具实例和运行日志。"""
     task_dir = task_dir or new_task_dir(question)
     tracer = TraceWriter(task_dir / TRACE_FILE)
-    session = ResearchSession()  # 本任务内工具共享的状态：读过的网页、笔记
+    contract = extract_contract(question)
+    session = ResearchSession(task_contract=contract)  # 本次请求是唯一约定来源
     memory_store = MemoryStore(settings.memory_db_path) if settings.memory_enabled else None
     memory_context = ""
     if memory_store:
@@ -114,6 +116,7 @@ def research(llm: LLMClient, settings: Settings, question: str, max_steps: int, 
             jina_api_key=settings.jina_api_key,
             session=session,
             question=question,
+            contract=contract,
             code_exec_timeout=min(settings.code_exec_timeout, settings.tool_timeout * 0.8),
         ),
         system_prompt=research_system_prompt(date.today().isoformat(), max_steps),
@@ -129,6 +132,7 @@ def research(llm: LLMClient, settings: Settings, question: str, max_steps: int, 
         review_max_tokens=settings.report_review_max_tokens,
         research_session=session,
         memory_context=memory_context,
+        task_contract=contract,
     )
     try:
         result = agent.run(question)
@@ -142,6 +146,7 @@ def research(llm: LLMClient, settings: Settings, question: str, max_steps: int, 
         fallback = task_dir / "report.md"
         fallback.write_text(result.answer, encoding="utf-8")
         save_check(fallback, inspect_report(result.answer, task_dir, session))
+        save_contract_check(fallback, result.answer, contract)
         save_review(fallback, result.answer, "not_reviewed", [], reason="最终文字兜底保存，未经过报告审稿")
         reports = [fallback]
 

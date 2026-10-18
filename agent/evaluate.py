@@ -20,8 +20,8 @@ from agent.eval_checks import CSV_COLUMNS, assess_run
 CASE_FILE = Path(__file__).with_name("eval_cases.json")
 
 
-def load_suite() -> dict:
-    suite = json.loads(CASE_FILE.read_text(encoding="utf-8"))
+def load_suite(path: Path | None = None) -> dict:
+    suite = json.loads((path or CASE_FILE).read_text(encoding="utf-8"))
     for mode in ("offline", "live"):
         if not suite[mode]:
             raise ValueError("题集不能为空")
@@ -65,6 +65,7 @@ def metadata(mode: str, suite: dict, cases: list[dict]) -> dict:
     files = [PROJECT_ROOT / "main.py", CASE_FILE]
     for directory in ("agent", "tools", "tests"):
         files.extend((PROJECT_ROOT / directory).glob("*.py"))
+    files.extend((PROJECT_ROOT / 'agent').glob('*.json'))
     files.extend((PROJECT_ROOT / "tests" / "fixtures").rglob("*.*"))
     for path in sorted(set(files)):
         code_digest.update(path.relative_to(PROJECT_ROOT).as_posix().encode())
@@ -75,7 +76,8 @@ def metadata(mode: str, suite: dict, cases: list[dict]) -> dict:
             "grader_sha256": hashlib.sha256((Path(__file__).with_name("eval_checks.py").read_bytes()
                                              + Path(__file__).with_name("quality.py").read_bytes()
                                              + Path(__file__).with_name("numeric_evidence.py").read_bytes()
-                                             + Path(__file__).with_name("markdown_tables.py").read_bytes())).hexdigest(), "state": "running",
+                                             + Path(__file__).with_name("markdown_tables.py").read_bytes()
+                                             + Path(__file__).with_name("task_contract.py").read_bytes())).hexdigest(), "state": "running",
             "definitions": cases,
             "cases": [{"id": c["id"], "title": c["title"], "status": "pending"} for c in cases]}
 
@@ -238,6 +240,7 @@ def positive(value: str) -> int:
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--suite', type=Path, default=CASE_FILE, help='版本化题集 JSON；默认保持原 v2 题集')
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("list", help="列出固定题集，不调用 API")
     for mode in ("offline", "live"):
@@ -265,7 +268,7 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
     out = data = None
     try:
-        suite = load_suite()
+        suite = load_suite(args.suite)
         if args.command == "list":
             for mode in ("offline", "live"):
                 for case in suite[mode]:

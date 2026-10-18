@@ -11,6 +11,7 @@ from pathlib import Path
 
 from agent.quality import inspect_report
 from agent.markdown_tables import markdown_tables
+from agent.task_contract import check_contract, extract_contract
 from agent.review import fingerprint
 from agent.numeric_evidence import arithmetic_errors, price_ratio_errors
 from tools.fetch import Page
@@ -198,6 +199,14 @@ def assess_run(case: dict, task_dir: Path) -> dict:
     report = report_path.read_text(encoding="utf-8") if report_path.is_file() else ""
     checks.append(check("explicit_arithmetic", not arithmetic_errors(report), "；".join(arithmetic_errors(report))))
     session = session_from_events(events)
+    original_question = case.get('prompt') or next((e.get('question', '') for e in events if e['kind'] == 'run_start'), '')
+    contract = extract_contract(original_question)
+    session.task_contract = contract
+    contract_check = check_contract(report, contract)
+    checks.append(check('task_contract_hard_limits', not contract_check['hard_errors'], '；'.join(contract_check['hard_errors'])))
+    if case.get('forbid_statistical_results'):
+        signals = [s for s in contract_check['observations'] if s.get('kind') == 'statistical_result']
+        checks.append(check('no_statistical_result_signals', not signals, '；'.join(s['quote'] for s in signals)))
     quality = inspect_report(report, task_dir, session)
     checks.append(check("mechanical_quality", bool(report) and not quality.issues,
                         "；".join(i.message for i in quality.issues)))

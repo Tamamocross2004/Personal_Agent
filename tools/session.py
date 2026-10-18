@@ -12,6 +12,7 @@ from urllib.parse import urlsplit, urlunsplit
 
 if TYPE_CHECKING:
     from tools.fetch import Page
+    from agent.task_contract import TaskContract
 
 
 def normalize_url(url: str) -> str:
@@ -40,6 +41,7 @@ class Note:
 class ResearchSession:
     pages: dict[str, Page] = field(default_factory=dict)  # 请求的 URL → 页面（即 fetch_url 的缓存）
     notes: list[Note] = field(default_factory=list)
+    task_contract: TaskContract | None = None
 
     def find_page(self, url: str) -> Page | None:
         """按规范化 URL 查找读过的页面（同时匹配请求地址和重定向后的最终地址）。"""

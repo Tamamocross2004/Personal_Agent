@@ -49,6 +49,7 @@ from agent.errors import classify_api_error
 from agent.planner import format_plan_for_prompt, generate_plan, load_plan, unfinished_tasks
 from agent.quality import inspect_report, save_check
 from agent.review import ReviewValidationError, build_review_messages, fingerprint, parse_verdict, review_feedback, save_review
+from agent.task_contract import TaskContract, extract_contract, save_contract_check
 from agent.prompts import (
     CONTINUE_PROMPT,
     EMPTY_REPLY_PROMPT,
@@ -173,6 +174,7 @@ class Agent:
         review_max_tokens: int = 2048,
         research_session=None,
         memory_context: str = "",
+        task_contract: TaskContract | None = None,
     ):
         self.llm = llm
         self.registry = registry
@@ -196,6 +198,7 @@ class Agent:
         self.review_max_tokens = review_max_tokens
         self.research_session = research_session
         self.memory_context = memory_context
+        self.task_contract = task_contract
 
     # ------------------------------------------------------------------
     # 对外接口
@@ -223,8 +226,17 @@ class Agent:
             self.compactor.reset()
 
         self._question = question
+        contract = self.task_contract
+        if contract is None or contract.request_sha256 != fingerprint(question):
+            contract = extract_contract(question)
+        self._contract = contract
+        if self.research_session is not None:
+            self.research_session.task_contract = contract
+        if self.task_dir:
+            self.task_dir.mkdir(parents=True, exist_ok=True)
+            (self.task_dir / "task_contract.json").write_text(contract.model_dump_json(indent=2), encoding="utf-8")
         messages: list[dict[str, Any]] = [
-            {"role": "system", "content": self.system_prompt},
+            {"role": "system", "content": self.system_prompt + ("\n\n" + contract.prompt() if contract.active else "")},
             {"role": "user", "content": question},
         ]
         if self.memory_context:
@@ -426,7 +438,8 @@ class Agent:
                                                                calculations_omitted=self._calculations_omitted,
                                                                source_readings=self._source_readings,
                                                                source_readings_omitted=self._source_readings_omitted,
-                                                               previous_report=self._last_report_texts.get(path.name))
+                                                               previous_report=self._last_report_texts.get(path.name),
+                                                               task_contract=self._contract)
             while True:
                 projected = estimate_messages(review_messages) + self.review_max_tokens * self.token_weights.output
                 if self._equiv + projected >= self.token_budget:
@@ -481,8 +494,11 @@ class Agent:
             if path.name == "notes.md" or path.is_symlink():
                 continue
             report = path.read_text(encoding="utf-8")
-            check = inspect_report(report, self.task_dir, self.research_session)
+            check = inspect_report(report, self.task_dir, self.research_session, contract=self._contract)
             save_check(path, check)
+            contract_check = save_contract_check(path, report, self._contract)
+            if contract_check['hard_errors']:
+                self._emit("notice", text=f"最终报告 {path.name} 仍违反任务硬约束：" + "；".join(contract_check['hard_errors']))
             if check.issues:
                 self._emit("notice", text=f"最终报告 {path.name} 仍有 {len(check.issues)} 项机械检查问题，见 {path.stem}.quality.json。")
             if self.review_reports:
@@ -543,6 +559,7 @@ class Agent:
                 lambda m, **kw: self._call_llm(m, None, None, purpose="planning", **kw),
                 self.task_dir,
                 today=date.today().isoformat(),
+                contract=self._contract,
             )
         except openai.APIError as e:
             self._emit("notice", text=f"生成计划失败（{type(e).__name__}），将不带计划继续。")

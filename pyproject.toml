@@ -35,7 +35,7 @@ build-backend = "setuptools.build_meta"
 include = ["agent*", "tools*"]
 
 [tool.setuptools.package-data]
-agent = ["eval_cases.json"]
+agent = ["*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

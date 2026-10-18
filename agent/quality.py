@@ -8,6 +8,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING
 from urllib.parse import unquote, urlsplit
+from agent.task_contract import TaskContract, check_contract
 
 from agent.planner import load_plan, unfinished_tasks
 if TYPE_CHECKING:
@@ -72,11 +73,16 @@ def urls(text: str) -> list[str]:
     return list(dict.fromkeys(m.group(0).rstrip(".,;:!?") for m in URL.finditer(text)))
 
 
-def inspect_report(text: str, task_dir: Path, session: ResearchSession | None) -> QualityCheck:
+def inspect_report(text: str, task_dir: Path, session: ResearchSession | None, *, contract: TaskContract | None = None) -> QualityCheck:
     result = QualityCheck()
 
     def issue(category, message, severity="warning"):
         result.issues.append(QualityIssue(category, message, severity))
+
+    contract = contract or (session.task_contract if session else None)
+    if contract:
+        for error in check_contract(text, contract)['hard_errors']:
+            issue('task_contract', error, 'error')
 
     unfinished = unfinished_tasks(load_plan(task_dir))
     if unfinished:

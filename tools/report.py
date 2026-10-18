@@ -17,6 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from agent.quality import inspect_report, save_check
 from agent.markdown_tables import markdown_tables
+from agent.task_contract import TaskContract, check_contract, explicit_headers, extract_contract, save_contract_check
 from agent.numeric_evidence import arithmetic_errors, price_ratio_errors, report_cost_errors
 from tools.registry import Tool, tool
 from tools.session import ResearchSession
@@ -77,10 +78,7 @@ def check_report(text: str, task_dir: Path, session: ResearchSession | None) -> 
 
 def required_table_headers(question: str) -> list[tuple[str, ...]]:
     """仅识别明确写在“表头/列名”后的管道分隔英文字段，不猜测任意自然语言格式。"""
-    field = r"`?[A-Za-z_][A-Za-z0-9_]*`?"
-    pattern = rf"(?:表头|列名)[^|\n]{{0,24}}?({field}(?:\s*\|\s*{field})+)"
-    return list(dict.fromkeys(tuple(c.strip().strip('`') for c in m.split('|'))
-                              for m in re.findall(pattern, question)))
+    return list(explicit_headers(question))
 
 
 def missing_table_headers(text: str, required: list[tuple[str, ...]]) -> list[tuple[str, ...]]:
@@ -88,10 +86,10 @@ def missing_table_headers(text: str, required: list[tuple[str, ...]]) -> list[tu
     return [header for header in required if header not in headers]
 
 
-def make_write_report(task_dir: Path, session: ResearchSession | None = None, *, question: str = "") -> Tool:
+def make_write_report(task_dir: Path, session: ResearchSession | None = None, *, question: str = "", contract: TaskContract | None = None) -> Tool:
     """session：本任务的笔记等状态，用于自动检查报告引用。不传则只检查计划。"""
 
-    required = required_table_headers(question)
+    initial_contract = contract or extract_contract(question)
 
     @tool(name="write_report")
     def write_report(
@@ -122,7 +120,12 @@ def make_write_report(task_dir: Path, session: ResearchSession | None = None, *,
                 raise ValueError("replacements/base_sha256 仅用于 patch 模式。")
             full = (path.read_text(encoding="utf-8") + "\n\n" + content
                     if mode == "append" and path.exists() else content)
-        missing = missing_table_headers(full, required) if complete else []
+        active_contract = session.task_contract if session and session.task_contract else initial_contract
+        contract_check = check_contract(full, active_contract)
+        if complete and contract_check['hard_errors']:
+            raise ValueError("尚未保存：任务约定检查失败：" + "；".join(contract_check['hard_errors'])
+                             + "请保留必答结论、依据及局限，按已声明计量口径精简；草稿不等于完整交付。")
+        missing = missing_table_headers(full, list(active_contract.required_headers)) if complete else []
         if missing:
             raise ValueError("尚未保存：完整报告缺少用户指定表头（原文及列顺序必须一致）："
                              + "；".join(" | ".join(header) for header in missing)
@@ -145,8 +148,12 @@ def make_write_report(task_dir: Path, session: ResearchSession | None = None, *,
         else:
             path.write_text(full, encoding="utf-8")
             saved = f"报告已保存：{path}（{len(full)} 字符）"
-        check = inspect_report(full, task_dir, session)
+        check = inspect_report(full, task_dir, session, contract=active_contract)
         save_check(path, check)
-        return saved + ("\n【分段草稿】尚未完成，不执行语义审稿；最后一段须 complete=true。" if not complete else "") + "\n\n" + check.feedback()
+        save_contract_check(path, full, active_contract)
+        scope_feedback = ""
+        if contract_check['observations']:
+            scope_feedback = "\n【范围核对线索】" + str(contract_check['observations']) + "\n线索不等于已判违规；结合任务与资料核对，软目标不作为硬上限，不为润色无限改稿。"
+        return saved + ("\n【分段草稿】尚未完成，不执行语义审稿；最后一段须 complete=true。" if not complete else "") + "\n\n" + check.feedback() + scope_feedback
 
     return write_report

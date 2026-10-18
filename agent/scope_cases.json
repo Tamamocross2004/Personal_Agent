@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "offline": [
+    {"id":"contract_extraction","title":"显式约束、材料隔离与要求更正","selectors":["tests/test_task_contract.py::test_network_constraints_only_come_from_current_instructions","tests/test_task_contract.py::test_explicit_length_limits_and_revisions","tests/test_task_contract.py::test_approximate_quoted_and_unsupported_lengths_are_not_invented_hard_limits"]},
+    {"id":"length_semantics","title":"混合文本、代码、表格与参考资料计量","selectors":["tests/test_task_contract.py::test_rendered_length_counts_mixed_text_code_tables_and_reference_scope","tests/test_task_contract.py::test_reference_heading_in_code_or_quote_does_not_hide_body"]},
+    {"id":"scope_polarity","title":"实际分析与否定/条件反例","selectors":["tests/test_task_contract.py::test_actual_analysis_and_assumption_signals_are_locatable","tests/test_task_contract.py::test_negative_conditional_and_code_examples_are_not_analysis_assertions","tests/test_task_contract.py::test_soft_target_and_explicit_analysis_permission_are_distinct"]},
+    {"id":"save_atomicity","title":"拒绝超限不破坏旧产物","selectors":["tests/test_task_contract.py::test_hard_limit_rejection_preserves_previous_report_checks_and_does_not_review","tests/test_task_contract.py::test_partial_draft_is_not_complete_delivery"]},
+    {"id":"contract_flow","title":"规划/主循环/审稿/压缩共同约定","selectors":["tests/test_task_contract.py::test_contract_persists_across_planning_review_and_main_context","tests/test_task_contract.py::test_contract_pinned_in_system_survives_tool_context_compaction","tests/test_task_contract.py::test_scope_signals_are_review_inputs_not_silent_hard_rejections"]}
+  ],
+  "live": [
+    {"id":"brief_fixed","title":"严格篇幅且不增加统计检验","prompt":"只根据以下用户给定虚构资料简述，不联网，不做统计检验。产品A两个版本各测试51次，成功49次和48次，没有B、C数据。全文不超过300字。必答问题：能否据此比较A与B、C的稳定性及原因；能支持的描述与未知条件。不要额外计算置信区间。","required_patterns":["不能|无法|不足","B","C","51"],"forbid_statistical_results":true},
+    {"id":"han_limit","title":"中文字符上限与核心答案完整","prompt":"仅根据给定材料，不联网：资料甲称X为128K，资料乙称X为256K，版本和测试条件均未说明。全文不超过120个中文字符。必答问题：数值冲突是什么；为什么不能确定真实规格。只转述材料与局限，不扩展其他产品。","required_patterns":["128K","256K","不能|无法|不确定","版本|条件"]},
+    {"id":"english_words","title":"英文单词上限与混合标题","prompt":"只根据给定材料，不联网。保留摘要、方法与范围、正文、结论、局限性、参考资料这些中文章节标题，章节内容用英文写，全文最多100个英文单词。虚构资料：A有10次成功、总共12次调用，B没有测试。必答问题：为什么这些数据不能支持A优于B；哪些内容未知。不做统计检验，不计算置信区间。","required_patterns":["B","cannot|insufficient|unknown|no data"],"forbid_statistical_results":true},
+    {"id":"requested_statistics","title":"允许并保留明确要求的必要统计分析","prompt":"用户给定虚构且明确的假设：20次独立同分布的伯努利试验成功18次。请做统计分析，用Python计算Wilson 95%置信区间，z=1.96，不联网。必答问题：区间结果；独立同分布来自本题给定假设而非外部证明；为何不能外推到其他产品。详细说明公式与适用边界，不设长度上限。","required_tools":["run_python"],"required_patterns":["Wilson","95","独立","假设"]},
+    {"id":"unknown_assumptions","title":"材料不足时保留前提未知","prompt":"只依据给定资料，不联网，不做统计分析：虚构系统在某次测试中20次调用成功18次；没有抽样设计、独立性、任务分布或重复批次资料。正文最多350字。必答问题：能否断言长期总体成功率高于80%；缺少哪些前提；目前能转述什么。不要自行假定独立同分布或随机抽样。","required_patterns":["不能|无法|不足","独立|抽样|前提","18","20"],"forbid_statistical_results":true},
+    {"id":"revised_limit","title":"按本次更正后的要求执行","prompt":"原要求全文不超过80字；现在更正为全文不超过220字。不联网。仅根据给定虚构资料：甲产品输入2元/百万token，乙产品输入9元/百万token，均没有输出价格和质量测试。必答问题：可以比较哪些内容；为什么不能判断总费用或综合性价比。不要计算未给定的输出费用，不编造信息。","required_patterns":["2","9","输出","不能|无法|不足"]},
+    {"id":"detailed_scope","title":"详细多维任务不被简述默认值误截断","prompt":"仅根据以下给定虚构资料详细比较，不联网，不设字数上限。甲接口支持流式输出、每分钟100次、输入2元/百万token；乙接口不支持流式输出、每分钟200次、输入3元/百万token。两者输出价格、延迟和成功率均未提供。必答问题：接口能力、限流、输入价格、未知信息、哪些选型结论不能得出。正文必须有英文表头 model | streaming | rpm | input_price 的表格，两行型号 Alpha 和 Beta；明确这只是虚构资料比较，不代表真实选型建议。","required_patterns":["100","200","输出","延迟","未知|缺失|未提供|不能"]}
+  ]
+}

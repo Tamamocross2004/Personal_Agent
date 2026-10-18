@@ -19,6 +19,7 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
+from agent.task_contract import TaskContract
 
 MAX_TASKS = 6
 
@@ -68,7 +69,7 @@ DEFAULT_TASKS = [
 ]
 
 
-def generate_plan(question: str, chat, task_dir: Path, today: str = "") -> dict:
+def generate_plan(question: str, chat, task_dir: Path, today: str = "", *, contract: TaskContract | None = None) -> dict:
     """调用 LLM 生成计划，保存到 task_dir/plan.json。
 
     chat: 可调用对象 chat(messages, **kwargs) -> ChatCompletion。由调用方传入，
@@ -76,7 +77,7 @@ def generate_plan(question: str, chat, task_dir: Path, today: str = "") -> dict:
     today: 今天的日期。不告诉模型日期，它会按训练数据猜"最新"的产品（阶段 5 实测拆出了"文心一言"）。
     """
     prompt = PLANNER_PROMPT.format(today=today or "（未知）")
-    messages = [{"role": "user", "content": prompt + question}]
+    messages = [{"role": "user", "content": prompt + question + ("\n\n" + contract.prompt() if contract else "")}]
 
     # response_format 指定 JSON 输出
     resp = chat(messages, response_format={"type": "json_object"})
@@ -89,6 +90,16 @@ def generate_plan(question: str, chat, task_dir: Path, today: str = "") -> dict:
     except json.JSONDecodeError:
         plan = {}
     plan["tasks"] = normalize_tasks(plan.get("tasks"))
+    if (contract and (contract.evidence_scope == 'provided_only' or contract.soft_body_target)
+            and [t['title'] for t in plan['tasks']] == [t['title'] for t in DEFAULT_TASKS]):
+        plan['tasks'] = [{"id":"task-1", "title":"回答本次必答问题及资料能支持的边界", "status":"pending", "note":""}]
+    if contract and contract.statistics == "forbidden":
+        kept = [t for t in plan['tasks'] if not (
+            re.search(r"计算|进行|开展|估计|构造", t['title'])
+            and re.search(r"统计检验|置信区间|Fisher|Wilson", t['title'], re.I)
+            and not re.search(r"不做|不进行|不能|无需|不应|未做|说明为何", t['title']))]
+        plan['tasks'] = normalize_tasks(kept) if kept else [
+            {"id": "task-1", "title": "按给定范围回答问题并保留未知边界", "status": "pending", "note": ""}]
 
     # 保存到文件
     task_dir.mkdir(parents=True, exist_ok=True)
