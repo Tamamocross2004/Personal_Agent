@@ -144,7 +144,8 @@ def unsupported_claims(report: str, pattern: str) -> list[str]:
     findings = []
     rejected_label = re.compile(r"^(?:[-*]\s*)?(?:(?:不能|不可(?:以)?|不应(?:该)?|无法|不足以)(?:说|得出|支持|断言|认定|推导|认为|判断|证明|暗示|成立)(?:的(?:结论|表述|说法|判断))?|不支持的结论)(?:包括|有)?\s*[：:]")
     for line in lines + table_fragments:
-        fragments = [line]
+        # 否定标签只支配本句内的列表；不能跨句覆盖后面的肯定断言。
+        fragments = re.split(r"(?<=[。！？?])", line)
         for fragment in fragments:
             plain = fragment.replace('**', '').strip()
             rejected_list = rejected_label.match(plain)
