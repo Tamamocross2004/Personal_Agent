@@ -12,7 +12,7 @@
 - [x] 阶段 3：错误处理与健壮性（运行日志与回放、循环保护、token 预算、异常回复处理、Jina 备用通道）
 - [x] 阶段 4：笔记与上下文管理（save_note / read_notes、旧网页原文压缩、运行对比）
 - [x] 阶段 5：规划与反思（按维度规划、进度跟踪、报告自动检查、步数提醒与收尾阶段；2026-10-18 复测结果见 ROADMAP）
-- [ ] 阶段 6：代码执行
+- [x] 阶段 6：代码执行（run_python、超时清理、计算与绘图；验收记录见 ROADMAP）
 - [ ] 阶段 7：报告质量
 - [ ] 阶段 8：长期记忆
 - [ ] 阶段 9：评估
@@ -159,9 +159,30 @@ python -m agent.simulate <任务目录> --thresholds 0 20000 60000 --hit-price 0
 | `save_note(content, source_url, topic)` | 记录从网页提炼的要点 | 网页原文稍后会被移出上下文，只有笔记保留；来源必须是读过的网页 |
 | `read_notes()` | 读取全部笔记 | 写报告前回顾，报告以笔记为依据 |
 | `write_report(content, filename, mode)` | 把 Markdown 报告存到任务目录，`mode="append"` 可分段追加 | 产出最终成果；文件名经过清洗，只能写进任务目录 |
+| `run_python(code)` | 用独立 Python 子进程计算数据、生成 CSV / PNG，返回退出码和有界 stdout/stderr | 复杂计算可复现，报告可引用实际生成的图表 |
 | `get_current_time(timezone)` | 当前日期、时间、星期 | 模型不知道"今天"是哪天 |
 | `days_between(start_date, end_date)` | 两个日期相差的天数 | 大小月、闰年容易算错 |
 | `calculator(expression)` | 安全计算数学表达式 | 模型心算不可靠；基于 AST 白名单实现，不使用 `eval` |
+
+### Python 计算与绘图
+
+更新依赖后即可使用：`python -m pip install -e ".[dev]"`，已包含 pandas、matplotlib。
+
+```powershell
+.\.venv\Scripts\python.exe main.py "根据搜到的模型 API 价格，计算输入10万、输出1万token的单任务成本，用Python画柱状图并写入报告"
+```
+
+每次 `run_python` 保存脚本到任务目录的 `.code_runs/<调用ID>/code.py`，以当前任务目录为 cwd；
+变量不跨调用保留，文件会保留。用 `print` 输出结果，`plt.savefig('costs.png')` 保存图表，
+报告用 `![成本对比](costs.png)` 引用。默认采用非交互 Agg 后端，不需要打开图形窗口。
+
+`CODE_EXEC_TIMEOUT` 默认为 30 秒，实际时限不超过 `TOOL_TIMEOUT` 的 80%；超时会终止进程树。
+stdout/stderr 分别最多返回 2500 字符，过长会标记截断。失败包含退出码和错误信息，模型可修正后重试。
+收尾阶段不允许执行代码，计算和绘图需要提前完成。
+
+**这是本地代码执行，不是安全沙箱。** 子进程仅继承少量系统环境变量，不继承 API Key、其它业务环境变量或 PYTHONPATH；
+但仍能以当前用户权限读写任务目录以外的文件、访问网络，也可能主动读取 `.env`。只应在可信本地环境使用；
+Docker 的文件、网络与资源限制属于后续增强。
 
 ### 如何添加一个新工具
 
@@ -212,6 +233,7 @@ tools/
   search.py    # web_search + 可替换的搜索后端（当前 ddgs）
   fetch.py     # fetch_url：下载、正文提取、分段、缓存、Jina Reader 备用通道
   report.py    # write_report：安全地写报告文件，并自动检查计划完成度与引用来源
+  code_exec.py # run_python：独立子进程、精简环境、超时清理、有界输出与产物路径
   plan.py      # update_plan：更新计划中子任务的状态
   notes.py     # save_note / read_notes
   session.py   # 一个任务内各工具共享的状态（读过的网页、笔记）

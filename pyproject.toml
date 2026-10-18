@@ -18,6 +18,9 @@ dependencies = [
     "trafilatura>=1.12",
     "beautifulsoup4>=4.12",
     "lxml>=5.0",
+    # 阶段 6：数据计算与非交互绘图
+    "pandas>=2.2",
+    "matplotlib>=3.8",
 ]
 
 [project.optional-dependencies]

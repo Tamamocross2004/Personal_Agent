@@ -7,6 +7,7 @@ from pathlib import Path
 import httpx
 
 from tools.basic import calculator, days_between, get_current_time
+from tools.code_exec import make_run_python
 from tools.fetch import make_fetch_url
 from tools.registry import Tool, ToolRegistry, ToolResult, tool
 from tools.notes import make_notes_tools
@@ -24,6 +25,7 @@ def default_registry(
     jina_api_key: str = "",
     session: ResearchSession | None = None,
     on_plan_update: callable = None,
+    code_exec_timeout: float = 30.0,
 ) -> ToolRegistry:
     """为一次研究任务组装全部工具。
 
@@ -39,6 +41,7 @@ def default_registry(
             *make_notes_tools(task_dir, session),
             make_update_plan(task_dir, on_update=on_plan_update),
             make_write_report(task_dir, session),
+            make_run_python(task_dir, timeout=code_exec_timeout),
             calculator,
             days_between,
             get_current_time,

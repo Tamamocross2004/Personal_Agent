@@ -169,7 +169,7 @@ class ToolRegistry:
         except Exception as e:  # noqa: BLE001 —— 工具内部的任何异常都要交给模型处理
             return ToolResult(f"ERROR: {type(e).__name__}: {e}", True)
 
-        return ToolResult(_to_text(result))
+        return result if isinstance(result, ToolResult) else ToolResult(_to_text(result))
 
 
 def _to_text(result: Any) -> str:
