@@ -15,7 +15,7 @@
 - [x] 阶段 6：代码执行（run_python、超时清理、计算与绘图；验收记录见 ROADMAP）
 - [x] 阶段 7：报告质量（来源分级、引用/图片检查、独立审稿与修订；结果见 ROADMAP）
 - [x] 阶段 8：长期记忆（SQLite/FTS5、中英文检索、历史背景注入与管理命令；验收见 ROADMAP）
-- [ ] 阶段 9：评估
+- [x] 阶段 9：评估（固定题集、离线回归、真实评估、结果复查和基线对比；持续迭代）
 
 每个阶段完成后打一个 git 标签（`stage-0`、`stage-1`…），可以用 `git diff stage-0 stage-1` 查看某一阶段具体改了什么。
 
@@ -49,6 +49,8 @@ python -m agent.compare --last 2       # 对比最近两次运行的 token、缓
 python -m agent.simulate <任务目录>    # 离线评估不同压缩阈值的成本
 python -m agent.cache_probe            # 测试不同请求写法能否命中厂商的前缀缓存（约 5 万输入 token）
 python -m agent.memory list            # 查看已保存的研究记忆（不需要 API Key）
+python -m agent.evaluate list          # 查看离线和真实模型题集（不调用 API）
+python -m agent.evaluate offline       # 离线固定回归，输出 JSON / Markdown 汇总
 
 # 5. 测试（无需 API Key）
 pytest
@@ -170,6 +172,59 @@ python -m agent.simulate <任务目录> --thresholds 0 20000 60000 --hit-price 0
 | `days_between(start_date, end_date)` | 两个日期相差的天数 | 大小月、闰年容易算错 |
 | `calculator(expression)` | 安全计算数学表达式 | 模型心算不可靠；基于 AST 白名单实现，不使用 `eval` |
 
+### 固定题集评估
+
+```powershell
+# 不调用 API：8 组固定回归（需要安装 dev 测试依赖）
+.\.venv\Scripts\python.exe -m agent.evaluate offline
+
+# 显式触发真实 API：8 题完整评估，默认 DeepSeek 或 .env 指定厂商
+.\.venv\Scripts\python.exe -m agent.evaluate live --provider deepseek
+
+# 只跑一题；记忆追问会自动先运行 memory_seed
+.\.venv\Scripts\python.exe -m agent.evaluate live --provider deepseek --case cost_components
+.\.venv\Scripts\python.exe -m agent.evaluate live --provider deepseek --case memory_followup
+```
+
+真实题集包含官方文档研究、固定虚构价格的计算/绘图与分项校验、资料冲突、证据不足、来源渠道、记忆基线和追问。
+固定价格题给定两款虚构型号及 CSV/报告列格式，用独立 Decimal 公式逐项核对用量、单价、输入/输出/总费用。
+即使模型审稿“未发现问题”，总额正确而分项抄错也会判失败。自由文本题的关键词检查仅是必要条件，仍需人工抽查结论。
+
+每次评估保存到新的 `workspace/evaluations/<时间>-<ID>/`，含 `results.json`、`report.md`；
+离线模式额外保存 `pytest.log`、`junit.xml`，真实模式在 `cases/` 中保留每题的报告、trace、审稿记录等。
+结果记录题集和代码 SHA-256、Git 版本与工作区状态、白名单模型参数、逐题检查与指标，不保存 API Key。
+评估使用独立任务目录，记忆题每次重复使用自己的数据库，不读取或污染日常研究记忆。
+
+真实评估可设置 `--max-steps 15 --budget 80000 --suite-budget 400000 --review-calls 2 --repeat 1`。
+以上为默认值；等效 token 预算是软预算，强制收尾可能超出。每题用量包含规划、研究和独立审稿；不是人民币价格。
+`--repeat` 可设 1–3 次，记忆数据库按重复次数隔离。失败依赖、预算耗尽、未运行或中断的题目都会保留，不从通过率分母中消失。
+
+查看旧结果或对比基线都不调用 API：
+
+```powershell
+# task_dir 应是该固定题集生成的单题目录；检查过程不改写原报告
+.\.venv\Scripts\python.exe -m agent.evaluate inspect <task_dir> --case cost_components
+
+# 评分器修正后，复查整份已有评估，不重跑模型，不改写原任务
+.\.venv\Scripts\python.exe -m agent.evaluate rescore <results.json>
+
+# --out 必须是新目录，不能覆盖已有基线
+.\.venv\Scripts\python.exe -m agent.evaluate offline --out workspace/evaluations/baseline-a
+.\.venv\Scripts\python.exe -m agent.evaluate offline --out workspace/evaluations/baseline-b
+.\.venv\Scripts\python.exe -m agent.evaluate compare workspace/evaluations/baseline-a/results.json workspace/evaluations/baseline-b/results.json
+```
+
+对比会列出通过率、步数、耗时、等效 token 的差异及候选退化题。
+只有完成运行且题集版本、评分器 SHA-256、题目选择和重复次数相同才直接对比；离线与真实结果不混比。
+评分器改变时可先用 `rescore` 将两份已有真实结果按同一版本复查；它保留原执行代码的哈希，指标来自原始 trace，不代表重新跑过模型。
+如果题目或标准答案已经改变，`rescore` 会拒绝重评，需要重新运行对应题集。
+对比不同模型时分别传 `--provider` / `--model`，并核对报告中的预算、温度和审稿配置；联网波动和模型采样可能影响结果。
+退出码：0 全部通过，1 有失败/跳过/未完成，2 参数或执行器错误，130 中断。
+
+离线集验证程序机制，不测真实模型语义能力；真实评估也不是独立事实认证。
+审稿耗尽（`skipped_limit`）、失败或与报告哈希不匹配都不能算通过，即使已有报告文件。
+成本题规定了英文 CSV/表格列；格式不匹配会导致自动检查失败，不能据此直接断言模型算术错误，需查看逐项检查详情。
+
 ### 长期研究记忆
 
 研究任务结束后自动将问题、摘要/结论/局限性、来源与发布日期、报告路径、完成及质量状态存入
@@ -288,6 +343,9 @@ agent/
   loop.py      # ★ Agent 主循环：调用模型 → 执行工具 → 回传结果 → 循环，以及各种运行保护
   context.py   # 上下文估算与压缩
   memory.py    # SQLite/FTS5 研究记忆、历史背景格式化与管理 CLI
+  evaluate.py  # 离线/真实题集执行、结果保存、只读复查与基线比较
+  eval_checks.py # 独立数值校验、引用/图片/审稿/记忆检查与 trace 指标
+  eval_cases.json # 版本化固定题集（离线 8 组、真实 8 题）
   planner.py   # 开局拆解研究计划（plan.json）
   quality.py   # 引用、来源、结构、本地图片机械检查
   review.py    # 独立报告审稿提示、证据打包、结构校验与结果记录

@@ -22,6 +22,7 @@ import json
 import sqlite3
 import sys
 from datetime import date
+from pathlib import Path
 from typing import Any
 
 import openai
@@ -78,9 +79,9 @@ def read_input() -> str | None:
 # ---------------------------------------------------------------------------
 
 
-def research(llm: LLMClient, settings: Settings, question: str, max_steps: int, budget: int) -> AgentResult:
+def research(llm: LLMClient, settings: Settings, question: str, max_steps: int, budget: int, *, task_dir: Path | None = None) -> AgentResult:
     """运行一次研究任务：独立的工作目录、工具实例和运行日志。"""
-    task_dir = new_task_dir(question)
+    task_dir = task_dir or new_task_dir(question)
     tracer = TraceWriter(task_dir / TRACE_FILE)
     session = ResearchSession()  # 本任务内工具共享的状态：读过的网页、笔记
     memory_store = MemoryStore(settings.memory_db_path) if settings.memory_enabled else None

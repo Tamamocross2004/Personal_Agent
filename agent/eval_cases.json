@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "offline": [
+    {"id": "numeric_components", "title": "成本分项/总额及报告与CSV一致性", "selectors": ["tests/test_evaluation.py::test_component_error_is_detected_even_if_total_correct", "tests/test_evaluation.py::test_csv_and_report_must_match_fixed_inputs"]},
+    {"id": "source_identity", "title": "社区/第三方不能冒充官方", "selectors": ["tests/test_report_quality.py::test_community_and_third_party_cannot_be_labeled_official"]},
+    {"id": "citations", "title": "引用编号与API地址误报", "selectors": ["tests/test_report_quality.py::test_numbered_references_missing_duplicate_unused", "tests/test_report_quality.py::test_complete_report_passes_and_api_endpoints_are_not_evidence"]},
+    {"id": "images", "title": "缺失/损坏/越界图片", "selectors": ["tests/test_report_quality.py::test_missing_escaping_and_corrupt_images"]},
+    {"id": "review_revision", "title": "矛盾反馈后修订（脚本模型，非语义能力测试）", "selectors": ["tests/test_report_review.py::test_independent_review_feedback_revision_and_usage_accounting"]},
+    {"id": "review_limits", "title": "审稿次数耗尽/失败不能记为通过", "selectors": ["tests/test_report_review.py::test_review_limit_marks_new_version_unreviewed", "tests/test_report_review.py::test_invalid_or_truncated_reviews_never_pass"]},
+    {"id": "code_plot", "title": "真实子进程计算、绘图与错误恢复", "selectors": ["tests/test_code_exec.py::test_agent_recovers_computes_plots_and_links_report"]},
+    {"id": "memory_followup", "title": "跨任务记忆召回及关闭记忆", "selectors": ["tests/test_memory.py::test_two_research_calls_recall_into_planner_and_main_loop"]}
+  ],
+  "live": [
+    {"id": "official_research", "title": "联网研究与已读引用", "prompt": "读取 Python 官方文档 https://docs.python.org/3/library/sqlite3.html ，用中文简述 Connection 上下文管理器是否会自动关闭连接，以及应如何关闭。只研究这个问题，阅读原文并记笔记后写报告，不扩展范围。", "required_tools": ["fetch_url", "save_note"], "min_sources": 1},
+    {"id": "cost_plot", "title": "固定价格计算与绘图", "prompt": "以下是用户给定的虚构测试单价，不是真实产品价格，无需联网：EvalAlpha 输入2元/百万token、输出8元/百万；EvalBeta 输入9元/百万、输出27元/百万。输入100000、输出10000 token，不命中缓存。用Python计算并生成 costs.csv 和 costs.png。报告正文必须有英文表头 model | input_cost | output_cost | total_cost 的费用表（金额单位元），行名为 EvalAlpha/EvalBeta。不要只写总额。", "required_tools": ["run_python"], "require_image": true, "numeric": {"input_tokens": 100000, "output_tokens": 10000}},
+    {"id": "cost_components", "title": "总额正确时仍核对每个分项", "prompt": "用户给定虚构测试价格：EvalAlpha 输入2元/百万token、输出8元/百万；EvalBeta 输入9元/百万、输出27元/百万。输入200000、输出10000 token，不命中缓存，无需联网。用Python导出 costs.csv，报告必须有英文表头 model | input_cost | output_cost | total_cost 的费用表（单位元），行名 EvalAlpha/EvalBeta，确保输入分项与总额同时正确。", "required_tools": ["run_python"], "numeric": {"input_tokens": 200000, "output_tokens": 10000}},
+    {"id": "conflicting_sources", "title": "给定资料冲突与局限", "prompt": "以下两段是用户提供的虚构测试材料，无需联网：资料甲（2026-10-01）称产品X上下文为128K；资料乙（2026-10-02）称为256K，均未说明版本和测试条件。只依据这些材料写简短报告，呈现冲突，不把较新日期直接当作更可信，不编造网址、测评或确定结论。", "required_patterns": ["128K", "256K", "冲突|矛盾|不一致", "无法|不能|未核实|不确定"]},
+    {"id": "limited_evidence", "title": "小样本不推导跨厂商赢家", "prompt": "用户给定虚构资料：仅对产品A的两个版本共做51次工具调用测试，得分49/51和48/51；没有产品B、C的测试。能否据此认定A在A/B/C中最稳定？只根据这些资料写简短报告，明确样本与比较对象，不能编造其他数据；无需联网。", "required_patterns": ["51", "不能|无法|不足|不支持"], "forbidden_claims": ["A.{0,8}(?:最稳定|最强)"]},
+    {"id": "source_channels", "title": "区分社区与第三方来源", "prompt": "无需联网，只按已知来源渠道规则写简短说明报告：developer.aliyun.com/article 是开发者社区文章；deepseekagent.io 是第三方网站，不能当成厂商官方模型卡。明确两者都不能仅凭标题充当官方定价依据。说明性地址请放在行内代码中，不把未读链接列作引用。", "required_patterns": ["社区", "第三方", "不能|不应|不可"]},
+    {"id": "memory_seed", "title": "建立隔离的记忆基线", "memory": true, "prompt": "记忆评估专用固定测试数据（并非真实产品，不需联网）：EvalAlpha 输入2元/百万、输出8元/百万token；EvalBeta 输入9元/百万、输出27元/百万。输入100000、输出10000，不命中缓存，人民币。用Python导出 costs.csv，报告写明型号、输入输出量、单价和假设，包含英文表头 model | input_cost | output_cost | total_cost 的两行费用表。保留这些固定测试假设供下次追问。", "required_tools": ["run_python"], "numeric": {"input_tokens": 100000, "output_tokens": 10000}},
+    {"id": "memory_followup", "title": "只靠历史找回型号与口径", "memory": true, "depends_on": "memory_seed", "prompt": "沿用上次用户给定的固定虚构测试型号和单价（不是当前产品价格，无需联网核实），输入量翻倍、输出不变。用Python导出 costs.csv，报告英文表头 model | input_cost | output_cost | total_cost，行名沿用历史型号，说明历史日期和本次用量。", "required_tools": ["run_python"], "require_recall": true, "numeric": {"input_tokens": 200000, "output_tokens": 10000}}
+  ]
+}
