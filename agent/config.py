@@ -1,6 +1,6 @@
 """配置加载。
 
-所有可调参数都从环境变量 / .env 读取，代码里不写死任何 Key。
+API Key 默认只从项目 .env 读取，其他参数仍可由环境变量覆盖；代码里不写死 Key。
 国产主流大模型都提供 OpenAI 兼容接口，因此"切换厂商"只是换 base_url + api_key + model。
 """
 
@@ -8,9 +8,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal
+from typing import Any, Callable, Literal
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
 from pydantic import Field
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -43,6 +43,24 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",
     )
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> tuple[PydanticBaseSettingsSource | Callable[[], dict[str, Any]], ...]:
+        def project_api_keys() -> dict[str, Any]:
+            values = dotenv_settings()
+            # 缺失项也显式置空，禁止回退到环境变量或其他隐式密钥源。
+            return {name: values.get(name) or "" for name in settings_cls.model_fields
+                    if name.endswith("_api_key")}
+
+        # 程序显式传参仍优先，供测试/受控调用；其余参数保持原环境变量优先级。
+        return init_settings, project_api_keys, env_settings, dotenv_settings, file_secret_settings
 
     llm_provider: ProviderName = "deepseek"
     llm_model: str | None = None
@@ -113,7 +131,7 @@ def load_llm_config(
     model: str | None = None,
     settings: Settings | None = None,
 ) -> LLMConfig:
-    """合并 预设 ← .env ← 函数参数（命令行），优先级从低到高。"""
+    """合并预设、Settings 和命令行覆盖；默认密钥仅由项目 .env 提供。"""
     s = settings or Settings()
     name = provider or s.llm_provider
     if name not in PROVIDERS:
@@ -123,7 +141,7 @@ def load_llm_config(
     api_key = getattr(s, preset.key_field)
     if not api_key:
         env_name = preset.key_field.upper()
-        raise ValueError(f"未配置 {env_name}。请在 .env 中填写（参考 .env.example）。")
+        raise ValueError(f"未配置项目 API Key {env_name}。请在本项目 .env 中填写（参考 .env.example）；不再使用全局环境变量中的 Key。")
 
     # .env 里的 LLM_MODEL / LLM_BASE_URL 是针对 LLM_PROVIDER 写的；
     # 如果命令行临时切换到别的厂商，就不再沿用它们，改用该厂商预设。

@@ -7,8 +7,8 @@ from agent.config import Settings
 def isolate_env(monkeypatch):
     """测试与本机环境隔离。
 
-    pydantic-settings 除了读 .env，还会读系统环境变量（且优先级更高）。
-    如果本机设置过 DEEPSEEK_API_KEY 等变量，测试结果就会受影响，所以每个测试前都清掉。
+    非密钥参数仍允许系统环境变量覆盖 .env，因此每个测试前清掉同名变量。
+    API Key 的项目文件限制由配置回归单独验证。
     """
     for name in Settings.model_fields:
         monkeypatch.delenv(name.upper(), raising=False)

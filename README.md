@@ -182,7 +182,7 @@ python -m agent.simulate <任务目录> --thresholds 0 20000 60000 --hit-price 0
 | `custom` | 任意 OpenAI 兼容服务 | `CUSTOM_API_KEY` | 需设置 `LLM_MODEL` |
 
 > 默认模型名只是起点，各家更新很快，请以官方文档为准，用 `LLM_MODEL` 或 `--model` 覆盖。
-> 注意：系统环境变量的优先级高于 `.env`，如果改了 `.env` 不生效，检查是否设置了同名系统变量。
+> API Key 默认只从本项目 `.env` 读取，包括模型厂商与可选 Jina Key；不会被 Windows/进程环境变量覆盖。项目 Key 缺失或留空时不回退全局 Key，模型调用会明确报错。模型、地址、预算等非密钥参数仍保持“环境变量高于 `.env`”，命令行模型/厂商选项优先。程序内显式传入的 Settings 参数仍可用于测试和受控调用。
 
 ## 可用工具
 
