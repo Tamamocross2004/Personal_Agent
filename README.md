@@ -14,7 +14,7 @@
 - [x] 阶段 5：规划与反思（按维度规划、进度跟踪、报告自动检查、步数提醒与收尾阶段；2026-10-18 复测结果见 ROADMAP）
 - [x] 阶段 6：代码执行（run_python、超时清理、计算与绘图；验收记录见 ROADMAP）
 - [x] 阶段 7：报告质量（来源分级、引用/图片检查、独立审稿与修订；结果见 ROADMAP）
-- [ ] 阶段 8：长期记忆
+- [x] 阶段 8：长期记忆（SQLite/FTS5、中英文检索、历史背景注入与管理命令；验收见 ROADMAP）
 - [ ] 阶段 9：评估
 
 每个阶段完成后打一个 git 标签（`stage-0`、`stage-1`…），可以用 `git diff stage-0 stage-1` 查看某一阶段具体改了什么。
@@ -41,12 +41,14 @@ python main.py "DeepSeek 最新模型支持哪些功能？"
 python main.py                         # 研究模式交互（每个问题独立运行）
 python main.py --chat                  # 纯对话模式（阶段 0，无工具）
 python main.py --provider qwen "..."   # 临时切换厂商
+python main.py --no-memory "..."       # 本次不读写长期记忆
 python main.py --max-steps 40 --budget 400000 "..."   # 调整步数 / 等效 token 预算（默认 30 步 / 30 万）
 python -m agent.replay                 # 回放最近一次任务的运行日志（不花钱）
 python -m agent.replay <任务目录> --full
 python -m agent.compare --last 2       # 对比最近两次运行的 token、缓存、笔记、引用等指标
 python -m agent.simulate <任务目录>    # 离线评估不同压缩阈值的成本
-python -m agent.cache_probe            # 测试不同请求写法能否命中厂商的前缀缓存（约 2 万 token）
+python -m agent.cache_probe            # 测试不同请求写法能否命中厂商的前缀缓存（约 5 万输入 token）
+python -m agent.memory list            # 查看已保存的研究记忆（不需要 API Key）
 
 # 5. 测试（无需 API Key）
 pytest
@@ -85,6 +87,7 @@ pytest
 | `plan.json` | 研究计划（开局按报告要回答的方面拆成 3–6 个子任务，`update_plan` 更新状态） |
 | `trace.jsonl` | 运行日志，每行一个事件（模型调用、工具调用、结果、耗时、token……），用 `python -m agent.replay` 回放 |
 | `messages.json` | 结束时完整的对话历史，排查“模型为什么这么做”时看这里 |
+| `memory_context.json` | 本次召回的历史记录 ID 与实际注入的背景；无历史命中时不生成 |
 | `<报告名>.quality.json` | 最终机械检查：计划、章节、引用编号、来源及图片，含对应报告文本的 SHA-256 |
 | `<报告名>.review.json` | 最新语义审稿结果、状态及报告文本 SHA-256 |
 | `<报告名>.reviews.jsonl` | 历次审稿与跳过记录，避免修订后误用旧审稿结论 |
@@ -167,6 +170,42 @@ python -m agent.simulate <任务目录> --thresholds 0 20000 60000 --hit-price 0
 | `days_between(start_date, end_date)` | 两个日期相差的天数 | 大小月、闰年容易算错 |
 | `calculator(expression)` | 安全计算数学表达式 | 模型心算不可靠；基于 AST 白名单实现，不使用 `eval` |
 
+### 长期研究记忆
+
+研究任务结束后自动将问题、摘要/结论/局限性、来源与发布日期、报告路径、完成及质量状态存入
+`workspace/memory.sqlite3`。不额外调用模型总结，也不自动导入以前的任务目录。
+“研究完成”与“质量通过”分别记录：正常结束但审稿有问题的报告不会因此变成已验证事实。
+中断/失败任务有报告或笔记时以未完成记录保存；没有报告也没有笔记的对话不存储。
+
+下次研究先用 SQLite FTS5 搜索问题和摘要，召回最多 3 条、总计最多约 6000 字符的历史背景。
+中文使用相邻双字切分，英文按词检索；普通问题无关键词命中时不注入无关记录。
+出现“沿用上次”“上次的型号”等明确追问时，优先带入最近一次研究，因此可连续提问：
+
+```powershell
+.\.venv\Scripts\python.exe main.py "比较两个模型输入10万、输出1万token的API成本"
+.\.venv\Scripts\python.exe main.py "沿用上次的型号，输入量翻倍而输出不变，费用是多少？"
+```
+
+历史背景带日期、来源和质量状态，同时进入规划与研究上下文，作为数据发送给当前 LLM。
+它不能替代当前任务的证据；价格、版本等时效事实仍需重新读取来源并记笔记。
+第一版不使用向量检索，也不推断或保存用户偏好；中文分词和“上次”的识别均为简单规则。
+
+管理命令不调用 LLM、不需要 API Key：
+
+```powershell
+.\.venv\Scripts\python.exe -m agent.memory list
+.\.venv\Scripts\python.exe -m agent.memory search "DeepSeek 价格"
+.\.venv\Scripts\python.exe -m agent.memory show 1
+.\.venv\Scripts\python.exe -m agent.memory delete 1
+# 指定另一个数据库：--db 写在子命令之前
+.\.venv\Scripts\python.exe -m agent.memory --db workspace/demo.sqlite3 list
+```
+
+`delete` 只删除数据库记录和检索索引，保留报告及已有任务中的背景快照。
+`MEMORY_ENABLED=false` 或 `--no-memory` 同时关闭本次召回和保存，纯对话 `--chat` 不使用研究记忆。
+默认路径位于已被 Git 忽略的 workspace；自定义数据库路径相对于项目根目录。
+数据库不可用时提示并继续研究，不影响报告保存。需要 Python 的 SQLite 带 FTS5 支持。
+
 ### 报告检查与审稿
 
 报告采用摘要 → 方法与范围 → 分维度正文 → 结论 → 局限性 → 参考资料的结构。
@@ -248,6 +287,7 @@ agent/
   llm.py       # LLM 客户端：OpenAI 兼容协议、tenacity 重试、用量统计
   loop.py      # ★ Agent 主循环：调用模型 → 执行工具 → 回传结果 → 循环，以及各种运行保护
   context.py   # 上下文估算与压缩
+  memory.py    # SQLite/FTS5 研究记忆、历史背景格式化与管理 CLI
   planner.py   # 开局拆解研究计划（plan.json）
   quality.py   # 引用、来源、结构、本地图片机械检查
   review.py    # 独立报告审稿提示、证据打包、结构校验与结果记录

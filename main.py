@@ -18,6 +18,8 @@ from __future__ import annotations
 
 import argparse
 import logging
+import json
+import sqlite3
 import sys
 from datetime import date
 from typing import Any
@@ -32,6 +34,7 @@ from agent.context import ContextCompactor
 from agent.display import console, show_event, usage_table
 from agent.llm import LLMClient
 from agent.loop import FINALIZE_REASONS, Agent, AgentResult, TokenWeights
+from agent.memory import MemoryStore, format_context, save_research
 from agent.prompts import CHAT_SYSTEM_PROMPT, research_system_prompt
 from agent.quality import inspect_report, save_check
 from agent.review import save_review
@@ -47,6 +50,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p = argparse.ArgumentParser(description="个人研究助理 Agent")
     p.add_argument("question", nargs="?", help="要提问的问题；省略则进入交互模式")
     p.add_argument("--chat", action="store_true", help="纯对话模式（不使用工具，阶段 0 行为）")
+    p.add_argument("--no-memory", action="store_true", help="本次不读取或写入长期记忆")
     p.add_argument("--provider", choices=list(PROVIDERS), help="覆盖 .env 中的 LLM_PROVIDER")
     p.add_argument("--model", help="覆盖模型名")
     p.add_argument("--max-steps", type=int, help="最大循环步数（默认取 .env 的 AGENT_MAX_STEPS，30）")
@@ -79,6 +83,19 @@ def research(llm: LLMClient, settings: Settings, question: str, max_steps: int, 
     task_dir = new_task_dir(question)
     tracer = TraceWriter(task_dir / TRACE_FILE)
     session = ResearchSession()  # 本任务内工具共享的状态：读过的网页、笔记
+    memory_store = MemoryStore(settings.memory_db_path) if settings.memory_enabled else None
+    memory_context = ""
+    if memory_store:
+        try:
+            records = memory_store.search(question, limit=settings.memory_recall_limit, followup=True)
+            memory_context = format_context(records, settings.memory_context_max_chars)
+            if records:
+                task_dir.mkdir(parents=True, exist_ok=True)
+                (task_dir / "memory_context.json").write_text(
+                    json.dumps({"query": question, "record_ids": [r["id"] for r in records], "context": memory_context},
+                               ensure_ascii=False, indent=2), encoding="utf-8")
+        except (OSError, sqlite3.Error, ValueError) as exc:
+            console.print(f"[yellow]历史记忆不可用（{type(exc).__name__}），本次继续研究。[/]")
     compactor = (
         ContextCompactor(
             threshold=settings.context_compact_threshold,
@@ -109,6 +126,7 @@ def research(llm: LLMClient, settings: Settings, question: str, max_steps: int, 
         review_max_calls=settings.report_review_max_calls,
         review_max_tokens=settings.report_review_max_tokens,
         research_session=session,
+        memory_context=memory_context,
     )
     try:
         result = agent.run(question)
@@ -131,6 +149,13 @@ def research(llm: LLMClient, settings: Settings, question: str, max_steps: int, 
         console.print("[dim]本次没有生成报告文件。[/]")
     if session.notes:
         console.print(f"[dim]笔记：{task_dir / NOTES_FILE}（{len(session.notes)} 条）[/]")
+    if memory_store:
+        try:
+            memory_id = save_research(memory_store, task_dir, question, result, session, reports)
+            if memory_id is not None:
+                console.print(f"[dim]已保存研究记忆 #{memory_id}（{memory_store.path}）。[/]")
+        except (OSError, sqlite3.Error, ValueError) as exc:
+            console.print(f"[yellow]记忆保存失败（{type(exc).__name__}），报告和日志已保留。[/]")
     console.print(f'[dim]运行日志：{task_dir}  （回放：python -m agent.replay "{task_dir}"）[/]')
     if result.error and "AuthenticationError" in result.error:
         console.print("[red]鉴权失败：请检查 API Key 是否正确、是否与所选厂商匹配。[/]")
@@ -145,7 +170,8 @@ def run_research(llm: LLMClient, settings: Settings, question: str | None, max_s
         if result.stop_reason == "interrupted":
             return 130  # 约定俗成：被 Ctrl+C 中断的进程退出码
         return 1 if result.stop_reason in FAILED_STOPS else 0
-    console.print("[dim]研究模式：每个问题独立运行（暂无跨问题记忆）。运行中按 Ctrl+C 中断当前任务，输入 exit 退出。[/]")
+    memory_mode = "历史记忆已启用" if settings.memory_enabled else "历史记忆已关闭"
+    console.print(f"[dim]研究模式：每个问题独立运行，{memory_mode}。运行中按 Ctrl+C 中断当前任务，输入 exit 退出。[/]")
     while (q := read_input()) is not None:
         research(llm, settings, q, max_steps, budget)
     return 0
@@ -195,6 +221,8 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         settings = Settings()
+        if args.no_memory:
+            settings = settings.model_copy(update={"memory_enabled": False})
         cfg = load_llm_config(provider=args.provider, model=args.model, settings=settings)
     except ValueError as e:
         console.print(f"[red]配置错误：{e}[/]")

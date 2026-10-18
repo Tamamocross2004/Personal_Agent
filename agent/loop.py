@@ -172,6 +172,7 @@ class Agent:
         review_max_calls: int = 2,
         review_max_tokens: int = 2048,
         research_session=None,
+        memory_context: str = "",
     ):
         self.llm = llm
         self.registry = registry
@@ -194,6 +195,7 @@ class Agent:
         self.review_max_calls = review_max_calls
         self.review_max_tokens = review_max_tokens
         self.research_session = research_session
+        self.memory_context = memory_context
 
     # ------------------------------------------------------------------
     # 对外接口
@@ -218,6 +220,8 @@ class Agent:
             {"role": "system", "content": self.system_prompt},
             {"role": "user", "content": question},
         ]
+        if self.memory_context:
+            messages.insert(1, {"role": "user", "content": self.memory_context})
         self._emit(
             "run_start",
             question=question,
@@ -227,6 +231,8 @@ class Agent:
             tools=self.registry.names,
         )
         started = time.perf_counter()
+        if self.memory_context:
+            self._emit("notice", text=f"已加载历史研究背景（{len(self.memory_context)} 字符），历史结论仍需核实。")
         try:
             self._plan(messages, question)
             stop, answer, error = self._loop(messages)
@@ -483,7 +489,7 @@ class Agent:
             return
         try:
             plan = generate_plan(
-                question,
+                question + ("\n\n" + self.memory_context if self.memory_context else ""),
                 lambda m, **kw: self._call_llm(m, None, None, purpose="planning", **kw),
                 self.task_dir,
                 today=date.today().isoformat(),

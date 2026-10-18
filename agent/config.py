@@ -72,6 +72,12 @@ class Settings(BaseSettings):
     report_review_max_calls: int = Field(default=2, ge=1, le=5)
     report_review_max_tokens: int = Field(default=2048, ge=256, le=8192)
 
+    # 阶段 8：本地研究记忆，读取与写入可整体关闭
+    memory_enabled: bool = True
+    memory_db_path: Path = PROJECT_ROOT / "workspace" / "memory.sqlite3"
+    memory_recall_limit: int = Field(default=3, ge=1, le=5)
+    memory_context_max_chars: int = Field(default=6000, ge=1500, le=20000)
+
     # ---- 上下文管理（阶段 4）----
     # 估算的上下文超过这个 token 数时，把旧的网页原文 / 搜索摘要移出上下文。设为 0 关闭压缩
     # 默认 6 万：压缩只作为"上下文太大"的保护，不作为省钱手段。
