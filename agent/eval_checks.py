@@ -142,14 +142,19 @@ def unsupported_claims(report: str, pattern: str) -> list[str]:
                 table_fragments.extend(cell for row in rows for i, cell in enumerate(row) if i not in rejected)
             lines[start:end] = [""] * (end - start)
     findings = []
+    rejected_label = re.compile(r"^(?:[-*]\s*)?(?:(?:不能|不可(?:以)?|不应(?:该)?|无法|不足以)(?:说|得出|支持|断言|认定|推导|认为|判断|证明|暗示|成立)(?:的(?:结论|表述|说法|判断))?|不支持的结论)(?:包括|有)?\s*[：:]")
     for line in lines + table_fragments:
         fragments = [line]
         for fragment in fragments:
             plain = fragment.replace('**', '').strip()
-            rejected_list = re.match(r"^(?:[-*]\s*)?(?:(?:不能|不可(?:以)?|不应(?:该)?|无法|不足以)(?:说|得出|支持|断言|认定|推导|认为|判断|证明|暗示|成立)(?:的(?:结论|表述|说法|判断))?|不支持的结论)(?:包括|有)?\s*[：:]", plain)
+            rejected_list = rejected_label.match(plain)
             if rejected_list and not re.search(r"但是|但|然而|不过", plain):
                 continue  # 明确的否定标签支配同一列表中的分号项。
             for sentence in re.split(r"(?<=[。！？?；;])|但是|但|然而|不过", fragment):
+                # 同行上一句可先说明已知事实，后一句才开始明确的否定列表。
+                # 转折已分开，后面的肯定断言仍须独立检查。
+                if rejected_label.match(sentence.replace('**', '').strip()):
+                    continue
                 if not re.search(pattern, sentence):
                     continue
                 normalized = re.sub(r"(?:不是|并非)(?:不能|不可(?:以)?|不应(?:该)?)", "可以", sentence.replace('**', ''))
