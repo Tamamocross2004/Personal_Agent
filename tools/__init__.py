@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import re
 
 import httpx
 
@@ -35,11 +36,17 @@ def default_registry(
     session：本任务内工具共享的状态（读过的网页、笔记）。调用方传入后可以在外部读取，例如上下文压缩时。
     """
     session = session if session is not None else ResearchSession()
+    # 只依据当前用户明确约束；不从历史背景推断权限。非联网研究不需要伪造网页笔记。
+    offline = bool(re.search(r"无需联网|不需(?:要)?联网|不必联网|不要联网|禁止联网", question))
+    notes = make_notes_tools(task_dir, session)
+    network_tools = [] if offline else [
+        make_web_search(search_backend or DDGSBackend()),
+        make_fetch_url(http_client, fallback=fetch_fallback, jina_api_key=jina_api_key, pages=session.pages),
+    ]
     return ToolRegistry(
         [
-            make_web_search(search_backend or DDGSBackend()),
-            make_fetch_url(http_client, fallback=fetch_fallback, jina_api_key=jina_api_key, pages=session.pages),
-            *make_notes_tools(task_dir, session),
+            *network_tools,
+            *[t for t in notes if not offline or t.name != "save_note"],
             make_update_plan(task_dir, on_update=on_plan_update),
             make_write_report(task_dir, session, question=question),
             make_run_python(task_dir, timeout=code_exec_timeout),

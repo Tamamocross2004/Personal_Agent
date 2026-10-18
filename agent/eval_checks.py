@@ -11,6 +11,7 @@ from pathlib import Path
 
 from agent.quality import inspect_report
 from agent.review import fingerprint
+from agent.numeric_evidence import arithmetic_errors, price_ratio_errors
 from tools.fetch import Page
 from tools.session import Note, ResearchSession
 
@@ -58,6 +59,14 @@ def numeric_checks(task_dir: Path, report: str, specification: dict) -> list[dic
                            "input_cost": ci, "output_cost": co, "total_cost": ci + co}
     checks = []
     try:
+        with (task_dir / "costs.csv").open(encoding="utf-8-sig") as stream:
+            sample = stream.read(12001)
+        if len(sample) <= 12000:
+            ratio_errors = price_ratio_errors(report, sample)
+            checks.append(check("report_price_ratios", not ratio_errors, "；".join(ratio_errors)))
+    except OSError:
+        pass  # 下方 numeric_csv 负责文件缺失。
+    try:
         with (task_dir / "costs.csv").open(encoding="utf-8-sig", newline="") as stream:
             reader = csv.DictReader(stream)
             if not set(CSV_COLUMNS).issubset(reader.fieldnames or []):
@@ -69,6 +78,16 @@ def numeric_checks(task_dir: Path, report: str, specification: dict) -> list[dic
     for label, rows, fields in (("csv", csv_rows, CSV_COLUMNS[1:]), ("report", table_rows(report), TABLE_COLUMNS[1:])):
         for model, values in expected.items():
             matches = [row for row in rows if row.get("model") == model]
+            if label == "report":
+                # 同一当前数据被正文及 CSV 展示表重复呈现并非矛盾；历史/当前不同数值仍失败。
+                distinct = {}
+                for row in matches:
+                    try:
+                        key = tuple(decimal_value(row.get(field, "")) for field in fields)
+                    except (ValueError, InvalidOperation):
+                        key = tuple(row.get(field, "") for field in fields)
+                    distinct.setdefault(key, row)
+                matches = list(distinct.values())
             checks.append(check(f"{label}_{model}_unique", len(matches) == 1, f"找到 {len(matches)} 行"))
             if len(matches) != 1:
                 continue
@@ -79,6 +98,43 @@ def numeric_checks(task_dir: Path, report: str, specification: dict) -> list[dic
                 except (ValueError, InvalidOperation) as exc:
                     checks.append(check(f"{label}_{model}_{field}", False, str(exc)))
     return checks
+
+
+def unsupported_claims(report: str, pattern: str) -> list[str]:
+    """有限规则：按句子/转折分开判定，表格否定列保留列语境；不是通用语义认证。"""
+    report = re.sub(r"(?ms)^\s*(`{3,}|~{3,}).*?^\s*\1[^\n]*$", "", report)
+    lines = report.splitlines()
+    rejected_columns: set[int] = set()
+    findings = []
+    negative = r"不能|无法|不足|不支持|不应|不代表|未能|编造|不予采用|不成立|不可|无从"
+    for index, line in enumerate(lines):
+        cells = [c.strip() for c in line.strip().strip('|').split('|')]
+        is_table = line.strip().startswith('|')
+        if is_table and index + 1 < len(lines) and re.fullmatch(r"[|\s:-]+", lines[index + 1]):
+            rejected_columns = {i for i, cell in enumerate(cells) if re.search(r"不可|不能|不支持|不应|无法", cell)}
+            continue
+        if not is_table:
+            rejected_columns = set()
+        fragments = [cell for i, cell in enumerate(cells) if i not in rejected_columns] if is_table else [line]
+        for fragment in fragments:
+            plain = fragment.replace('**', '').strip()
+            rejected_list = re.match(r"^(?:[-*]\s*)?(?:不能得出|不可支持|不应断言|不能认定|不支持的结论)\s*[：:]", plain)
+            if rejected_list and not re.search(r"但是|但|然而|不过", plain):
+                continue  # 明确的否定标签支配同一列表中的分号项。
+            for sentence in re.split(r"(?<=[。！？?；;])|但是|但|然而|不过", fragment):
+                if not re.search(pattern, sentence):
+                    continue
+                normalized = sentence.replace("不是不能", "可以").replace("并非不能", "可以")
+                question = re.search(r"能否|是否|[？?]|若要|如果要|需补齐", normalized)
+                rejection = re.search(negative, normalized)
+                quoted_discussion = (re.search(r'''["“‘「]''', normalized)
+                                     and re.search(r"表述|说法|判断|命题|强行", normalized)
+                                     and re.search(r"缺少|缺乏|尚缺|无对照|未知|不存在|不具备", normalized))
+                conditions = re.search(r"(?:成立|认定).{0,8}(?:需要|前提|条件)|(?:所需|需要).{0,8}(?:证据|数据)", normalized)
+                if question or rejection or quoted_discussion or conditions:
+                    continue
+                findings.append(sentence.strip())
+    return findings
 
 
 def session_from_events(events: list[dict]) -> ResearchSession:
@@ -118,6 +174,7 @@ def assess_run(case: dict, task_dir: Path) -> dict:
     report_path = task_dir / "report.md"
     checks.append(check("report_exists", report_path.is_file()))
     report = report_path.read_text(encoding="utf-8") if report_path.is_file() else ""
+    checks.append(check("explicit_arithmetic", not arithmetic_errors(report), "；".join(arithmetic_errors(report))))
     session = session_from_events(events)
     quality = inspect_report(report, task_dir, session)
     checks.append(check("mechanical_quality", bool(report) and not quality.issues,
@@ -139,8 +196,7 @@ def assess_run(case: dict, task_dir: Path) -> dict:
     for pattern in case.get("required_patterns", []):
         checks.append(check(f"contains_{pattern}", bool(re.search(pattern, report, re.I))))
     for pattern in case.get("forbidden_claims", []):
-        unsupported = [line for line in report.splitlines() if re.search(pattern, line)
-                       and not re.search(r"不能|无法|不足|不支持|不应|不代表|未能|编造|不予采用|不成立|能否|是否|[？?]|若要|如果要|需补齐", line)]
+        unsupported = unsupported_claims(report, pattern)
         checks.append(check("no_unsupported_winner", not unsupported, "；".join(unsupported)))
     if case.get("numeric"):
         checks.extend(numeric_checks(task_dir, report, case["numeric"]))

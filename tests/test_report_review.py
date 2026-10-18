@@ -56,7 +56,7 @@ def test_invalid_or_truncated_reviews_never_pass(tmp_path, reply):
         completion(tool_calls=[("w", "write_report", {"content": BAD})]),
         completion(reply, finish_reason="length" if reply == '{"issues": []}' else "stop"),
         completion("完成但审稿失败"),
-    ])
+    ], review_max_calls=1)
     agent.run("检查")
     assert json.loads((tmp_path / "report.review.json").read_text(encoding="utf-8"))["status"] == "failed"
 
@@ -159,6 +159,45 @@ def test_finishing_same_text_after_draft_gets_fresh_review(tmp_path):
 def test_review_quote_must_match_report():
     with pytest.raises(ValueError):
         parse_verdict(json.dumps({"issues": [{**ISSUE, "quote": "假引用"}]}, ensure_ascii=False), BAD)
+
+
+def test_invalid_no_change_issue_repaired_within_original_call_limit(tmp_path):
+    invalid = json.dumps({"issues": [{**ISSUE, "message": "与证据一致，不构成矛盾。", "suggestion": "无需修改。"}]}, ensure_ascii=False)
+    agent, llm, events = agent_for(tmp_path, [
+        completion(tool_calls=[("write", "write_report", {"content": BAD})]),
+        completion(invalid), completion('{"issues": []}'), completion("结束"),
+    ])
+    result = agent.run("核查")
+    history = [json.loads(line) for line in (tmp_path / "report.reviews.jsonl").read_text(encoding="utf-8").splitlines()]
+    assert [r["status"] for r in history] == ["failed", "reviewed"]
+    assert len([e for e in events if e.kind == "llm_call" and e.data.get("purpose") == "report_review"]) == 2
+    assert result.total_tokens == 15 * len(llm.requests)
+
+
+def test_repeated_invalid_review_stays_failed_and_retains_raw_reply(tmp_path):
+    invalid = json.dumps({"issues": [{**ISSUE, "suggestion": "无需修改。"}]}, ensure_ascii=False)
+    agent, _, _ = agent_for(tmp_path, [
+        completion(tool_calls=[("write", "write_report", {"content": BAD})]),
+        completion(invalid), completion(invalid), completion("审稿失败"),
+    ])
+    agent.run("核查")
+    record = json.loads((tmp_path / "report.review.json").read_text(encoding="utf-8"))
+    assert record["status"] == "failed" and record["raw_response"] == invalid
+
+
+def test_mixed_valid_and_no_change_issues_preserve_actionable_feedback_and_review_slot(tmp_path):
+    mixed = json.dumps({"issues": [ISSUE, {**ISSUE, "suggestion": "无需修改。"}]}, ensure_ascii=False)
+    agent, _, _ = agent_for(tmp_path, [
+        completion(tool_calls=[("write", "write_report", {"content": BAD})]),
+        completion(mixed),
+        completion(tool_calls=[("fix", "write_report", {"content": FIXED})]),
+        completion('{"issues": []}'), completion("结束"),
+    ])
+    agent.run("核查")
+    history = [json.loads(line) for line in (tmp_path / "report.reviews.jsonl").read_text(encoding="utf-8").splitlines()]
+    assert [r["status"] for r in history] == ["partial", "reviewed"]
+    assert history[0]["issues"] == [ISSUE] and history[0]["raw_response"] == mixed
+    assert history[-1]["report_sha256"] == fingerprint(FIXED)
 
 
 def test_api_failure_preserves_report_and_records_failed_review(tmp_path):

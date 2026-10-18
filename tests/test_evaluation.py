@@ -157,6 +157,19 @@ def test_invalid_review_record_never_passes(tmp_path):
     ("能否认定产品A在A/B/C中最稳定？", True),
     ("任何‘A最稳定’的说法都属于编造数据，本报告不予采用。", True),
     ("若要回答A/B/C谁最稳定，需补齐同口径测试。", True),
+    ('"A在A/B/C中最稳定"是一个三者之间的比较判断，成立至少需要三个产品同口径数据。', True),
+    ('任何"A最稳定"的表述都隐含对未测对象的假设，这些假设在资料中不存在。', True),
+    ('若强行表述为"A最稳定"，属于无对照结论。', True),
+    ('不能认定B最强。但A最稳定。', False),
+    ('能否认定A最稳定？结论：A最稳定。', False),
+    ('不是不能说A最稳定。', False),
+    ('结论："A最稳定"。', False),
+    ('B和C的表现未知，A最稳定。', False),
+    ('缺少B的数据，结论：A最稳定。', False),
+    ('- **不能得出**：A比B稳定；A是三者中最稳定的；A优于任何未测试产品。', True),
+    ('- **不能得出**：B最强；但A是三者中最稳定的。', False),
+    ('| 可支持结论 | 不可支持结论 |\n|---|---|\n| A两个版本得分接近 | A最稳定 |', True),
+    ('| 不可支持结论 | 可支持结论 |\n|---|---|\n| B最强 | A最稳定 |', False),
 ])
 def test_questions_and_rejected_claims_are_not_affirmative_winners(tmp_path, statement, passed):
     evaluation_task(tmp_path)
@@ -166,6 +179,25 @@ def test_questions_and_rejected_claims_are_not_affirmative_winners(tmp_path, sta
     path.with_suffix(".review.json").write_text(json.dumps({"status": "reviewed", "issues": [], "report_sha256": fingerprint(text)}), encoding="utf-8")
     result = assess_run({"forbidden_claims": ["A.{0,8}(?:最稳定|最强)"]}, tmp_path)
     assert result["status"] == ("pass" if passed else "fail")
+
+
+def test_duplicate_identical_report_data_is_allowed_but_conflicting_history_still_fails(tmp_path):
+    report = numeric_fixture(tmp_path)
+    table = report[report.index("| model"):report.index("\n\n## 结论")]
+    spec = {"input_tokens": 200000, "output_tokens": 10000}
+    assert all(c["passed"] for c in numeric_checks(tmp_path, report + "\n\n" + table, spec))
+    changed = table.replace("0.40", "0.20")
+    assert any(not c["passed"] for c in numeric_checks(tmp_path, report + "\n\n" + changed, spec))
+
+
+def test_clean_semantic_review_cannot_override_wrong_derived_equation(tmp_path):
+    case = evaluation_task(tmp_path)
+    path = tmp_path / "report.md"
+    report = path.read_text(encoding="utf-8") + "\n输出单价 27 ÷ 8 = 4.5 倍。"
+    path.write_text(report, encoding="utf-8")
+    path.with_suffix(".review.json").write_text(json.dumps({"status": "reviewed", "issues": [], "report_sha256": fingerprint(report)}), encoding="utf-8")
+    result = assess_run(case, tmp_path)
+    assert any(c["name"] == "explicit_arithmetic" and not c["passed"] for c in result["checks"])
 
 
 def test_rescore_does_not_rerun_model_or_modify_original_artifacts(tmp_path, monkeypatch):

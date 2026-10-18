@@ -73,7 +73,8 @@ def metadata(mode: str, suite: dict, cases: list[dict]) -> dict:
             "suite_version": suite["version"], "suite_sha256": checksum,
             "git_revision": revision, "git_dirty": dirty, "code_sha256": code_digest.hexdigest(),
             "grader_sha256": hashlib.sha256((Path(__file__).with_name("eval_checks.py").read_bytes()
-                                             + Path(__file__).with_name("quality.py").read_bytes())).hexdigest(), "state": "running",
+                                             + Path(__file__).with_name("quality.py").read_bytes()
+                                             + Path(__file__).with_name("numeric_evidence.py").read_bytes())).hexdigest(), "state": "running",
             "definitions": cases,
             "cases": [{"id": c["id"], "title": c["title"], "status": "pending"} for c in cases]}
 

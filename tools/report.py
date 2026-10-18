@@ -16,6 +16,7 @@ from typing import Annotated, Literal
 from pydantic import Field
 
 from agent.quality import inspect_report, save_check
+from agent.numeric_evidence import arithmetic_errors, price_ratio_errors, report_cost_errors
 from tools.registry import Tool, tool
 from tools.session import ResearchSession
 
@@ -96,6 +97,16 @@ def make_write_report(task_dir: Path, session: ResearchSession | None = None, *,
             raise ValueError("尚未保存：完整报告缺少用户指定表头（原文及列顺序必须一致）："
                              + "；".join(" | ".join(header) for header in missing)
                              + "。请修正后重试；分段写作中间段请设 complete=false，最后一段设 true。")
+        errors = arithmetic_errors(full) if complete else []
+        csv_path = task_dir / "costs.csv"
+        if complete and csv_path.is_file() and not csv_path.is_symlink():
+            with csv_path.open(encoding="utf-8-sig", errors="replace") as stream:
+                sample = stream.read(12001)
+            if len(sample) <= 12000:
+                errors.extend(report_cost_errors(full, sample))
+                errors.extend(price_ratio_errors(full, sample))
+        if errors:
+            raise ValueError("尚未保存：数值检查失败，请核对计算结果：" + "；".join(errors))
         if mode == "append" and path.exists():
             with path.open("a", encoding="utf-8") as f:
                 f.write("\n\n" + content)

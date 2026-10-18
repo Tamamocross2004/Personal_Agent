@@ -48,7 +48,7 @@ from agent.context import ContextCompactor, estimate_messages, estimate_tools
 from agent.errors import classify_api_error
 from agent.planner import format_plan_for_prompt, generate_plan, load_plan, unfinished_tasks
 from agent.quality import inspect_report, save_check
-from agent.review import build_review_messages, fingerprint, parse_verdict, review_feedback, save_review
+from agent.review import ReviewValidationError, build_review_messages, fingerprint, parse_verdict, review_feedback, save_review
 from agent.prompts import (
     CONTINUE_PROMPT,
     EMPTY_REPLY_PROMPT,
@@ -402,10 +402,11 @@ class Agent:
                                                                question=self._question,
                                                                memory_context=self.memory_context,
                                                                previous_review=self._last_reviews.get(path.name))
-            projected = estimate_messages(review_messages) + self.review_max_tokens * self.token_weights.output
-            if self._equiv + projected >= self.token_budget:
-                record = save_review(path, report, "skipped_budget", [])
-            else:
+            while True:
+                projected = estimate_messages(review_messages) + self.review_max_tokens * self.token_weights.output
+                if self._equiv + projected >= self.token_budget:
+                    record = save_review(path, report, "skipped_budget", [])
+                    break
                 self._review_count += 1
                 self._reviewed_hashes.add(digest)
                 self._emit("notice", text=f"开始报告审稿：{path.name}（{self._review_count}/{self.review_max_calls}），用量计入预算。")
@@ -420,10 +421,22 @@ class Agent:
                         raise ValueError("审稿回复不完整")
                     issues = parse_verdict(raw_review, report)
                     record = save_review(path, report, "partial" if truncated else "reviewed", issues)
+                    break
                 except (openai.APIError, ValueError, IndexError) as exc:
-                    record = save_review(path, report, "failed", [], error_type=type(exc).__name__,
+                    valid_issues = exc.valid_issues if isinstance(exc, ReviewValidationError) else []
+                    record = save_review(path, report, "partial" if valid_issues else "failed", valid_issues, error_type=type(exc).__name__,
                                          error_detail=str(exc)[:2000] if isinstance(exc, ValueError) else "模型服务调用失败",
                                          raw_response=raw_review[:12000])
+                    if valid_issues:
+                        break  # 先落实有效意见，再用剩余次数审查修订稿；不能把 partial 当通过。
+                    if not isinstance(exc, ValueError) or self._review_count >= self.review_max_calls:
+                        break
+                    self._emit("notice", text="审稿回复未通过校验，在原次数和预算上限内要求纠正；失败记录已保留。")
+                    review_messages.extend([
+                        {"role": "assistant", "content": raw_review[:12000]},
+                        {"role": "user", "content": "上一回复未通过校验：" + str(exc)[:2000]
+                         + "。请重新审查原报告，返回符合 schema 的完整 JSON；只列实际存在且需要修改的问题，无问题则 issues=[]。"},
+                    ])
                 finally:
                     # 审稿是独立上下文，不能把其 token 数当作主对话下一轮的基准。
                     self._last_prompt = 0

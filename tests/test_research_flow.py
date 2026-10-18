@@ -60,6 +60,13 @@ def test_default_registry_tools(tmp_path):
     ]
 
 
+def test_explicit_offline_question_has_no_network_or_web_note_tools(tmp_path):
+    registry = default_registry(tmp_path, search_backend=FakeBackend(), question="固定虚构价格，不需要联网。")
+    assert not set(registry.names) & {"web_search", "fetch_url", "save_note"}
+    assert {"read_notes", "write_report", "run_python"}.issubset(registry.names)
+    assert registry.execute("fetch_url", {"url": "https://example.com"}).is_error
+
+
 def test_steps_run_out_then_wrapup_writes_real_report(tmp_path):
     """阶段 5 实测的情形：步数用完时还没写报告。
     现在收尾阶段可以 read_notes → write_report，且 write_report 的自动检查会指出未读的引用；不许再搜索。"""
