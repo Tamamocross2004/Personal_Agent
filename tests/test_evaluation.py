@@ -11,6 +11,19 @@ from agent.evaluate import compare_results, load_suite, main, parse_junit, selec
 from agent.review import fingerprint
 
 
+@pytest.mark.parametrize("round_number", [2, 3])
+def test_original_failed_reports_do_not_assert_a_winner(round_number):
+    from agent.eval_checks import unsupported_claims
+    report = (Path(__file__).parent / "fixtures" / f"limited_evidence_round{round_number}.md").read_text(encoding="utf-8")
+    assert unsupported_claims(report, r"A.{0,8}(?:最稳定|最强)") == []
+
+
+def test_original_memory_report_has_both_numeric_rows(tmp_path):
+    numeric_fixture(tmp_path)
+    report = (Path(__file__).parent / "fixtures" / "memory_followup_optional_pipes.md").read_text(encoding="utf-8")
+    assert all(item["passed"] for item in numeric_checks(tmp_path, report, {"input_tokens": 200000, "output_tokens": 10000}))
+
+
 def numeric_fixture(tmp_path, *, wrong_report=False, wrong_csv=False):
     # 人工计算的固定答案，与实现的 Decimal 公式独立：0.4+0.08=0.48；1.8+0.27=2.07。
     rows = [["EvalAlpha", 200000, 10000, 2, 8, 0.4, 0.08, 0.48],
@@ -171,6 +184,8 @@ def test_invalid_review_record_never_passes(tmp_path):
     ('不对B作评价，因此A最稳定。', False),
     ('不能评价B，因此A最稳定。', False),
     ('是否B最强，结论：A最稳定。', False),
+    ('因此"产品A在A/B/C中最稳定"这一结论缺少比较对象，无法成立。', True),
+    ('结论："A最稳定"，B的结论无法成立。', False),
     ('不对"A最稳定"作任何暗示，但结论是A最稳定。', False),
     ('- **不能得出**：A比B稳定；A是三者中最稳定的；A优于任何未测试产品。', True),
     ('- **不能得出**：B最强；但A是三者中最稳定的。', False),

@@ -137,8 +137,12 @@ def unsupported_claims(report: str, pattern: str) -> list[str]:
                 quoted_discussion = (re.search(r'''["“‘「]''', normalized)
                                      and re.search(r"表述|说法|判断|命题|强行", normalized)
                                      and re.search(r"缺少|缺乏|尚缺|无对照|未知|不存在|不具备", normalized))
+                # 否定的是引述后的“这一结论”，可跨逗号回指，不借用对其他对象的否定。
+                quoted_rejection = any(re.match(
+                    r'''["”’」]\s*(?:这一|该|此)?(?:结论|命题|说法|表述|判断)[^。！？;；]{0,60}(?:无法成立|不能成立|不成立)''',
+                    normalized[claim.end():]) for claim in claims)
                 conditions = re.search(r"(?:成立|认定).{0,8}(?:需要|前提|条件)|(?:所需|需要).{0,8}(?:证据|数据)|命题.{0,12}要求.{0,12}条件.*成立", normalized)
-                if question or rejection or quoted_discussion or conditions:
+                if question or rejection or quoted_discussion or quoted_rejection or conditions:
                     continue
                 findings.append(sentence.strip())
     return findings
