@@ -11,10 +11,11 @@ from agent.evaluate import compare_results, load_suite, main, parse_junit, selec
 from agent.review import fingerprint
 
 
-@pytest.mark.parametrize("round_number", [2, 3])
-def test_original_failed_reports_do_not_assert_a_winner(round_number):
+@pytest.mark.parametrize("fixture", ["limited_evidence_round2", "limited_evidence_round3",
+                                   "limited_evidence_v2_round1", "limited_evidence_v2_round3"])
+def test_original_failed_reports_do_not_assert_a_winner(fixture):
     from agent.eval_checks import unsupported_claims
-    report = (Path(__file__).parent / "fixtures" / f"limited_evidence_round{round_number}.md").read_text(encoding="utf-8")
+    report = (Path(__file__).parent / "fixtures" / f"{fixture}.md").read_text(encoding="utf-8")
     assert unsupported_claims(report, r"A.{0,8}(?:最稳定|最强)") == []
 
 
@@ -186,6 +187,13 @@ def test_invalid_review_record_never_passes(tmp_path):
     ('是否B最强，结论：A最稳定。', False),
     ('因此"产品A在A/B/C中最稳定"这一结论缺少比较对象，无法成立。', True),
     ('结论："A最稳定"，B的结论无法成立。', False),
+    ('- **不能说**：A比B稳定、A比C稳定、A是A/B/C中最稳定的。', True),
+    ('因此"A 在 A/B/C 中最稳定"这一比较性结论缺少两个比较对象的数据，无法成立；', True),
+    ('"A 在 A/B/C 中最稳定"是一个三者之间的相对判断，需要 B、C 在同一指标、同一测试方式下的对应数据。', True),
+    ('"A最稳定"是正确的判断，需要B补充数据。', False),
+    ('A最稳定，需要B补充数据验证。', False),
+    ('不能说：B最强；但A最稳定。', False),
+    ('"A最稳定"这一结论无法成立，而结论是A最稳定。', False),
     ('不对"A最稳定"作任何暗示，但结论是A最稳定。', False),
     ('- **不能得出**：A比B稳定；A是三者中最稳定的；A优于任何未测试产品。', True),
     ('- **不能得出**：B最强；但A是三者中最稳定的。', False),

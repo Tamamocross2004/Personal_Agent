@@ -92,6 +92,37 @@ def numeric_checks(task_dir: Path, report: str, specification: dict) -> list[dic
     return checks
 
 
+def _nonasserted_claim(sentence: str, claim: re.Match) -> bool:
+    """识别命题的语用范围：局部否定/提问，以及引述后回指该命题的条件或驳斥。"""
+    left = max(sentence.rfind(mark, 0, claim.start()) for mark in ("，", ",", "：", ":")) + 1
+    right = min((p for mark in ("，", ",") if (p := sentence.find(mark, claim.end())) >= 0), default=len(sentence))
+    context = sentence[left:right]
+    if re.search(r"能否|是否|[？?]|若要|如果要|需补齐", context):
+        return True
+    if re.search(r"不能|无法|不足|不支持|不应|不代表|未能|编造|不予采用|不成立|不可|无从", context):
+        return True
+    before, after = sentence[:claim.start()], sentence[claim.end():]
+    if (re.search(r"不对\s*[\"“‘「]?\s*$", before)
+            and re.match(r"[\"”’」]?\s*作(?:任何)?(?:倾向性)?(?:暗示|判断|评价|断言)", after)):
+        return True
+    for quote in re.finditer(r'''["“‘「]([^"“”‘’「」\n]+)["”’」]''', sentence):
+        if not (quote.start(1) <= claim.start() and claim.end() <= quote.end(1)):
+            continue
+        tail = sentence[quote.end():]
+        lead = re.split(r"[，,]", tail, maxsplit=1)[0]
+        # 回指必须出现在引号后第一个从句；不能用另一对象的否定覆盖引述的肯定。
+        meta = re.search(r"结论|命题|判断|说法|表述", lead)
+        affirmed = re.search(r"正确|准确|已证实|已成立|毫无疑问|事实", lead)
+        if meta and not affirmed:
+            if re.search(r"缺少|缺乏|尚缺|无对照|未知|不存在|不具备|无法成立|不能成立|不成立", tail):
+                return True
+            if re.search(r"(?:需要|要求|前提).*(?:证据|数据|条件)", tail):
+                return True
+        if re.search(r"(?:若|如果).*强行", sentence[:quote.start()]) and re.search(r"无对照|缺少|缺乏", tail):
+            return True
+    return False
+
+
 def unsupported_claims(report: str, pattern: str) -> list[str]:
     """有限规则：按句子/转折分开判定，表格否定列保留列语境；不是通用语义认证。"""
     report = re.sub(r"(?ms)^\s*(`{3,}|~{3,}).*?^\s*\1[^\n]*$", "", report)
@@ -107,42 +138,19 @@ def unsupported_claims(report: str, pattern: str) -> list[str]:
                 table_fragments.extend(cell for row in rows for i, cell in enumerate(row) if i not in rejected)
             lines[start:end] = [""] * (end - start)
     findings = []
-    negative = r"不能|无法|不足|不支持|不应|不代表|未能|编造|不予采用|不成立|不可|无从"
     for line in lines + table_fragments:
         fragments = [line]
         for fragment in fragments:
             plain = fragment.replace('**', '').strip()
-            rejected_list = re.match(r"^(?:[-*]\s*)?(?:不能得出|不可支持|不应断言|不能认定|不支持的结论)\s*[：:]", plain)
+            rejected_list = re.match(r"^(?:[-*]\s*)?(?:(?:不能|不可|不应|无法|不足以)(?:说|得出|支持|断言|认定|推导|认为|判断|证明|暗示|成立)(?:的(?:结论|表述|说法|判断))?|不支持的结论)(?:包括|有)?\s*[：:]", plain)
             if rejected_list and not re.search(r"但是|但|然而|不过", plain):
                 continue  # 明确的否定标签支配同一列表中的分号项。
             for sentence in re.split(r"(?<=[。！？?；;])|但是|但|然而|不过", fragment):
                 if not re.search(pattern, sentence):
                     continue
-                normalized = sentence.replace("不是不能", "可以").replace("并非不能", "可以")
+                normalized = sentence.replace('**', '').replace("不是不能", "可以").replace("并非不能", "可以")
                 claims = list(re.finditer(pattern, normalized))
-                # 逐个命题检查局部从句，不能用同句中对 B 的否定掩盖对 A 的肯定。
-                contexts = []
-                for claim in claims:
-                    left = max(normalized.rfind(mark, 0, claim.start()) for mark in ("，", ",", "：", ":")) + 1
-                    right = min((p for mark in ("，", ",") if (p := normalized.find(mark, claim.end())) >= 0), default=len(normalized))
-                    contexts.append(normalized[left:right])
-                question = all(re.search(r"能否|是否|[？?]|若要|如果要|需补齐", context) for context in contexts)
-                rejection = all(re.search(negative, context) for context in contexts)
-                # 否定必须支配这个命题；“不对B评价，因此A最稳定”不能借用前半句的否定。
-                for claim in re.finditer(pattern, normalized):
-                    before, after = normalized[:claim.start()], normalized[claim.end():]
-                    if (re.search(r"不对\s*[\"“‘「]?\s*$", before)
-                            and re.match(r"[\"”’」]?\s*作(?:任何)?(?:倾向性)?(?:暗示|判断|评价|断言)", after)):
-                        rejection = True
-                quoted_discussion = (re.search(r'''["“‘「]''', normalized)
-                                     and re.search(r"表述|说法|判断|命题|强行", normalized)
-                                     and re.search(r"缺少|缺乏|尚缺|无对照|未知|不存在|不具备", normalized))
-                # 否定的是引述后的“这一结论”，可跨逗号回指，不借用对其他对象的否定。
-                quoted_rejection = any(re.match(
-                    r'''["”’」]\s*(?:这一|该|此)?(?:结论|命题|说法|表述|判断)[^。！？;；]{0,60}(?:无法成立|不能成立|不成立)''',
-                    normalized[claim.end():]) for claim in claims)
-                conditions = re.search(r"(?:成立|认定).{0,8}(?:需要|前提|条件)|(?:所需|需要).{0,8}(?:证据|数据)|命题.{0,12}要求.{0,12}条件.*成立", normalized)
-                if question or rejection or quoted_discussion or quoted_rejection or conditions:
+                if all(_nonasserted_claim(normalized, claim) for claim in claims):
                     continue
                 findings.append(sentence.strip())
     return findings
