@@ -53,7 +53,7 @@
 ```powershell
 .\.venv\Scripts\python.exe -m pytest -q
 npm.cmd --prefix desktop run build
-# 先关闭已有应用；此项只检查界面，不提交研究
+# 先关闭已有应用；测试拦截提交，不创建研究、不调用模型
 npm.cmd --prefix desktop run smoke
 ```
 
