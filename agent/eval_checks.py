@@ -111,6 +111,11 @@ def _nonasserted_claim(sentence: str, claim: re.Match) -> bool:
             continue
         tail = sentence[quote.end():]
         lead = re.split(r"[，,]", tail, maxsplit=1)[0]
+        # “判断某命题需要数据”讨论的是证据条件，并未断言该命题成立。
+        # 限定为裸判断动词，不能用“已经认定...”掩盖肯定结论。
+        if (re.fullmatch(r'\s*(?:若要|如果要|要)?(?:判断|认定|证明|证实|得出|断言)\s*', sentence[:quote.start()])
+                and re.match(r'\s*(?:需要|需有|须有|必须有)[^。；;]{0,100}(?:证据|数据)', tail)):
+            return True
         # 引述命题后的“所需条件/成立前提”是条件议题，不是命题本身的肯定。
         if re.match(r"\s*(?:所需(?:要)?的?|成立(?:所需)?的?)(?:条件|证据|数据|前提)", tail):
             return True

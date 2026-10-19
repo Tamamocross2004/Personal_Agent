@@ -13,7 +13,7 @@ from agent.review import fingerprint
 
 @pytest.mark.parametrize("fixture", ["limited_evidence_round2", "limited_evidence_round3",
                                    "limited_evidence_v2_round1", "limited_evidence_v2_round3",
-                                   "limited_evidence_stage10"])
+                                   "limited_evidence_stage10", "limited_evidence_scope_final"])
 def test_original_failed_reports_do_not_assert_a_winner(fixture):
     from agent.eval_checks import unsupported_claims
     report = (Path(__file__).parent / "fixtures" / f"{fixture}.md").read_text(encoding="utf-8")
@@ -236,6 +236,11 @@ def test_invalid_review_record_never_passes(tmp_path):
     ('材料已有记录。不可以说：B最强；A最稳定。', True),
     ('材料已有记录。不可以说：B最强；但A最稳定。', False),
     ('材料已有记录。不可以说：B最强。A最稳定。', False),
+    ('判断"A在A/B/C中最稳定"需要B、C的可比数据。', True),
+    ('要判断"A最稳定"需要同口径数据。', True),
+    ('判断"A最稳定"需要B数据，但结论是A最稳定。', False),
+    ('已经认定"A最稳定"，需要补充B数据。', False),
+    ('判断"B最强"需要数据，A最稳定。', False),
     ('因此"A/B/C中最稳定"的比较集实际只有一个产品，排序无从谈起。', True),
     ('"A最稳定"的比较集不足，排序无从谈起，但结论仍是A最稳定。', False),
     ('不对"A最稳定"作任何暗示，但结论是A最稳定。', False),
