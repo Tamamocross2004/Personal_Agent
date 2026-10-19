@@ -106,7 +106,8 @@ def generate_plan(question: str, chat, task_dir: Path, today: str = "", *, contr
         kept, removed = [], []
         for task in plan['tasks']:
             extra = set(named_methods(task['title'])) - set(contract.analysis_methods)
-            if extra and re.search(r'计算|比较|对比|构造|估计|模拟|评估|绘制', task['title']):
+            if (extra and re.search(r'计算|比较|对比|构造|估计|模拟|评估|绘制', task['title'])
+                    and not re.search(r'不计算|不采用|不使用|未计算|未做|不做|说明为何', task['title'])):
                 removed.append(task['title'])
             else:
                 kept.append(task)

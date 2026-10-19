@@ -31,6 +31,7 @@ def test_requested_method_scope_comes_from_explicit_instructions(question, expec
     'Wald 区间为0.7至1.0。',
     '作为对照，Clopper-Pearson区间 [0.6, 0.99]。',
     '| 方法 | 下限 | 上限 |\n|---|---|---|\n| Agresti-Coull | 0.68 | 0.98 |',
+    '| 方法 | 区间 |\n|---|---|\n| Wald | [0.7,1.0] |',
 ])
 def test_unrequested_numeric_results_are_rejected(report):
     c = extract_contract('请计算Wilson区间，详细解释。')
@@ -61,6 +62,14 @@ def test_code_preflight_checks_ast_names_without_executing_or_creating_files(tmp
     assert not (tmp_path/'unwanted.txt').exists() and not (tmp_path/'.code_runs').exists()
     good = registry.execute('run_python', {'code': "# 不计算Wald\nwilson_lower=0.699\nprint('未计算Wald', wilson_lower)"})
     assert not good.is_error and '0.699' in good.content
+
+
+def test_code_guard_uses_updated_shared_contract(tmp_path):
+    from tools import ResearchSession
+    session = ResearchSession()
+    registry = default_registry(tmp_path, question='请计算Wilson区间，不联网。', session=session)
+    session.task_contract = extract_contract('请比较Wilson和Wald区间，不联网。')
+    assert not registry.execute('run_python', {'code':'wald_lower=0.7\nprint(wald_lower)'}).is_error
 
 
 def test_scope_rejection_preserves_report_and_sidecars(tmp_path):

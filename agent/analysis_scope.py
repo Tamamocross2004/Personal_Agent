@@ -81,6 +81,6 @@ def report_scope_errors(report: str, allowed: tuple[str, ...]) -> list[str]:
             continue
         for row in rows:
             extra = set(named_methods(' '.join(row))) - set(allowed)
-            if extra and sum(bool(re.fullmatch(r'\s*[-+]?\d+(?:\.\d+)?\s*[%％]?\s*', cell)) for cell in row) >= 2:
+            if extra and (re.search(numeric_pair, ' '.join(row)) or sum(bool(re.fullmatch(r'\s*[-+]?\d+(?:\.\d+)?\s*[%％]?\s*', cell)) for cell in row) >= 2):
                 errors.append('未要求的方法结果表：' + ' | '.join(row)[:250])
     return list(dict.fromkeys(errors))[:12]
