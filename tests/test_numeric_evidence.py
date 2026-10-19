@@ -11,6 +11,16 @@ def test_incorrect_explicit_arithmetic_is_rejected(text):
     assert arithmetic_errors(text)
 
 
+@pytest.mark.parametrize('text,bad', [
+    (r'0.9 \times 0.1/20 = 0.0045', False),
+    (r'0.9 \cdot 0.1/20 = 0.0045', False),
+    (r'9 \div 2 = 4.5', False),
+    (r'0.9 \times 0.1/20 = 0.0050', True),
+])
+def test_latex_operators_do_not_create_false_suffix_equations(text, bad):
+    assert bool(arithmetic_errors(text)) == bad
+
+
 @pytest.mark.parametrize("text", ["27 ÷ 8 = 3.375", "1.17/0.28≈4.18", "49/51≈96.1%", "0.4+0.08=0.48",
                                   "1.17/0.28≈**4.18 倍**",
                                   "200,000 ÷ 1,000,000 × 2 = 0.4", "200 000 ÷ 1 000 000 × 2 = 0.40",

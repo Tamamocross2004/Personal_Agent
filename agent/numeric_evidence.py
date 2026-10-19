@@ -149,6 +149,7 @@ def arithmetic_errors(report: str) -> list[str]:
         if line.lstrip().startswith(">"):
             continue
         line = re.sub(r"`[^`]*`", "", line).replace('**', '')
+        line = re.sub(r'\\(times|cdot|div)(?![A-Za-z])', lambda m: {'times':'×','cdot':'×','div':'÷'}[m[1]], line)
         position = 0
         while (match := _EQUATION.search(line, position)) is not None:
             # 连等式两边可共享中间表达式，继续从下一字符查找，不能只核对最右侧。

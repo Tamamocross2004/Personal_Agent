@@ -30,6 +30,8 @@ def test_requested_method_scope_comes_from_explicit_instructions(question, expec
 @pytest.mark.parametrize('report', [
     'Wald 区间为0.7至1.0。',
     '作为对照，Clopper-Pearson区间 [0.6, 0.99]。',
+    r'Wilson通常比Wald稳健：Wald区间会给出 $0.9 \pm 1.96\sqrt{0.0045}=[0.7686,1.0314]$；只作概念对比。',
+    'Wald区间为(0,1)。',
     '| 方法 | 下限 | 上限 |\n|---|---|---|\n| Agresti-Coull | 0.68 | 0.98 |',
     '| 方法 | 区间 |\n|---|---|\n| Wald | [0.7,1.0] |',
 ])
@@ -42,6 +44,8 @@ def test_unrequested_numeric_results_are_rejected(report):
 @pytest.mark.parametrize('report', [
     '未计算Wald区间。本次Wilson区间为[0.699,0.972]。',
     'Wald 方法在接近边界时可能不可靠，本文未采用。',
+    'Wilson 在小样本时比 Wald 更稳健，端点不会越出 (0, 1)。',
+    'Wald可能超出$(0,1)$，此处只说明概率域边界。',
     'Wald与Wilson的概念不同；只提供Wilson区间[0.699,0.972]。',
     '| 方法 | 下限 | 上限 |\n|---|---|---|\n| Wilson | 0.699 | 0.972 |\n| Wald | 未计算 | 未计算 |',
     '```text\nWald区间为[0.1,0.9]\n```',
@@ -88,6 +92,12 @@ def test_original_inline_extra_calculation_is_caught():
     from pathlib import Path
     code=(Path(__file__).parent/'fixtures/extra_method_output_code.txt').read_text(encoding='utf-8')
     assert code_scope_errors(code, ('Wilson',))
+
+
+def test_original_repeated_method_prose_is_caught():
+    from pathlib import Path
+    text=(Path(__file__).parent/'fixtures/repeated_method_numeric_result.md').read_text(encoding='utf-8')
+    assert report_scope_errors(text, ('Wilson',))
 
 
 def test_length_feedback_identifies_long_sentences_and_preserves_rejection_reason(tmp_path):

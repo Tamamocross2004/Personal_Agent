@@ -78,13 +78,15 @@ def report_scope_errors(report: str, allowed: tuple[str, ...]) -> list[str]:
             continue
         for sentence in re.split(r'[。；;\n]', token.content):
             for name in set(named_methods(sentence)) - set(allowed):
-                method = re.search(METHODS[name], sentence, re.I)
-                after = sentence[method.end():]
-                # 不把同句后面属于另一方法的结果归到此处。
-                starts = [m.start() for pattern in METHODS.values() for m in re.finditer(pattern, after, re.I)]
-                after = after[:min(starts)] if starts else after
-                if re.search(numeric_pair, after) or re.search(r'(?:区间|下限|上限|检验结果|p\s*)\s*(?:为|是|[=＝<>])\s*[-+]?\d', after, re.I):
-                    errors.append(f'未要求的 {name} 数值结果：{sentence.strip()[:250]}')
+                for method in re.finditer(METHODS[name], sentence, re.I):
+                    after = sentence[method.end():]
+                    # 每次出现都检查；不能因同句先提及方法名而漏掉后面的实际结果。
+                    starts = [m.start() for pattern in METHODS.values() for m in re.finditer(pattern, after, re.I)]
+                    after = after[:min(starts)] if starts else after
+                    # “端点不越出(0,1)”是合法概率域，不是另算一个数值区间。
+                    after = re.sub(r'(?:不|不会|始终|可能)?(?:越出|超出|落在|位于)\s*\$?\s*[\[(（]\s*0\s*[,，]\s*1\s*[\])）]', '', after)
+                    if re.search(numeric_pair, after) or re.search(r'(?:区间|下限|上限|检验结果|p\s*)\s*(?:为|是|[=＝<>])\s*[-+]?\d', after, re.I):
+                        errors.append(f'未要求的 {name} 数值结果：{sentence.strip()[:250]}')
     for header, rows in markdown_tables(report):
         if not any(re.search(r'方法|区间|method|lower|upper|下限|上限', cell, re.I) for cell in header):
             continue
