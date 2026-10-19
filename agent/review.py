@@ -146,6 +146,7 @@ def build_review_messages(report: str, task_dir: Path, session, *, question: str
         truncated = truncated or bool(packet['omitted_items'])
         payload['evidence_limits'] += f"；关联包省略{packet['omitted_items']}项，仅展示被选择结论的来源上下文，未认证全部事实。"
     system = REVIEW_SYSTEM + ('\nclaim_evidence把关键原句与本次真实证据关联。located只证明摘录和版本存在，不证明蕴含。'
+        'items是结论关联，sources按source_id共享原文上下文，重复引用复用同一来源。'
         '逐项核对所引上下文是否支持结论及其版本、主体、条件、单位；inference检查假设，unknown保留未知。'
         'history不是当前事实，抓取/读取时间不是发布日期，page_date是未经核实的元数据。'
         '只处理实质错误：不因只选择部分关键结论、没有全覆盖或缺少审计附表而强行扩写报告。') + "\n输出 JSON Schema：\n" + json.dumps(ReviewVerdict.model_json_schema(), ensure_ascii=False)

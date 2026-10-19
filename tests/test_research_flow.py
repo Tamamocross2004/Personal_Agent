@@ -54,6 +54,7 @@ def test_default_registry_tools(tmp_path):
         "update_plan",
         "write_report",
         "run_python",
+        "read_evidence",
         "calculator",
         "days_between",
         "get_current_time",

@@ -99,7 +99,7 @@ _FINALIZE_REASONS = {
 }
 
 # 收尾阶段仍允许调用的工具：只用于整理已有成果，不再获取新信息
-WRAPUP_TOOLS = ("read_notes", "write_report", "update_plan")
+WRAPUP_TOOLS = ("read_notes", "read_evidence", "write_report", "update_plan")
 
 
 def finalize_prompt(reason: str) -> str:
@@ -108,6 +108,7 @@ def finalize_prompt(reason: str) -> str:
     return (
         f"【系统通知】{why}，现在进入收尾阶段：不能再搜索或读网页，只能调用 {' / '.join(WRAPUP_TOOLS)}，"
         "而且只剩很少几轮。\n"
+        "可用read_evidence核对本次已收到的证据原文；不能读取未展示缓存或重新计算。"
         "如果你还没有用 write_report 保存报告：请立即以笔记为依据调用 write_report 保存报告（格式同前述要求），"
         f"在报告开头注明「因{why}提前结束，以下内容可能不完整」，没研究到的子任务在报告里如实写明。"
         "参考资料只能列出笔记中出现过的来源（不能列出只在搜索结果里见过的网页）。\n"

@@ -404,7 +404,12 @@ class Agent:
                 ids = self._evidence.capture(name,arguments,content,call.id,result.evidence,
                                              min(len(result.content),self.max_tool_result_chars))
                 if ids:
-                    content += '\n【本次证据ID】' + '、'.join(ids) + '；摘录须来自上面的实际返回内容，不是未展示的缓存全文。'
+                    content += '\n【本次证据ID】' + '、'.join(ids) + '；摘录须来自对应实际片段；需要原文用read_evidence读取。'
+                    for source_id in ids:
+                        source=self._evidence.records[source_id]
+                        preview=source['text'][:100] if source['kind']=='web' else source['text'].split('成功输出：',1)[-1][:120]
+                        content += '\n'+json.dumps({'source_id':source_id,'range':[source.get('start'),source.get('end')],
+                                                    'preview':preview},ensure_ascii=False)
             if name == "fetch_url" and not result.is_error:
                 self._source_readings.append({"tool_call_id": call.id, "arguments": arguments[:2000],
                     "content": content[:8000], "possibly_truncated": len(result.content) > min(self.max_tool_result_chars, 8000) or len(arguments) > 2000})

@@ -4,7 +4,7 @@ from pathlib import Path
 import httpx
 import pytest
 
-from agent.evidence import Claim, EvidenceLedger, audit_mapping, main, sha, write_json
+from agent.evidence import Claim, EvidenceLedger, audit_mapping, locate_excerpt, main, mapping_sha, sha, write_json
 from agent.loop import Agent
 from agent.review import build_review_messages
 from fakes import ScriptedLLM, completion
@@ -171,7 +171,7 @@ def test_review_gets_same_current_links_and_context_without_certifying_entailmen
     messages,partial=build_review_messages(report('甲更好。'),tmp_path,session,question='比较')
     payload=json.loads(messages[1]['content'])
     assert payload['claim_evidence']['items'][0]['claim']['quote']=='甲更好'
-    assert '甲报价2元' in payload['claim_evidence']['items'][0]['sources'][0]['context']
+    assert '甲报价2元' in payload['claim_evidence']['sources']['user-1']['contexts'][0]
     assert payload['claim_evidence']['semantic_support']=='not_certified'
     assert payload['evidence_packet_estimated_tokens']>0 and not partial
     assert 'located只证明' in messages[0]['content']
@@ -295,3 +295,52 @@ def test_memory_preserves_evidence_status_and_does_not_promote_metadata_date(tmp
     assert record['sources'][0]['published_date'] is None
     assert record['sources'][0]['page_date']=='2026-01-01'
     assert record['sources'][0]['page_date_kind']=='unverified_metadata'
+
+
+@pytest.mark.parametrize('requested,expected',[
+    ('Alpha 0.28','Alpha        0.28'),
+    ('Alpha 0.28\nBeta 1.17','Alpha        0.28\nBeta    1.17'),
+    ('Alpha 0.29',None),('alpha 0.28',None),('Alpha:0.28',None),
+])
+def test_whitespace_locator_stores_original_without_changing_words(requested,expected):
+    assert locate_excerpt('Alpha        0.28\nBeta    1.17',requested)==expected
+
+
+def test_resolved_whitespace_reference_remains_stable_across_save_review_refresh(tmp_path):
+    ledger=EvidenceLedger(tmp_path,'Alpha        0.28')
+    session=ResearchSession(evidence=ledger)
+    reg=ToolRegistry([make_write_report(tmp_path,session)])
+    claim=direct(quote='Alpha费用0.28',excerpt='Alpha 0.28')
+    text=report('Alpha费用0.28。')
+    assert not reg.execute('write_report',{'content':text,'claims':[claim]}).is_error
+    original=json.loads((tmp_path/'report.evidence.json').read_text(encoding='utf-8'))
+    restored=ledger.prepare(tmp_path/'report.md',text,None,complete=True)
+    assert mapping_sha(original)==mapping_sha(restored)
+    ref=restored['claims'][0]['supports'][0]
+    assert ref['excerpt']=='Alpha        0.28' and ref['requested_excerpt']=='Alpha 0.28' and ref['locator']=='whitespace'
+    assert audit_mapping(tmp_path)['status']=='mapped'
+
+
+def test_shared_sources_are_not_repeated_for_each_claim(tmp_path):
+    ledger=EvidenceLedger(tmp_path,'用户输入。'+'甲'*500)
+    ledger.add('calculation','计算结果。'+'乙'*500,source_id='calculation-1')
+    claim=Claim(quote='报告结论',kind='calculated',supports=[{'source_id':'user-1','excerpt':'用户输入。'},
+                      {'source_id':'calculation-1','excerpt':'计算结果。'}])
+    mapped=ledger.validate('报告结论',[claim]*8)
+    packet=ledger.packet({'status':'mapped','claims':mapped})
+    assert len(packet['items'])==8 and len(packet['sources'])==2 and packet['omitted_items']==0
+    assert ledger.packet({'status':'mapped','claims':mapped},budget=1)['omitted_items']==8
+
+
+def test_read_evidence_only_reopens_retained_delivered_text(tmp_path):
+    from tools.evidence import make_read_evidence
+    ledger,session,_=setup(tmp_path)
+    ledger.add('web','已读内容包含close()',source_id='web-1',start=0,end=17)
+    reg=ToolRegistry([make_read_evidence(session)])
+    before=ledger.path.read_bytes()
+    result=reg.execute('read_evidence',{'source_id':'web-1','query':'close'})
+    assert not result.is_error and json.loads(result.content)['excerpt']=='已读内容包含close()'
+    assert json.loads(reg.execute('read_evidence',{'source_id':'web-1','query':'未读秘密'}).content)['match'] is False
+    assert reg.execute('read_evidence',{'source_id':'web-999'}).is_error
+    assert len(json.loads(reg.execute('read_evidence',{}).content)['records'])==2
+    assert ledger.path.read_bytes()==before

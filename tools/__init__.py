@@ -8,6 +8,7 @@ import httpx
 
 from tools.basic import calculator, days_between, get_current_time
 from tools.code_exec import make_run_python
+from tools.evidence import make_read_evidence
 from tools.fetch import make_fetch_url
 from tools.registry import Tool, ToolRegistry, ToolResult, tool
 from tools.notes import make_notes_tools
@@ -53,6 +54,7 @@ def default_registry(
             make_update_plan(task_dir, on_update=on_plan_update),
             make_write_report(task_dir, session, contract=contract),
             make_run_python(task_dir, timeout=code_exec_timeout, contract=contract, session=session),
+            make_read_evidence(session),
             calculator,
             days_between,
             get_current_time,

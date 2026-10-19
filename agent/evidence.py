@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Literal
@@ -22,6 +23,16 @@ def now() -> str:
 def mapping_sha(mapping: dict) -> str:
     return sha(json.dumps({k:mapping.get(k) for k in ('request_sha256','report_sha256','status','claims')},
                           ensure_ascii=False,sort_keys=True))
+
+
+def locate_excerpt(text: str, excerpt: str) -> str | None:
+    if excerpt in text:
+        return excerpt
+    words=re.findall(r'\S+',excerpt)
+    if not words:
+        return None
+    match=re.search(r'\s+'.join(re.escape(w) for w in words),text)
+    return match[0] if match else None  # 只容许空白差异，保存的是实际原文，不替换词语/标点。
 
 
 def write_json(path: Path, value: dict) -> None:
@@ -117,11 +128,17 @@ class EvidenceLedger:
             refs = []
             for ref in claim.supports:
                 source = self.records.get(ref.source_id)
-                if not source or sha(source['text']) != source['text_sha256'] or ref.excerpt not in source['text']:
-                    raise ValueError('证据ID不存在、哈希无效或摘录未逐字出现在实际返回内容中：'+ref.source_id)
+                if not source or sha(source['text']) != source['text_sha256']:
+                    raise ValueError('证据ID不存在或哈希无效：'+ref.source_id+'；用read_evidence查看本次保留的ID。')
+                resolved=locate_excerpt(source['text'],ref.excerpt)
+                if resolved is None:
+                    raise ValueError('摘录不在证据'+ref.source_id+'中：'+ref.excerpt[:100]
+                        +'；用read_evidence(source_id="'+ref.source_id+'", query="关键词")读取真实原文，不要反复猜ID或重算。')
                 if claim.kind == 'direct' and source['kind'] not in ('web','user'):
                     raise ValueError('direct仅用于用户材料/已读原文；历史摘要和计算不能冒充当前直接事实')
-                refs.append({**ref.model_dump(),'source_kind':source['kind'],'source_sha256':source['text_sha256']})
+                refs.append({**ref.model_dump(),'excerpt':resolved,'requested_excerpt':ref.excerpt,
+                    'locator':'exact' if resolved==ref.excerpt else 'whitespace',
+                    'source_kind':source['kind'],'source_sha256':source['text_sha256']})
             if claim.kind == 'calculated' and not any(r['source_kind']=='calculation' for r in refs):
                 raise ValueError('calculated结论必须关联本次成功计算，不能只给原始数字')
             if any(r['source_kind']=='history' for r in refs) and not claim.limits.strip():
@@ -154,6 +171,13 @@ class EvidenceLedger:
                     restored.append(Claim.model_validate({**{k:c[k] for k in Claim.model_fields},
                         'supports':[{k:r[k] for k in EvidenceRef.model_fields} for r in c['supports']]}))
                 mapped = self.validate(report,restored)
+                for old,current in zip(previous.get('claims',[]),mapped):
+                    for before,after in zip(old['supports'],current['supports']):
+                        requested=before.get('requested_excerpt',before['excerpt'])
+                        if locate_excerpt(self.records[after['source_id']]['text'],requested)!=after['excerpt']:
+                            raise ValueError('旧摘录定位信息失效')
+                        after['requested_excerpt']=requested
+                        after['locator']='exact' if requested==after['excerpt'] else 'whitespace'
             except (ValueError,KeyError,TypeError):
                 mapped,broken = [],True
         else:
@@ -167,24 +191,29 @@ class EvidenceLedger:
             'semantic_support':'not_certified'}
 
     def packet(self, mapping: dict, budget: int = 14000) -> dict:
-        items, omitted = [], 0
+        items, sources, omitted = [], {}, 0
         for claim in mapping.get('claims',[]):
-            sources = []
+            candidate={key:{**value,'contexts':list(value['contexts'])} for key,value in sources.items()}
+            missing=False
             for ref in claim['supports']:
                 record = self.records.get(ref['source_id'])
                 if not record:
-                    omitted += 1
+                    missing=True
                     continue
                 pos = record['text'].find(ref['excerpt'])
                 context = record['text'][max(0,pos-250):pos+len(ref['excerpt'])+250]
-                sources.append({k:v for k,v in record.items() if k!='text'} | {'context':context,
-                    'context_is_excerpt':len(context)<len(record['text']),
-                    **({'history_header':record['text'].split('历史摘要：',1)[0][:800]} if record['kind']=='history' else {})})
-            item = {'claim':claim,'sources':sources}
-            if len(json.dumps(items+[item],ensure_ascii=False))>budget:
+                entry=candidate.setdefault(record['id'],{k:v for k,v in record.items() if k!='text'} |
+                    {'contexts':[],'context_is_excerpt':len(context)<len(record['text']),
+                     **({'history_header':record['text'].split('历史摘要：',1)[0][:800]} if record['kind']=='history' else {})})
+                if not any(context in old for old in entry['contexts']):
+                    entry['contexts']=[old for old in entry['contexts'] if old not in context]+[context]
+            item = {'claim':claim}
+            if missing or len(json.dumps({'items':items+[item],'sources':candidate},ensure_ascii=False))>budget:
                 omitted += 1
-            else: items.append(item)
-        return {'status':mapping.get('status','unmapped'),'items':items,'omitted_items':omitted,
+            else:
+                items.append(item)
+                sources=candidate
+        return {'status':mapping.get('status','unmapped'),'items':items,'sources':sources,'omitted_items':omitted,
                 'ledger_omitted_records':self.omitted,'semantic_support':'not_certified'}
 
 
