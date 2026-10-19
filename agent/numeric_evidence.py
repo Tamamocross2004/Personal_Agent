@@ -161,6 +161,22 @@ def arithmetic_errors(report: str) -> list[str]:
             continue
         line = re.sub(r"`[^`]*`", "", line).replace('**', '')
         line = re.sub(r'\\(times|cdot|div)(?![A-Za-z])', lambda m: {'times':'×','cdot':'×','div':'÷'}[m[1]], line)
+        # 常见的“占95.2%（200000÷210000）”也是显式计算断言，不要求写等号。
+        for match in re.finditer(rf"({_NUM})\s*%\s*[（(]\s*({_NUM}\s*[÷/]\s*{_NUM})\s*[）)]", line):
+            prefix = re.split(r'[。；;]', line[:match.start()])[-1]
+            if re.search(r'不能|不应|错误|反例', prefix):
+                continue
+            stated, expression = match.groups()
+            try:
+                with localcontext() as ctx:
+                    ctx.prec = 28
+                    actual = _calculate(expression) * 100
+                    claimed = number(stated)
+                    tolerance = Decimal(5).scaleb(claimed.as_tuple().exponent - 1)
+                    if abs(actual - claimed) > tolerance:
+                        errors.append(f"百分比「{match[0]}」不成立；括号算式对应 {actual}%。")
+            except (InvalidOperation, ValueError, ArithmeticError, SyntaxError):
+                errors.append(f"百分比「{match[0]}」无法完成有效计算。")
         position = 0
         while (match := _EQUATION.search(line, position)) is not None:
             # 连等式两边可共享中间表达式，继续从下一字符查找，不能只核对最右侧。

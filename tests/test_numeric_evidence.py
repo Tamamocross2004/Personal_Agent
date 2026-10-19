@@ -37,7 +37,7 @@ def test_actual_failed_reports_are_rejected_and_old_file_preserved(tmp_path):
     (tmp_path/'costs.csv').write_text('model,input_price,output_price\nEvalAlpha,2,8\nEvalBeta,9,27\n',encoding='utf-8')
     reg=ToolRegistry([make_write_report(tmp_path)])
     assert not reg.execute('write_report',{'content':'保留正确稿。'}).is_error
-    for name in ['numeric_bad_total.md', 'numeric_bad_internal_ratio.md', 'numeric_bad_expanded_ratio.md']:
+    for name in ['numeric_bad_total.md', 'numeric_bad_internal_ratio.md', 'numeric_bad_expanded_ratio.md', 'numeric_bad_parenthesized_percent.md']:
         text=(Path(__file__).parent/'fixtures'/name).read_text(encoding='utf-8')
         assert reg.execute('write_report',{'content':text}).is_error
         assert (tmp_path/'report.md').read_text(encoding='utf-8')=='保留正确稿。'
@@ -129,3 +129,17 @@ def test_current_report_table_cannot_mix_in_historical_amounts(tmp_path):
 def test_named_price_ratio_claims_against_csv(text, wrong):
     content = "model,input_price,output_price\nAlpha,2,8\nBeta,9,27\n"
     assert bool(price_ratio_errors(text, content)) is wrong
+
+
+@pytest.mark.parametrize('text,wrong', [
+    ('输入占全部token的96.8%（200000 ÷ 210000），输出仅占3.2%（10000/210000）。', True),
+    ('输入占95.24%（200000÷210000），输出占4.76%（10000/210000）。', False),
+    ('输入占95.2%(200000 / 210000)。', False),
+    ('费用占83.3%（0.4/0.48）。', False),
+    ('占10%（1/0）。', True),
+    ('> 原错误：占96.8%（200000/210000）。', False),
+    ('不能说输入占96.8%（200000/210000）。', False),
+    ('错误示例：占96.8%（200000/210000）。', False),
+])
+def test_explicit_parenthesized_fraction_percent_is_checked(text, wrong):
+    assert bool(arithmetic_errors(text)) is wrong
