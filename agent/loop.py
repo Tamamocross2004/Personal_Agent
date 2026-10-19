@@ -34,6 +34,7 @@
 from __future__ import annotations
 
 import json
+import re
 import threading
 import time
 from dataclasses import asdict, dataclass, field
@@ -390,6 +391,8 @@ class Agent:
         messages.append(_assistant_message_to_dict(msg))
         reports_written = {}
         length_rejected = False
+        rejected_length_calls = set()
+        length_measurements = []
         if msg.content:
             self._emit("thought", text=msg.content)
 
@@ -406,6 +409,12 @@ class Agent:
             content = _truncate(result.content, self.max_tool_result_chars)
             if name == 'write_report' and result.is_error and '超过明确上限' in result.content:
                 length_rejected = True
+                rejected_length_calls.add(call.id)
+                for scope, unit, actual, maximum in re.findall(
+                    r'(full|body)/(characters|han_characters|english_words) 实际 (\d+)，超过明确上限 (\d+)', result.content
+                ):
+                    length_measurements.append({'scope':scope,'unit':unit,'actual':int(actual),
+                                                'maximum':int(maximum),'suggested_target':int(int(maximum)*.6)})
             if self._evidence and not result.is_error:
                 ids = self._evidence.capture(name,arguments,content,call.id,result.evidence,
                                              min(len(result.content),self.max_tool_result_chars))
@@ -447,6 +456,30 @@ class Agent:
                 complete = args.get("complete", True)
                 reports_written[filename] = complete
                 self._report_completeness[filename] = complete
+
+        if rejected_length_calls and not reports_written:
+            # 失败参数仍在 trace；只移除其对模型的反复锚定，保留同批其他工具的配对消息。
+            compacted = []
+            for item in messages:
+                if item.get('role') == 'tool' and item.get('tool_call_id') in rejected_length_calls:
+                    continue
+                if item.get('role') == 'assistant' and item.get('tool_calls'):
+                    calls = [c for c in item['tool_calls'] if c['id'] not in rejected_length_calls]
+                    if not calls:
+                        continue
+                    item = dict(item)
+                    if len(calls) != len(item['tool_calls']):
+                        item['content'] = None
+                    item['tool_calls'] = calls
+                compacted.append(item)
+            messages[:] = compacted
+            self._last_prompt = 0
+            self._len_at_last_call = 0
+            messages.append({'role':'assistant','content':
+                '【上下文整理】本批超限write_report未保存。被拒写稿参数与反馈已移出模型上下文，完整记录仍在trace。'
+                '原任务、其他工具结果和证据索引保留；请重新生成显著更短的完整稿，不能复用被拒稿。'
+                '程序计量（不是放宽上限）：'+json.dumps(length_measurements[:4],ensure_ascii=False)})
+            self._emit('notice',text='已从模型上下文移除本批超限写稿调用；原始参数/反馈仍保留在trace，证据索引不变。')
 
         if length_rejected and not reports_written and not self._length_repair_requested:
             self._length_repair_requested = True

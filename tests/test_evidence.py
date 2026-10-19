@@ -266,26 +266,42 @@ def test_same_run_without_links_gets_only_one_bounded_reminder(tmp_path):
     assert len([e for e in events if e.kind=='notice' and '【结束前结构核对】' in e.data['text']])==1
 
 
-def test_length_repair_can_shorten_quote_without_shortening_source_or_adding_steps(tmp_path):
+@pytest.mark.parametrize('mixed', [False, True])
+def test_length_repair_can_shorten_quote_without_shortening_source_or_adding_steps(tmp_path, mixed):
     question='全文不超过120个中文字符。资料甲称X为128K，资料乙称X为256K；版本和测试条件均未说明。'
     short='# X冲突\n## 摘要\n甲128K，乙256K。\n## 方法与范围\n仅用户资料。\n## 正文\n版本、条件未给。\n## 结论\n真实规格未知。\n## 局限性\n无法核实。\n## 参考资料\n用户甲乙。'
     long=short+'\n'+('两份资料均未说明版本与测试条件，无法判断真实规格。'*8)
     session=ResearchSession()
     claim=direct(quote='甲128K，乙256K',excerpt='资料甲称X为128K，资料乙称X为256K')
     llm=ScriptedLLM([completion('{"tasks": []}'),
-        completion(tool_calls=[('w1','write_report',{'content':long,'claims':[claim]})]),
+        completion(tool_calls=[('w1','write_report',{'content':long,'claims':[claim]})]
+                   + ([('c1','calculator',{'expression':'2*3'})] if mixed else [])),
         completion(tool_calls=[('w2','write_report',{'content':long,'claims':[claim]})]),
         completion(tool_calls=[('w3','write_report',{'content':short,'claims':[claim]})]),completion('完成')])
     events=[]
-    agent=Agent(llm,ToolRegistry([make_write_report(tmp_path,session)]),task_dir=tmp_path,
+    agent=Agent(llm,ToolRegistry([make_write_report(tmp_path,session),calculator]),task_dir=tmp_path,
                 research_session=session,max_steps=4,review_reports=False,on_event=events.append)
-    agent.run(question)
+    from agent.trace import TraceWriter, fanout
+    writer=TraceWriter(tmp_path/'trace.jsonl')
+    agent.on_event=fanout(events.append,writer)
+    try:
+        agent.run(question)
+    finally:
+        writer.close()
     assert agent._steps==4 and agent._review_count==0
     assert len([e for e in events if e.kind=='notice' and '【硬篇幅修订】' in e.data['text']])==1
     assert (tmp_path/'report.md').read_text(encoding='utf-8')==short
     assert audit_mapping(tmp_path)['status']=='mapped'
     mapping=json.loads((tmp_path/'report.evidence.json').read_text(encoding='utf-8'))
     assert mapping['claims'][0]['supports'][0]['excerpt']=='资料甲称X为128K，资料乙称X为256K'
+    for request in llm.requests[2:]:
+        calls=[c for message in request['messages'] for c in message.get('tool_calls',[])]
+        assert not any(c['id'] in ('w1','w2') for c in calls)
+        if mixed:
+            assert any(c['id']=='c1' for c in calls)
+            assert any(m.get('tool_call_id')=='c1' for m in request['messages'])
+    trace=[json.loads(s) for s in (tmp_path/'trace.jsonl').read_text(encoding='utf-8').splitlines()]
+    assert any(e['kind']=='tool_call' and e['id']=='w1' and json.loads(e['arguments'])['content']==long for e in trace)
 
 
 def test_missing_links_defer_review_without_using_a_call(tmp_path):
