@@ -1,0 +1,1884 @@
+{
+  "date": "2026-10-19",
+  "stage": 10,
+  "acceptance": "passed_for_documented_scope_and_length_gates",
+  "acceptance_record": "stage10-scope-acceptance-20261019.md",
+  "unit_tests": {
+    "passed": 579,
+    "seconds": 20.88
+  },
+  "offline": [
+    {
+      "suite": "agent/eval_cases.json",
+      "passed": 8,
+      "selected": 8
+    },
+    {
+      "suite": "agent/scope_cases.json",
+      "passed": 5,
+      "selected": 5
+    },
+    {
+      "suite": "agent/scope_followup_cases.json",
+      "passed": 1,
+      "selected": 1
+    }
+  ],
+  "key_source": "project .env only; no global key fallback",
+  "read_only_rescoring_used_for_final_result": false,
+  "execution_identity": {
+    "git_revision": "c6f7dd4276bed537f27db9c1ebdb234a63471313",
+    "code_sha256": "5659a6495198eec92eb8d56f5a2d614e2944c39f337087ee07c0e4479739b1d1",
+    "grader_sha256": "faebd8a3e72d12f4f82b06838da4584d1dfe1f0f293e974a127b1dbc3b8b086b",
+    "config": {
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "max_steps": 15,
+      "per_case_budget": 80000,
+      "suite_budget": 400000,
+      "review_max_calls": 2,
+      "repeat": 1,
+      "temperature": 0.3,
+      "thinking": "disabled",
+      "token_weights": {
+        "cached": 0.1,
+        "output": 2.0
+      }
+    }
+  },
+  "run_names": [
+    "stage10-scope-release-v2-live",
+    "stage10-scope-release-range-round1",
+    "stage10-scope-release-range-round2",
+    "stage10-scope-release-range-round3",
+    "stage10-scope-release-followup-live"
+  ],
+  "suite_hashes": [
+    "b478e191150525ccc0505333a55b28e6ca24008cc19e599b19a9f1a9847bc8ae",
+    "4359b2fd528afc6d049c15d3397bb819abf483268568998c04d8ed7ddae25b64",
+    "4359b2fd528afc6d049c15d3397bb819abf483268568998c04d8ed7ddae25b64",
+    "4359b2fd528afc6d049c15d3397bb819abf483268568998c04d8ed7ddae25b64",
+    "7e58776adbdd251625e98c193cc9a922c3d8751d0246c924811f45204c0f71c7"
+  ],
+  "raw_summaries": [
+    {
+      "selected": 9,
+      "passed": 9,
+      "failed": 0,
+      "unfinished": 0,
+      "pass_rate": 1.0,
+      "steps": 55,
+      "seconds": 147.11,
+      "equivalent_tokens": 152572,
+      "review_calls": 10
+    },
+    {
+      "selected": 7,
+      "passed": 7,
+      "failed": 0,
+      "unfinished": 0,
+      "pass_rate": 1.0,
+      "steps": 33,
+      "seconds": 81.79,
+      "equivalent_tokens": 77032,
+      "review_calls": 7
+    },
+    {
+      "selected": 7,
+      "passed": 7,
+      "failed": 0,
+      "unfinished": 0,
+      "pass_rate": 1.0,
+      "steps": 34,
+      "seconds": 89.95,
+      "equivalent_tokens": 84264,
+      "review_calls": 7
+    },
+    {
+      "selected": 7,
+      "passed": 7,
+      "failed": 0,
+      "unfinished": 0,
+      "pass_rate": 1.0,
+      "steps": 34,
+      "seconds": 78.2,
+      "equivalent_tokens": 77859,
+      "review_calls": 7
+    },
+    {
+      "selected": 2,
+      "passed": 2,
+      "failed": 0,
+      "unfinished": 0,
+      "pass_rate": 1.0,
+      "steps": 17,
+      "seconds": 67.14,
+      "equivalent_tokens": 74852,
+      "review_calls": 3
+    }
+  ],
+  "cases": [
+    {
+      "run": "stage10-scope-release-v2-live",
+      "id": "official_research",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "scope": "body",
+          "unit": "characters",
+          "actual": 1097,
+          "soft_target": 500
+        }
+      ],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 8,
+        "seconds": 22.7,
+        "equivalent_tokens": 25725,
+        "input_tokens": 77985,
+        "cached_tokens": 66176,
+        "output_tokens": 3649,
+        "llm_calls": 10,
+        "review_calls": 1,
+        "tool_errors": 2,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "fetch_url": 2,
+        "update_plan": 3,
+        "save_note": 1,
+        "read_notes": 1,
+        "write_report": 3
+      },
+      "observations": [
+        {
+          "kind": "soft_length",
+          "message": "正文 1097 个可见非空白字符，超过默认简述目标 500；这不是用户硬上限。"
+        }
+      ]
+    },
+    {
+      "run": "stage10-scope-release-v2-live",
+      "id": "cost_plot",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 6,
+        "seconds": 18.52,
+        "equivalent_tokens": 18298,
+        "input_tokens": 45739,
+        "cached_tokens": 36734,
+        "output_tokens": 2810,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "run_python": 1,
+        "update_plan": 5,
+        "read_notes": 1,
+        "write_report": 1
+      },
+      "observations": []
+    },
+    {
+      "run": "stage10-scope-release-v2-live",
+      "id": "cost_components",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 6,
+        "seconds": 16.28,
+        "equivalent_tokens": 16180,
+        "input_tokens": 42660,
+        "cached_tokens": 34816,
+        "output_tokens": 2427,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "run_python": 2,
+        "update_plan": 4,
+        "read_notes": 1,
+        "write_report": 1
+      },
+      "observations": []
+    },
+    {
+      "run": "stage10-scope-release-v2-live",
+      "id": "conflicting_sources",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "scope": "body",
+          "unit": "characters",
+          "actual": 692,
+          "soft_target": 500
+        }
+      ],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 5,
+        "seconds": 15.02,
+        "equivalent_tokens": 11155,
+        "input_tokens": 34194,
+        "cached_tokens": 30848,
+        "output_tokens": 2362,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "update_plan": 6,
+        "write_report": 2
+      },
+      "observations": [
+        {
+          "kind": "soft_length",
+          "message": "正文 692 个可见非空白字符，超过默认简述目标 500；这不是用户硬上限。"
+        }
+      ]
+    },
+    {
+      "run": "stage10-scope-release-v2-live",
+      "id": "limited_evidence",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "scope": "body",
+          "unit": "characters",
+          "actual": 803,
+          "soft_target": 500
+        }
+      ],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 7,
+        "seconds": 15.3,
+        "equivalent_tokens": 14013,
+        "input_tokens": 43678,
+        "cached_tokens": 38272,
+        "output_tokens": 2390,
+        "llm_calls": 9,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "calculator": 4,
+        "update_plan": 4,
+        "read_notes": 1,
+        "write_report": 2
+      },
+      "observations": [
+        {
+          "kind": "soft_length",
+          "message": "正文 803 个可见非空白字符，超过默认简述目标 500；这不是用户硬上限。"
+        }
+      ]
+    },
+    {
+      "run": "stage10-scope-release-v2-live",
+      "id": "ambiguous_evidence",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "scope": "body",
+          "unit": "characters",
+          "actual": 955,
+          "soft_target": 500
+        }
+      ],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 5,
+        "seconds": 11.33,
+        "equivalent_tokens": 12125,
+        "input_tokens": 32831,
+        "cached_tokens": 26880,
+        "output_tokens": 1743,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "update_plan": 6,
+        "read_notes": 1,
+        "write_report": 1
+      },
+      "observations": [
+        {
+          "kind": "soft_length",
+          "message": "正文 955 个可见非空白字符，超过默认简述目标 500；这不是用户硬上限。"
+        }
+      ]
+    },
+    {
+      "run": "stage10-scope-release-v2-live",
+      "id": "source_channels",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "scope": "body",
+          "unit": "characters",
+          "actual": 858,
+          "soft_target": 500
+        }
+      ],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 4,
+        "seconds": 12.5,
+        "equivalent_tokens": 10987,
+        "input_tokens": 27556,
+        "cached_tokens": 23168,
+        "output_tokens": 2141,
+        "llm_calls": 6,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "update_plan": 4,
+        "write_report": 2
+      },
+      "observations": [
+        {
+          "kind": "soft_length",
+          "message": "正文 858 个可见非空白字符，超过默认简述目标 500；这不是用户硬上限。"
+        }
+      ]
+    },
+    {
+      "run": "stage10-scope-release-v2-live",
+      "id": "memory_seed",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 6,
+        "seconds": 16.91,
+        "equivalent_tokens": 21345,
+        "input_tokens": 49207,
+        "cached_tokens": 37120,
+        "output_tokens": 2773,
+        "llm_calls": 9,
+        "review_calls": 2,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "run_python": 1,
+        "update_plan": 4,
+        "calculator": 2,
+        "read_notes": 1,
+        "write_report": 2
+      },
+      "observations": []
+    },
+    {
+      "run": "stage10-scope-release-v2-live",
+      "id": "memory_followup",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 8,
+        "seconds": 18.55,
+        "equivalent_tokens": 22744,
+        "input_tokens": 66029,
+        "cached_tokens": 55808,
+        "output_tokens": 3471,
+        "llm_calls": 10,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "update_plan": 6,
+        "read_notes": 1,
+        "run_python": 1,
+        "write_report": 2
+      },
+      "observations": []
+    },
+    {
+      "run": "stage10-scope-release-range-round1",
+      "id": "brief_fixed",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 300,
+          "unit": "characters",
+          "scope": "full",
+          "explicit_text": "不超过300字",
+          "actual": 256
+        }
+      ],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 5,
+        "seconds": 7.88,
+        "equivalent_tokens": 8891,
+        "input_tokens": 30111,
+        "cached_tokens": 25984,
+        "output_tokens": 1083,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "update_plan": 4,
+        "write_report": 2
+      },
+      "observations": []
+    },
+    {
+      "run": "stage10-scope-release-range-round1",
+      "id": "han_limit",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 120,
+          "unit": "han_characters",
+          "scope": "full",
+          "explicit_text": "不超过120个中文字符",
+          "actual": 110
+        }
+      ],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 4,
+        "seconds": 6.91,
+        "equivalent_tokens": 5827,
+        "input_tokens": 23728,
+        "cached_tokens": 21632,
+        "output_tokens": 784,
+        "llm_calls": 6,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "read_notes": 1,
+        "update_plan": 2,
+        "write_report": 2
+      },
+      "observations": []
+    },
+    {
+      "run": "stage10-scope-release-range-round1",
+      "id": "english_words",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 100,
+          "unit": "english_words",
+          "scope": "full",
+          "explicit_text": "最多100个英文单词",
+          "actual": 71
+        }
+      ],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 3,
+        "seconds": 5.41,
+        "equivalent_tokens": 5892,
+        "input_tokens": 18027,
+        "cached_tokens": 14592,
+        "output_tokens": 499,
+        "llm_calls": 5,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "update_plan": 2,
+        "write_report": 1
+      },
+      "observations": []
+    },
+    {
+      "run": "stage10-scope-release-range-round1",
+      "id": "requested_statistics",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "hard_errors": [],
+      "analysis_methods": [
+        "Wilson"
+      ],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 7,
+        "seconds": 26.05,
+        "equivalent_tokens": 24492,
+        "input_tokens": 56247,
+        "cached_tokens": 45568,
+        "output_tokens": 4628,
+        "llm_calls": 9,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "run_python": 3,
+        "update_plan": 5,
+        "read_notes": 1,
+        "write_report": 1
+      },
+      "observations": [
+        {
+          "kind": "assumption",
+          "quote": "该区间是\"若 p 真为某值 q，则观测到 p̂ 与 q 的得分统计量不超过 1.96 的概率不小于 95%\"这一反解得到的近似区间，只在题设的独立同分布、单一固定 p 前提下有意义",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        },
+        {
+          "kind": "assumption",
+          "quote": "独立同分布来自题目给定，不是由这 20 次观测证明的",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        },
+        {
+          "kind": "assumption",
+          "quote": "**没有代表性证据**：本任务没有抽样框、没有随机抽样说明、没有产品间可比性信息",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        }
+      ]
+    },
+    {
+      "run": "stage10-scope-release-range-round1",
+      "id": "unknown_assumptions",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 350,
+          "unit": "characters",
+          "scope": "body",
+          "explicit_text": "最多350字",
+          "actual": 338
+        }
+      ],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 4,
+        "seconds": 8.37,
+        "equivalent_tokens": 8792,
+        "input_tokens": 25964,
+        "cached_tokens": 21504,
+        "output_tokens": 1091,
+        "llm_calls": 6,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "update_plan": 6,
+        "write_report": 1
+      },
+      "observations": []
+    },
+    {
+      "run": "stage10-scope-release-range-round1",
+      "id": "revised_limit",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 220,
+          "unit": "characters",
+          "scope": "full",
+          "explicit_text": "不超过220字",
+          "actual": 184
+        }
+      ],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 5,
+        "seconds": 7.8,
+        "equivalent_tokens": 7167,
+        "input_tokens": 29810,
+        "cached_tokens": 27392,
+        "output_tokens": 1005,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "update_plan": 4,
+        "write_report": 2
+      },
+      "observations": []
+    },
+    {
+      "run": "stage10-scope-release-range-round1",
+      "id": "detailed_scope",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 5,
+        "seconds": 19.37,
+        "equivalent_tokens": 15971,
+        "input_tokens": 35985,
+        "cached_tokens": 29184,
+        "output_tokens": 3126,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "read_notes": 1,
+        "update_plan": 6,
+        "calculator": 1,
+        "write_report": 1
+      },
+      "observations": []
+    },
+    {
+      "run": "stage10-scope-release-range-round2",
+      "id": "brief_fixed",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 300,
+          "unit": "characters",
+          "scope": "full",
+          "explicit_text": "不超过300字",
+          "actual": 197
+        }
+      ],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 4,
+        "seconds": 6.7,
+        "equivalent_tokens": 5922,
+        "input_tokens": 23886,
+        "cached_tokens": 21760,
+        "output_tokens": 810,
+        "llm_calls": 6,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "update_plan": 2,
+        "write_report": 2
+      },
+      "observations": []
+    },
+    {
+      "run": "stage10-scope-release-range-round2",
+      "id": "han_limit",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 120,
+          "unit": "han_characters",
+          "scope": "full",
+          "explicit_text": "不超过120个中文字符",
+          "actual": 118
+        }
+      ],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 5,
+        "seconds": 7.48,
+        "equivalent_tokens": 6391,
+        "input_tokens": 28249,
+        "cached_tokens": 25984,
+        "output_tokens": 764,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "read_notes": 1,
+        "update_plan": 2,
+        "write_report": 2
+      },
+      "observations": []
+    },
+    {
+      "run": "stage10-scope-release-range-round2",
+      "id": "english_words",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 100,
+          "unit": "english_words",
+          "scope": "full",
+          "explicit_text": "最多100个英文单词",
+          "actual": 94
+        }
+      ],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 3,
+        "seconds": 5.5,
+        "equivalent_tokens": 5984,
+        "input_tokens": 18144,
+        "cached_tokens": 14720,
+        "output_tokens": 544,
+        "llm_calls": 5,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "update_plan": 2,
+        "write_report": 1
+      },
+      "observations": []
+    },
+    {
+      "run": "stage10-scope-release-range-round2",
+      "id": "requested_statistics",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "hard_errors": [],
+      "analysis_methods": [
+        "Wilson"
+      ],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 6,
+        "seconds": 34.78,
+        "equivalent_tokens": 30196,
+        "input_tokens": 55710,
+        "cached_tokens": 45696,
+        "output_tokens": 7806,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "run_python": 1,
+        "update_plan": 5,
+        "read_notes": 1,
+        "write_report": 2
+      },
+      "observations": [
+        {
+          "kind": "assumption",
+          "quote": "在题设给定的条件下（20 次独立同分布伯努利试验、成功概率恒定为 $p$、观测到 18 次成功），用 Wilson 得分区间法、取 $z=1.96$ 计算，得到 $p$ 的 95% 置信区间为 **[0.698962, 0.972134]**，即约 **[69.90%, 97.21%]**",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        },
+        {
+          "kind": "assumption",
+          "quote": "本题的\"20 次独立同分布伯努利试验、成功概率恒定为 $p$\"是**题目给定的前提**，不是从数据中得出的结论，也不是本次计算验证过的性质",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        }
+      ]
+    },
+    {
+      "run": "stage10-scope-release-range-round2",
+      "id": "unknown_assumptions",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 350,
+          "unit": "characters",
+          "scope": "body",
+          "explicit_text": "最多350字",
+          "actual": 321
+        }
+      ],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 7,
+        "seconds": 11.56,
+        "equivalent_tokens": 12996,
+        "input_tokens": 45476,
+        "cached_tokens": 39936,
+        "output_tokens": 1731,
+        "llm_calls": 9,
+        "review_calls": 1,
+        "tool_errors": 2,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "update_plan": 6,
+        "calculator": 1,
+        "read_notes": 1,
+        "write_report": 3
+      },
+      "observations": []
+    },
+    {
+      "run": "stage10-scope-release-range-round2",
+      "id": "revised_limit",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 220,
+          "unit": "characters",
+          "scope": "full",
+          "explicit_text": "不超过220字",
+          "actual": 161
+        }
+      ],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 4,
+        "seconds": 6.46,
+        "equivalent_tokens": 7252,
+        "input_tokens": 23934,
+        "cached_tokens": 20224,
+        "output_tokens": 760,
+        "llm_calls": 6,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "update_plan": 2,
+        "calculator": 1,
+        "write_report": 2
+      },
+      "observations": []
+    },
+    {
+      "run": "stage10-scope-release-range-round2",
+      "id": "detailed_scope",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 5,
+        "seconds": 17.47,
+        "equivalent_tokens": 15523,
+        "input_tokens": 36140,
+        "cached_tokens": 29312,
+        "output_tokens": 2882,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "update_plan": 5,
+        "calculator": 2,
+        "read_notes": 1,
+        "write_report": 1
+      },
+      "observations": []
+    },
+    {
+      "run": "stage10-scope-release-range-round3",
+      "id": "brief_fixed",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 300,
+          "unit": "characters",
+          "scope": "full",
+          "explicit_text": "不超过300字",
+          "actual": 284
+        }
+      ],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 6,
+        "seconds": 9.4,
+        "equivalent_tokens": 9915,
+        "input_tokens": 35023,
+        "cached_tokens": 30336,
+        "output_tokens": 1097,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "update_plan": 2,
+        "calculator": 2,
+        "read_notes": 1,
+        "write_report": 2
+      },
+      "observations": [
+        {
+          "kind": "assumption",
+          "quote": "未知：B、C数据、测试条件是否一致、样本是否独立同分布、稳定性定义",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        }
+      ]
+    },
+    {
+      "run": "stage10-scope-release-range-round3",
+      "id": "han_limit",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 120,
+          "unit": "han_characters",
+          "scope": "full",
+          "explicit_text": "不超过120个中文字符",
+          "actual": 115
+        }
+      ],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 5,
+        "seconds": 7.8,
+        "equivalent_tokens": 7115,
+        "input_tokens": 29750,
+        "cached_tokens": 27392,
+        "output_tokens": 1009,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 2,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "read_notes": 1,
+        "update_plan": 2,
+        "write_report": 3
+      },
+      "observations": []
+    },
+    {
+      "run": "stage10-scope-release-range-round3",
+      "id": "english_words",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 100,
+          "unit": "english_words",
+          "scope": "full",
+          "explicit_text": "最多100个英文单词",
+          "actual": 87
+        }
+      ],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 3,
+        "seconds": 5.14,
+        "equivalent_tokens": 6281,
+        "input_tokens": 18567,
+        "cached_tokens": 14976,
+        "output_tokens": 596,
+        "llm_calls": 5,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "update_plan": 3,
+        "write_report": 1
+      },
+      "observations": []
+    },
+    {
+      "run": "stage10-scope-release-range-round3",
+      "id": "requested_statistics",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "hard_errors": [],
+      "analysis_methods": [
+        "Wilson"
+      ],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 5,
+        "seconds": 20.16,
+        "equivalent_tokens": 20382,
+        "input_tokens": 40372,
+        "cached_tokens": 31104,
+        "output_tokens": 4002,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "run_python": 2,
+        "update_plan": 6,
+        "write_report": 1
+      },
+      "observations": [
+        {
+          "kind": "assumption",
+          "quote": "需要强调三点：其一，\"独立同分布\"与\"伯努利\"是题目给定的前提，不是由这 20 个数据检验或证明出来的",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        },
+        {
+          "kind": "assumption",
+          "quote": "题目明确设定\"20 次独立同分布的伯努利试验\"",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        },
+        {
+          "kind": "assumption",
+          "quote": "各次试验相互独立，且分布相同（i.i.d.）",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        }
+      ]
+    },
+    {
+      "run": "stage10-scope-release-range-round3",
+      "id": "unknown_assumptions",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 350,
+          "unit": "characters",
+          "scope": "body",
+          "explicit_text": "最多350字",
+          "actual": 324
+        }
+      ],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 5,
+        "seconds": 9.32,
+        "equivalent_tokens": 9847,
+        "input_tokens": 30713,
+        "cached_tokens": 25856,
+        "output_tokens": 1202,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "update_plan": 3,
+        "calculator": 1,
+        "write_report": 2
+      },
+      "observations": []
+    },
+    {
+      "run": "stage10-scope-release-range-round3",
+      "id": "revised_limit",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 220,
+          "unit": "characters",
+          "scope": "full",
+          "explicit_text": "不超过220字",
+          "actual": 188
+        }
+      ],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 5,
+        "seconds": 7.75,
+        "equivalent_tokens": 8266,
+        "input_tokens": 28974,
+        "cached_tokens": 24960,
+        "output_tokens": 878,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "update_plan": 2,
+        "calculator": 1,
+        "write_report": 2
+      },
+      "observations": []
+    },
+    {
+      "run": "stage10-scope-release-range-round3",
+      "id": "detailed_scope",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "hard_errors": [],
+      "analysis_methods": [],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 5,
+        "seconds": 18.63,
+        "equivalent_tokens": 16053,
+        "input_tokens": 36565,
+        "cached_tokens": 29696,
+        "output_tokens": 3107,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "update_plan": 5,
+        "calculator": 2,
+        "read_notes": 1,
+        "write_report": 1
+      },
+      "observations": []
+    },
+    {
+      "run": "stage10-scope-release-followup-live",
+      "id": "two_methods_requested",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "hard_errors": [],
+      "analysis_methods": [
+        "Wilson",
+        "Wald"
+      ],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 11,
+        "seconds": 47.39,
+        "equivalent_tokens": 47470,
+        "input_tokens": 121912,
+        "cached_tokens": 110973,
+        "output_tokens": 12717,
+        "llm_calls": 13,
+        "review_calls": 1,
+        "tool_errors": 4,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "run_python": 2,
+        "update_plan": 6,
+        "read_notes": 1,
+        "write_report": 5
+      },
+      "observations": [
+        {
+          "kind": "assumption",
+          "quote": "题设：某虚构产品完成 40 次独立同分布的伯努利试验，成功 32 次，取 95% 置信水平、z = 1.96",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        },
+        {
+          "kind": "assumption",
+          "quote": "**共同前提**：两者都要求独立同分布的二项抽样、固定的 n，并把 z = 1.96 当作已知分位数",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        }
+      ]
+    },
+    {
+      "run": "stage10-scope-release-followup-live",
+      "id": "one_method_reworded",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "hard_errors": [],
+      "analysis_methods": [
+        "Wilson"
+      ],
+      "extra_method_results": [],
+      "review_status": "reviewed",
+      "review_clean_and_current": true,
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "metrics": {
+        "steps": 6,
+        "seconds": 19.75,
+        "equivalent_tokens": 27382,
+        "input_tokens": 58000,
+        "cached_tokens": 42624,
+        "output_tokens": 3872,
+        "llm_calls": 9,
+        "review_calls": 2,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "tool_calls": {
+        "run_python": 2,
+        "update_plan": 5,
+        "write_report": 2
+      },
+      "observations": [
+        {
+          "kind": "assumption",
+          "quote": "在题设条件下（24 次独立同分布伯努利试验，18 次成功，置信水平 95%，z = 1.96），样本成功比例为 p̂ = 18/24 = 0.75",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        },
+        {
+          "kind": "assumption",
+          "quote": "**独立同分布伯努利试验**：24 次试验相互独立、每次成功概率相同（同一 p）",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        },
+        {
+          "kind": "assumption",
+          "quote": "若题设的\"独立同分布\"不成立，区间数值虽可算出，但解释失效",
+          "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"
+        }
+      ]
+    }
+  ],
+  "artifact_sha256": {
+    "stage10-scope-release-v2-live\\cases\\01-official_research\\report.md": "48ae36024da53c51dfd57bcfacd3ea8542dcef314f520b3118a9d01bed041373",
+    "stage10-scope-release-v2-live\\cases\\01-official_research\\trace.jsonl": "d24e88e2bf113df2c6d52c6996f724cafeaa13f16b87a48669e0dcf2ff93989a",
+    "stage10-scope-release-v2-live\\cases\\01-official_research\\report.contract.json": "e977b4e0c811b308379cbbffd1a8cb1411b2d6aae53dd0c44724841a880816cb",
+    "stage10-scope-release-v2-live\\cases\\01-official_research\\report.review.json": "08ebd8a02be9bc070c7cb45175a2e1b94eba8473357c5f19f1c6dd752771ecd0",
+    "stage10-scope-release-v2-live\\cases\\01-official_research\\task_contract.json": "bdb652691dda5eceb135793967c70289f98fab2401f2c1f448365bc2ec661821",
+    "stage10-scope-release-v2-live\\cases\\01-cost_plot\\report.md": "e575f1489f8e3ac1dee8f6a1a3e78d01d8b18e338c86ea4f03a32dd10e4e910d",
+    "stage10-scope-release-v2-live\\cases\\01-cost_plot\\trace.jsonl": "6739f2a9450873c6846320a397baa240a5fe5a4bdd6769dab3328d4c06de7b17",
+    "stage10-scope-release-v2-live\\cases\\01-cost_plot\\report.contract.json": "45f3b0b84e77e2106645a5b7c08cc3d1de978a8d66c70198fa0c08946cd76904",
+    "stage10-scope-release-v2-live\\cases\\01-cost_plot\\report.review.json": "85f91f4afc884013b2a8613c707ad5b06a8e0ffa89762bdd06d453aca7e83a41",
+    "stage10-scope-release-v2-live\\cases\\01-cost_plot\\task_contract.json": "c8cab81c77031db691d1246bb4db76b2f9b77811c0881097dc9ff9c3571bc93c",
+    "stage10-scope-release-v2-live\\cases\\01-cost_components\\report.md": "22799fc797a48e0985058bee2bb756017d64dab957f3e59a238084e57b96b0b0",
+    "stage10-scope-release-v2-live\\cases\\01-cost_components\\trace.jsonl": "f1655cc764ff017098b001bfbf07f72f10779c7730726c871a2c062685dd54c3",
+    "stage10-scope-release-v2-live\\cases\\01-cost_components\\report.contract.json": "3374a911234a417b17b865997a1843ddbdc6328a74bc9faddefc2284ae3279a0",
+    "stage10-scope-release-v2-live\\cases\\01-cost_components\\report.review.json": "6cad1fea480c9f8cb77b45cab9e578005dfe563e5dac95e0c04526957645d271",
+    "stage10-scope-release-v2-live\\cases\\01-cost_components\\task_contract.json": "45c7d4b92c0401a0934bd215e749a36cad8a93c8fd441f99dd6a0cf48f022fc0",
+    "stage10-scope-release-v2-live\\cases\\01-conflicting_sources\\report.md": "c13889965236f1d8eb913bdd17f087d7bb646303b13105fa8bf3aa7717e58091",
+    "stage10-scope-release-v2-live\\cases\\01-conflicting_sources\\trace.jsonl": "b223de22785bcc9ae7aa3cfeecae5d85fcac9a75a925e0d2b93e1975aca72592",
+    "stage10-scope-release-v2-live\\cases\\01-conflicting_sources\\report.contract.json": "2cd8af497be537b125a2077e0f202e557fd2ad83913934d431f526339a3c8ca3",
+    "stage10-scope-release-v2-live\\cases\\01-conflicting_sources\\report.review.json": "045203cd36ae4a0778d844f67b60a1febd9157eb9823c03d682086e38e5af5f8",
+    "stage10-scope-release-v2-live\\cases\\01-conflicting_sources\\task_contract.json": "b20b9b41ed0f7f7634871dd16544625a25ef7fb636e84c9b4adfb1195b6bd087",
+    "stage10-scope-release-v2-live\\cases\\01-limited_evidence\\report.md": "f98244967eaef89da5a38a5915307762d00d135302a895eaea2f9db51b0c9339",
+    "stage10-scope-release-v2-live\\cases\\01-limited_evidence\\trace.jsonl": "ac126a265dde81a91aa1ef0f61c7a21ef19ce9965030ef87d20cae1e6a87b33c",
+    "stage10-scope-release-v2-live\\cases\\01-limited_evidence\\report.contract.json": "a2595b7b0c859454965b0a2c91b31558f78441ca5d89372ba56e0797960c2765",
+    "stage10-scope-release-v2-live\\cases\\01-limited_evidence\\report.review.json": "128f66a627dab0df56426e3f834d06fde83555a05fdce80fef0ccbac61ecb497",
+    "stage10-scope-release-v2-live\\cases\\01-limited_evidence\\task_contract.json": "1ca10d100938e95c8ebe6d25e7044dcbcff23c43f7a159785b72de448c425ca4",
+    "stage10-scope-release-v2-live\\cases\\01-ambiguous_evidence\\report.md": "8f1cde8ba482da7f90b92746bd77990749bdaa06a1b3c250b1f5e4390c239915",
+    "stage10-scope-release-v2-live\\cases\\01-ambiguous_evidence\\trace.jsonl": "078b40846ed6f22f767b8ae3e861c2dbd4d2685b0d35d11e8bac20f4f0256905",
+    "stage10-scope-release-v2-live\\cases\\01-ambiguous_evidence\\report.contract.json": "776da1fd57e525e4b02dae60621c711e4dbe71b132be4f69bc29f3132671caf8",
+    "stage10-scope-release-v2-live\\cases\\01-ambiguous_evidence\\report.review.json": "2908f14a3d43d43c9985c9a53d3ac41e13778e845c39c478d58a6b5c1cb72c2c",
+    "stage10-scope-release-v2-live\\cases\\01-ambiguous_evidence\\task_contract.json": "3721475d9410eac1f9515e8e2f07b26e679b456a81b0b675bcec39c1fe29e2dc",
+    "stage10-scope-release-v2-live\\cases\\01-source_channels\\report.md": "7d13ad3f5a82c3339c11aef6d2510023f6db3d0ceb84842a91616c42a673ef2f",
+    "stage10-scope-release-v2-live\\cases\\01-source_channels\\trace.jsonl": "50f3e847fae54cde33c51193ffb1ecaa9ebf0445c1d2dc7d6412152f40c3232d",
+    "stage10-scope-release-v2-live\\cases\\01-source_channels\\report.contract.json": "a46deab2a3031f191cc1a4214790f6dfff9afcfee03f4a13d26c57fcf871e853",
+    "stage10-scope-release-v2-live\\cases\\01-source_channels\\report.review.json": "cb6180a237729a4dfc2570eba8226427e5d230aeee8d64db890735fb4e9cb246",
+    "stage10-scope-release-v2-live\\cases\\01-source_channels\\task_contract.json": "2b51ed145c16b234ad05fb3794c137bdfc8f8d5be3ee0ae3e641906ffc61444c",
+    "stage10-scope-release-v2-live\\cases\\01-memory_seed\\report.md": "a4efe6e58503ebcb8d1a76eb586868675f9ed304f602011a7e9ddd0613158c84",
+    "stage10-scope-release-v2-live\\cases\\01-memory_seed\\trace.jsonl": "27d326cfda04c0acd8fe454cb8a5d3271e8be1ce034eafbe10d652d093c98798",
+    "stage10-scope-release-v2-live\\cases\\01-memory_seed\\report.contract.json": "07c428100706bfbe9c3a2b152359e87367b06f27dfc765f8cf6f4ef7c71e3e76",
+    "stage10-scope-release-v2-live\\cases\\01-memory_seed\\report.review.json": "f6be938a7da6833d59f43228fa4195ddac440b9a8c144be749f667bba602354d",
+    "stage10-scope-release-v2-live\\cases\\01-memory_seed\\task_contract.json": "fc374549be0da91f6184f1f4de0ba7175a2e0e68ce99165ed2dde6cffe178aa6",
+    "stage10-scope-release-v2-live\\cases\\01-memory_followup\\report.md": "1ff25e7556787c5b8dc4f93d0ff0a79e0352e808df751c12b71c390bf6b9569d",
+    "stage10-scope-release-v2-live\\cases\\01-memory_followup\\trace.jsonl": "b7ddd6affbfcd9ea61c5c04c250401a3d0dce18693a38921689a4c0a742bc9b7",
+    "stage10-scope-release-v2-live\\cases\\01-memory_followup\\report.contract.json": "f552554ab3906569be9a5ea248081da4b62aaba1a909d5c61880f85bb315f627",
+    "stage10-scope-release-v2-live\\cases\\01-memory_followup\\report.review.json": "f37f053441b2217550789f2144c9d49d8d79721766556908ac6a9561a8dad81c",
+    "stage10-scope-release-v2-live\\cases\\01-memory_followup\\task_contract.json": "58846f14c2f9f8618c541c9a567643cbb5ef890cba49bae3c62a66d194740263",
+    "stage10-scope-release-range-round1\\cases\\01-brief_fixed\\report.md": "7dcb32b16f28bc17e15bfd3b85a73e367472b80d552c7a0f70ca82830da1fe82",
+    "stage10-scope-release-range-round1\\cases\\01-brief_fixed\\trace.jsonl": "1fa0ba0b3f21e99cc62d5f7604a9f024e11f2941814874758c80f532b6ad7877",
+    "stage10-scope-release-range-round1\\cases\\01-brief_fixed\\report.contract.json": "ac41c143462458d2976c6e55b38a136d7e4cf46291975de5f9ef15c871e0ae84",
+    "stage10-scope-release-range-round1\\cases\\01-brief_fixed\\report.review.json": "bb31d1d2a734991de852af8653ebf1bc7447b09936039ac312e69c3fe934572e",
+    "stage10-scope-release-range-round1\\cases\\01-brief_fixed\\task_contract.json": "f5cc5f61938d3d24313f87729bccb0da9df1212ed4e82fbdffb07e577e051450",
+    "stage10-scope-release-range-round1\\cases\\01-han_limit\\report.md": "6309b725f018b8f730b8204afba92fef18e7777349278ee7a9e073a9fdefd2b3",
+    "stage10-scope-release-range-round1\\cases\\01-han_limit\\trace.jsonl": "812d92ff195ed57e19cc497e2068285ea605291f27f7b9a42bc289b181636aa6",
+    "stage10-scope-release-range-round1\\cases\\01-han_limit\\report.contract.json": "23f7b681bc7174d7c4e87c1bae11b947d011b6ca80ce8e45edb16b79eeb0c6e6",
+    "stage10-scope-release-range-round1\\cases\\01-han_limit\\report.review.json": "d96a7549f34040a209da00c6c8aa6c640d9fad9e4c9bcc07d2f91e00c9246060",
+    "stage10-scope-release-range-round1\\cases\\01-han_limit\\task_contract.json": "96bc064c53230c259f829a7ff88fd829945fffe134a38ee43d0ab554132f4506",
+    "stage10-scope-release-range-round1\\cases\\01-english_words\\report.md": "5486a701f4f7273e4d22c35eec806ecf8be40f55c951f334e8edacd2106fa407",
+    "stage10-scope-release-range-round1\\cases\\01-english_words\\trace.jsonl": "2d00a937f00826e77c43c56c0822b4a6d12ce21eab38119082f919d946653070",
+    "stage10-scope-release-range-round1\\cases\\01-english_words\\report.contract.json": "dd5bf7696fe850cfb88f2ef6de0694e59e2b56cef52abf1bb58bffaeab326e5c",
+    "stage10-scope-release-range-round1\\cases\\01-english_words\\report.review.json": "e474d13af2dec7494af2bf3d8c215318e52c4768400b9b40e4f8440b9dbdd2b0",
+    "stage10-scope-release-range-round1\\cases\\01-english_words\\task_contract.json": "0023c2d3865eb80a9d4f4531bd1ba598eda317868c1bd8292c1b81f5f45faccc",
+    "stage10-scope-release-range-round1\\cases\\01-requested_statistics\\report.md": "b75a261eeb019d9c5fa02aea2a0c4f81e17309047ee249d334a59e85b3a31ece",
+    "stage10-scope-release-range-round1\\cases\\01-requested_statistics\\trace.jsonl": "033c1c33bda6c316be095734c0ef50cede809bf710448df7abe7478ccbb5e4e5",
+    "stage10-scope-release-range-round1\\cases\\01-requested_statistics\\report.contract.json": "2f4cd53b490c3512bd2f561999e6d2030c728bb70ce3511548f5e12d393fbd24",
+    "stage10-scope-release-range-round1\\cases\\01-requested_statistics\\report.review.json": "81d6a67e807c8d141df9d555140e4697633aad2b4277286b5678f9ce82c295f8",
+    "stage10-scope-release-range-round1\\cases\\01-requested_statistics\\task_contract.json": "44724428f1b25ca9447cdbba5fce42384ae6e994867c510afd5be0835aa96d08",
+    "stage10-scope-release-range-round1\\cases\\01-unknown_assumptions\\report.md": "27f2aa0d3e55191276550b9f63b7bc0ef91fab052c1c38ba33bcb302921548ff",
+    "stage10-scope-release-range-round1\\cases\\01-unknown_assumptions\\trace.jsonl": "db8ed12883a3acee6a34735a84ac34fbe6ca7977f11b3aab46d74ae52cbe008e",
+    "stage10-scope-release-range-round1\\cases\\01-unknown_assumptions\\report.contract.json": "20d2df66685b980d83ed29d3524791dc3fe475592c32355e21c09cf575a5b6c3",
+    "stage10-scope-release-range-round1\\cases\\01-unknown_assumptions\\report.review.json": "a8479769d12488eeb23d4e356148dc93b1bfcc755b11c971b4368cf1e319ae05",
+    "stage10-scope-release-range-round1\\cases\\01-unknown_assumptions\\task_contract.json": "0447f8648e00de5327ffa2261461b626789f2628bb415b964907fc4b63529c48",
+    "stage10-scope-release-range-round1\\cases\\01-revised_limit\\report.md": "5575763a522f8d8c440163f89616ee5863dd093b3b705eb2735e674a69d1e234",
+    "stage10-scope-release-range-round1\\cases\\01-revised_limit\\trace.jsonl": "943158caeaaf8372a004851e475dd3cfd2eaa16d6ecee191ffedb50543e70922",
+    "stage10-scope-release-range-round1\\cases\\01-revised_limit\\report.contract.json": "3826e7dd79ec4f46b90c0b5eb7eff54a7bfb477fe79f21a9d3b1707772c39836",
+    "stage10-scope-release-range-round1\\cases\\01-revised_limit\\report.review.json": "b004c8a9b558b5722f1a65ffdbd3ec46498b732a054b8da46217eafc2a033e4c",
+    "stage10-scope-release-range-round1\\cases\\01-revised_limit\\task_contract.json": "ee5906fd9b7b4d831868e8b37eb18f0ad0f36d9185e307d7c6ea0efd2cfe91a7",
+    "stage10-scope-release-range-round1\\cases\\01-detailed_scope\\report.md": "6751605d638345d713ada60d067cf6b3b7cb455a98318fde9dffe94f9fd249ad",
+    "stage10-scope-release-range-round1\\cases\\01-detailed_scope\\trace.jsonl": "638252f46c75e092b462b5328ca060ebda7bbc67e4612cbe4ba9bc1eb060ed5f",
+    "stage10-scope-release-range-round1\\cases\\01-detailed_scope\\report.contract.json": "fda80ee82712dd6f188be6e5bcfe994d61fddc6e17ec0f0c43d3acf01b753458",
+    "stage10-scope-release-range-round1\\cases\\01-detailed_scope\\report.review.json": "10aeeb5e12dbcb14f8dc892d9944bfc06a2046d5ada6e063f2bf8484961569ef",
+    "stage10-scope-release-range-round1\\cases\\01-detailed_scope\\task_contract.json": "6aad5dc9a221519106e9c080d6012bc672b5161f3d3a0420bd0d9e1876465218",
+    "stage10-scope-release-range-round2\\cases\\01-brief_fixed\\report.md": "5e7196ee0f108ab5d62bfdd6fbbc7cbf92e795022209511b6c9caeaa663e8aff",
+    "stage10-scope-release-range-round2\\cases\\01-brief_fixed\\trace.jsonl": "8e07af188be8c2a418199516d84ce52d9456bd07459a13131447efd4f077abd8",
+    "stage10-scope-release-range-round2\\cases\\01-brief_fixed\\report.contract.json": "d936393b991097783af6b5c617dd40d9f75285221e5b2a4bd1da1e1de46567ed",
+    "stage10-scope-release-range-round2\\cases\\01-brief_fixed\\report.review.json": "25a0528d569f658b5cba6ed77c5dcd3d9e6b3743630b82bab10a06958b18be24",
+    "stage10-scope-release-range-round2\\cases\\01-brief_fixed\\task_contract.json": "f5cc5f61938d3d24313f87729bccb0da9df1212ed4e82fbdffb07e577e051450",
+    "stage10-scope-release-range-round2\\cases\\01-han_limit\\report.md": "4a196e7b3697202a220d8429a85a3326bc7c0f17340b82f3868bc6dec260eabc",
+    "stage10-scope-release-range-round2\\cases\\01-han_limit\\trace.jsonl": "d87897d2220e28c5c653fa7378020b07a33dbc7d88fd798946009b70c626fe68",
+    "stage10-scope-release-range-round2\\cases\\01-han_limit\\report.contract.json": "e50faccd3ab11dd513d5739b726415b8e476ab7522fc84c0f6ffc9275f9d3c05",
+    "stage10-scope-release-range-round2\\cases\\01-han_limit\\report.review.json": "ff2d5ba5c77f08281bb572d4d8b0358874a489c52cda21c50f02beeef083fd09",
+    "stage10-scope-release-range-round2\\cases\\01-han_limit\\task_contract.json": "96bc064c53230c259f829a7ff88fd829945fffe134a38ee43d0ab554132f4506",
+    "stage10-scope-release-range-round2\\cases\\01-english_words\\report.md": "3dacd61eeebc50881a7864aa08d44224117492f1aabe7f3a17c6fd09a13e5dc3",
+    "stage10-scope-release-range-round2\\cases\\01-english_words\\trace.jsonl": "8b67115adde69f678f4a480e65670a3f1510af691f3d04b88c006d39dd4221cd",
+    "stage10-scope-release-range-round2\\cases\\01-english_words\\report.contract.json": "419672b07ab94f049a47ead3d0f18e0f2469d3683518ffc11150092fae104e16",
+    "stage10-scope-release-range-round2\\cases\\01-english_words\\report.review.json": "461a7a5d79bdb5b322fe53c6ccdf90a21976bb5bace596f62566bf4c9514872a",
+    "stage10-scope-release-range-round2\\cases\\01-english_words\\task_contract.json": "0023c2d3865eb80a9d4f4531bd1ba598eda317868c1bd8292c1b81f5f45faccc",
+    "stage10-scope-release-range-round2\\cases\\01-requested_statistics\\report.md": "8804140c8a271a54738c75a0d651314efe3f9eec2d56e53a2b7ea1aeec7126c1",
+    "stage10-scope-release-range-round2\\cases\\01-requested_statistics\\trace.jsonl": "9e34ec35e070aa601257c4e3534467f120484a9921b8b13847d788f13058e2eb",
+    "stage10-scope-release-range-round2\\cases\\01-requested_statistics\\report.contract.json": "a970f006cc07d3dc0332fb3fe23eee5259b7c1a0a4e72fa1162c42423fcf7885",
+    "stage10-scope-release-range-round2\\cases\\01-requested_statistics\\report.review.json": "0a9ef6d317cc2063aa4982dac26404a98957d9430cdd936ca43eafc87a44d906",
+    "stage10-scope-release-range-round2\\cases\\01-requested_statistics\\task_contract.json": "44724428f1b25ca9447cdbba5fce42384ae6e994867c510afd5be0835aa96d08",
+    "stage10-scope-release-range-round2\\cases\\01-unknown_assumptions\\report.md": "8ce2f343f3f13e0deb29c0e335871717ea4def35c90cc86cd116aa5404b08b05",
+    "stage10-scope-release-range-round2\\cases\\01-unknown_assumptions\\trace.jsonl": "95b3cefa5d602a398c4f67346625260cd2c86ad806125ea21e424fad11bbf37e",
+    "stage10-scope-release-range-round2\\cases\\01-unknown_assumptions\\report.contract.json": "c88dd6a634b3bb6495e2089273fd2f2ac8040307313fd09bb054bb028744bd1b",
+    "stage10-scope-release-range-round2\\cases\\01-unknown_assumptions\\report.review.json": "bc6c8115dfe5a2de644d869b553c998e6dee58548b21ead90715aedd5b7d37cc",
+    "stage10-scope-release-range-round2\\cases\\01-unknown_assumptions\\task_contract.json": "0447f8648e00de5327ffa2261461b626789f2628bb415b964907fc4b63529c48",
+    "stage10-scope-release-range-round2\\cases\\01-revised_limit\\report.md": "8c7f77a20e000148a8c1a08ff2b660f0f3d6f0dc6954945884994cfd25907b07",
+    "stage10-scope-release-range-round2\\cases\\01-revised_limit\\trace.jsonl": "cfb4537042a4174861bc819058417ba91029f37f088f9cfe192dded2b97b2cfd",
+    "stage10-scope-release-range-round2\\cases\\01-revised_limit\\report.contract.json": "4cd30a25efebc7e20badcf512fb1996a49b83b26085e2e3a035022491d21f4b9",
+    "stage10-scope-release-range-round2\\cases\\01-revised_limit\\report.review.json": "37429882e3ba79a35cb7c65b614255623716d542a90a2ca103492cd2e5c93e89",
+    "stage10-scope-release-range-round2\\cases\\01-revised_limit\\task_contract.json": "ee5906fd9b7b4d831868e8b37eb18f0ad0f36d9185e307d7c6ea0efd2cfe91a7",
+    "stage10-scope-release-range-round2\\cases\\01-detailed_scope\\report.md": "dd1a95e581c92c4dcb56869a0056d7444154af96020c573c12de83261d2176cf",
+    "stage10-scope-release-range-round2\\cases\\01-detailed_scope\\trace.jsonl": "2e3828aa5237a3ac3125227ca2e95fa89e54019932a213576b133e3e96f83f59",
+    "stage10-scope-release-range-round2\\cases\\01-detailed_scope\\report.contract.json": "28f1d903f962e191e5dcfaba927c40a2ba1cf284026eac251d8bdf7ee7fbc7fb",
+    "stage10-scope-release-range-round2\\cases\\01-detailed_scope\\report.review.json": "9747d07846aac28e4e5b5090f9bf7fa55c672ab09981d176d591f48ddb74bc41",
+    "stage10-scope-release-range-round2\\cases\\01-detailed_scope\\task_contract.json": "6aad5dc9a221519106e9c080d6012bc672b5161f3d3a0420bd0d9e1876465218",
+    "stage10-scope-release-range-round3\\cases\\01-brief_fixed\\report.md": "d8a00a5cc322d520f08624c7e3bc169fc994c1d6e2440b0a9ccd654b1f44ca96",
+    "stage10-scope-release-range-round3\\cases\\01-brief_fixed\\trace.jsonl": "6f5a64ed355a49287a00221e7540359c3246e8d995ee536b67bf575d8b9340e9",
+    "stage10-scope-release-range-round3\\cases\\01-brief_fixed\\report.contract.json": "e2c74a6b535561b4ac71d60169e11e9fe3af628adaceaf1a61bb3da75d0cf29a",
+    "stage10-scope-release-range-round3\\cases\\01-brief_fixed\\report.review.json": "3840e1d2f032630ac2f79a10ce4fffee28e86ec43c6044df3c2734c339dd1f1d",
+    "stage10-scope-release-range-round3\\cases\\01-brief_fixed\\task_contract.json": "f5cc5f61938d3d24313f87729bccb0da9df1212ed4e82fbdffb07e577e051450",
+    "stage10-scope-release-range-round3\\cases\\01-han_limit\\report.md": "9e654ea2d05e83d666fb403d7d4c715aab6ab5ef4a59d2434185ec1ee3a30233",
+    "stage10-scope-release-range-round3\\cases\\01-han_limit\\trace.jsonl": "62a2f2118e886281cff2a9b88aeca8266f0b7dbb0904be397aa300e4b504016e",
+    "stage10-scope-release-range-round3\\cases\\01-han_limit\\report.contract.json": "80575266e529570003a36cb6f52f12d8c64780f0768b3e7715a6450de357ba83",
+    "stage10-scope-release-range-round3\\cases\\01-han_limit\\report.review.json": "dd3042ff6d81685baaa8c0f0db43ea12d3642c5fb3aa592d76d7d4ca453f0663",
+    "stage10-scope-release-range-round3\\cases\\01-han_limit\\task_contract.json": "96bc064c53230c259f829a7ff88fd829945fffe134a38ee43d0ab554132f4506",
+    "stage10-scope-release-range-round3\\cases\\01-english_words\\report.md": "7918241a2e7f261664aaf032e137d9c7c3e9733f4de596100f8520ccd04d33a0",
+    "stage10-scope-release-range-round3\\cases\\01-english_words\\trace.jsonl": "823250913ef9478f3118f07eaba906b53fd5d8a06a25aa08066e0488f7bbf4ac",
+    "stage10-scope-release-range-round3\\cases\\01-english_words\\report.contract.json": "71eea23e31d4dff8e44cd68fede666cda9e46ba41a2a251f5908b7450218b427",
+    "stage10-scope-release-range-round3\\cases\\01-english_words\\report.review.json": "420c72bcded3351bbccd8e1be1c4b1b0f36e8f527e08b710af7eb2e274bc6b1e",
+    "stage10-scope-release-range-round3\\cases\\01-english_words\\task_contract.json": "0023c2d3865eb80a9d4f4531bd1ba598eda317868c1bd8292c1b81f5f45faccc",
+    "stage10-scope-release-range-round3\\cases\\01-requested_statistics\\report.md": "9fa926cf738fd0625185f25f9f9e9fba59fd3baa3d1c3abfbbd42daca1fc01a8",
+    "stage10-scope-release-range-round3\\cases\\01-requested_statistics\\trace.jsonl": "46a8254d876d9e8114818f83c7a42ff0ae6c2559b61a651e07af86e409b23eac",
+    "stage10-scope-release-range-round3\\cases\\01-requested_statistics\\report.contract.json": "39b0fe3cfde760f6a8a95ce5704d5ce7aee2bc7c94d25ddbaf1aa24052fdd32c",
+    "stage10-scope-release-range-round3\\cases\\01-requested_statistics\\report.review.json": "18b394ec077b19fe33e649ad9655b2e522ddfecb0070f29230f88473db82acae",
+    "stage10-scope-release-range-round3\\cases\\01-requested_statistics\\task_contract.json": "44724428f1b25ca9447cdbba5fce42384ae6e994867c510afd5be0835aa96d08",
+    "stage10-scope-release-range-round3\\cases\\01-unknown_assumptions\\report.md": "02af72bd4736d8758e1080c7abff31418eb0c19c013d1af7069dde66c3bbbb44",
+    "stage10-scope-release-range-round3\\cases\\01-unknown_assumptions\\trace.jsonl": "63d87094cf3b0bca9ac3abe8ab25c24b11087c50736559e3d47683c97b1a7657",
+    "stage10-scope-release-range-round3\\cases\\01-unknown_assumptions\\report.contract.json": "3e0a887306ee49d387e888c796f393340f574420d91adca06340f36d58dbe04f",
+    "stage10-scope-release-range-round3\\cases\\01-unknown_assumptions\\report.review.json": "d340d204f1228ced585459c1045180d8c9e4a22d3e345a65e63d43602a8c2ece",
+    "stage10-scope-release-range-round3\\cases\\01-unknown_assumptions\\task_contract.json": "0447f8648e00de5327ffa2261461b626789f2628bb415b964907fc4b63529c48",
+    "stage10-scope-release-range-round3\\cases\\01-revised_limit\\report.md": "704652399994e54014274b2339d2ee87bf18306f32f96295916a803579157cbc",
+    "stage10-scope-release-range-round3\\cases\\01-revised_limit\\trace.jsonl": "0f5eca119afe3788b5448ec7f33cef281009553ca82cc1b4eda77b18da38b863",
+    "stage10-scope-release-range-round3\\cases\\01-revised_limit\\report.contract.json": "8c1b593321e2b7a95d22731259cdb804ba8a1acc3b0c9608cc1785d9f0e1808a",
+    "stage10-scope-release-range-round3\\cases\\01-revised_limit\\report.review.json": "9f66777ed80b34f0b4f0ea75e1ff815186167af19b92a4080510ef5ec87c6633",
+    "stage10-scope-release-range-round3\\cases\\01-revised_limit\\task_contract.json": "ee5906fd9b7b4d831868e8b37eb18f0ad0f36d9185e307d7c6ea0efd2cfe91a7",
+    "stage10-scope-release-range-round3\\cases\\01-detailed_scope\\report.md": "66d35a541fb2d5c6c20a7f8a86d5854917f558515c15249dd54fc8da99e9c231",
+    "stage10-scope-release-range-round3\\cases\\01-detailed_scope\\trace.jsonl": "1762e7e4bcc06f3b0352998132d49d797302e4119113f677bf0380d8f5e4d300",
+    "stage10-scope-release-range-round3\\cases\\01-detailed_scope\\report.contract.json": "0c38d68cc2e23d2abe71bc071d0adb2786c9bcfa79cc29564864945c4d0544dd",
+    "stage10-scope-release-range-round3\\cases\\01-detailed_scope\\report.review.json": "80af0d3e3854c570ed6735070413a81a97f7ec61b857e21747933332bea1bcc3",
+    "stage10-scope-release-range-round3\\cases\\01-detailed_scope\\task_contract.json": "6aad5dc9a221519106e9c080d6012bc672b5161f3d3a0420bd0d9e1876465218",
+    "stage10-scope-release-followup-live\\cases\\01-two_methods_requested\\report.md": "b3c250e99de361808a3669988b8baab93eac79e3b79be6fa21aded5e045f06cf",
+    "stage10-scope-release-followup-live\\cases\\01-two_methods_requested\\trace.jsonl": "06beebca663d8e1c28bc3dbb4484ce4e9ff374821d296d383f1d9ccce3c04550",
+    "stage10-scope-release-followup-live\\cases\\01-two_methods_requested\\report.contract.json": "1a218a5b14c10ac2244613d6712bc4018fe593dc882c649247529851f4b5d1cc",
+    "stage10-scope-release-followup-live\\cases\\01-two_methods_requested\\report.review.json": "862d7a930eb479db76812dc6cf4807535a4795cd4b3e89954a29a59c3fcb29d9",
+    "stage10-scope-release-followup-live\\cases\\01-two_methods_requested\\task_contract.json": "2ab895fd20fb47572a25602cea918b0f2ecf8786df3013ae3e321a08ded831dd",
+    "stage10-scope-release-followup-live\\cases\\01-one_method_reworded\\report.md": "58c00b9be755b18131f562d6a569cfe430dc57100241d5f5b0d0c4162d87f46e",
+    "stage10-scope-release-followup-live\\cases\\01-one_method_reworded\\trace.jsonl": "7c46592d3cb21c0812aa9ad9879a6aba6e45f798acf6236b70d3c3952dca927c",
+    "stage10-scope-release-followup-live\\cases\\01-one_method_reworded\\report.contract.json": "48bceaa1090fa4109dafa1d83b0f9b37eaeb49787778ab09ac344875c05dd77f",
+    "stage10-scope-release-followup-live\\cases\\01-one_method_reworded\\report.review.json": "f97d81db346bd446bf5f916003c67778922c2312e2e3ac602753ea13398a8522",
+    "stage10-scope-release-followup-live\\cases\\01-one_method_reworded\\task_contract.json": "079b12350857ad6600d1d6b9da59f89271b6006acc21e49cabec22a9c8a83f55"
+  },
+  "totals": {
+    "steps": 173,
+    "seconds": 464.19,
+    "equivalent_tokens": 466579,
+    "review_calls": 34
+  },
+  "raw_passed": 32,
+  "selected": 32,
+  "current_clean_reviews": 32,
+  "hard_errors": 0,
+  "oracles": {
+    "Wilson_n20_x18": [
+      0.6989617935882066,
+      0.9721341060158468
+    ],
+    "Wilson_n24_x18": [
+      0.5510017468789357,
+      0.8800079652065766
+    ],
+    "Wilson_n40_x32": [
+      0.6524239261814333,
+      0.8950013502683314
+    ],
+    "Wald_n40_x32": [
+      0.6760387157213996,
+      0.9239612842786005
+    ]
+  },
+  "limitations": "该审计不替代逐题人工核对，不认证任意语义或计费归属。",
+  "scope_replay": {
+    "performed_by": "coding assistant; not independent human certification",
+    "hard_length_reports_passed": 15,
+    "single_method_main_reports": 3,
+    "supplemental_reports": 2,
+    "blocked_extra_method_attempt": {
+      "run": "stage10-scope-release-range-round3",
+      "case": "requested_statistics",
+      "method": "Wald",
+      "executed": false,
+      "recovered": true
+    },
+    "successful_code_and_report_scope": "checked against requested known methods",
+    "cost_chart": "PNG viewed; bars, component labels and totals match CSV",
+    "report_scientific_content_fully_certified": false
+  },
+  "development_failures": [
+    {
+      "revision": "6571264",
+      "raw_passed": 30,
+      "selected": 32,
+      "accepted": false,
+      "findings": [
+        "two length repair failures",
+        "extra Wald calculation escaped output-label checks"
+      ]
+    },
+    {
+      "revision": "a874be7",
+      "raw_passed": 31,
+      "selected": 32,
+      "rescored_passed": 32,
+      "accepted": false,
+      "findings": [
+        "conditional quoted claim scoring false positive",
+        "actual extra Wald endpoints in report despite clean automatic rescore"
+      ]
+    }
+  ],
+  "remaining_limits": [
+    "Finite method names and templates; not semantic code proof or a Python sandbox.",
+    "Soft brief target 500 is not a hard user limit; one 1097-character report had an extension reason.",
+    "Some generated statistical prose overstates open-interval bounds and nominal coverage; endpoint correctness does not certify all theory statements.",
+    "Supplemental cases participated in development; not a held-out set.",
+    "Original v2 ran once; only the seven scope cases ran three rounds.",
+    "Model alias, key and thinking changes preclude causal performance comparisons with old runs.",
+    "Original artifacts are ignored local files; published hashes cannot reconstruct them.",
+    "Stages 11 through 14 remain pending."
+  ]
+}
