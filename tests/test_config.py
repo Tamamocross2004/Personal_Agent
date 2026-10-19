@@ -16,6 +16,7 @@ def test_default_provider_uses_preset():
     assert cfg.base_url == PROVIDERS["deepseek"].base_url
     assert cfg.model == PROVIDERS["deepseek"].default_model
     assert cfg.api_key == "sk-test"
+    assert cfg.model == 'deepseek-flash' and cfg.thinking == 'disabled'
 
 
 def test_missing_key_raises_helpful_error():

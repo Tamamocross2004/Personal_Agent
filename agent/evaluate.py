@@ -77,7 +77,8 @@ def metadata(mode: str, suite: dict, cases: list[dict]) -> dict:
                                              + Path(__file__).with_name("quality.py").read_bytes()
                                              + Path(__file__).with_name("numeric_evidence.py").read_bytes()
                                              + Path(__file__).with_name("markdown_tables.py").read_bytes()
-                                             + Path(__file__).with_name("task_contract.py").read_bytes())).hexdigest(), "state": "running",
+                                             + Path(__file__).with_name("task_contract.py").read_bytes()
+                                             + Path(__file__).with_name("analysis_scope.py").read_bytes())).hexdigest(), "state": "running",
             "definitions": cases,
             "cases": [{"id": c["id"], "title": c["title"], "status": "pending"} for c in cases]}
 
@@ -174,7 +175,7 @@ def run_live(out: Path, data: dict, cases: list[dict], args) -> None:
     data["config"] = {"provider": cfg.provider, "model": cfg.model, "max_steps": args.max_steps,
                       "per_case_budget": args.budget, "suite_budget": args.suite_budget,
                       "review_max_calls": args.review_calls, "repeat": args.repeat,
-                      "temperature": cfg.temperature,
+                      "temperature": cfg.temperature, "thinking": cfg.thinking,
                       "token_weights": {"cached": settings.token_weight_cached, "output": settings.token_weight_output}}
     data["cases"] = [{"id": c["id"], "title": c["title"], "repeat": repeat, "status": "pending"}
                      for repeat in range(1, args.repeat + 1) for c in cases]
@@ -303,7 +304,7 @@ def main(argv=None) -> int:
         elif args.command == "rescore":
             data["source_results"] = str(args.results.resolve())
             data["source_code_sha256"] = source.get("code_sha256")
-            data["config"] = {k: source.get("config", {}).get(k) for k in ("provider", "model", "max_steps", "per_case_budget", "suite_budget", "review_max_calls", "repeat", "temperature", "token_weights")}
+            data["config"] = {k: source.get("config", {}).get(k) for k in ("provider", "model", "max_steps", "per_case_budget", "suite_budget", "review_max_calls", "repeat", "temperature", "thinking", "token_weights")}
             data["cases"] = []
             for old in source["cases"]:
                 record = {"id": old["id"], "title": old["title"], "repeat": old.get("repeat", 1), "source_status": old["status"]}

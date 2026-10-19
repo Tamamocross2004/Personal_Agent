@@ -13,7 +13,7 @@ from agent.quality import inspect_report
 from agent.markdown_tables import markdown_tables
 from agent.task_contract import check_contract, extract_contract
 from agent.review import fingerprint
-from agent.numeric_evidence import arithmetic_errors, price_ratio_errors
+from agent.numeric_evidence import arithmetic_errors, price_ratio_errors, scaling_explanation_errors
 from tools.fetch import Page
 from tools.session import Note, ResearchSession
 
@@ -204,6 +204,7 @@ def assess_run(case: dict, task_dir: Path) -> dict:
     checks.append(check("report_exists", report_path.is_file()))
     report = report_path.read_text(encoding="utf-8") if report_path.is_file() else ""
     checks.append(check("explicit_arithmetic", not arithmetic_errors(report), "；".join(arithmetic_errors(report))))
+    checks.append(check('scaling_explanation', not scaling_explanation_errors(report), '；'.join(scaling_explanation_errors(report))))
     session = session_from_events(events)
     original_question = case.get('prompt') or next((e.get('question', '') for e in events if e['kind'] == 'run_start'), '')
     contract = extract_contract(original_question)
@@ -245,5 +246,8 @@ def assess_run(case: dict, task_dir: Path) -> dict:
             recalled = False
         checks.append(check("memory_recall", recalled))
     return {"status": "pass" if all(c["passed"] for c in checks) else "fail", "metrics": metrics,
+            "model_identity": {'requested_models': sorted({e['requested_model'] for e in calls if e.get('requested_model')}),
+                               'response_models': sorted({e['response_model'] for e in calls if e.get('response_model')}),
+                               'all_calls_identified': bool(calls) and all(e.get('requested_model') and e.get('response_model') for e in calls)},
             "checks": checks, "review_status": review_status, "task_dir": str(task_dir.resolve()),
             "assessment_scope": "固定规则和已收集证据检查；不等价于独立事实认证。自由文本结论仍需人工抽查。"}

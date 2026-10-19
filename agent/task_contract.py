@@ -10,6 +10,7 @@ from typing import Literal
 
 from markdown_it import MarkdownIt
 from pydantic import BaseModel, ConfigDict, Field
+from agent.analysis_scope import requested_methods, report_scope_errors
 
 
 class LengthRule(BaseModel):
@@ -29,6 +30,7 @@ class TaskContract(BaseModel):
     evidence_scope: Literal["provided_only", "unspecified"] = "unspecified"
     network_allowed: bool | None = None
     statistics: Literal["forbidden", "requested", "unspecified"] = "unspecified"
+    analysis_methods: tuple[str, ...] = ()
     length_rules: tuple[LengthRule, ...] = ()
     soft_body_target: int | None = None
     required_headers: tuple[tuple[str, ...], ...] = ()
@@ -50,13 +52,18 @@ class TaskContract(BaseModel):
         if self.length_rules:
             text += ("\n【明确上限写作策略】先按上限约80%起草以留计量余量，这只是建议、不是更小的硬上限。"
                      "全文限制包括标题、章节名与参考资料；先删重复解释，不要只删不参与本次计量的字符，也不要增加自称合规的字数说明。")
+        if self.analysis_methods:
+            text += ('\n【指定分析范围】只计算 ' + '、'.join(self.analysis_methods)
+                     + '。先用标准库完成该方法的输入、端点和必要中间值；详细解释仅展开该公式、题设假设与适用边界。'
+                     '不要计算其他区间、覆盖率网格、样本量或绘制额外对照图；无需导入额外依赖。'
+                     '可以简短提及其他方法的概念差异或说明未采用，但不新增其数值结果。审稿要求补可选实验时应删除无关段落而非扩大研究。')
         return text
 
     @property
     def active(self) -> bool:
         return bool(self.required_answers or self.evidence_scope != 'unspecified' or self.network_allowed is not None
                     or self.statistics != 'unspecified' or self.length_rules or self.soft_body_target
-                    or self.required_headers or self.output_files or self.ambiguities)
+                    or self.analysis_methods or self.required_headers or self.output_files or self.ambiguities)
 
 
 def instruction_text(question: str) -> str:
@@ -102,6 +109,9 @@ def extract_contract(question: str) -> TaskContract:
         r"(?P<deny>(?:不要|禁止|无需|不做|不进行|不开展|(?:不得|不允许)(?:进行|做|开展)?)(?:任何)?(?:额外)?(?:统计分析|统计检验|置信区间))"
         r"|(?P<allow>(?:请|需要|要求|允许)(?:进行|做|计算|开展)?(?:统计分析|统计检验|置信区间|Fisher|Wilson))",
         "requested", "forbidden", ambiguities, "统计分析要求")
+    methods = requested_methods(text) if statistics != 'forbidden' else ()
+    if methods and statistics is None:
+        statistics = 'requested'
     lengths = []
     # 只支持阿拉伯数字的明确上限；约数、区间和模糊数量保留给语义核对。
     units = r"中文字符|汉字|英文单词|单词|字符|字|words?\b"
@@ -141,6 +151,7 @@ def extract_contract(question: str) -> TaskContract:
     return TaskContract(request_sha256=hashlib.sha256(question.encode()).hexdigest(), request_excerpt=question[:2000],
         required_answers=answers, evidence_scope="provided_only" if provided else "unspecified",
         network_allowed=None if network is None else network == "allow", statistics=statistics or "unspecified",
+        analysis_methods=methods,
         length_rules=tuple(lengths), soft_body_target=500 if brief and not lengths else None,
         required_headers=explicit_headers(question), output_files=files, ambiguities=tuple(dict.fromkeys(ambiguities)))
 
@@ -218,6 +229,7 @@ def check_contract(report: str, contract: TaskContract) -> dict:
         if signal['kind'] == 'assumption' or (contract.statistics != 'requested' and (
                 contract.statistics == "forbidden" or contract.soft_body_target or contract.evidence_scope == "provided_only")):
             observations.append({**signal, "message": "核对是否进行了被禁止/未要求的分析，以及前提是否由资料支持；引述或讨论方法本身不等于实际分析。"})
+    hard_errors.extend(report_scope_errors(report, contract.analysis_methods))
     return {"request_sha256": contract.request_sha256,
             "report_sha256": hashlib.sha256(report.encode()).hexdigest(),
             "hard_errors": hard_errors, "measurements": measures, "observations": observations,
@@ -253,7 +265,7 @@ def length_repair_hint(result: dict) -> str:
                 'english_words':'英文单词（删中文或仅删标点不会降低英文词数）',
                 'characters':'可见非空白字符（删空白不会降低数量；英文、数字和标点也计入）'}[m['unit']]
         advice.append(f"本次计量是{unit}，至少需减少{m['actual']-m['maximum']}；建议下一稿写到约{int(m['maximum']*.8)}以留余量，仍按原上限{m['maximum']}检查。")
-    return '；'.join(advice) + '全文范围含标题和参考资料，正文范围也含章节名；合并重复解释，保留必答结论、依据及局限。'
+    return ('；'.join(advice) + '全文范围含标题和参考资料，正文范围也含章节名；合并重复解释，保留必答结论、依据及局限。') if advice else ''
 
 
 def save_contract_check(path: Path, report: str, contract: TaskContract, *, extension_reason: str | None = None) -> dict:

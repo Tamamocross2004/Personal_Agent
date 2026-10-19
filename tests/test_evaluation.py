@@ -26,6 +26,21 @@ def test_original_memory_report_has_both_numeric_rows(tmp_path):
     assert all(item["passed"] for item in numeric_checks(tmp_path, report, {"input_tokens": 200000, "output_tokens": 10000}))
 
 
+def test_assessment_keeps_response_identity_and_does_not_guess_legacy_runs(tmp_path):
+    evaluation_task(tmp_path)
+    case = next(c for c in load_suite()['live'] if c['id'] == 'conflicting_sources')
+    legacy = assess_run(case, tmp_path)
+    assert not legacy['model_identity']['all_calls_identified']
+    trace = tmp_path/'trace.jsonl'
+    events = [json.loads(line) for line in trace.read_text(encoding='utf-8').splitlines()]
+    for event in events:
+        if event['kind'] == 'llm_call':
+            event.update(requested_model='test-alias', response_model='test-resolved')
+    trace.write_text('\n'.join(json.dumps(e) for e in events), encoding='utf-8')
+    identity = assess_run(case, tmp_path)['model_identity']
+    assert identity == {'requested_models':['test-alias'], 'response_models':['test-resolved'], 'all_calls_identified':True}
+
+
 def numeric_fixture(tmp_path, *, wrong_report=False, wrong_csv=False):
     # 人工计算的固定答案，与实现的 Decimal 公式独立：0.4+0.08=0.48；1.8+0.27=2.07。
     rows = [["EvalAlpha", 200000, 10000, 2, 8, 0.4, 0.08, 0.48],

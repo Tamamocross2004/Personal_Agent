@@ -27,7 +27,7 @@ class ProviderPreset:
 
 # 默认模型名仅作起点 —— 各家迭代很快，请以官方文档为准，并用 LLM_MODEL 覆盖。
 PROVIDERS: dict[str, ProviderPreset] = {
-    "deepseek": ProviderPreset("https://api.deepseek.com", "deepseek-chat", "deepseek_api_key"),
+    "deepseek": ProviderPreset("https://api.deepseek.com", "deepseek-flash", "deepseek_api_key"),
     "qwen": ProviderPreset(
         "https://dashscope.aliyuncs.com/compatible-mode/v1", "qwen-plus", "dashscope_api_key"
     ),
@@ -124,6 +124,7 @@ class LLMConfig:
     timeout: float
     max_retries: int
     max_tokens: int | None = None
+    thinking: Literal['enabled', 'disabled'] | None = None
 
 
 def load_llm_config(
@@ -162,4 +163,5 @@ def load_llm_config(
         timeout=s.llm_timeout,
         max_retries=s.llm_max_retries,
         max_tokens=s.llm_max_tokens,
+        thinking='disabled' if name == 'deepseek' and final_model == 'deepseek-flash' else None,
     )

@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "offline": [
+    {"id":"named_analysis_scope","title":"指定方法、结果与否定反例","selectors":["tests/test_analysis_scope.py"]}
+  ],
+  "live": [
+    {"id":"two_methods_requested","title":"明确要求两个方法时保留两个结果","prompt":"只依据题设，不联网。某虚构产品完成40次独立同分布的伯努利试验，成功32次。请用Python分别计算Wilson和Wald的95%区间，z=1.96，明确允许比较这两个方法；不要再增加其他区间方法或模拟。解释本题独立同分布是假设，不代表现实采样已核实。两个区间均须给出下限与上限，保留必要条件和外推限制。","required_tools":["run_python"],"required_patterns":["Wilson","Wald","假设","0.65|65.","0.92|92."]},
+    {"id":"one_method_reworded","title":"不同措辞的单方法详细计算","prompt":"仅用以下假定数据完成分析，不联网：24次独立同分布的伯努利试验，18次成功。计算Wilson得分区间，置信水平95%，z=1.96，使用Python。请详细展示输入、公式、中间值和端点；不要用其他方法作为对照，不增加图表。说明推断依赖题设，不能自动推广到不同系统。","required_tools":["run_python"],"required_patterns":["Wilson","假设|题设","0.55|55.","0.88|88."]}
+  ]
+}

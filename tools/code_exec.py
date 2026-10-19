@@ -15,6 +15,8 @@ from typing import Annotated
 from pydantic import Field
 
 from tools.registry import Tool, ToolResult, tool
+from agent.analysis_scope import code_scope_errors
+from agent.task_contract import TaskContract
 
 
 def execution_env(run_dir: Path) -> dict[str, str]:
@@ -40,7 +42,7 @@ def _kill_tree(process: subprocess.Popen) -> None:
             pass
 
 
-def make_run_python(task_dir: Path, timeout: float = 30, max_output_chars: int = 2500) -> Tool:
+def make_run_python(task_dir: Path, timeout: float = 30, max_output_chars: int = 2500, *, contract: TaskContract | None = None) -> Tool:
     """每次调用保存独立脚本与有界输出，执行失败也保留可复盘的代码。"""
     if timeout <= 0 or max_output_chars <= 0:
         raise ValueError("执行超时和输出上限必须大于 0")
@@ -57,6 +59,9 @@ def make_run_python(task_dir: Path, timeout: float = 30, max_output_chars: int =
         本工具不是沙箱：代码仍拥有当前用户权限。"""
         if not code.strip():
             raise ValueError("代码不能为空")
+        scope_errors = code_scope_errors(code, contract.analysis_methods if contract else ())
+        if scope_errors:
+            raise ValueError('尚未执行：分析范围检查失败：' + '；'.join(scope_errors))
         root.mkdir(parents=True, exist_ok=True)
         run_dir = root / ".code_runs" / uuid.uuid4().hex
         run_dir.mkdir(parents=True)

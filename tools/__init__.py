@@ -52,7 +52,7 @@ def default_registry(
             *[t for t in notes if not offline or t.name != "save_note"],
             make_update_plan(task_dir, on_update=on_plan_update),
             make_write_report(task_dir, session, contract=contract),
-            make_run_python(task_dir, timeout=code_exec_timeout),
+            make_run_python(task_dir, timeout=code_exec_timeout, contract=contract),
             calculator,
             days_between,
             get_current_time,

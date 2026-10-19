@@ -18,7 +18,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from agent.quality import inspect_report, save_check
 from agent.markdown_tables import markdown_tables
 from agent.task_contract import TaskContract, check_contract, explicit_headers, extract_contract, length_repair_hint, needs_brief_reason, save_contract_check
-from agent.numeric_evidence import arithmetic_errors, price_ratio_errors, report_cost_errors
+from agent.numeric_evidence import arithmetic_errors, price_ratio_errors, report_cost_errors, scaling_explanation_errors
 from tools.registry import Tool, tool
 from tools.session import ResearchSession
 
@@ -134,7 +134,7 @@ def make_write_report(task_dir: Path, session: ResearchSession | None = None, *,
             raise ValueError("尚未保存：完整报告缺少用户指定表头（原文及列顺序必须一致）："
                              + "；".join(" | ".join(header) for header in missing)
                              + "。请修正后重试；分段写作中间段请设 complete=false，最后一段设 true。")
-        errors = arithmetic_errors(full) if complete else []
+        errors = arithmetic_errors(full) + scaling_explanation_errors(full) if complete else []
         csv_path = task_dir / "costs.csv"
         if complete and csv_path.is_file() and not csv_path.is_symlink():
             with csv_path.open(encoding="utf-8-sig", errors="replace") as stream:

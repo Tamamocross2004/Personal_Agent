@@ -87,6 +87,16 @@ def test_ask_returns_text_and_records_usage():
     assert (llm.usage.calls, llm.usage.prompt_tokens, llm.usage.completion_tokens) == (1, 12, 3)
 
 
+def test_explicit_non_thinking_mode_preserves_other_extra_fields():
+    from dataclasses import replace
+    fake = FakeOpenAI([fake_completion('ok'), fake_completion('ok')])
+    client = LLMClient(replace(CFG, thinking='disabled'), client=fake)
+    client.chat([{'role':'user','content':'hi'}], extra_body={'other_option':True})
+    assert fake.calls[0]['extra_body'] == {'other_option':True,'thinking':{'type':'disabled'}}
+    client.chat([{'role':'user','content':'hi'}], extra_body={'thinking':{'type':'enabled'}})
+    assert fake.calls[1]['extra_body']['thinking']['type'] == 'enabled'
+
+
 def test_usage_accumulates_across_calls():
     llm, _ = make_client([fake_completion("a", 10, 1), fake_completion("b", 20, 2)])
     llm.ask("1")

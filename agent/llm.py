@@ -108,6 +108,11 @@ class LLMClient:
             params["max_tokens"] = self.config.max_tokens
         if tools:  # 有些厂商对 tools=[] 会报错，空时干脆不传
             params["tools"] = tools
+        if self.config.thinking is not None:
+            extra = dict(params.get('extra_body') or {})
+            if 'thinking' not in extra and 'reasoning_effort' not in params:
+                extra['thinking'] = {'type': self.config.thinking}
+            params['extra_body'] = extra
 
         start = time.perf_counter()
         resp = self._chat_with_retry(**params)

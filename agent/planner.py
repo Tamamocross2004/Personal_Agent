@@ -20,6 +20,7 @@ import json
 import re
 from pathlib import Path
 from agent.task_contract import TaskContract
+from agent.analysis_scope import named_methods
 
 MAX_TASKS = 6
 
@@ -100,6 +101,19 @@ def generate_plan(question: str, chat, task_dir: Path, today: str = "", *, contr
             and not re.search(r"不做|不进行|不能|无需|不应|未做|说明为何", t['title']))]
         plan['tasks'] = normalize_tasks(kept) if kept else [
             {"id": "task-1", "title": "按给定范围回答问题并保留未知边界", "status": "pending", "note": ""}]
+
+    if contract and contract.analysis_methods:
+        kept, removed = [], []
+        for task in plan['tasks']:
+            extra = set(named_methods(task['title'])) - set(contract.analysis_methods)
+            if extra and re.search(r'计算|比较|对比|构造|估计|模拟|评估|绘制', task['title']):
+                removed.append(task['title'])
+            else:
+                kept.append(task)
+        if removed:
+            kept.insert(0, {'title': '、'.join(contract.analysis_methods) + '的结果、公式、题设假设及适用边界'})
+            plan['tasks'] = normalize_tasks(kept)
+            plan['scope_adjustments'] = {'removed': removed, 'reason': '仅保留当前明确要求的方法及必要解释'}
 
     # 保存到文件
     task_dir.mkdir(parents=True, exist_ok=True)

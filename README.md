@@ -175,7 +175,7 @@ python -m agent.simulate <任务目录> --thresholds 0 20000 60000 --hit-price 0
 
 | provider | 厂商 | Key 变量 | 默认模型 |
 |---|---|---|---|
-| `deepseek` | DeepSeek | `DEEPSEEK_API_KEY` | `deepseek-chat` |
+| `deepseek` | DeepSeek | `DEEPSEEK_API_KEY` | `deepseek-flash` |
 | `qwen` | 阿里云百炼 / 通义千问 | `DASHSCOPE_API_KEY` | `qwen-plus` |
 | `glm` | 智谱 | `ZHIPU_API_KEY` | `glm-4-plus` |
 | `kimi` | 月之暗面 | `MOONSHOT_API_KEY` | `moonshot-v1-32k` |

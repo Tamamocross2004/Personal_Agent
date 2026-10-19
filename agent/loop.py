@@ -535,6 +535,8 @@ class Agent:
             "llm_call",
             purpose=purpose,
             step=step,
+            requested_model=getattr(getattr(self.llm, 'config', None), 'model', None),
+            response_model=resp.model,
             prompt_tokens=p,
             cached_tokens=cached,
             completion_tokens=c,

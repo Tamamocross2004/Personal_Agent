@@ -37,6 +37,16 @@ def csv_facts(content: str) -> list[dict]:
                     ci = number(row["input_tokens"]) * pi / 1000000
                     co = number(row["output_tokens"]) * po / 1000000
                     fact.update(expected_input_cost=str(ci), expected_output_cost=str(co), expected_total_cost=str(ci + co))
+                    if ci + co:
+                        fact.update(current_input_cost_share=str(ci/(ci+co)), current_output_cost_share=str(co/(ci+co)))
+                    baseline = ci/2 + co
+                    if baseline:
+                        # 这是反事实计算证据，不声称用户历史用量必然减半。
+                        fact['counterfactual_half_input'] = {
+                            'condition': '假如输入减半、输出不变、单价不变；不代表实际历史记录',
+                            'baseline_input_cost_share': str((ci/2)/baseline),
+                            'baseline_output_cost_share': str(co/baseline),
+                            'current_div_baseline_total': str((ci+co)/baseline)}
                 if facts:
                     base = facts[0]
                     fact["relative_to_model"] = base["model"]
@@ -48,6 +58,20 @@ def csv_facts(content: str) -> list[dict]:
         except (InvalidOperation, ValueError, ArithmeticError):
             continue
     return facts
+
+
+def scaling_explanation_errors(report: str) -> list[str]:
+    """仅识别明确用当前占比加权费用变化倍数的模板；未指定基期留给审稿。"""
+    clean = re.sub(r'(?ms)^\s*(`{3,}|~{3,}).*?^\s*\1[^\n]*$', '', report).replace('**', '')
+    errors = []
+    for sentence in re.split(r'[。；;\n]', clean):
+        if re.search(r'错误|不能用|不应|不要|不得|示例|反例', sentence):
+            continue
+        if (re.search(r'(?:总费用|总成本).{0,10}(?:倍数|倍率|比值).{0,16}(?:等于|=|＝|为)', sentence)
+                and re.search(r'(?:本次|当前|调整后).{0,6}输入(?:费用)?占比\s*[×*]\s*2', sentence)
+                and re.search(r'输出(?:费用)?占比\s*[×*]\s*1', sentence)):
+            errors.append('费用变化倍率应使用变更前的输入/输出费用占比，不是本次占比：' + sentence.strip()[:250])
+    return errors
 
 
 def price_ratio_errors(report: str, csv_content: str) -> list[str]:
