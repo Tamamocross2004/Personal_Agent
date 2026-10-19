@@ -217,6 +217,7 @@ class Agent:
         self._review_count = 0
         self._report_completeness: dict[str, bool] = {}
         self._structure_repair_requested = False
+        self._length_repair_requested = False
         self._calculation_results: list[dict] = []
         self._calculations_omitted = 0
         self._source_readings: list[dict] = []
@@ -256,7 +257,9 @@ class Agent:
                 'supports的excerpt逐字摘自对应证据。direct为资料陈述，calculated须关联成功计算，'
                 'inference填写假设，unknown明确未知；历史须说明日期与限制。'
                 '摘录存在不代表支持结论，须核对版本、条件、单位、行为主体与日期。'
-                '报告任何修订须重交claims，旧关联不会自动沿用；不用在报告内添加冗长审计表或字数说明。')
+                '报告任何修订须重交claims，旧关联不会自动沿用；不用在报告内添加冗长审计表或字数说明。'
+                '资料未提供不等于数值为零；直接资料与计算推导分开标注，不把引用原文扩大成未描述的行为。'
+                '用户禁止补日期时保留资料相对时间，不把系统当天日期补入资料陈述。')
         if self.memory_context:
             messages.insert(1, {"role": "user", "content": self.memory_context})
         self._emit(
@@ -386,6 +389,7 @@ class Agent:
         """
         messages.append(_assistant_message_to_dict(msg))
         reports_written = {}
+        length_rejected = False
         if msg.content:
             self._emit("thought", text=msg.content)
 
@@ -400,6 +404,8 @@ class Agent:
             else:
                 result, seconds = self._run_tool(name, arguments)
             content = _truncate(result.content, self.max_tool_result_chars)
+            if name == 'write_report' and result.is_error and '超过明确上限' in result.content:
+                length_rejected = True
             if self._evidence and not result.is_error:
                 ids = self._evidence.capture(name,arguments,content,call.id,result.evidence,
                                              min(len(result.content),self.max_tool_result_chars))
@@ -441,6 +447,16 @@ class Agent:
                 complete = args.get("complete", True)
                 reports_written[filename] = complete
                 self._report_completeness[filename] = complete
+
+        if length_rejected and not reports_written and not self._length_repair_requested:
+            self._length_repair_requested = True
+            reminder = ('【硬篇幅修订】上一稿未保存。下一稿整体重写为明显更短的正文，按工具反馈的计量单位和余量目标压缩，'
+                        '不要重复提交原稿或只删参考资料。保留必要章节，每节只写必要短句，合并重复解释。'
+                        '可以缩短结论原句并同步更新claims.quote，不必为了保留旧quote继续保留长句。'
+                        'claims、supports.excerpt、assumptions、limits是独立依据字段，不计入报告正文长度；'
+                        '来源原文保留在excerpt，不必抄进正文。不得删掉必答事实或修改原上限；仍用原步数、预算和审稿次数。')
+            messages.append({'role':'system','content':reminder})
+            self._emit('notice',text=reminder)
 
         for filename, complete in reports_written.items():
             self._review_saved_report(messages, filename, complete=complete)
