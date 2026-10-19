@@ -45,6 +45,15 @@ def code_scope_errors(code: str, allowed: tuple[str, ...]) -> list[str]:
         return []  # 原有执行器反馈语法错误。
     identifiers = []
     for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            arguments = [*node.args, *(k.value for k in node.keywords if k.arg not in ('sep','end'))]
+            if any(not (isinstance(arg, ast.Constant) and isinstance(arg.value, str)) for arg in arguments):
+                for arg in arguments:
+                    for part in ast.walk(arg):
+                        if isinstance(part, ast.Constant) and isinstance(part.value, str):
+                            # 有计算值的输出标签也可能暴露额外方法；纯概念文本与明确未计算的说明保留。
+                            if not re.search(r'未计算|不计算|未采用|不采用|未使用|不使用|not[ _](?:computed|calculated|used)', part.value, re.I):
+                                identifiers.append(part.value)
         if isinstance(node, ast.Name):
             identifiers.append(node.id)
         elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):

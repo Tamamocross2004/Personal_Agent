@@ -1,0 +1,30 @@
+
+import math
+n = 20
+x = 18
+z = 1.96
+p = x / n
+z2 = z*z
+denom = 1 + z2/n
+center = (p + z2/(2*n)) / denom
+half = (z/denom) * math.sqrt(p*(1-p)/n + z2/(4*n*n))
+lower = center - half
+upper = center + half
+print("p_hat =", p)
+print("z^2 =", z2)
+print("z^2/n =", z2/n)
+print("z^2/(2n) =", z2/(2*n))
+print("denom =", denom)
+print("center =", center)
+print("half =", half)
+print("lower =", lower)
+print("upper =", upper)
+# 中间量
+print("p(1-p)/n =", p*(1-p)/n)
+print("z^2/(4n^2) =", z2/(4*n*n))
+print("inside sqrt =", p*(1-p)/n + z2/(4*n*n))
+print("sqrt =", math.sqrt(p*(1-p)/n + z2/(4*n*n)))
+# 对照：Wald 仅作概念说明（不采用数值结论）
+print("wald_half =", z*math.sqrt(p*(1-p)/n))
+print("lower*100 =", lower*100, "upper*100 =", upper*100)
+print("width =", upper-lower)

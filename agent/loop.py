@@ -222,6 +222,7 @@ class Agent:
         self._reviewed_hashes = set()
         self._last_reviews: dict[str, dict] = {}
         self._call_stats: dict[tuple[str, str], list[int]] = {}  # 调用签名 → [调用次数, 成功次数]
+        self._write_errors: dict[tuple[str,str],str] = {}
         if self.compactor:
             self.compactor.reset()
 
@@ -617,13 +618,21 @@ class Agent:
         if successes >= 1 or calls >= 3:
             self._blocked += 1
             self._emit("notice", text=f"拦截了一次重复调用：{name}（累计 {self._blocked} 次）")
-            return ToolResult(REPEAT_BLOCKED_RESULT, True), 0.0
+            feedback = REPEAT_BLOCKED_RESULT
+            if name == 'write_report' and not successes and sig in self._write_errors:
+                feedback += '\n上次保存拒绝的具体原因：' + self._write_errors[sig]
+                feedback += '\n不要重发同一内容；请合并重复解释、重写为明显更短的稿件，保留必答结论、依据和局限。'
+            return ToolResult(feedback, True), 0.0
 
         started = time.perf_counter()
         result = self._execute_with_timeout(name, arguments)
         stats[0] += 1
         if not result.is_error:
             stats[1] += 1
+        elif name == 'write_report':
+            self._write_errors[sig] = result.content[:1800]
+            if len(self._write_errors) > 20:
+                self._write_errors.pop(next(iter(self._write_errors)))
         return result, time.perf_counter() - started
 
     def _execute_with_timeout(self, name: str, arguments: str) -> ToolResult:

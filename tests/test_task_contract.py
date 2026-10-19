@@ -243,7 +243,7 @@ def test_limit_feedback_explains_unit_and_margin_without_changing_limit(tmp_path
     reg=ToolRegistry([make_write_report(tmp_path,question='全文不超过10个中文字符')])
     result=reg.execute('write_report',{'content':'中文'*8})
     assert result.is_error and '至少需减少6' in result.content and '删空白、英文' in result.content
-    # 建议的80%余量不能变成新的硬上限。
+    # 建议的写作余量不能变成新的硬上限。
     assert not reg.execute('write_report',{'content':'中文'*5}).is_error
 
 

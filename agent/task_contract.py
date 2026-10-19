@@ -50,8 +50,10 @@ class TaskContract(BaseModel):
                      f"默认正文目标约{self.soft_body_target}个可见非空白字符，含英文引文；能中文转述的依据用简短转述并保留引用。"
                      "若用户明确要求或完整回答确实需要更长，保留必要信息；这不是硬截断上限，也不能删掉关键条件来凑长度。")
         if self.length_rules:
-            text += ("\n【明确上限写作策略】先按上限约80%起草以留计量余量，这只是建议、不是更小的硬上限。"
+            text += ("\n【明确上限写作策略】先按上限约60%起草以留计量余量，这只是建议、不是更小的硬上限。"
                      "全文限制包括标题、章节名与参考资料；先删重复解释，不要只删不参与本次计量的字符，也不要增加自称合规的字数说明。")
+            text += ('较短上限时，必要事实和理由完整说明一次即可，不在摘要、正文、结论反复重述；'
+                     '优先省略未要求的倍数、差值和背景。必备章节各用短句，不为齐全而重复论证。')
         if self.analysis_methods:
             text += ('\n【指定分析范围】只计算 ' + '、'.join(self.analysis_methods)
                      + '。先用标准库完成该方法的输入、端点和必要中间值；详细解释仅展开该公式、题设假设与适用边界。'
@@ -256,7 +258,7 @@ def needs_brief_reason(result: dict, contract: TaskContract) -> bool:
     return bool(contract.soft_body_target and any(m.get('soft_target') and m['actual'] > 2*m['soft_target'] for m in result['measurements']))
 
 
-def length_repair_hint(result: dict) -> str:
+def length_repair_hint(result: dict, report: str = '') -> str:
     advice = []
     for m in result['measurements']:
         if 'maximum' not in m or m['actual'] <= m['maximum']:
@@ -264,7 +266,13 @@ def length_repair_hint(result: dict) -> str:
         unit = {'han_characters':'汉字（删空白、英文、数字或标点不会降低汉字数）',
                 'english_words':'英文单词（删中文或仅删标点不会降低英文词数）',
                 'characters':'可见非空白字符（删空白不会降低数量；英文、数字和标点也计入）'}[m['unit']]
-        advice.append(f"本次计量是{unit}，至少需减少{m['actual']-m['maximum']}；建议下一稿写到约{int(m['maximum']*.8)}以留余量，仍按原上限{m['maximum']}检查。")
+        target = int(m['maximum']*.6)
+        advice.append(f"本次计量是{unit}，至少需减少{m['actual']-m['maximum']}；建议整体删减约{m['actual']-target}，下一稿写到约{target}以留余量，仍按原上限{m['maximum']}检查。不要反复只删一两个字。")
+        if report:
+            sentences = re.split(r'[。！？\n]', visible_text(report, m['scope']))
+            longest = sorted(((length_count(s,m['unit']),s) for s in sentences if s.strip()), reverse=True)[:2]
+            advice.append('长句定位（压缩重复解释，保留核心事实，不是自动删除）：' +
+                          json.dumps([{'count':n,'text':s[:180]} for n,s in longest],ensure_ascii=False))
     return ('；'.join(advice) + '全文范围含标题和参考资料，正文范围也含章节名；合并重复解释，保留必答结论、依据及局限。') if advice else ''
 
 

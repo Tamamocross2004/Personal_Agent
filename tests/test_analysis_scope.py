@@ -72,6 +72,39 @@ def test_code_guard_uses_updated_shared_contract(tmp_path):
     assert not registry.execute('run_python', {'code':'wald_lower=0.7\nprint(wald_lower)'}).is_error
 
 
+@pytest.mark.parametrize('code,bad', [
+    ('print("wald_half =", 1.96*(.9*.1/20)**.5)', True),
+    ('print(f"Wald lower={.7}")', True),
+    ('import pandas as pd\nprint(pd.DataFrame({"method":["Wald"],"lower":[.7]}))', True),
+    ('print("Wald只是概念对比，不输出结果")', False),
+    ('print("未计算Wald", .699)', False),
+    ('print("Wald not computed", .699)', False),
+])
+def test_computed_output_labels_are_checked_but_pure_explanations_are_allowed(code, bad):
+    assert bool(code_scope_errors(code, ('Wilson',))) == bad
+
+
+def test_original_inline_extra_calculation_is_caught():
+    from pathlib import Path
+    code=(Path(__file__).parent/'fixtures/extra_method_output_code.txt').read_text(encoding='utf-8')
+    assert code_scope_errors(code, ('Wilson',))
+
+
+def test_length_feedback_identifies_long_sentences_and_preserves_rejection_reason(tmp_path):
+    from agent.loop import Agent
+    from fakes import ScriptedLLM
+    question='全文不超过80字。'
+    bad='# 标题\n'+'这是重复的解释，需要保留核心事实并压缩。'*7
+    registry=ToolRegistry([make_write_report(tmp_path, question=question)])
+    responses=[completion(tool_calls=[(str(i),'write_report',{'content':bad})]) for i in range(4)]
+    responses += [completion(tool_calls=[('fixed','write_report',{'content':'# 结论\n资料不足，无法确定。'})]),completion('完成')]
+    events=[]
+    Agent(ScriptedLLM(responses),registry,on_event=events.append).run(question)
+    blocked=next(e.data['content'] for e in events if e.kind=='tool_result' and '上次保存拒绝的具体原因' in e.data['content'])
+    assert '长句定位' in blocked and '整体删减' in blocked and '约48' in blocked
+    assert (tmp_path/'report.md').read_text(encoding='utf-8')=='# 结论\n资料不足，无法确定。'
+
+
 def test_scope_rejection_preserves_report_and_sidecars(tmp_path):
     c = extract_contract('请计算Wilson置信区间。')
     registry = ToolRegistry([make_write_report(tmp_path, contract=c)])

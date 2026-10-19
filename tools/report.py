@@ -125,7 +125,7 @@ def make_write_report(task_dir: Path, session: ResearchSession | None = None, *,
         contract_check = check_contract(full, active_contract)
         if complete and contract_check['hard_errors']:
             raise ValueError("尚未保存：任务约定检查失败：" + "；".join(contract_check['hard_errors'])
-                             + length_repair_hint(contract_check) + "草稿不等于完整交付。")
+                             + length_repair_hint(contract_check, full) + "草稿不等于完整交付。")
         if complete and needs_brief_reason(contract_check, active_contract) and len(brief_extension_reason.strip()) < 20:
             raise ValueError("尚未保存：用户要求简述，正文明显超过默认软目标。请先删除重复引文、无关背景或额外分析，保留必答结论、依据和局限。"
                              "默认目标不是用户硬上限；如确实需要较长内容，可在 brief_extension_reason 中说明具体必答项与必要性（至少20字符），由审稿核对，不能只称更全面。")

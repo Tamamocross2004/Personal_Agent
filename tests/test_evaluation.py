@@ -135,6 +135,17 @@ def test_junit_failure_skip_and_missing_are_not_passes(tmp_path):
     assert results[0]["metrics"]["equivalent_tokens"] is None
 
 
+def test_junit_module_selector_includes_failures_and_skips(tmp_path):
+    xml=tmp_path/'junit.xml'
+    xml.write_text('<testsuites><testsuite><testcase classname="tests.test_example" name="test_ok"/>'
+                   '<testcase classname="tests.test_example" name="test_bad"><failure/></testcase>'
+                   '<testcase classname="tests.test_example" name="test_skip"><skipped/></testcase></testsuite></testsuites>')
+    result=parse_junit(xml,[{'id':'all','title':'完整模块','selectors':['tests/test_example.py']}])[0]
+    assert result['status']=='fail' and len(result['checks'])==3
+    missing=parse_junit(xml,[{'id':'missing','title':'不存在的模块','selectors':['tests/missing.py']}])[0]
+    assert missing['status']=='error'
+
+
 def baseline():
     return {"mode": "live", "suite_sha256": "same", "grader_sha256": "grader", "state": "complete", "cases": [
         {"id": "one", "status": "pass", "metrics": {"seconds": 1, "steps": 3, "equivalent_tokens": 100}},

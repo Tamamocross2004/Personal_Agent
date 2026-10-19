@@ -131,10 +131,10 @@ def parse_junit(path: Path, cases: list[dict]) -> list[dict]:
         selected = []
         missing = []
         for selector in case["selectors"]:
-            file, function = selector.split("::")
+            file, separator, function = selector.partition("::")
             module = Path(file).stem
             matches = [test for test in tests if test.attrib.get("classname", "").split(".")[-1] == module
-                       and test.attrib.get("name", "").split("[")[0] == function]
+                       and (not separator or test.attrib.get("name", "").split("[")[0] == function)]
             if not matches:
                 missing.append(selector)
             selected.extend(matches)
