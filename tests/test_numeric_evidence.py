@@ -17,6 +17,11 @@ def test_chinese_adjacent_equations_keep_ascii_identifier_boundary(text, wrong):
 
 @pytest.mark.parametrize('text,wrong', [
     ('两型号的输入、输出单价比例均为1:3。', True),
+    ('两型号的输入单价与输出单价之比均为 1:3，因此费用差异完全来自单价水平。', True),
+    ('Alpha的输入单价与输出单价之比为1:4。', False),
+    ('Beta的输入单价和输出单价之比为1:3。', False),
+    ('如果两型号的输入单价与输出单价之比均为1:3。', False),
+    ('不能说两型号的输入单价与输出单价之比均为1:3。', False),
     ('Alpha的输入/输出单价之比为1:4。', False),
     ('Alpha的输入/输出单价比例为1:3。', True),
     ('Beta的输入、输出单价比例为1:3。', False),
@@ -32,7 +37,7 @@ def test_actual_failed_reports_are_rejected_and_old_file_preserved(tmp_path):
     (tmp_path/'costs.csv').write_text('model,input_price,output_price\nEvalAlpha,2,8\nEvalBeta,9,27\n',encoding='utf-8')
     reg=ToolRegistry([make_write_report(tmp_path)])
     assert not reg.execute('write_report',{'content':'保留正确稿。'}).is_error
-    for name in ['numeric_bad_total.md', 'numeric_bad_internal_ratio.md']:
+    for name in ['numeric_bad_total.md', 'numeric_bad_internal_ratio.md', 'numeric_bad_expanded_ratio.md']:
         text=(Path(__file__).parent/'fixtures'/name).read_text(encoding='utf-8')
         assert reg.execute('write_report',{'content':text}).is_error
         assert (tmp_path/'report.md').read_text(encoding='utf-8')=='保留正确稿。'

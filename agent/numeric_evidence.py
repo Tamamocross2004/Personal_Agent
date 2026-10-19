@@ -104,7 +104,7 @@ def price_ratio_errors(report: str, csv_content: str) -> list[str]:
                 except ArithmeticError:
                     errors.append(f"「{match[0]}」的单价倍数无法计算。")
         # 型号内部的输入:输出单价比例，与两型号间的输入/输出倍数分别核对。
-        ratio = re.compile(rf"({names}|两(?:个|款)?(?:型号|模型|产品)|两者)\s*的?\s*输入\s*[、及和与/]\s*输出\s*单价\s*(?:之比|比例|比)\s*(?:均|都)?(?:为|是)\s*({_NUM})\s*[:：]\s*({_NUM})")
+        ratio = re.compile(rf"({names}|两(?:个|款)?(?:型号|模型|产品)|两者)\s*的?\s*输入\s*(?:单价\s*)?[、及和与/]\s*输出\s*单价\s*(?:之比|比例|比)\s*(?:均|都)?(?:为|是)\s*({_NUM})\s*[:：]\s*({_NUM})")
         for match in ratio.finditer(line.replace('**', '').replace('`', '')):
             if re.search(r'不能|不可|不应|不得|错误|若|如果', line[:match.start()]):
                 continue
