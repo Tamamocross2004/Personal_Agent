@@ -17,6 +17,7 @@
 - [x] 阶段 8：长期记忆（SQLite/FTS5、中英文检索、历史背景注入与管理命令；验收见 ROADMAP）
 - [x] 阶段 9：评估（固定题集、离线回归、真实评估、结果复查和基线对比；持续迭代）
 - [x] 阶段 10：任务约定、范围与篇幅控制（2026-10-19 完成范围验收；边界与复测见下方记录）
+- [x] 阶段 11：关键结论证据索引、假设记录与版本绑定（2026-10-19；仅认证选定关联可定位）
 
 每个阶段完成后打一个 git 标签（`stage-0`、`stage-1`…），可以用 `git diff stage-0 stage-1` 查看某一阶段具体改了什么。
 
@@ -24,7 +25,9 @@
 
 阶段 10 最新记录：单测 **579 passed**，离线 **8/8 + 5/5 + 1/1**；冻结版本原 v2 一轮 **9/9**、范围题三轮各 **7/7**、补充题 **2/2**，合计原始 **32/32**，无需重评分。15 份明确篇幅上限全部满足，32 份最终稿均完成审稿、无问题项且哈希匹配。本次使用项目 `.env` Key；指定方法的计算和报告检查、长度修订反馈、费用基准权重已补齐。详见 [阶段 10 收尾验收](docs/stage10-scope-acceptance-20261019.md)。此前未通过的 [10 月 18 日记录](docs/stage10-acceptance-20261018.md) 和本轮开发失败均保留；固定题集通过不认证任意语义或全部统计解释。
 
-2026-10-19 短报告后续优化：缺章稿先修结构再消耗审稿次数，正常结束前最多提醒一次修复，保持原步数和预算。单测 **594 passed**，用户原始220字提问三次均通过（197、216、218字），兼容性自动结果原v2 **9/9**、范围 **7/7**。但回放另发现两处数值解释漏检，**不能称全部报告内容通过验收**。见 [结构修复与剩余问题](docs/short-report-structure-fix-20261019.md)。
+2026-10-19 短报告后续优化：缺章稿先修结构再消耗审稿次数，正常结束前最多提醒一次修复，保持原步数和预算。单测 **594 passed**，用户原始220字提问三次均通过（197、216、218字），兼容性自动结果原v2 **9/9**、范围 **7/7**。当时回放另发现两处数值解释漏检，**不能称全部报告内容通过验收**；后续已针对已知算式及型号内部比例句式补修复，见 [数值修复](docs/numeric-followup-fix-20261019.md) 和 [阶段 11 验收](docs/stage11-acceptance-20261019.md)。见 [结构修复与剩余问题](docs/short-report-structure-fix-20261019.md)。
+
+阶段 11 最新记录：单测 **662 passed**，证据/原 v2/范围离线 **5/5、8/8、5/5**。冻结实现真实模型证据两轮各 **6/6**、原v2 **9/9**、范围三轮各 **7/7**；结果与人工核对边界见 [阶段 11 验收](docs/stage11-acceptance-20261019.md) 和 [机器记录](docs/stage11-evaluation-20261019.json)。证据与审稿绑定同一报告版本；`mapped` 仅表示选定原句与所存依据可定位，类型标注和语义支持仍需核对。阶段 12 尚未开展。
 
 ## 快速开始
 
@@ -52,6 +55,7 @@ python main.py --no-memory "..."       # 本次不读写长期记忆
 python main.py --max-steps 40 --budget 400000 "..."   # 调整步数 / 等效 token 预算（默认 30 步 / 30 万）
 python -m agent.replay                 # 回放最近一次任务的运行日志（不花钱）
 python -m agent.replay <任务目录> --full
+python -m agent.evidence <任务目录>    # 离线核对关键结论关联与版本，不调用 API
 python -m agent.compare --last 2       # 对比最近两次运行的 token、缓存、笔记、引用等指标
 python -m agent.simulate <任务目录>    # 离线评估不同压缩阈值的成本
 python -m agent.cache_probe            # 测试不同请求写法能否命中厂商的前缀缓存（约 5 万输入 token）
@@ -71,7 +75,7 @@ pytest
 ← 搜索「DeepSeek GLM Kimi Agent 对比」的结果（共 5 条）：…
 ──────────── Step 2 ────────────
 → 调用 fetch_url(url='https://blog.example.com/llm-comparison')
-← URL: … 标题: … 发布日期: 2026-08-13 正文: 第 0–2911 字符…
+← URL: … 标题: … 页面日期（元数据，类型未核实）: 2026-08-13 正文: 第 0–2911 字符…
 → 调用 fetch_url(url='https://zhuanlan.zhihu.com/p/…')
 ← ERROR: FetchError: HTTP 403：页面无法访问，请换一个来源
 ──────────── Step 3 ────────────
@@ -92,11 +96,13 @@ pytest
 | 文件 | 内容 |
 |---|---|
 | `*.md` | 研究报告 |
+| `evidence.json` | 本次实际送达的用户材料、网页片段、成功计算及有日期历史的有界索引 |
+| `report.evidence.json` | 选定结论原句、依据摘录、类型/假设/限制及报告版本；mapped 不认证事实正确 |
 | `notes.md` | 研究笔记（`save_note` 记录的要点和来源） |
 | `plan.json` | 研究计划（按问题复杂度拆成 1–6 个子任务，简单问题优先 1–2 个；`update_plan` 更新状态） |
 | `task_contract.json` | 从本次请求保守提取的任务约定；原始问题仍有效，历史和网页不增加指令 |
 | `trace.jsonl` | 运行日志，每行一个事件（模型调用、工具调用、结果、耗时、token……），用 `python -m agent.replay` 回放 |
-| `messages.json` | 结束时完整的对话历史，排查“模型为什么这么做”时看这里 |
+| `messages.json` | 结束时保留的模型上下文，可能已整理/压缩；完整原始调用与反馈看 trace.jsonl |
 | `memory_context.json` | 本次召回的历史记录 ID 与实际注入的背景；无历史命中时不生成 |
 | `<报告名>.quality.json` | 最终机械检查：计划、章节、引用编号、来源及图片，含对应报告文本的 SHA-256 |
 | `<报告名>.contract.json` | 篇幅计量、明确长度错误、范围观察和简述扩展理由，关联请求及报告哈希 |
@@ -128,7 +134,7 @@ python -m agent.evaluate --suite agent/scope_cases.json offline
 
 | 情况 | Agent 的反应 |
 |---|---|
-| 步数用完 / 预计下一次调用会超出 token 预算 / 反复重复调用 | 进入收尾阶段：只允许 `read_notes` / `write_report` / `update_plan`，最多再调用 3 次模型；仍没写报告就把收尾回答存为 `report.md` |
+| 步数用完 / 预计下一次调用会超出 token 预算 / 反复重复调用 | 进入收尾阶段：只允许 `read_notes` / `read_evidence` / `write_report` / `update_plan`，最多再调用 3 次模型；仍没写报告就把收尾回答存为 `report.md` |
 | token 用到预算 80% | 提醒模型尽快写报告 |
 | 只剩 6 步 | 提醒模型停止搜索、开始收尾，并列出计划中未完成的子任务（步数上限也写在 system prompt 里） |
 | 调用 `write_report` 后 | 检查计划、章节、引用编号、证据来源和本地图片；默认追加独立模型审稿，将意见交回主循环修订 |
@@ -194,9 +200,10 @@ DeepSeek 默认 `deepseek-flash` 显式发送 `thinking: disabled`，保持本�
 |---|---|---|
 | `web_search(query, max_results)` | 联网搜索，返回标题 / URL / 摘要 | 模型的知识有截止日期；当前使用 ddgs（DuckDuckGo 等，免费无 Key） |
 | `fetch_url(url, start, query, length)` | 读取网页正文；用关键词定位，再按偏移精读；失败时可经 Jina Reader 读取 | 缓存全文，定位时只返回最多 4 个有界片段，减少长文逐页阅读 |
-| `save_note(content, source_url, topic)` | 记录从网页提炼的要点 | 网页原文稍后会被移出上下文，只有笔记保留；来源必须是读过的网页 |
-| `read_notes()` | 读取全部笔记 | 写报告前回顾，报告以笔记为依据 |
-| `write_report(content, filename, mode, complete, replacements, base_sha256)` | 保存报告，append 分段追加，patch 按报告版本精确替换 | 完整稿保存前核对表头和数值；中间草稿 `complete=false` 不消耗审稿次数 |
+| `save_note(content, source_url, topic)` | 记录从网页提炼的要点 | 网页原文稍后会被移出上下文，笔记摘要与原始证据索引分别有界保留；来源必须是读过的网页 |
+| `read_notes()` | 读取全部笔记 | 回顾摘要，关键结论仍需核对原始证据 |
+| `read_evidence(source_id, query)` | 重看本次保留证据 ID 与摘录 | 不读取未送达的缓存全文 |
+| `write_report(content, filename, mode, complete, replacements, base_sha256, claims)` | 保存报告，append 分段追加，patch 按报告版本精确替换 | 完整稿保存前核对表头和数值；中间草稿 `complete=false` 不消耗审稿次数 |
 | `run_python(code)` | 用独立 Python 子进程计算数据、生成 CSV / PNG，返回退出码和有界 stdout/stderr | 复杂计算可复现，报告可引用实际生成的图表 |
 | `get_current_time(timezone)` | 当前日期、时间、星期 | 模型不知道"今天"是哪天 |
 | `days_between(start_date, end_date)` | 两个日期相差的天数 | 大小月、闰年容易算错 |
@@ -343,6 +350,31 @@ REPORT_REVIEW_MAX_TOKENS=2048
 机械检查不验证事实真伪；模型审稿也可能遗漏或误报。审稿不联网、没有独立事实核验能力，
 只读取有限的 CSV/代码样本，不读取图像像素，不能保证图表视觉内容与所有数据完全一致。
 
+硬篇幅拒绝后，后续模型上下文会移除本批被拒写稿及回复，保留原任务、其他工具结果与证据索引，并附程序计量重新生成。原始参数/反馈仍在 trace；不自动替用户删稿，也不重置实际用量、步数或重复保护。静态修订提醒每任务最多一次。
+
+### 关键结论与证据
+
+`write_report` 可用 `claims` 提交最多 8 条关键结论：报告原句 `quote`、类型 `kind`、
+依据 `supports`（`source_id` 与 `excerpt`），以及 `assumptions`、`limits`。
+类型为 `direct`（直接资料）、`calculated`（计算）、`inference`（依赖假设的推断）、`unknown`（未知或冲突）。
+这些类型由模型填写，有限检查只验证来源类别等约束，不能证明分类和推理正确。
+不提供关联仍可保存报告，但完整稿保持 `unmapped`，暂不消耗语义审稿次数。
+
+工具 `read_evidence(source_id="", query="")` 可列出已保留 ID 或重新查看某条实际送达内容；
+只能读取本次索引，不读取未展示的缓存全文。网页日期类型未核实，抓取时间单独保存；历史日期不证明当前事实。
+改稿未提供新关联时保守使全部旧关联过期；只改关联也会使旧审稿失效，复审仍受原预算和次数上限约束。
+摘录允许仅空白差异匹配，最终保存原始子串，不能用相似措辞冒充原文。
+
+在项目根目录核对已有任务，无需 API Key：
+
+```powershell
+.\.venv\Scripts\python.exe -m agent.evidence "workspace/<任务目录>"
+```
+
+退出码 0 代表版本与所选关联可定位；`draft`、`unmapped`、`stale` 或损坏返回非零。
+查看 `report.evidence.json` 和 `evidence.json` 可逐条复核。所有关联均保留 `semantic_support=not_certified`；
+少量关键句被关联不等于整篇事实已覆盖，成功运行代码也不等于任意计算逻辑正确。
+
 ### Python 计算与绘图
 
 更新依赖后即可使用：`python -m pip install -e ".[dev]"`，已包含 pandas、matplotlib。
@@ -396,6 +428,8 @@ agent/
   llm.py       # LLM 客户端：OpenAI 兼容协议、tenacity 重试、用量统计
   loop.py      # ★ Agent 主循环：调用模型 → 执行工具 → 回传结果 → 循环，以及各种运行保护
   context.py   # 上下文估算与压缩
+  evidence.py  # 已送达证据索引、选定结论关联、版本审计 CLI
+  evidence_cases.json # 阶段11证据开发回归题集（非独立保留集）
   memory.py    # SQLite/FTS5 研究记忆、历史背景格式化与管理 CLI
   evaluate.py  # 离线/真实题集执行、结果保存、只读复查与基线比较
   eval_checks.py # 独立数值校验、引用/图片/审稿/记忆检查与 trace 指标
@@ -418,6 +452,7 @@ tools/
   basic.py     # 基础工具：get_current_time / days_between / calculator
   search.py    # web_search + 可替换的搜索后端（当前 ddgs）
   fetch.py     # fetch_url：下载、正文提取、分段、缓存、Jina Reader 备用通道
+  evidence.py  # read_evidence：只读本次保留证据及原始摘录
   report.py    # write_report：安全地写报告文件，并自动检查计划完成度与引用来源
   code_exec.py # run_python：独立子进程、精简环境、超时清理、有界输出与产物路径
   plan.py      # update_plan：更新计划中子任务的状态
