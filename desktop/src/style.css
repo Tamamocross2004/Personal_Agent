@@ -1282,3 +1282,138 @@ small {
     font-size: 27px;
   }
 }
+.usage-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 4px 0 15px;
+}
+.usage-cards > div {
+  border: 1px solid #3d5148;
+  border-radius: 8px;
+  padding: 13px 10px;
+  background: #202b25;
+}
+.usage-cards span {
+  display: block;
+  font-size: 10px;
+  color: #92ab9d;
+  margin-bottom: 10px;
+}
+.usage-cards strong {
+  font-weight: 500;
+  font-size: 20px;
+  color: #c9e0d2;
+  overflow-wrap: anywhere;
+}
+.usage-cards small {
+  font-size: 10px;
+}
+.usage-note {
+  font-size: 10px;
+  line-height: 1.9;
+  color: #cbb68e;
+  background: #302a21;
+  border: 1px solid #594c39;
+  border-radius: 6px;
+  padding: 9px 11px;
+  margin: 12px 0;
+}
+.usage-table {
+  overflow: auto;
+}
+.usage-table table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 10px;
+  margin: 4px 0 12px;
+}
+.usage-table th,
+.usage-table td {
+  padding: 9px 6px;
+  text-align: right;
+  border-bottom: 1px solid #35453e;
+  white-space: nowrap;
+}
+.usage-table th:first-child,
+.usage-table td:first-child {
+  text-align: left;
+}
+.usage-table th {
+  font-weight: 400;
+  color: #92b5a1;
+}
+.usage-table small {
+  display: block;
+  font-size: 8px;
+}
+.usage-rate {
+  margin: 12px 0;
+  padding: 12px;
+  background: #1e2924;
+  border-radius: 6px;
+  line-height: 1.8;
+}
+.usage-rate b {
+  font-size: 10px;
+  font-weight: 500;
+  color: #b9d1c3;
+}
+.usage-rate p {
+  font-size: 10px !important;
+}
+.usage-disclaimer {
+  font-size: 10px;
+  line-height: 1.9;
+  color: #7f9990;
+}
+.rate-button {
+  border: 1px solid #65836d;
+  color: #c4dbcd;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 11px;
+}
+.pricing-editor {
+  border-top: 1px solid #405348;
+  border-bottom: 1px solid #405348;
+  padding: 15px 0;
+  margin: 22px 0;
+}
+.pricing-editor summary {
+  cursor: pointer;
+  font-size: 12px;
+  color: #bbd6c4;
+}
+.price-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.price-presets button {
+  font-size: 10px;
+  border: 1px solid #465f4e;
+  border-radius: 5px;
+  padding: 7px 8px;
+  color: #acc9b6;
+}
+.rate-inputs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.rate-inputs input {
+  min-width: 0;
+}
+.price-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.price-actions > button:last-child {
+  font-size: 10px;
+  color: #8a9f96;
+}
+.tabs {
+  gap: 14px;
+}

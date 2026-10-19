@@ -156,6 +156,10 @@ const path = require("node:path");
     await page.getByPlaceholder("搜索会话").fill("");
     await page.getByRole("button", { name: "本地工作区" }).click();
     await page.getByRole("heading", { name: "运行设置" }).waitFor();
+    await page.locator(".pricing-editor summary").click();
+    for (const name of ["未缓存输入费率", "缓存输入费率", "输出费率"]) {
+      await page.getByRole("spinbutton", { name, exact: true }).waitFor();
+    }
     await page.getByRole("button", { name: "完成", exact: true }).click();
     await page.getByRole("button", { name: "显示或隐藏成果面板" }).click();
     assert.equal(await page.locator(".inspector").count(), 0);

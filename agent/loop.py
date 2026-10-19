@@ -662,7 +662,18 @@ class Agent:
         self._check_stop()
         started = time.perf_counter()
         self._len_at_last_call = len(messages)
-        resp = self.llm.chat(messages, tools=tools, **kwargs)
+        config = getattr(self.llm, 'config', None)
+        identity = {'provider':getattr(config,'provider',None),'requested_model':getattr(config,'model',None)}
+        attempts_before = getattr(self.llm, 'request_attempts', None)
+        def attempts():
+            after = getattr(self.llm, 'request_attempts', None)
+            return after-attempts_before if isinstance(after,int) and isinstance(attempts_before,int) else None
+        try:
+            resp = self.llm.chat(messages, tools=tools, **kwargs)
+        except Exception as exc:
+            self._emit('llm_error',purpose=purpose,step=step,**identity,request_attempts=attempts(),
+                       error_type=type(exc).__name__,seconds=round(time.perf_counter()-started,2))
+            raise
         u = resp.usage
         p = u.prompt_tokens if u else 0
         c = u.completion_tokens if u else 0
@@ -676,7 +687,10 @@ class Agent:
             purpose=purpose,
             evidence_packet_estimated_tokens=evidence_tokens_estimate,
             step=step,
-            requested_model=getattr(getattr(self.llm, 'config', None), 'model', None),
+            **identity,
+            request_attempts=attempts(),
+            usage_reported=u is not None,
+            cache_usage_reported=_cache_usage_reported(u),
             response_model=resp.model,
             prompt_tokens=p,
             cached_tokens=cached,
@@ -942,6 +956,13 @@ def _cached_tokens(usage: Any) -> int:
     if cached is None:
         cached = (getattr(usage, "model_extra", None) or {}).get("prompt_cache_hit_tokens")
     return int(cached or 0)
+
+
+def _cache_usage_reported(usage: Any) -> bool:
+    if usage is None:return False
+    details = getattr(usage, 'prompt_tokens_details', None)
+    return (getattr(details, 'cached_tokens', None) is not None
+            or (getattr(usage,'model_extra',None) or {}).get('prompt_cache_hit_tokens') is not None)
 
 
 def _normalize_args(arguments: str) -> str:

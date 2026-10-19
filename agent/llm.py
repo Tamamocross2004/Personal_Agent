@@ -76,6 +76,7 @@ class LLMClient:
             max_retries=0,
         )
         self.usage = UsageStats()
+        self.request_attempts = 0
 
         self._chat_with_retry = retry(
             retry=retry_if_exception_type(RETRYABLE_ERRORS),
@@ -86,6 +87,7 @@ class LLMClient:
         )(self._raw_chat)
 
     def _raw_chat(self, **kwargs: Any) -> ChatCompletion:
+        self.request_attempts += 1
         return self._client.chat.completions.create(**kwargs)
 
     def chat(

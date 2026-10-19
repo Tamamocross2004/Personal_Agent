@@ -28,6 +28,7 @@ import {
   Command,
 } from "lucide-react";
 import "./style.css";
+import { UsagePanel, PricingEditor, money } from "./usage";
 
 declare global {
   interface Window {
@@ -55,6 +56,7 @@ type Run = {
   result: any;
 };
 type Detail = Run & {
+  usage: any;
   files: { name: string; size: number; modified: number; type: string }[];
   review: any;
   evidence: any;
@@ -152,6 +154,7 @@ function App() {
     [inspector, setInspector] = useState(true),
     [tab, setTab] = useState("report"),
     [selectedFile, setSelectedFile] = useState("report.md");
+  const [pricingExpanded, setPricingExpanded] = useState(false);
   const [content, setContent] = useState(""),
     [fileError, setFileError] = useState(""),
     [busy, setBusy] = useState(false),
@@ -660,6 +663,7 @@ function App() {
                                 "tool_result",
                                 "notice",
                                 "llm_call",
+                                "llm_error",
                                 "step",
                               ].includes(e.kind),
                             )
@@ -723,6 +727,16 @@ function App() {
                       >
                         <BookOpen size={14} />
                         {detail.claims?.claims?.length || 0} 条结论关联
+                      </button>
+                      <button
+                        onClick={() => {
+                          setTab("usage");
+                          setInspector(true);
+                        }}
+                      >
+                        {detail.usage?.available
+                          ? `${detail.usage.calls} 次模型 · ${money(detail.usage.estimated_cost)}`
+                          : "用量统计"}
                       </button>
                       <button
                         onClick={() => window.desktop.openTask(run.task_dir)}
@@ -832,6 +846,7 @@ function App() {
               ["files", "文件"],
               ["evidence", "依据"],
               ["quality", "质量"],
+              ["usage", "用量"],
             ].map(([id, label]) => (
               <button
                 className={tab === id ? "active" : ""}
@@ -861,6 +876,15 @@ function App() {
                 <span>{time(detail.created_at)}</span>
               </div>
               <div className="inspector-body">
+                {tab === "usage" && (
+                  <UsagePanel
+                    value={detail.usage}
+                    onPricing={() => {
+                      setPricingExpanded(true);
+                      setSettings(true);
+                    }}
+                  />
+                )}
                 {tab === "report" &&
                   (content ? (
                     <article className="markdown document">
@@ -1210,6 +1234,12 @@ function App() {
                 : "项目默认模型 Key 未配置"}
               <small>审稿上限 {config?.review_max_calls} 次 · 单任务执行</small>
             </div>
+            <PricingEditor
+              provider={options.provider}
+              model={options.model}
+              api={api}
+              expanded={pricingExpanded}
+            />
             <p className="muted small">
               追问可沿用本会话上一轮报告作为历史数据。停止后重新提交会创建新任务，首版尚无检查点恢复。
             </p>
@@ -1340,13 +1370,24 @@ function Empty({ text }: { text: string }) {
   );
 }
 function Event({ value: e }: { value: any }) {
+  if (e.kind === "llm_error")
+    return (
+      <div className="notice-event">
+        模型请求失败 · {e.error_type} · {e.request_attempts ?? "未知"}{" "}
+        次请求尝试
+      </div>
+    );
   if (e.kind === "step")
     return <div className="step-divider">步骤 {e.step}</div>;
   if (e.kind === "llm_call")
     return (
       <div className="model-event">
         <span className="tiny-dot" />
-        {e.purpose === "report_review" ? "报告审稿" : "模型调用"}
+        {e.purpose === "report_review"
+          ? "报告审稿"
+          : e.purpose === "planning"
+            ? "研究规划"
+            : "研究调用"}
         <span>
           {number(e.equivalent_tokens)} 等效 token · {e.seconds}s
         </span>

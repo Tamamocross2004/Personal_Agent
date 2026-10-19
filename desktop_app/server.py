@@ -18,6 +18,7 @@ from pydantic import BaseModel, Field
 
 from agent.config import PROJECT_ROOT,ProviderName
 from desktop_app.manager import Manager,FINAL
+from desktop_app.usage import PriceProfile, flash_profile
 
 
 class SessionPatch(BaseModel):
@@ -74,6 +75,12 @@ def create_app(manager:Manager,token:str,ui_dir:Path|None=None):
 
     @app.get('/api/config')
     def config():return manager.config()
+    @app.get('/api/pricing')
+    def pricing():return redact({**manager.pricing.read(),'presets':[flash_profile(),flash_profile(False)]})
+    @app.put('/api/pricing')
+    def update_pricing(body:PriceProfile):return redact(manager.pricing.save(body.provider,body.model,body))
+    @app.delete('/api/pricing')
+    def delete_pricing(provider:ProviderName,model:str):return redact(manager.pricing.save(provider,model))
     @app.get('/api/sessions')
     def sessions(archived:bool=False):return redact(manager.store.sessions(archived))
     @app.post('/api/sessions')

@@ -13,6 +13,7 @@ from agent.evidence import audit_mapping, sha
 from agent.memory import format_context
 from agent.workspace import new_task_dir
 from desktop_app.store import Store
+from desktop_app.usage import PricingBook, TraceUsageReader, summarize
 
 ACTIVE={'queued','running','cancelling'}
 FINAL={'completed','partial','failed','cancelled','interrupted','imported'}
@@ -44,6 +45,8 @@ class Manager:
         self.root.mkdir(parents=True,exist_ok=True)
         self.settings=settings or Settings()
         self.store=Store(self.root/'desktop.sqlite3')
+        self.pricing=PricingBook(self.root/'desktop-pricing.json')
+        self.usage_reader=TraceUsageReader()
         self.lock=threading.RLock()
         self.process=None
         self.active=None
@@ -87,6 +90,7 @@ class Manager:
             load_llm_config(provider=options['provider'],model=options['model'],settings=self.settings)
             path=new_task_dir(question,root=self.root)
             path.mkdir(parents=True)
+            options={**options,'pricing':self.pricing.get(options['provider'],options['model'])}
             row=self.store.add_run(sid,question,path,options)
             if self.store.session(sid)['title']=='新研究':self.store.update_session(sid,title=question[:28])
             return row
@@ -158,7 +162,7 @@ class Manager:
     def stop(self,rid,force=False):
         with self.lock:
             row=self.store.run(rid)
-            if row['state']=='queued':return self.store.set_run(rid,'cancelled',{'error':'排队任务已取消，未调用模型。'})
+            if row['state']=='queued':return self.store.set_run(rid,'cancelled',{'error':'排队任务已取消，未调用模型。','usage_not_started':True})
             if row['state'] not in {'running','cancelling'}:return row
             (self.safe_task(row)/'.desktop-stop').touch()
             if force and self.active==rid and self.process:
@@ -203,9 +207,15 @@ class Manager:
         if review.get('evidence_mapping_sha256') and review['evidence_mapping_sha256']!=evidence.get('mapping_sha256'):
             review={**review,'status':'stale'}
         return {**row,'files':files,'review':review,'evidence':evidence,
+                'usage':self.usage(row),
                 'quality':read_json(root/'report.quality.json',{}),'plan':read_json(root/'plan.json',{}),
                 'contract':read_json(root/'task_contract.json',{}),
                 'claims':read_json(root/'report.evidence.json',{}),'sources':read_json(root/'evidence.json',{})}
+
+    def usage(self,row):
+        try:trace=self.usage_reader.read(self.safe_task(row)/'trace.jsonl')
+        except OSError:trace=None
+        return summarize(trace,row,self.pricing)
 
     def import_history(self):
         imported=0
