@@ -192,6 +192,7 @@ def test_corrupt_memory_does_not_break_research_or_overwrite_database(tmp_path, 
         completion('{"tasks":[{"title":"说明结果"}]}'),
         completion(tool_calls=[("w", "write_report", {"content": "# 报告\n已有结果"})]),
         completion("完成"),
+        completion("仍有结构警告，保留现有结果。"),  # 正常结束前只提醒一次结构修复；损坏记忆仍不能中断研究。
     ])
     assert main.research(llm, settings, "DeepSeek 成本", 10, 300000).stop_reason == "final_answer"
     assert (task / "report.md").exists()

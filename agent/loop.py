@@ -47,7 +47,7 @@ from openai.types.chat import ChatCompletion, ChatCompletionMessage
 from agent.context import ContextCompactor, estimate_messages, estimate_tools
 from agent.errors import classify_api_error
 from agent.planner import format_plan_for_prompt, generate_plan, load_plan, unfinished_tasks
-from agent.quality import inspect_report, save_check
+from agent.quality import inspect_report, save_check, structure_repair_feedback
 from agent.review import ReviewValidationError, build_review_messages, fingerprint, parse_verdict, review_feedback, save_review
 from agent.task_contract import TaskContract, extract_contract, save_contract_check
 from agent.prompts import (
@@ -214,6 +214,8 @@ class Agent:
         self._budget_warned = False
         self._blocked = 0
         self._review_count = 0
+        self._report_completeness: dict[str, bool] = {}
+        self._structure_repair_requested = False
         self._calculation_results: list[dict] = []
         self._calculations_omitted = 0
         self._source_readings: list[dict] = []
@@ -331,6 +333,10 @@ class Agent:
                     self._emit("notice", text="模型返回了空回复，已提醒它继续。")
                     continue
                 messages.append(_assistant_message_to_dict(msg))
+                if step < self.max_steps and self._request_structure_repair(messages):
+                    pending_text.clear()
+                    empty_replies = 0
+                    continue
                 answer = "".join(pending_text) + text
                 self._emit("final", text=answer, stop_reason="final_answer")
                 return "final_answer", answer, None
@@ -404,14 +410,45 @@ class Agent:
             )
             messages.append({"role": "tool", "tool_call_id": call.id, "content": content})
             if name == "write_report" and not result.is_error:
+                from tools.report import safe_filename
                 args = json.loads(arguments)
-                reports_written[args.get("filename", "report.md")] = args.get("complete", True)
+                filename = safe_filename(args.get("filename", "report.md"))
+                complete = args.get("complete", True)
+                reports_written[filename] = complete
+                self._report_completeness[filename] = complete
 
         for filename, complete in reports_written.items():
             self._review_saved_report(messages, filename, complete=complete)
 
         if truncated:
             self._emit("notice", text="回复因输出长度上限被截断，工具调用未执行，已告知模型分段处理。")
+
+    def _request_structure_repair(self, messages: list[dict[str, Any]]) -> bool:
+        """正常结束前只提醒一次；不增加步数、预算或强制收尾轮数。"""
+        if self._structure_repair_requested or not self.task_dir:
+            return False
+        pending = []
+        for filename, complete in self._report_completeness.items():
+            path = self.task_dir / filename
+            if not complete or filename == 'notes.md' or not path.is_file() or path.is_symlink():
+                continue
+            report = path.read_text(encoding='utf-8')
+            check = inspect_report(report, self.task_dir, self.research_session, contract=self._contract)
+            feedback = structure_repair_feedback(report, self._contract, check)
+            if feedback:
+                pending.append(f"文件 {filename}\n{feedback}")
+            if len(pending) >= 4:
+                break  # 有界反馈；不扫描本次未成功写入的其他 Markdown 文件。
+        if not pending:
+            return False
+        self._structure_repair_requested = True
+        feedback = ('【结束前结构核对】本次已保存的完整报告仍有结构缺项。'
+                    '这是本次唯一一次结束前修复提醒，占用现有剩余步数和预算。'
+                    '请先在用户篇幅及内容要求内修订，再最终回答；不能只在回答里解释。\n'
+                    + '\n'.join(pending))
+        messages.append({'role': 'user', 'content': feedback})
+        self._emit('notice', text=feedback)
+        return True
 
     def _review_saved_report(self, messages: list[dict[str, Any]], filename: str, *, complete: bool = True) -> None:
         if not self.review_reports or not self.task_dir:
@@ -428,6 +465,9 @@ class Agent:
         if not complete:
             self._reviewed_hashes.discard(digest)
             record = save_review(path, report, "not_reviewed", [], reason="分段草稿尚未完成")
+        elif structure_repair_feedback(report, self._contract, inspect_report(
+                report, self.task_dir, self.research_session, contract=self._contract)):
+            record = save_review(path, report, "not_reviewed", [], reason="机械结构检查待修复，暂不消耗语义审稿次数")
         elif self._review_count >= self.review_max_calls:
             record = save_review(path, report, "skipped_limit", [])
         else:
@@ -484,6 +524,8 @@ class Agent:
         self._last_reviews[path.name] = {k: record[k] for k in ("report_sha256", "status", "issues")}
         self._last_report_texts[path.name] = report[:40000]
         feedback = review_feedback(record)
+        if record.get('reason'):
+            feedback += '\n原因：' + record['reason']
         self._emit("notice", text=feedback)
         messages.append({"role": "user", "content": feedback})
 

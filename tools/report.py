@@ -15,7 +15,7 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from agent.quality import inspect_report, save_check
+from agent.quality import inspect_report, save_check, structure_repair_feedback
 from agent.markdown_tables import markdown_tables
 from agent.task_contract import TaskContract, check_contract, explicit_headers, extract_contract, length_repair_hint, needs_brief_reason, save_contract_check
 from agent.numeric_evidence import arithmetic_errors, price_ratio_errors, report_cost_errors, scaling_explanation_errors
@@ -158,6 +158,7 @@ def make_write_report(task_dir: Path, session: ResearchSession | None = None, *,
         scope_feedback = ""
         if contract_check['observations']:
             scope_feedback = "\n【范围核对线索】" + str(contract_check['observations']) + "\n线索不等于已判违规；结合任务与资料核对，软目标不作为硬上限，不为润色无限改稿。"
-        return saved + ("\n【分段草稿】尚未完成，不执行语义审稿；最后一段须 complete=true。" if not complete else "") + "\n\n" + check.feedback() + scope_feedback
+        repair = structure_repair_feedback(full, active_contract, check) if complete else ''
+        return saved + ("\n【分段草稿】尚未完成，不执行语义审稿；最后一段须 complete=true。" if not complete else "") + "\n\n" + check.feedback() + ('\n' + repair if repair else '') + scope_feedback
 
     return write_report

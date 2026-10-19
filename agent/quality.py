@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import re
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
@@ -67,6 +68,25 @@ class QualityCheck:
         return "【自动检查】发现以下问题（分段写作时可在完整报告写完后修正）：\n" + "\n".join(
             f"- [{i.category}] {i.message}" for i in self.issues
         )
+
+
+def structure_repair_feedback(text: str, contract: TaskContract, check: QualityCheck) -> str:
+    """缺章是可修订的警告；计量余量不证明任意新稿一定放得下。"""
+    missing = [i.message for i in check.issues if i.category == 'structure']
+    if not missing:
+        return ''
+    measures = check_contract(text, contract)['measurements']
+    units = {'characters': '可见非空白字符', 'han_characters': '汉字', 'english_words': '英文单词'}
+    counts = [f"{m['scope']}/{units[m['unit']]}：当前{m['actual']}，上限{m['maximum']}，"
+              f"剩余{max(0, m['maximum']-m['actual'])}"
+              for m in measures if 'maximum' in m]
+    return ('【结构修订】' + '；'.join(missing)
+            + f"\n当前报告 SHA-256：{hashlib.sha256(text.encode('utf-8')).hexdigest()}。"
+            + ('\n按本次计量：' + '；'.join(counts) + '。' if counts else '')
+            + '\n先复用内容相符的现有章节标题、压缩重复解释，再用 write_report 修正文件。'
+              '短稿每节一句即可，不能只补空标题、编造来源或删掉必答理由。'
+              '用户硬上限优先；余量不保证能直接追加，须检查修订后的全文。'
+              '不要未经修订尝试就断言补齐章节必然超限；确有格式冲突时如实说明。')
 
 
 def urls(text: str) -> list[str]:
