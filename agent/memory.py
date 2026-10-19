@@ -173,12 +173,23 @@ def save_research(store: MemoryStore, task_dir: Path, question: str, result, ses
             except (OSError, ValueError, TypeError):
                 item[kind] = {"status": "unknown", "issues": None}
         quality.append(item)
+        try:
+            mapping=json.loads(path.with_suffix('.evidence.json').read_text(encoding='utf-8'))
+            item['evidence']={'status':mapping['status'] if mapping['report_sha256']==fingerprint(text) else 'stale',
+                              'claims':len(mapping.get('claims',[])),'semantic_support':'not_certified'}
+            from agent.evidence import mapping_sha
+            review_data=json.loads(path.with_suffix('.review.json').read_text(encoding='utf-8'))
+            if item['review']['status']=='reviewed' and review_data.get('evidence_mapping_sha256')!=mapping_sha(mapping):
+                item['review']['status']='stale'
+        except (OSError,ValueError,KeyError,TypeError):
+            item.setdefault('evidence',{'status':'unknown','semantic_support':'not_certified'})
     sources = []
     for note in session.notes:
         if not any(s["url"] == note.source_url for s in sources):
             page = session.find_page(note.source_url)
             sources.append({"url": note.source_url, "title": note.source_title,
-                            "published_date": page.date if page else None})
+                            "published_date": None, "page_date":page.date if page else None,
+                            "page_date_kind":"unverified_metadata", "fetched_at":page.fetched_at if page else None})
     summary = "\n\n".join(summaries) if summaries else "未生成报告；已有笔记：\n" + "\n".join(n.content for n in session.notes)[:4000]
     plan = load_plan(task_dir)
     incomplete = unfinished_tasks(plan) or [t for t in (plan or {}).get("tasks", []) if t.get("status") == "skipped"]

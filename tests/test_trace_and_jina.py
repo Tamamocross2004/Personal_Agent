@@ -72,7 +72,7 @@ def test_falls_back_to_jina(direct):
 
     assert not r.is_error, r.content
     assert "标题: 国产大模型核心能力评测" in r.content
-    assert "发布日期: 2026-05-14" in r.content
+    assert "页面日期（元数据，类型未核实）: 2026-05-14" in r.content
     assert "经第三方 Jina Reader 读取" in r.content  # 如实告诉模型来源通道
     assert "Agentic 指数" in r.content and "<web_content>" in r.content
     jina_req = seen[-1]

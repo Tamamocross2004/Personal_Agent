@@ -106,8 +106,10 @@ def test_final_plan_checks_can_be_refreshed_without_changing_report(tmp_path):
         completion(tool_calls=[("w", "write_report", {"content": report()})]),
         completion(tool_calls=[("p", "update_plan", {"task_id": "task-1", "status": "done"})]),
         completion("完成"),
+        completion("计划已完成，依据尚未关联。"),
     ])
-    registry = ToolRegistry([make_write_report(tmp_path, evidence()), make_update_plan(tmp_path)])
-    Agent(llm, registry, task_dir=tmp_path, research_session=evidence()).run("报告")
+    session=evidence()
+    registry = ToolRegistry([make_write_report(tmp_path, session), make_update_plan(tmp_path)])
+    Agent(llm, registry, task_dir=tmp_path, research_session=session).run("报告")
     check = json.loads((tmp_path / "report.quality.json").read_text(encoding="utf-8"))
     assert check["issues"] == []

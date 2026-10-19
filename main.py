@@ -148,6 +148,9 @@ def research(llm: LLMClient, settings: Settings, question: str, max_steps: int, 
         save_check(fallback, inspect_report(result.answer, task_dir, session))
         save_contract_check(fallback, result.answer, contract)
         save_review(fallback, result.answer, "not_reviewed", [], reason="最终文字兜底保存，未经过报告审稿")
+        if session.evidence:
+            from agent.evidence import write_json
+            write_json(fallback.with_suffix('.evidence.json'),session.evidence.prepare(fallback,result.answer,None,complete=False))
         reports = [fallback]
 
     for r in reports:

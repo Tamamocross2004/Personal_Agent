@@ -42,6 +42,7 @@ class ResearchSession:
     pages: dict[str, Page] = field(default_factory=dict)  # 请求的 URL → 页面（即 fetch_url 的缓存）
     notes: list[Note] = field(default_factory=list)
     task_contract: TaskContract | None = None
+    evidence: object | None = None  # Agent创建的本次证据账本，不从历史文件恢复。
 
     def find_page(self, url: str) -> Page | None:
         """按规范化 URL 查找读过的页面（同时匹配请求地址和重定向后的最终地址）。"""

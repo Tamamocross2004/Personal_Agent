@@ -146,6 +146,7 @@ def test_two_research_calls_recall_into_planner_and_main_loop(tmp_path, monkeypa
             completion(tool_calls=[("w", "write_report", {"content": text}),
                                    ("p", "update_plan", {"task_id": "task-1", "status": "done"})]),
             completion("完成"),
+            completion("关键依据尚未关联，保留结果。"),
         ])
 
     main.research(model(), settings, "Alpha/Beta API 成本", 10, 300000)

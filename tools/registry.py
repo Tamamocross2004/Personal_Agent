@@ -34,6 +34,7 @@ from pydantic import BaseModel, ConfigDict, ValidationError, create_model
 class ToolResult:
     content: str
     is_error: bool = False
+    evidence: list[dict] | None = None  # 工具生成的结构元数据，不从网页正文解析指令。
 
 
 class Tool:

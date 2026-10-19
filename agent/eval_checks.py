@@ -220,6 +220,19 @@ def assess_run(case: dict, task_dir: Path) -> dict:
         signals = [s for s in contract_check['observations'] if s.get('kind') == 'statistical_result']
         checks.append(check('no_statistical_result_signals', not signals, '；'.join(s['quote'] for s in signals)))
     quality = inspect_report(report, task_dir, session)
+    audit = None
+    if case.get('require_evidence'):
+        from agent.evidence import audit_mapping
+        try:
+            audit = audit_mapping(task_dir)
+            checks.append(check('evidence_current_and_mapped', audit['status']=='mapped' and audit['claims']>0,
+                                json.dumps(audit,ensure_ascii=False)))
+            for kind in case.get('required_evidence_kinds',[]):
+                checks.append(check('evidence_kind_'+kind,kind in audit['claim_kinds']))
+            for kind in case.get('required_evidence_source_kinds',[]):
+                checks.append(check('evidence_source_'+kind,kind in audit['source_kinds']))
+        except (OSError,ValueError,KeyError,TypeError) as exc:
+            checks.append(check('evidence_current_and_mapped',False,str(exc)))
     checks.append(check("mechanical_quality", bool(report) and not quality.issues,
                         "；".join(i.message for i in quality.issues)))
     try:
@@ -227,6 +240,9 @@ def assess_run(case: dict, task_dir: Path) -> dict:
         if not isinstance(review, dict):
             raise ValueError("审稿记录格式错误")
         review_ok = review.get("status") == "reviewed" and review.get("issues") == [] and review.get("report_sha256") == fingerprint(report)
+        if case.get('require_evidence'):
+            bound = audit is not None and review.get('evidence_mapping_sha256')==audit['mapping_sha256']
+            checks.append(check('review_matches_evidence_mapping',bound))
         review_status = review.get("status", "unknown") if review.get("report_sha256") == fingerprint(report) else "stale"
     except (OSError, ValueError):
         review_ok, review_status = False, "missing_or_invalid"

@@ -78,7 +78,8 @@ def metadata(mode: str, suite: dict, cases: list[dict]) -> dict:
                                              + Path(__file__).with_name("numeric_evidence.py").read_bytes()
                                              + Path(__file__).with_name("markdown_tables.py").read_bytes()
                                              + Path(__file__).with_name("task_contract.py").read_bytes()
-                                             + Path(__file__).with_name("analysis_scope.py").read_bytes())).hexdigest(), "state": "running",
+                                             + Path(__file__).with_name("analysis_scope.py").read_bytes()
+                                             + Path(__file__).with_name("evidence.py").read_bytes())).hexdigest(), "state": "running",
             "definitions": cases,
             "cases": [{"id": c["id"], "title": c["title"], "status": "pending"} for c in cases]}
 

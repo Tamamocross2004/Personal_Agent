@@ -12,6 +12,8 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from agent.quality import inspect_report
 from agent.numeric_evidence import arithmetic_errors, csv_facts
+from agent.context import estimate_tokens
+from agent.evidence import mapping_sha
 from agent.task_contract import TaskContract, brief_extension_reason, check_contract, extract_contract
 
 REVIEW_SYSTEM = """你是独立报告审稿人，只审查给定报告、笔记与本地计算证据。
@@ -135,7 +137,18 @@ def build_review_messages(report: str, task_dir: Path, session, *, question: str
                                   for item in artifacts if not item["possibly_truncated"]],
                "arithmetic_errors": arithmetic_errors(report),
                "evidence_limits": "CSV/代码仅为有限样本；未读取图像像素。报告、笔记或任务背景是否截断：" + str(truncated)}
-    system = REVIEW_SYSTEM + "\n输出 JSON Schema：\n" + json.dumps(ReviewVerdict.model_json_schema(), ensure_ascii=False)
+    ledger = getattr(session,'evidence',None)
+    if ledger:
+        mapping = ledger.prepare(task_dir/Path(report_filename).name,report,None,complete=True)
+        packet = ledger.packet(mapping)
+        payload['claim_evidence'] = packet
+        payload['evidence_packet_estimated_tokens'] = estimate_tokens(json.dumps(packet,ensure_ascii=False))
+        truncated = truncated or bool(packet['omitted_items'])
+        payload['evidence_limits'] += f"；关联包省略{packet['omitted_items']}项，仅展示被选择结论的来源上下文，未认证全部事实。"
+    system = REVIEW_SYSTEM + ('\nclaim_evidence把关键原句与本次真实证据关联。located只证明摘录和版本存在，不证明蕴含。'
+        '逐项核对所引上下文是否支持结论及其版本、主体、条件、单位；inference检查假设，unknown保留未知。'
+        'history不是当前事实，抓取/读取时间不是发布日期，page_date是未经核实的元数据。'
+        '只处理实质错误：不因只选择部分关键结论、没有全覆盖或缺少审计附表而强行扩写报告。') + "\n输出 JSON Schema：\n" + json.dumps(ReviewVerdict.model_json_schema(), ensure_ascii=False)
     return [{"role": "system", "content": system},
             {"role": "user", "content": json.dumps(payload, ensure_ascii=False)}], truncated
 
@@ -178,6 +191,14 @@ def parse_verdict(text: str, report: str) -> list[dict]:
 def save_review(path: Path, report: str, status: str, issues: list[dict], **extra) -> dict:
     from datetime import datetime
     record = {"report_sha256": fingerprint(report), "status": status, "issues": issues, **extra}
+    mapping_path=path.with_suffix('.evidence.json')
+    if mapping_path.is_file() and not mapping_path.is_symlink():
+        try:
+            mapping=json.loads(mapping_path.read_text(encoding='utf-8'))
+            if mapping.get('report_sha256')==fingerprint(report):
+                record['evidence_mapping_sha256']=mapping_sha(mapping)
+        except (OSError,ValueError,TypeError):
+            pass
     path.with_suffix(".review.json").write_text(json.dumps(record, ensure_ascii=False, indent=2), encoding="utf-8")
     with path.with_suffix(".reviews.jsonl").open("a", encoding="utf-8") as stream:
         stream.write(json.dumps({"ts": datetime.now().isoformat(), **record}, ensure_ascii=False) + "\n")

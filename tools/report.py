@@ -16,6 +16,7 @@ from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 from agent.quality import inspect_report, save_check, structure_repair_feedback
+from agent.evidence import Claim, write_json
 from agent.markdown_tables import markdown_tables
 from agent.task_contract import TaskContract, check_contract, explicit_headers, extract_contract, length_repair_hint, needs_brief_reason, save_contract_check
 from agent.numeric_evidence import arithmetic_errors, price_ratio_errors, report_cost_errors, scaling_explanation_errors
@@ -103,6 +104,7 @@ def make_write_report(task_dir: Path, session: ResearchSession | None = None, *,
         replacements: Annotated[list[ReportReplacement], Field(max_length=16, description="patch 模式的原文/新文替换列表；定位均基于修订前原稿")] = [],
         base_sha256: Annotated[str, Field(description="patch 模式必填：最新审稿反馈中的报告 SHA-256")] = "",
         brief_extension_reason: Annotated[str, Field(max_length=600, description="简述稿明显超过默认软目标时，说明具体必答项为何需要这些内容；非硬上限豁免，泛称全面完整不充分")] = "",
+        claims: Annotated[list[Claim] | None, Field(max_length=8, description="选择1-8项关键结论：quote逐字摘自本稿；kind为direct/calculated/inference/unknown；supports引用本次user-1、history-1或工具返回的证据ID及逐字excerpt。推断填assumptions，历史填limits。修订稿需重交关联，否则旧关联失效；不自动认证语义")] = None,
     ) -> str:
         """把研究报告（Markdown）保存到本地。报告较长时可分多次写：先 overwrite 写开头，再 append 追加后续章节。
         返回值附有对报告的自动检查结果。"""
@@ -144,6 +146,10 @@ def make_write_report(task_dir: Path, session: ResearchSession | None = None, *,
                 errors.extend(price_ratio_errors(full, sample))
         if errors:
             raise ValueError("尚未保存：数值检查失败，请核对计算结果：" + "；".join(errors))
+        ledger = session.evidence if session else None
+        if claims and ledger is None:
+            raise ValueError('本次没有可用证据账本，不能提交自造证据ID')
+        mapping = ledger.prepare(path, full, claims, complete=complete) if ledger else None
         if mode == "append" and path.exists():
             with path.open("a", encoding="utf-8") as f:
                 f.write("\n\n" + content)
@@ -155,10 +161,16 @@ def make_write_report(task_dir: Path, session: ResearchSession | None = None, *,
         check = inspect_report(full, task_dir, session, contract=active_contract)
         save_check(path, check)
         save_contract_check(path, full, active_contract, extension_reason=brief_extension_reason)
+        evidence_feedback = ''
+        if mapping is not None:
+            write_json(path.with_suffix('.evidence.json'),mapping)
+            evidence_feedback = (f"\n【关键结论依据】状态 {mapping['status']}，关联{len(mapping['claims'])}项；"
+                '只校验原句、证据摘录与版本，不认证蕴含或真实性。'
+                + ('请用claims参数关联关键结论；修订后旧关联不能继续作当前依据。' if mapping['status']!='mapped' else '其余未关联文本未认证。'))
         scope_feedback = ""
         if contract_check['observations']:
             scope_feedback = "\n【范围核对线索】" + str(contract_check['observations']) + "\n线索不等于已判违规；结合任务与资料核对，软目标不作为硬上限，不为润色无限改稿。"
         repair = structure_repair_feedback(full, active_contract, check) if complete else ''
-        return saved + ("\n【分段草稿】尚未完成，不执行语义审稿；最后一段须 complete=true。" if not complete else "") + "\n\n" + check.feedback() + ('\n' + repair if repair else '') + scope_feedback
+        return saved + ("\n【分段草稿】尚未完成，不执行语义审稿；最后一段须 complete=true。" if not complete else "") + "\n\n" + check.feedback() + ('\n' + repair if repair else '') + scope_feedback + evidence_feedback
 
     return write_report

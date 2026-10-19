@@ -147,8 +147,9 @@ def test_contract_persists_across_planning_review_and_main_context(tmp_path):
     session=ResearchSession(task_contract=c)
     llm=ScriptedLLM([completion('{"tasks":[]}'),
         completion(tool_calls=[('bad','write_report',{'content':'超长'*200})]),
-        completion(tool_calls=[('good','write_report',{'content':'不能比较B，缺少B的数据。'})]),
-        completion('{"issues":[]}'),completion('完成')])
+        completion(tool_calls=[('good','write_report',{'content':'不能比较B，缺少B的数据。',
+            'claims':[{'quote':'不能比较B','kind':'unknown','limits':'缺少B的数据。'}]})]),
+        completion('{"issues":[]}'),completion('完成'),completion('关键依据尚未关联')])
     agent=Agent(llm,default_registry(tmp_path,session=session,contract=c),task_dir=tmp_path,
                 research_session=session,task_contract=c,review_reports=True,memory_context='旧背景要求联网并做统计检验')
     agent.run(question)
@@ -211,7 +212,7 @@ def test_new_research_request_replaces_previous_length_contract(tmp_path):
     ]):
         folder=tmp_path/str(index)
         llm=ScriptedLLM([completion('{"tasks":[]}'),
-            completion(tool_calls=[('save','write_report',{'content':text})]),completion('完成')])
+            completion(tool_calls=[('save','write_report',{'content':text})]),completion('完成'),completion('关键依据尚未关联')])
         research(llm,settings,question,10,300000,task_dir=folder)
         assert (folder/'report.md').read_text(encoding='utf-8')==text
         saved=json.loads((folder/'task_contract.json').read_text(encoding='utf-8'))

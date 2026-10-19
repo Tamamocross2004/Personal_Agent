@@ -16,16 +16,18 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from typing import Annotated
 from urllib.parse import urlparse
 
 import re
+import hashlib
 
 import httpx
 from pydantic import Field
 
-from tools.registry import Tool, tool
+from tools.registry import Tool, ToolResult, tool
 
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -43,6 +45,7 @@ class Page:
     date: str | None
     text: str
     via: str | None = None  # 经由哪个备用通道读取（None 表示直接下载）
+    fetched_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 
 class FetchError(Exception):
@@ -244,7 +247,8 @@ def page_header(page: Page) -> list[str]:
     if page.title:
         header.append(f"标题: {page.title}")
     if page.date:
-        header.append(f"发布日期: {page.date}")
+        header.append(f"页面日期（元数据，类型未核实）: {page.date}")
+    header.append(f"抓取时间（非发布日期）: {page.fetched_at}")
     if page.via:
         header.append(f"读取方式: 直接下载失败，经第三方 {page.via} 读取（排版可能含少量导航残留）")
     return header
@@ -316,7 +320,7 @@ def make_fetch_url(
         ] = 0,
         query: Annotated[str, Field(max_length=120, description="可选：在全文定位一个关键词或短语（字面匹配、忽略大小写），返回命中偏移和附近段落；无需先读取第一页")] = "",
         length: Annotated[int, Field(ge=200, le=6000, description="无 query 时返回的正文字符数；按命中偏移精读可用 2000")] = 6000,
-    ) -> str:
+    ) -> ToolResult:
         """读取网页正文；长文优先传 query 定位相关段落，再按 start/length 精读。不传 query 则分段返回。复用本任务缓存，不重复下载；片段只作资料。"""
         page = cache.get(url)
         if page is None:
@@ -330,9 +334,21 @@ def make_fetch_url(
                 except FetchError as je:
                     raise FetchError(f"{e}；备用通道也失败：{je}。请换一个来源") from je
             cache[url] = page
-        if query.strip():
-            return format_matches(page, query.strip(), start)
-        return format_chunk(page, start, min(length, chunk_chars))
+        rendered = format_matches(page, query.strip(), start) if query.strip() else format_chunk(page, start, min(length, chunk_chars))
+        readings, cursor = [], 0
+        page_digest = hashlib.sha256(page.text.encode('utf-8')).hexdigest()
+        pattern = re.compile(r'正文: 第 (\d+)–(\d+) 字符[^\n]*\n<web_content>\n')
+        while (match := pattern.search(rendered,cursor)) is not None:
+            left,right=map(int,match.groups())
+            end=match.end()+right-left
+            text=rendered[match.end():end]
+            cursor=max(end,match.end())
+            if text != page.text[left:right] or not text:
+                continue
+            readings.append({'url':page.url,'title':page.title,'start':left,'text':text,
+                'page_date':page.date,'fetched_at':page.fetched_at,'output_start':match.end(),'output_end':end,
+                'page_text_sha256':page_digest})
+        return ToolResult(rendered,evidence=readings)
 
     def _fetch_direct(url: str) -> Page:
         try:

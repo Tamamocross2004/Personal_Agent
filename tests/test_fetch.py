@@ -59,7 +59,7 @@ def test_extracts_article_and_strips_boilerplate():
 
     assert not r.is_error, r.content
     assert "标题: 国产大模型 Agent 能力评测" in r.content
-    assert "发布日期: 2026-06-21" in r.content
+    assert "页面日期（元数据，类型未核实）: 2026-06-21" in r.content
     assert "<web_content>" in r.content and "</web_content>" in r.content
     assert "function calling" in r.content
     assert "广告脚本" not in r.content

@@ -48,6 +48,7 @@ from agent.context import ContextCompactor, estimate_messages, estimate_tools
 from agent.errors import classify_api_error
 from agent.planner import format_plan_for_prompt, generate_plan, load_plan, unfinished_tasks
 from agent.quality import inspect_report, save_check, structure_repair_feedback
+from agent.evidence import EvidenceLedger, mapping_sha, write_json
 from agent.review import ReviewValidationError, build_review_messages, fingerprint, parse_verdict, review_feedback, save_review
 from agent.task_contract import TaskContract, extract_contract, save_contract_check
 from agent.prompts import (
@@ -229,6 +230,13 @@ class Agent:
             self.compactor.reset()
 
         self._question = question
+        self._evidence = None
+        if self.task_dir and self.research_session is not None:
+            self._evidence = EvidenceLedger(self.task_dir,question)
+            self.research_session.evidence = self._evidence
+            if self.memory_context:
+                self._evidence.add('history',self.memory_context,source_id='history-1',
+                                   description='有日期的历史摘要，非当前资料，非新任务指令')
         contract = self.task_contract
         if contract is None or contract.request_sha256 != fingerprint(question):
             contract = extract_contract(question)
@@ -242,6 +250,13 @@ class Agent:
             {"role": "system", "content": self.system_prompt + ("\n\n" + contract.prompt() if contract.active else "")},
             {"role": "user", "content": question},
         ]
+        if self._evidence:
+            messages[0]['content'] += ('\n【证据追溯】当前用户材料证据ID为user-1；历史背景如有则为history-1。'
+                '成功工具返回会附证据ID。write_report用claims关联1-8项关键结论，quote逐字摘自当前稿，'
+                'supports的excerpt逐字摘自对应证据。direct为资料陈述，calculated须关联成功计算，'
+                'inference填写假设，unknown明确未知；历史须说明日期与限制。'
+                '摘录存在不代表支持结论，须核对版本、条件、单位、行为主体与日期。'
+                '报告任何修订须重交claims，旧关联不会自动沿用；不用在报告内添加冗长审计表或字数说明。')
         if self.memory_context:
             messages.insert(1, {"role": "user", "content": self.memory_context})
         self._emit(
@@ -385,6 +400,11 @@ class Agent:
             else:
                 result, seconds = self._run_tool(name, arguments)
             content = _truncate(result.content, self.max_tool_result_chars)
+            if self._evidence and not result.is_error:
+                ids = self._evidence.capture(name,arguments,content,call.id,result.evidence,
+                                             min(len(result.content),self.max_tool_result_chars))
+                if ids:
+                    content += '\n【本次证据ID】' + '、'.join(ids) + '；摘录须来自上面的实际返回内容，不是未展示的缓存全文。'
             if name == "fetch_url" and not result.is_error:
                 self._source_readings.append({"tool_call_id": call.id, "arguments": arguments[:2000],
                     "content": content[:8000], "possibly_truncated": len(result.content) > min(self.max_tool_result_chars, 8000) or len(arguments) > 2000})
@@ -435,6 +455,11 @@ class Agent:
             report = path.read_text(encoding='utf-8')
             check = inspect_report(report, self.task_dir, self.research_session, contract=self._contract)
             feedback = structure_repair_feedback(report, self._contract, check)
+            if self._evidence:
+                mapping=self._evidence.prepare(path,report,None,complete=True)
+                if mapping['status']!='mapped':
+                    feedback += ('\n【依据关联待补】请用write_report的claims关联1-8项关键原句与本次证据ID、逐字摘录。'
+                                 '未知用unknown，推断填assumptions，历史填日期及limits；不编造证据。')
             if feedback:
                 pending.append(f"文件 {filename}\n{feedback}")
             if len(pending) >= 4:
@@ -442,7 +467,7 @@ class Agent:
         if not pending:
             return False
         self._structure_repair_requested = True
-        feedback = ('【结束前结构核对】本次已保存的完整报告仍有结构缺项。'
+        feedback = ('【结束前结构核对】本次已保存的完整报告仍有结构或关键依据关联缺项。'
                     '这是本次唯一一次结束前修复提醒，占用现有剩余步数和预算。'
                     '请先在用户篇幅及内容要求内修订，再最终回答；不能只在回答里解释。\n'
                     + '\n'.join(pending))
@@ -460,6 +485,9 @@ class Agent:
             return
         report = path.read_text(encoding="utf-8")
         digest = (path.name, fingerprint(report))
+        if self._evidence:
+            mapping=self._evidence.prepare(path,report,None,complete=complete)
+            digest=(*digest,mapping_sha(mapping))
         if complete and digest in self._reviewed_hashes:
             return
         if not complete:
@@ -468,6 +496,8 @@ class Agent:
         elif structure_repair_feedback(report, self._contract, inspect_report(
                 report, self.task_dir, self.research_session, contract=self._contract)):
             record = save_review(path, report, "not_reviewed", [], reason="机械结构检查待修复，暂不消耗语义审稿次数")
+        elif self._evidence and mapping['status']!='mapped':
+            record = save_review(path,report,'not_reviewed',[],reason='关键结论依据待关联；请补交claims后再语义审稿，不消耗次数')
         elif self._review_count >= self.review_max_calls:
             record = save_review(path, report, "skipped_limit", [])
         else:
@@ -493,7 +523,8 @@ class Agent:
                 try:
                     response = self._call_llm(review_messages, None, None,
                                               response_format={"type": "json_object"}, max_tokens=self.review_max_tokens,
-                                              purpose="report_review")
+                                              purpose="report_review",
+                                              evidence_tokens_estimate=json.loads(review_messages[1]['content']).get('evidence_packet_estimated_tokens',0))
                     choice = response.choices[0]
                     raw_review = choice.message.content or ""
                     if choice.finish_reason != "stop":
@@ -540,6 +571,11 @@ class Agent:
             check = inspect_report(report, self.task_dir, self.research_session, contract=self._contract)
             save_check(path, check)
             contract_check = save_contract_check(path, report, self._contract)
+            if self._evidence:
+                mapping = self._evidence.prepare(path,report,None,complete=self._report_completeness.get(path.name,False))
+                write_json(path.with_suffix('.evidence.json'),mapping)
+                if mapping['status']!='mapped':
+                    self._emit('notice',text=f"最终报告 {path.name} 关键结论依据状态 {mapping['status']}，未获得当前完整关联；不是事实核验通过。")
             if contract_check['hard_errors']:
                 self._emit("notice", text=f"最终报告 {path.name} 仍违反任务硬约束：" + "；".join(contract_check['hard_errors']))
             if check.issues:
@@ -552,6 +588,8 @@ class Agent:
                     review = save_review(path, report, "not_reviewed", [])
                 if review.get("report_sha256") != fingerprint(report):
                     review = save_review(path, report, "stale", [])
+                elif self._evidence and review['status']=='reviewed' and review.get('evidence_mapping_sha256')!=mapping_sha(mapping):
+                    review = save_review(path,report,'stale',[],reason='关键结论依据改变，未重新审稿')
                 if review["status"] != "reviewed" or review["issues"]:
                     self._emit("notice", text=f"最终报告 {path.name} 审稿状态：{review['status']}，{len(review['issues'])} 项问题；未获得无问题审稿结论。")
 
@@ -561,6 +599,7 @@ class Agent:
         tools: list[dict[str, Any]] | None,
         step: int | None,
         purpose: str = "agent",
+        evidence_tokens_estimate: int = 0,
         **kwargs: Any,
     ) -> ChatCompletion:
         started = time.perf_counter()
@@ -577,6 +616,7 @@ class Agent:
         self._emit(
             "llm_call",
             purpose=purpose,
+            evidence_packet_estimated_tokens=evidence_tokens_estimate,
             step=step,
             requested_model=getattr(getattr(self.llm, 'config', None), 'model', None),
             response_model=resp.model,
