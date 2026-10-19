@@ -1,0 +1,1028 @@
+{
+  "date": "2026-10-19",
+  "source_revision": "21c37cb3368d81ba80bee8e67a4d191e441a0f58",
+  "code_sha256": "d5337c7d9d7e84412d29e89042da3d94443092dadba09da4c3f5be989d845fe0",
+  "grader_sha256": "eefc13bf317a303e101c2b0f1e648ab281b973be0cf8d5fde55c3c2d659b62a6",
+  "unit_tests": {
+    "passed": 594,
+    "seconds": 19.12
+  },
+  "offline_groups_passed": [
+    8,
+    5,
+    1
+  ],
+  "runs": [
+    {
+      "name": "structure-repair-exact-user-live",
+      "suite_sha256": "a261310e82a5e6e2637347a2ffef06e134178c239a6a41a3e688b36e7c078f28",
+      "config": {
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "thinking": "disabled",
+        "temperature": 0.3,
+        "max_steps": 30,
+        "per_case_budget": 300000,
+        "review_max_calls": 2,
+        "memory_enabled": false,
+        "token_weights": {
+          "cached": 0.1,
+          "output": 2.0
+        }
+      },
+      "summary": {
+        "selected": 3,
+        "passed": 3,
+        "failed": 0,
+        "unfinished": 0,
+        "pass_rate": 1.0,
+        "steps": 15,
+        "seconds": 25.25,
+        "equivalent_tokens": 28471,
+        "review_calls": 3
+      }
+    },
+    {
+      "name": "structure-repair-v2-live",
+      "suite_sha256": "b478e191150525ccc0505333a55b28e6ca24008cc19e599b19a9f1a9847bc8ae",
+      "config": {
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "max_steps": 15,
+        "per_case_budget": 80000,
+        "suite_budget": 400000,
+        "review_max_calls": 2,
+        "repeat": 1,
+        "temperature": 0.3,
+        "thinking": "disabled",
+        "token_weights": {
+          "cached": 0.1,
+          "output": 2.0
+        }
+      },
+      "summary": {
+        "selected": 9,
+        "passed": 9,
+        "failed": 0,
+        "unfinished": 0,
+        "pass_rate": 1.0,
+        "steps": 60,
+        "seconds": 159.55,
+        "equivalent_tokens": 181145,
+        "review_calls": 13
+      }
+    },
+    {
+      "name": "structure-repair-scope-live",
+      "suite_sha256": "4359b2fd528afc6d049c15d3397bb819abf483268568998c04d8ed7ddae25b64",
+      "config": {
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "max_steps": 15,
+        "per_case_budget": 80000,
+        "suite_budget": 400000,
+        "review_max_calls": 2,
+        "repeat": 1,
+        "temperature": 0.3,
+        "thinking": "disabled",
+        "token_weights": {
+          "cached": 0.1,
+          "output": 2.0
+        }
+      },
+      "summary": {
+        "selected": 7,
+        "passed": 7,
+        "failed": 0,
+        "unfinished": 0,
+        "pass_rate": 1.0,
+        "steps": 31,
+        "seconds": 75.77,
+        "equivalent_tokens": 77282,
+        "review_calls": 7
+      }
+    }
+  ],
+  "cases": [
+    {
+      "run": "structure-repair-exact-user-live",
+      "id": "user_prompt_1",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 220,
+          "unit": "characters",
+          "scope": "full",
+          "explicit_text": "不超过220字",
+          "actual": 197
+        }
+      ],
+      "hard_errors": [],
+      "quality_issues": [],
+      "review_status": "reviewed",
+      "review_issues": [],
+      "review_hash_current": true,
+      "metrics": {
+        "steps": 4,
+        "seconds": 7.4,
+        "equivalent_tokens": 9054,
+        "input_tokens": 23993,
+        "cached_tokens": 18432,
+        "output_tokens": 825,
+        "llm_calls": 6,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "premature_final_repair_notices": 0,
+      "rejected_writes": 1
+    },
+    {
+      "run": "structure-repair-exact-user-live",
+      "id": "user_prompt_2",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 220,
+          "unit": "characters",
+          "scope": "full",
+          "explicit_text": "不超过220字",
+          "actual": 216
+        }
+      ],
+      "hard_errors": [],
+      "quality_issues": [],
+      "review_status": "reviewed",
+      "review_issues": [],
+      "review_hash_current": true,
+      "metrics": {
+        "steps": 6,
+        "seconds": 9.43,
+        "equivalent_tokens": 10319,
+        "input_tokens": 36655,
+        "cached_tokens": 32000,
+        "output_tokens": 1232,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 2,
+        "stop_reason": "final_answer"
+      },
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "premature_final_repair_notices": 0,
+      "rejected_writes": 2
+    },
+    {
+      "run": "structure-repair-exact-user-live",
+      "id": "user_prompt_3",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 220,
+          "unit": "characters",
+          "scope": "full",
+          "explicit_text": "不超过220字",
+          "actual": 218
+        }
+      ],
+      "hard_errors": [],
+      "quality_issues": [],
+      "review_status": "reviewed",
+      "review_issues": [],
+      "review_hash_current": true,
+      "metrics": {
+        "steps": 5,
+        "seconds": 8.42,
+        "equivalent_tokens": 9098,
+        "input_tokens": 30314,
+        "cached_tokens": 25856,
+        "output_tokens": 1027,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "premature_final_repair_notices": 0,
+      "rejected_writes": 1
+    },
+    {
+      "run": "structure-repair-v2-live",
+      "id": "official_research",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "scope": "body",
+          "unit": "characters",
+          "actual": 982,
+          "soft_target": 500
+        }
+      ],
+      "hard_errors": [],
+      "quality_issues": [],
+      "review_status": "reviewed",
+      "review_issues": [],
+      "review_hash_current": true,
+      "metrics": {
+        "steps": 8,
+        "seconds": 31.07,
+        "equivalent_tokens": 36355,
+        "input_tokens": 89781,
+        "cached_tokens": 69760,
+        "output_tokens": 4679,
+        "llm_calls": 11,
+        "review_calls": 2,
+        "tool_errors": 2,
+        "stop_reason": "final_answer"
+      },
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "premature_final_repair_notices": 0,
+      "rejected_writes": 2
+    },
+    {
+      "run": "structure-repair-v2-live",
+      "id": "cost_plot",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "hard_errors": [],
+      "quality_issues": [],
+      "review_status": "reviewed",
+      "review_issues": [],
+      "review_hash_current": true,
+      "metrics": {
+        "steps": 7,
+        "seconds": 20.4,
+        "equivalent_tokens": 25562,
+        "input_tokens": 60368,
+        "cached_tokens": 47358,
+        "output_tokens": 3908,
+        "llm_calls": 10,
+        "review_calls": 2,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "premature_final_repair_notices": 0,
+      "rejected_writes": 1
+    },
+    {
+      "run": "structure-repair-v2-live",
+      "id": "cost_components",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "hard_errors": [],
+      "quality_issues": [],
+      "review_status": "reviewed",
+      "review_issues": [],
+      "review_hash_current": true,
+      "metrics": {
+        "steps": 7,
+        "seconds": 19.04,
+        "equivalent_tokens": 19355,
+        "input_tokens": 53026,
+        "cached_tokens": 43648,
+        "output_tokens": 2806,
+        "llm_calls": 9,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "premature_final_repair_notices": 0,
+      "rejected_writes": 0
+    },
+    {
+      "run": "structure-repair-v2-live",
+      "id": "conflicting_sources",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "scope": "body",
+          "unit": "characters",
+          "actual": 919,
+          "soft_target": 500
+        }
+      ],
+      "hard_errors": [],
+      "quality_issues": [],
+      "review_status": "reviewed",
+      "review_issues": [],
+      "review_hash_current": true,
+      "metrics": {
+        "steps": 6,
+        "seconds": 12.46,
+        "equivalent_tokens": 12292,
+        "input_tokens": 37904,
+        "cached_tokens": 32256,
+        "output_tokens": 1709,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "premature_final_repair_notices": 0,
+      "rejected_writes": 0
+    },
+    {
+      "run": "structure-repair-v2-live",
+      "id": "limited_evidence",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "scope": "body",
+          "unit": "characters",
+          "actual": 968,
+          "soft_target": 500
+        }
+      ],
+      "hard_errors": [],
+      "quality_issues": [],
+      "review_status": "reviewed",
+      "review_issues": [],
+      "review_hash_current": true,
+      "metrics": {
+        "steps": 6,
+        "seconds": 13.61,
+        "equivalent_tokens": 15585,
+        "input_tokens": 41790,
+        "cached_tokens": 33408,
+        "output_tokens": 1931,
+        "llm_calls": 9,
+        "review_calls": 2,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "premature_final_repair_notices": 0,
+      "rejected_writes": 0
+    },
+    {
+      "run": "structure-repair-v2-live",
+      "id": "ambiguous_evidence",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "scope": "body",
+          "unit": "characters",
+          "actual": 1020,
+          "soft_target": 500
+        }
+      ],
+      "hard_errors": [],
+      "quality_issues": [],
+      "review_status": "reviewed",
+      "review_issues": [],
+      "review_hash_current": true,
+      "metrics": {
+        "steps": 7,
+        "seconds": 18.37,
+        "equivalent_tokens": 19572,
+        "input_tokens": 53259,
+        "cached_tokens": 43648,
+        "output_tokens": 2798,
+        "llm_calls": 10,
+        "review_calls": 2,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "premature_final_repair_notices": 0,
+      "rejected_writes": 1
+    },
+    {
+      "run": "structure-repair-v2-live",
+      "id": "source_channels",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "scope": "body",
+          "unit": "characters",
+          "actual": 873,
+          "soft_target": 500
+        }
+      ],
+      "hard_errors": [],
+      "quality_issues": [],
+      "review_status": "reviewed",
+      "review_issues": [],
+      "review_hash_current": true,
+      "metrics": {
+        "steps": 6,
+        "seconds": 13.66,
+        "equivalent_tokens": 13280,
+        "input_tokens": 39632,
+        "cached_tokens": 34304,
+        "output_tokens": 2261,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "premature_final_repair_notices": 0,
+      "rejected_writes": 1
+    },
+    {
+      "run": "structure-repair-v2-live",
+      "id": "memory_seed",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "hard_errors": [],
+      "quality_issues": [],
+      "review_status": "reviewed",
+      "review_issues": [],
+      "review_hash_current": true,
+      "metrics": {
+        "steps": 5,
+        "seconds": 11.66,
+        "equivalent_tokens": 14052,
+        "input_tokens": 35605,
+        "cached_tokens": 28288,
+        "output_tokens": 1953,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "premature_final_repair_notices": 0,
+      "rejected_writes": 0
+    },
+    {
+      "run": "structure-repair-v2-live",
+      "id": "memory_followup",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "hard_errors": [],
+      "quality_issues": [],
+      "review_status": "reviewed",
+      "review_issues": [],
+      "review_hash_current": true,
+      "metrics": {
+        "steps": 8,
+        "seconds": 19.28,
+        "equivalent_tokens": 25092,
+        "input_tokens": 71802,
+        "cached_tokens": 60416,
+        "output_tokens": 3832,
+        "llm_calls": 10,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "premature_final_repair_notices": 0,
+      "rejected_writes": 1
+    },
+    {
+      "run": "structure-repair-scope-live",
+      "id": "brief_fixed",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 300,
+          "unit": "characters",
+          "scope": "full",
+          "explicit_text": "不超过300字",
+          "actual": 264
+        }
+      ],
+      "hard_errors": [],
+      "quality_issues": [],
+      "review_status": "reviewed",
+      "review_issues": [],
+      "review_hash_current": true,
+      "metrics": {
+        "steps": 5,
+        "seconds": 8.77,
+        "equivalent_tokens": 9429,
+        "input_tokens": 30937,
+        "cached_tokens": 26496,
+        "output_tokens": 1169,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "premature_final_repair_notices": 0,
+      "rejected_writes": 1
+    },
+    {
+      "run": "structure-repair-scope-live",
+      "id": "han_limit",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 120,
+          "unit": "han_characters",
+          "scope": "full",
+          "explicit_text": "不超过120个中文字符",
+          "actual": 115
+        }
+      ],
+      "hard_errors": [],
+      "quality_issues": [],
+      "review_status": "reviewed",
+      "review_issues": [],
+      "review_hash_current": true,
+      "metrics": {
+        "steps": 3,
+        "seconds": 4.53,
+        "equivalent_tokens": 6129,
+        "input_tokens": 18203,
+        "cached_tokens": 14464,
+        "output_tokens": 472,
+        "llm_calls": 5,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "premature_final_repair_notices": 0,
+      "rejected_writes": 0
+    },
+    {
+      "run": "structure-repair-scope-live",
+      "id": "english_words",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 100,
+          "unit": "english_words",
+          "scope": "full",
+          "explicit_text": "最多100个英文单词",
+          "actual": 92
+        }
+      ],
+      "hard_errors": [],
+      "quality_issues": [],
+      "review_status": "reviewed",
+      "review_issues": [],
+      "review_hash_current": true,
+      "metrics": {
+        "steps": 3,
+        "seconds": 5.42,
+        "equivalent_tokens": 6448,
+        "input_tokens": 18360,
+        "cached_tokens": 14464,
+        "output_tokens": 553,
+        "llm_calls": 5,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "premature_final_repair_notices": 0,
+      "rejected_writes": 0
+    },
+    {
+      "run": "structure-repair-scope-live",
+      "id": "requested_statistics",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "hard_errors": [],
+      "quality_issues": [],
+      "review_status": "reviewed",
+      "review_issues": [],
+      "review_hash_current": true,
+      "metrics": {
+        "steps": 5,
+        "seconds": 19.72,
+        "equivalent_tokens": 18283,
+        "input_tokens": 38422,
+        "cached_tokens": 29952,
+        "output_tokens": 3409,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "premature_final_repair_notices": 0,
+      "rejected_writes": 0
+    },
+    {
+      "run": "structure-repair-scope-live",
+      "id": "unknown_assumptions",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 350,
+          "unit": "characters",
+          "scope": "body",
+          "explicit_text": "最多350字",
+          "actual": 297
+        }
+      ],
+      "hard_errors": [],
+      "quality_issues": [],
+      "review_status": "reviewed",
+      "review_issues": [],
+      "review_hash_current": true,
+      "metrics": {
+        "steps": 4,
+        "seconds": 8.48,
+        "equivalent_tokens": 9177,
+        "input_tokens": 25937,
+        "cached_tokens": 21120,
+        "output_tokens": 1124,
+        "llm_calls": 6,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "premature_final_repair_notices": 0,
+      "rejected_writes": 1
+    },
+    {
+      "run": "structure-repair-scope-live",
+      "id": "revised_limit",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [
+        {
+          "maximum": 220,
+          "unit": "characters",
+          "scope": "full",
+          "explicit_text": "不超过220字",
+          "actual": 215
+        }
+      ],
+      "hard_errors": [],
+      "quality_issues": [],
+      "review_status": "reviewed",
+      "review_issues": [],
+      "review_hash_current": true,
+      "metrics": {
+        "steps": 6,
+        "seconds": 9.58,
+        "equivalent_tokens": 10093,
+        "input_tokens": 35687,
+        "cached_tokens": 30976,
+        "output_tokens": 1142,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "premature_final_repair_notices": 0,
+      "rejected_writes": 1
+    },
+    {
+      "run": "structure-repair-scope-live",
+      "id": "detailed_scope",
+      "raw_status": "pass",
+      "failed_checks": [],
+      "measurements": [],
+      "hard_errors": [],
+      "quality_issues": [],
+      "review_status": "reviewed",
+      "review_issues": [],
+      "review_hash_current": true,
+      "metrics": {
+        "steps": 5,
+        "seconds": 19.27,
+        "equivalent_tokens": 17723,
+        "input_tokens": 39453,
+        "cached_tokens": 31360,
+        "output_tokens": 3247,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "premature_final_repair_notices": 0,
+      "rejected_writes": 0
+    }
+  ],
+  "artifact_sha256": {
+    "structure-repair-exact-user-live/cases/user_prompt_1/report.md": "112e6d3fd68c00d84b9a751442db589766dce62e934d7ea662606f6b2c0a08c5",
+    "structure-repair-exact-user-live/cases/user_prompt_1/trace.jsonl": "1d9f300df039063a4d4c2570936b7e8a724d8d6d3c6136094415d42c5fceb52a",
+    "structure-repair-exact-user-live/cases/user_prompt_1/report.contract.json": "e5f98ae94c18ca05ce9629470d02d7361be3c4a307a37b35c89d2e153da0cf43",
+    "structure-repair-exact-user-live/cases/user_prompt_1/report.quality.json": "791a72bb0ad811b190440186672255b2b39904b4c410edffcea2a98f86cb85d3",
+    "structure-repair-exact-user-live/cases/user_prompt_1/report.review.json": "e22b8f11db115960f6367e4f9073e8f51b65a39d4db11059ff5a3b43d3c0c337",
+    "structure-repair-exact-user-live/cases/user_prompt_1/task_contract.json": "27539cbe38fd9b0958210466b1f60cf89e55e38c3a8144972db3a71d35d349ad",
+    "structure-repair-exact-user-live/cases/user_prompt_2/report.md": "01042589122c544d20bcf7c4c14cc95207c00f31ced492a43fe09f7fe68dcb03",
+    "structure-repair-exact-user-live/cases/user_prompt_2/trace.jsonl": "60cf5f0bfbbf8624c79c03a6e719868fec9bd46ab2ba572d7479218e12b9c920",
+    "structure-repair-exact-user-live/cases/user_prompt_2/report.contract.json": "2e6b2395e261c6306b969eda56f4259ba25e71b270cb4cf19cf50e8d54b56904",
+    "structure-repair-exact-user-live/cases/user_prompt_2/report.quality.json": "df929681d9d8a9407de87bbeb15da96f34c088e8fc927f3919f6e8cdb5a7c19c",
+    "structure-repair-exact-user-live/cases/user_prompt_2/report.review.json": "d3e9c639709167e1776beb5e37da3c27ba62add0e702d8f71fa147b3685cadad",
+    "structure-repair-exact-user-live/cases/user_prompt_2/task_contract.json": "27539cbe38fd9b0958210466b1f60cf89e55e38c3a8144972db3a71d35d349ad",
+    "structure-repair-exact-user-live/cases/user_prompt_3/report.md": "8f1e4fb7f96fc1fe3196f299e715b71ecf745e08189b8e68587270fa315ee243",
+    "structure-repair-exact-user-live/cases/user_prompt_3/trace.jsonl": "a749ece48be18ad3033b4327dfd27a41628e3587cfd6123856947310ff5778d4",
+    "structure-repair-exact-user-live/cases/user_prompt_3/report.contract.json": "aa3749b23ffda8d1cd8a37c482d10b70dd94e8d70c74e1c9c7c4955fe7fce491",
+    "structure-repair-exact-user-live/cases/user_prompt_3/report.quality.json": "c8bb2d5094c93888f2307a16aaebc0609ff12da7e7749cf00f2cae7c36071213",
+    "structure-repair-exact-user-live/cases/user_prompt_3/report.review.json": "d31c9640c8212c24b378133c5c6cce1ecba9a115d72631d9c7eadf54f53b8def",
+    "structure-repair-exact-user-live/cases/user_prompt_3/task_contract.json": "27539cbe38fd9b0958210466b1f60cf89e55e38c3a8144972db3a71d35d349ad",
+    "structure-repair-v2-live/cases/01-official_research/report.md": "705363e9c46f734a8d01e0ece7043e1b8627bebe4b4777529ea16ac1853f00ea",
+    "structure-repair-v2-live/cases/01-official_research/trace.jsonl": "94a004584d50b450a713678581e9ebdee6a2a8408d72e3d746aae3a81e21d170",
+    "structure-repair-v2-live/cases/01-official_research/report.contract.json": "4c4b93805aeea9ecd0b9f5c253af9b0c260d9e4ff4f4fb041e334ce271a2f8f8",
+    "structure-repair-v2-live/cases/01-official_research/report.quality.json": "9af8dd38ff3e6298c99ed9aee18b1464fa368f482659460718c0651190e0c2aa",
+    "structure-repair-v2-live/cases/01-official_research/report.review.json": "92b974dc869e3b543aea8b8588b97febac7281eeff852acec0ad9437a9f8ed6c",
+    "structure-repair-v2-live/cases/01-official_research/task_contract.json": "bdb652691dda5eceb135793967c70289f98fab2401f2c1f448365bc2ec661821",
+    "structure-repair-v2-live/cases/01-cost_plot/report.md": "35c1fd3b47221cb95b24901c30a0e6f52281d7874be52c7b94c6dc3d99135db7",
+    "structure-repair-v2-live/cases/01-cost_plot/trace.jsonl": "15fbf02b0164bf62f2718534104438f54300afef1f47ecdbd415eeacd3519203",
+    "structure-repair-v2-live/cases/01-cost_plot/report.contract.json": "426b000c6776a1c0a821141b364b505ce0b4bbe9525d11c7e680ecea81a7f7c7",
+    "structure-repair-v2-live/cases/01-cost_plot/report.quality.json": "d41145863dd6d1d67c6895d45a80d1f45cb654552eb96e30804e6fdfd2de47c4",
+    "structure-repair-v2-live/cases/01-cost_plot/report.review.json": "7e104de127fb98e4da95812433f2abf8362eb721403ac26ddab69542bb1e8154",
+    "structure-repair-v2-live/cases/01-cost_plot/task_contract.json": "c8cab81c77031db691d1246bb4db76b2f9b77811c0881097dc9ff9c3571bc93c",
+    "structure-repair-v2-live/cases/01-cost_components/report.md": "1106645e62b52aa0b687fae35edfe956adfab27e612ddce317f08a73a1443dee",
+    "structure-repair-v2-live/cases/01-cost_components/trace.jsonl": "462c975a3672901bbe34bb18a283ad36adc83f9c0bc304590ff46ef4e467c8f6",
+    "structure-repair-v2-live/cases/01-cost_components/report.contract.json": "1ed623d5fa6de1563365bf0b69ac52aa95b68481074186bd60b81f33b5576386",
+    "structure-repair-v2-live/cases/01-cost_components/report.quality.json": "974f6192f72ca73a744fbd55caebfd4693fdad58875c5c73c4d451b5a75d1ace",
+    "structure-repair-v2-live/cases/01-cost_components/report.review.json": "2eee8f26b1b0c81d77d6dbfd6b1f930e958b3aec66838322521d9c16c89968e9",
+    "structure-repair-v2-live/cases/01-cost_components/task_contract.json": "45c7d4b92c0401a0934bd215e749a36cad8a93c8fd441f99dd6a0cf48f022fc0",
+    "structure-repair-v2-live/cases/01-conflicting_sources/report.md": "35cf40c87667346843367e0066f6a49cfcb79a1eef0509d941c2c48ba7403b4a",
+    "structure-repair-v2-live/cases/01-conflicting_sources/trace.jsonl": "17b07f6ca2e70b848a6450621a8fed415e0a6c4b17cfa3f3e3e5d66fdb5ec208",
+    "structure-repair-v2-live/cases/01-conflicting_sources/report.contract.json": "89a22802515f74348ae8fbfc961b20a930362ba466bb88873bbe2b541548b332",
+    "structure-repair-v2-live/cases/01-conflicting_sources/report.quality.json": "7a66e81448c08756fdfc2fa09bae9f4ae9226051fff122e8b2887e522a9e3ff7",
+    "structure-repair-v2-live/cases/01-conflicting_sources/report.review.json": "3c4eed3268fec456ac299a49006260c8760c33d3c9b4e0e47fe94a7a64df743e",
+    "structure-repair-v2-live/cases/01-conflicting_sources/task_contract.json": "b20b9b41ed0f7f7634871dd16544625a25ef7fb636e84c9b4adfb1195b6bd087",
+    "structure-repair-v2-live/cases/01-limited_evidence/report.md": "e3af3c68871e7bb157c1633670bf413efc8a4bf3aad980d6324b9d6f8dc2e826",
+    "structure-repair-v2-live/cases/01-limited_evidence/trace.jsonl": "a5bbd64c1e6cb6358caf02fa1cf5e8da6b918891044001b78e1b7a6c893cc1fc",
+    "structure-repair-v2-live/cases/01-limited_evidence/report.contract.json": "4854eec03212dabef703ee1ad4a7d5010f820772c20ba982a21e760090d05bc7",
+    "structure-repair-v2-live/cases/01-limited_evidence/report.quality.json": "6e96aff4af696fa3e6ba2c69ef3409a720cefa7e50f62be1098bea625399a74c",
+    "structure-repair-v2-live/cases/01-limited_evidence/report.review.json": "a19f742233fe9de4e6983f8fd5c23b4b963d41247d57d569e0bb8a82cc042179",
+    "structure-repair-v2-live/cases/01-limited_evidence/task_contract.json": "1ca10d100938e95c8ebe6d25e7044dcbcff23c43f7a159785b72de448c425ca4",
+    "structure-repair-v2-live/cases/01-ambiguous_evidence/report.md": "8083f8c5c598e201fb0e080b62e23aad5e7c732ef943a58f2d88ce835fc7772b",
+    "structure-repair-v2-live/cases/01-ambiguous_evidence/trace.jsonl": "2e9aee6706efb6a943a77282c7ce1c75cd516d401191a5f07d62b1808aae7287",
+    "structure-repair-v2-live/cases/01-ambiguous_evidence/report.contract.json": "7f1a781165e141113b8555a4bdb9f03d0605ddfe945f51a84b20bb5b316ad1bc",
+    "structure-repair-v2-live/cases/01-ambiguous_evidence/report.quality.json": "83b69794f7a56d374bab07ba3091523bae7fd4b87a1854174c78ac89764b8686",
+    "structure-repair-v2-live/cases/01-ambiguous_evidence/report.review.json": "0f6b44f952e63ddc2bce1e8be7cc854ce25ec1b6ba31bb47b4f25e873d79245d",
+    "structure-repair-v2-live/cases/01-ambiguous_evidence/task_contract.json": "3721475d9410eac1f9515e8e2f07b26e679b456a81b0b675bcec39c1fe29e2dc",
+    "structure-repair-v2-live/cases/01-source_channels/report.md": "71786a6ef7c17abdef9be0bc7d8a15290a71554b51efae15700279e49f070c25",
+    "structure-repair-v2-live/cases/01-source_channels/trace.jsonl": "8dca304fe47b36b84bc0ec388b264bc0342775f4a6f19e7f010b846e332c7a99",
+    "structure-repair-v2-live/cases/01-source_channels/report.contract.json": "bd15137666baa5cd6cc3f61bda1df5e972fe892ede975f389d098bc82a9287d7",
+    "structure-repair-v2-live/cases/01-source_channels/report.quality.json": "0147b1ea8ff34fb11c9c265822cac13ddda609206f6e350c70e645f261ab0c65",
+    "structure-repair-v2-live/cases/01-source_channels/report.review.json": "b58629d029baf155e3402d1111fa6cd99f51a86dbf9ef57a684a6db8980cf55c",
+    "structure-repair-v2-live/cases/01-source_channels/task_contract.json": "2b51ed145c16b234ad05fb3794c137bdfc8f8d5be3ee0ae3e641906ffc61444c",
+    "structure-repair-v2-live/cases/01-memory_seed/report.md": "ada27720097ba735e14ca5b7cf382274caf618eb35aa6ce8c077ef120598d3e5",
+    "structure-repair-v2-live/cases/01-memory_seed/trace.jsonl": "56e52e9458c8a7976bf8cdc595ce51a12c6e73900c62ff683face9d4c679f85e",
+    "structure-repair-v2-live/cases/01-memory_seed/report.contract.json": "0919fc6ea3f960aa64f720317ac3f889ccdb71b1adf7f20d26cd881f9121cad2",
+    "structure-repair-v2-live/cases/01-memory_seed/report.quality.json": "daf457a0203c8b33f42ca5e9413600f439df079b6e21dcc63177f0d2e74e9f72",
+    "structure-repair-v2-live/cases/01-memory_seed/report.review.json": "43219eb8975822646a21fc28948ed886848d739750a4d97b6976127d574ac6d8",
+    "structure-repair-v2-live/cases/01-memory_seed/task_contract.json": "fc374549be0da91f6184f1f4de0ba7175a2e0e68ce99165ed2dde6cffe178aa6",
+    "structure-repair-v2-live/cases/01-memory_followup/report.md": "df476e2e37bee274efcc083674123708f634699906206d55de618062a3d8a91b",
+    "structure-repair-v2-live/cases/01-memory_followup/trace.jsonl": "5c4ca72abcb2be0dc9a378088658677f164ac715c84360df47821deb69e9e952",
+    "structure-repair-v2-live/cases/01-memory_followup/report.contract.json": "3c807be8cf65f14d4586da55ae0845ebe13b163ec8d41b0de1f723b167b0ad57",
+    "structure-repair-v2-live/cases/01-memory_followup/report.quality.json": "9eb0b20ed4159104162c87ad927825039db43d0e7f2eb0934178919af8b1cdaa",
+    "structure-repair-v2-live/cases/01-memory_followup/report.review.json": "49d45a1ab5f7eb2551f0959dbed6363083c1f51349c3e318e832df99e1a8bd12",
+    "structure-repair-v2-live/cases/01-memory_followup/task_contract.json": "58846f14c2f9f8618c541c9a567643cbb5ef890cba49bae3c62a66d194740263",
+    "structure-repair-scope-live/cases/01-brief_fixed/report.md": "e4d27d1aa6db20d5a920fb7d7005c59383adb39d1db6acbcab2de91aecb9e6d3",
+    "structure-repair-scope-live/cases/01-brief_fixed/trace.jsonl": "72e0612b784ce94840e919b4689f9450e0a267f8c90066714c04f5c9c3ba65ce",
+    "structure-repair-scope-live/cases/01-brief_fixed/report.contract.json": "85365be6704c8a5ecc6644df69f9f8a5121d8f5daf45214f37793c26fcdef6cc",
+    "structure-repair-scope-live/cases/01-brief_fixed/report.quality.json": "8e4ad546ee8d406218f4a82cb32e8bbbcc04c1743f5062aa4133c16a9667a299",
+    "structure-repair-scope-live/cases/01-brief_fixed/report.review.json": "fe300cee066835eee1d41a8f830beefb39b000bd158134dbb135af4f9c6a7a35",
+    "structure-repair-scope-live/cases/01-brief_fixed/task_contract.json": "f5cc5f61938d3d24313f87729bccb0da9df1212ed4e82fbdffb07e577e051450",
+    "structure-repair-scope-live/cases/01-han_limit/report.md": "99d9336e85d0caf9cda8f2bc2059fa56641453f493e809fef10314b35d779bb4",
+    "structure-repair-scope-live/cases/01-han_limit/trace.jsonl": "c37fc34ce07a4c723b9f625485f7dc75be463434adf4ff1307df1a51b1629c89",
+    "structure-repair-scope-live/cases/01-han_limit/report.contract.json": "c3fcd1bf9a461e70f964bbb9e40f7cac0a9e262db9d4ae5bc70c59ec3a11a59c",
+    "structure-repair-scope-live/cases/01-han_limit/report.quality.json": "0c72e3a90e726cf2cf1071df1c78ecbf4ba4b099bdcfc76de8365013f45b6a48",
+    "structure-repair-scope-live/cases/01-han_limit/report.review.json": "aabc4a243b41c782a2dc3037d2a3ac5004674e3d39f13719658ecf25d7ad3ce3",
+    "structure-repair-scope-live/cases/01-han_limit/task_contract.json": "96bc064c53230c259f829a7ff88fd829945fffe134a38ee43d0ab554132f4506",
+    "structure-repair-scope-live/cases/01-english_words/report.md": "71c3fc8a7ac5d13b2c0efd14f275e98891eecefd1b65fc604c9ac935a41985eb",
+    "structure-repair-scope-live/cases/01-english_words/trace.jsonl": "c8b371180c3cd5b4f9294f0ffcaa883a08f3afbcf96463ec161cb5aa4eb30330",
+    "structure-repair-scope-live/cases/01-english_words/report.contract.json": "7f0094a7d206e607c738010a307731aa7b21c9adbe96df4fac50dc1c4aa07696",
+    "structure-repair-scope-live/cases/01-english_words/report.quality.json": "e957d0d646c827e222ec3d88a03c1c93a26672257aa6611dacf9c91999652c61",
+    "structure-repair-scope-live/cases/01-english_words/report.review.json": "512725d2106114057dd4515fcc6a05174de646d5f0a860475b2d4fe6c59d651f",
+    "structure-repair-scope-live/cases/01-english_words/task_contract.json": "0023c2d3865eb80a9d4f4531bd1ba598eda317868c1bd8292c1b81f5f45faccc",
+    "structure-repair-scope-live/cases/01-requested_statistics/report.md": "07975f3a4caee635c8244ff18a429e1a2e05016e165dc1949ce6c8535bfa141d",
+    "structure-repair-scope-live/cases/01-requested_statistics/trace.jsonl": "805b1431367fbe59bcdeb5838af879f881e7fef80e92ae947a078eb8e06a2c5a",
+    "structure-repair-scope-live/cases/01-requested_statistics/report.contract.json": "ab1ec29c039cd95dfc0a855dc2cea9d6a7d4182f53d81fe0fbd1df45c4ba92d9",
+    "structure-repair-scope-live/cases/01-requested_statistics/report.quality.json": "0e06f202e438edfb7d9995ed0ca707493d15732c36bd64fb22a28e0de25a86d2",
+    "structure-repair-scope-live/cases/01-requested_statistics/report.review.json": "084574a9a6759492703c0cba5a199d586833cb1850ced25a5f41cc84b19ec63d",
+    "structure-repair-scope-live/cases/01-requested_statistics/task_contract.json": "44724428f1b25ca9447cdbba5fce42384ae6e994867c510afd5be0835aa96d08",
+    "structure-repair-scope-live/cases/01-unknown_assumptions/report.md": "b4db8f3976f2b04fdfa3d9fcc78b92e01545aba381a79eea5e40c625da72a0ac",
+    "structure-repair-scope-live/cases/01-unknown_assumptions/trace.jsonl": "70b05721f88a9dcc534fb130998fe9e58f1cf4175b11d02f8b2cebc76f54d11b",
+    "structure-repair-scope-live/cases/01-unknown_assumptions/report.contract.json": "cb407e2c3c43f15b7f514e796a164621342d58ec6100417c3dac6eaf437c3aec",
+    "structure-repair-scope-live/cases/01-unknown_assumptions/report.quality.json": "d42f8158d65d89ed9b02c98490dfc2480bfe91d5ac5f389b23bf7ff1ee1c2c1c",
+    "structure-repair-scope-live/cases/01-unknown_assumptions/report.review.json": "53d9726e93cc8eeb50b848baa900074055bfdf09c987f57a3f1a63ade4f6fa1d",
+    "structure-repair-scope-live/cases/01-unknown_assumptions/task_contract.json": "0447f8648e00de5327ffa2261461b626789f2628bb415b964907fc4b63529c48",
+    "structure-repair-scope-live/cases/01-revised_limit/report.md": "705541a1476bda173fe4c08b4890290f2458cd4c2be0dbd59fc95cee50ac01a4",
+    "structure-repair-scope-live/cases/01-revised_limit/trace.jsonl": "233b5789faf60ed49188370a1ba51ba03ae5388c88a4952911ebbb0d6278fab7",
+    "structure-repair-scope-live/cases/01-revised_limit/report.contract.json": "b96968975d7081f3fea0e62e8e1cfe3d30b6e190f2f78f7157484cc91414b6cf",
+    "structure-repair-scope-live/cases/01-revised_limit/report.quality.json": "0a7c782ca20a743eb41a3f281b90ea868284831818a67c58ce95568fb9e5bf09",
+    "structure-repair-scope-live/cases/01-revised_limit/report.review.json": "40d2f0c03aad8a513b1a130e09e4d3689c6b0722393f8c0e06b30ad3e71768ab",
+    "structure-repair-scope-live/cases/01-revised_limit/task_contract.json": "ee5906fd9b7b4d831868e8b37eb18f0ad0f36d9185e307d7c6ea0efd2cfe91a7",
+    "structure-repair-scope-live/cases/01-detailed_scope/report.md": "b0904c461c87ccdbeb286b3a90109d26151f85888ce187d4a3bd3bbf1a87e775",
+    "structure-repair-scope-live/cases/01-detailed_scope/trace.jsonl": "d7a06ded5a0c25922e2e87b706889a14bb69e3022aee4ae6204ca9430437ce3e",
+    "structure-repair-scope-live/cases/01-detailed_scope/report.contract.json": "c32e657776690a02839f96c86cf12a2899df6e13fcc714b4c769f28b71af3b60",
+    "structure-repair-scope-live/cases/01-detailed_scope/report.quality.json": "7be36f50ea6b8a25e46db274f36f58613523a3d7245229555a5a3a1cd59ad907",
+    "structure-repair-scope-live/cases/01-detailed_scope/report.review.json": "f471283d887a531ddc87fe060a3f058418cd7954b82156e2f8214d25a06a42fc",
+    "structure-repair-scope-live/cases/01-detailed_scope/task_contract.json": "6aad5dc9a221519106e9c080d6012bc672b5161f3d3a0420bd0d9e1876465218"
+  },
+  "raw_passed": 19,
+  "selected": 19,
+  "clean_current_reviews": 19,
+  "mechanically_clean_reports": 19,
+  "totals": {
+    "steps": 106,
+    "seconds": 260.57,
+    "equivalent_tokens": 286898,
+    "review_calls": 23
+  },
+  "original_prompt_policy": "Exact user run_start question; no evaluator-appended structure requirements.",
+  "original_user_artifacts_unchanged": true,
+  "structure_fix_verified": true,
+  "overall_report_content_acceptance": false,
+  "manual_findings": [
+    {
+      "run": "structure-repair-v2-live",
+      "case": "limited_evidence",
+      "status": "unresolved",
+      "finding": "Report says combined successes are 98 and writes 98/102 approximately 95.1%; 49+48 is 97. Table and narrative repeat the wrong total.",
+      "correct_value": "97/102 approximately 95.1%",
+      "model_review_missed": true
+    },
+    {
+      "run": "structure-repair-v2-live",
+      "case": "memory_seed",
+      "status": "unresolved",
+      "finding": "Report claims input/output unit-price ratios are both 1:3. Alpha prices 2 and 8 give 1:4; Beta prices 9 and 27 give 1:3.",
+      "correct_value": "Alpha 1:4; Beta 1:3",
+      "model_review_missed": true
+    }
+  ],
+  "scope": "Post-stage-10 structure repair; does not implement stage 11 or certify arbitrary semantics.",
+  "limits": [
+    "One bounded normal-completion reminder; no additional main steps or budget.",
+    "First drafts may still exceed limits; existing checks reject and request revision.",
+    "Online samples are development regression evidence, not independent held-out evaluation.",
+    "Scripted tests cover the premature-final branch; live exact-prompt cases need not enter it.",
+    "Local artifacts are ignored; hashes do not reconstruct them."
+  ]
+}
