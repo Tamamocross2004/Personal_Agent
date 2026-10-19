@@ -177,6 +177,7 @@ class Agent:
         research_session=None,
         memory_context: str = "",
         task_contract: TaskContract | None = None,
+        should_stop: Callable[[], bool] | None = None,
     ):
         self.llm = llm
         self.registry = registry
@@ -201,6 +202,7 @@ class Agent:
         self.research_session = research_session
         self.memory_context = memory_context
         self.task_contract = task_contract
+        self.should_stop = should_stop
 
     # ------------------------------------------------------------------
     # 对外接口
@@ -278,7 +280,7 @@ class Agent:
             self._plan(messages, question)
             stop, answer, error = self._loop(messages)
         except KeyboardInterrupt:
-            self._emit("notice", text="用户中断（Ctrl+C），任务停止。")
+            self._emit("notice", text="用户中断，任务停止。")
             stop, answer, error = "interrupted", "", "用户中断"
 
         self._refresh_report_checks()
@@ -397,6 +399,7 @@ class Agent:
             self._emit("thought", text=msg.content)
 
         for call in msg.tool_calls or []:
+            self._check_stop()
             name, arguments = call.function.name, call.function.arguments
             self._emit("tool_call", id=call.id, name=name, arguments=arguments)
             if truncated:
@@ -656,6 +659,7 @@ class Agent:
         evidence_tokens_estimate: int = 0,
         **kwargs: Any,
     ) -> ChatCompletion:
+        self._check_stop()
         started = time.perf_counter()
         self._len_at_last_call = len(messages)
         resp = self.llm.chat(messages, tools=tools, **kwargs)
@@ -681,7 +685,13 @@ class Agent:
             seconds=round(time.perf_counter() - started, 2),
             finish_reason=resp.choices[0].finish_reason if resp.choices else None,
         )
+        # 已返回的调用先记录实际用量，再响应停止，避免丢失已消耗 token。
+        self._check_stop()
         return resp
+
+    def _check_stop(self) -> None:
+        if self.should_stop and self.should_stop():
+            raise KeyboardInterrupt
 
     def _plan(self, messages: list[dict[str, Any]], question: str) -> None:
         """任务开始时先拆解计划，一次性写进 system 消息。

@@ -21,3 +21,8 @@ logs/
 .idea/
 .DS_Store
 Thumbs.db
+
+# 桌面应用依赖与构建产物
+desktop/node_modules/
+desktop/dist/
+desktop/release/

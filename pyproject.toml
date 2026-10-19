@@ -25,14 +25,15 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0"]
+dev = ["pytest>=8.0", "fastapi>=0.115,<1", "uvicorn>=0.30,<1"]
+desktop = ["fastapi>=0.115,<1", "uvicorn>=0.30,<1"]
 
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["agent*", "tools*"]
+include = ["agent*", "tools*", "desktop_app*"]
 
 [tool.setuptools.package-data]
 agent = ["*.json"]

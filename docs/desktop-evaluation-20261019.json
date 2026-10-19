@@ -1,0 +1,108 @@
+{
+  "date": "2026-10-19",
+  "scope": "desktop-first-release; not stage12 quality certification or stage13 resume acceptance",
+  "backend_tests": {
+    "total": 681,
+    "desktop_cases": 19,
+    "log": "workspace/desktop-full-test.log"
+  },
+  "frontend_build": "passed",
+  "desktop_smoke": "passed; no research submitted",
+  "real_research": {
+    "run_id": "63cb0a36577348ebbe3a43bae1910476",
+    "task_dir": "workspace/20261019-173307-不联网-仅用虚构价格-EvalAlpha输入2-输出8元-百",
+    "options": {
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "max_steps": 15,
+      "budget": 80000,
+      "memory": false
+    },
+    "state": "completed",
+    "result": {
+      "steps": 7,
+      "stop_reason": "final_answer",
+      "total_tokens": 79069,
+      "error": null,
+      "equivalent_tokens": 33500
+    },
+    "response_models": [
+      "deepseek-flash"
+    ],
+    "review_status": "reviewed",
+    "review_issues": 0,
+    "review_calls": 1,
+    "evidence": {
+      "status": "mapped",
+      "claims": 5,
+      "mapping_sha256": "b7947bff1e55d6419ed6fb4a53334aac3eaa2742a75eef1278ef09920974544d",
+      "claim_kinds": [
+        "calculated",
+        "direct"
+      ],
+      "source_kinds": [
+        "calculation",
+        "user"
+      ],
+      "records": 2,
+      "omitted_records": 0,
+      "structural_links_valid": true,
+      "semantic_support": "not_certified"
+    },
+    "csv_independent_totals": [
+      0.48,
+      2.07
+    ],
+    "network_tool_calls": 0
+  },
+  "cooperative_cancel": {
+    "run_id": "47cd5b6d56a94850a3ea39fa01f2bef9",
+    "state": "cancelled",
+    "result": {
+      "answer": "",
+      "steps": 0,
+      "stop_reason": "interrupted",
+      "total_tokens": 982,
+      "error": "用户中断",
+      "equivalent_tokens": 751
+    },
+    "requested_models": [
+      "deepseek-flash"
+    ],
+    "tool_calls": 0
+  },
+  "ui": {
+    "checks": [
+      "reopen-persisted-real-report-and-csv",
+      "rename-archive-unarchive-menu-regression",
+      "search",
+      "evidence-preview",
+      "import-cli-history",
+      "owned-backend-processes-cleaned-up"
+    ],
+    "errors": [],
+    "csv": "model\tinput_price_yuan_per_mtok\toutput_price_yuan_per_mtok\tinput_tokens\toutput_tokens\tinput_cost_yuan\toutput_cost_yuan\ttotal_cost_yuan\nEvalAlpha\t2.0\t8.0\t200000\t10000\t0.4\t0.08\t0.48\nEvalBeta\t9.0\t27.0\t200000\t10000\t1.8\t0.27\t2.07",
+    "quality": "执行与检查状态\n\n任务结束、审稿完成和事实正确是不同的判断。\n\n本轮模型\ndeepseek-flash\n本轮上限\n15 步 / 80,000 等效 token\n联网约定\n禁止联网\n结束原因\nfinal_answer\n语义审稿\nreviewed\n审稿问题\n0 项\n证据关联\nmapped\n语义支持认证\n未认证\n等效 token\n33,500\n任务步数\n7\n研究计划\n\n✓ EvalAlpha 与 EvalBeta 在 20 万输入、1 万输出 token 下的成本计算（Python 实现与 costs.csv 内容）\n\n✓ 两模型成本差异对比与关键结论依据（单价结构、差额来源）",
+    "importMessage": "已有顶层任务均已索引",
+    "serverPids": [
+      "9284",
+      "35876"
+    ],
+    "survivingPids": []
+  },
+  "image_preview": {
+    "image": "costs.png",
+    "dimensions": [
+      1050,
+      630
+    ],
+    "finalQuality": "执行与检查状态\n\n任务结束、审稿完成和事实正确是不同的判断。\n\n本轮模型\ndeepseek-flash\n本轮上限\n15 步 / 80,000 等效 token\n联网约定\n禁止联网\n资料范围\n以原始问题为准\n输出文件约定\n用Python计算并生成costs.csv\n结束原因\nfinal_answer\n语义审稿\nreviewed\n审稿问题\n0 项\n证据关联\nmapped\n语义支持认证\n未认证\n等效 token\n33,500\n任务步数\n7\n研究计划\n\n✓ EvalAlpha 与 EvalBeta 在 20 万输入、1 万输出 token 下的成本计算（Python 实现与 costs.csv 内容）\n\n✓ 两模型成本差异对比与关键结论依据（单价结构、差额来源）",
+    "passed": true
+  },
+  "limitations": [
+    "final answer shown after completion; execution events are streamed",
+    "no checkpoint resume or self contained installer",
+    "mapped is structural linkage only; semantic_support remains not_certified"
+  ],
+  "development_record": "Initial live UI run completed; menu did not close after rename and was fixed. Subsequent QA locator/process lookup mistakes were corrected; latest read-only checks passed."
+}

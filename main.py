@@ -23,7 +23,7 @@ import sqlite3
 import sys
 from datetime import date
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import openai
 from rich.logging import RichHandler
@@ -80,15 +80,24 @@ def read_input() -> str | None:
 # ---------------------------------------------------------------------------
 
 
-def research(llm: LLMClient, settings: Settings, question: str, max_steps: int, budget: int, *, task_dir: Path | None = None) -> AgentResult:
+def research(
+    llm: LLMClient, settings: Settings, question: str, max_steps: int, budget: int, *,
+    task_dir: Path | None = None,
+    historical_context: str | None = None,
+    should_stop: Callable[[], bool] | None = None,
+) -> AgentResult:
     """运行一次研究任务：独立的工作目录、工具实例和运行日志。"""
     task_dir = task_dir or new_task_dir(question)
     tracer = TraceWriter(task_dir / TRACE_FILE)
     contract = extract_contract(question)
     session = ResearchSession(task_contract=contract)  # 本次请求是唯一约定来源
     memory_store = MemoryStore(settings.memory_db_path) if settings.memory_enabled else None
-    memory_context = ""
-    if memory_store:
+    memory_context = historical_context or ""
+    if historical_context:
+        task_dir.mkdir(parents=True, exist_ok=True)
+        (task_dir / "memory_context.json").write_text(json.dumps({"query":question,
+            "record_ids":[],"source":"desktop_session","context":historical_context}, ensure_ascii=False,indent=2),encoding="utf-8")
+    if memory_store and historical_context is None:
         try:
             records = memory_store.search(question, limit=settings.memory_recall_limit, followup=True)
             memory_context = format_context(records, settings.memory_context_max_chars)
@@ -133,6 +142,7 @@ def research(llm: LLMClient, settings: Settings, question: str, max_steps: int, 
         research_session=session,
         memory_context=memory_context,
         task_contract=contract,
+        should_stop=should_stop,
     )
     try:
         result = agent.run(question)
