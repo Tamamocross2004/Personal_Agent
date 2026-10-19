@@ -82,7 +82,7 @@ def price_ratio_errors(report: str, csv_content: str) -> list[str]:
         if row["model"] in prices and prices[row["model"]] != pair:
             return []
         prices[row["model"]] = pair
-    if len(prices) < 2:
+    if not prices:
         return []
     names = '|'.join(re.escape(name) for name in sorted(prices, key=len, reverse=True))
     pattern = re.compile(rf"({names})\s*的?\s*(输入\s*[、及和与/]\s*输出|输入|输出)\s*单价\s*(?:均|都)?(?:为|是)\s*({names})\s*(?:对应单价)?\s*的?\s*(?:约\s*)?({_NUM})\s*倍")
@@ -103,13 +103,24 @@ def price_ratio_errors(report: str, csv_content: str) -> list[str]:
                         errors.append(f"「{match[0]}」与 CSV 不一致：{numerator}/{denominator} 的{'输入' if index == 0 else '输出'}单价倍数为 {actual}。")
                 except ArithmeticError:
                     errors.append(f"「{match[0]}」的单价倍数无法计算。")
+        # 型号内部的输入:输出单价比例，与两型号间的输入/输出倍数分别核对。
+        ratio = re.compile(rf"({names}|两(?:个|款)?(?:型号|模型|产品)|两者)\s*的?\s*输入\s*[、及和与/]\s*输出\s*单价\s*(?:之比|比例|比)\s*(?:均|都)?(?:为|是)\s*({_NUM})\s*[:：]\s*({_NUM})")
+        for match in ratio.finditer(line.replace('**', '').replace('`', '')):
+            if re.search(r'不能|不可|不应|不得|错误|若|如果', line[:match.start()]):
+                continue
+            subject, left, right = match.groups()
+            targets = [subject] if subject in prices else list(prices) if len(prices) == 2 else []
+            for model in targets:
+                pi, po = prices[model]
+                if pi * number(right) != po * number(left) or number(right) == 0:
+                    errors.append(f"「{match[0]}」与 CSV 不一致：{model} 输入/输出单价为 {pi}:{po}，须逐型号核对。")
     return errors[:20]
 
 
 _NUM = r"(?:\d{1,3}(?:[, \u202f\u00a0]\d{3})+|\d+)(?:\.\d+)?"
 _ATOM = rf"\(*\s*[+-]?{_NUM}\s*\)*"
 _RIGHT = rf"{_ATOM}(?:\s*[÷/×*+−-]\s*{_ATOM})*"
-_EQUATION = re.compile(rf"(?<![\w.,/÷×*+−-])({_ATOM}(?:\s*[÷/×*+−-]\s*{_ATOM})+)\s*(?:=|≈|≃|＝)\s*(?:约\s*)?({_RIGHT})(\s*%)?")
+_EQUATION = re.compile(rf"(?<![A-Za-z0-9_.,/÷×*+−-])({_ATOM}(?:\s*[÷/×*+−-]\s*{_ATOM})+)\s*(?:=|≈|≃|＝)\s*(?:约\s*)?({_RIGHT})(\s*%)?")
 
 
 def _calculate(expression: str) -> Decimal:

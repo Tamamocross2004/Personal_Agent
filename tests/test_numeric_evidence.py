@@ -5,6 +5,39 @@ from tools.registry import ToolRegistry
 from tools.report import make_write_report
 
 
+@pytest.mark.parametrize('text,wrong', [
+    ('49/51≈96.1%，48/51≈94.1%，合计98/102≈95.1%。', True),
+    ('合计97/102≈95.1%。', False), ('合计49+48=98。', True),
+    ('变量x98/102≈95.1%。', False), ('版本v2+3=8。', False),
+    ('> 原错误：合计98/102≈95.1%。', False),
+])
+def test_chinese_adjacent_equations_keep_ascii_identifier_boundary(text, wrong):
+    assert bool(arithmetic_errors(text)) is wrong
+
+
+@pytest.mark.parametrize('text,wrong', [
+    ('两型号的输入、输出单价比例均为1:3。', True),
+    ('Alpha的输入/输出单价之比为1:4。', False),
+    ('Alpha的输入/输出单价比例为1:3。', True),
+    ('Beta的输入、输出单价比例为1:3。', False),
+    ('不能说两型号的输入、输出单价比例均为1:3。', False),
+    ('> 原错误：两型号的输入、输出单价比例均为1:3。', False),
+])
+def test_intra_model_price_ratio_is_not_cross_model_ratio(text, wrong):
+    assert bool(price_ratio_errors(text, 'model,input_price,output_price\nAlpha,2,8\nBeta,9,27\n')) is wrong
+
+
+def test_actual_failed_reports_are_rejected_and_old_file_preserved(tmp_path):
+    from pathlib import Path
+    (tmp_path/'costs.csv').write_text('model,input_price,output_price\nEvalAlpha,2,8\nEvalBeta,9,27\n',encoding='utf-8')
+    reg=ToolRegistry([make_write_report(tmp_path)])
+    assert not reg.execute('write_report',{'content':'保留正确稿。'}).is_error
+    for name in ['numeric_bad_total.md', 'numeric_bad_internal_ratio.md']:
+        text=(Path(__file__).parent/'fixtures'/name).read_text(encoding='utf-8')
+        assert reg.execute('write_report',{'content':text}).is_error
+        assert (tmp_path/'report.md').read_text(encoding='utf-8')=='保留正确稿。'
+
+
 @pytest.mark.parametrize("text", ["27 ÷ 8 = 4.5", "2+3=8", "1/0=0", "9×2＝20",
                                   "**27 ÷ 8 = 4.5**", "27 ÷ 8 = **4.5 倍**"])
 def test_incorrect_explicit_arithmetic_is_rejected(text):
