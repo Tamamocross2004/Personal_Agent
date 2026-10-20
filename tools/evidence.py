@@ -8,7 +8,7 @@ from tools.session import ResearchSession
 def make_read_evidence(session: ResearchSession) -> Tool:
     @tool(name='read_evidence')
     def read_evidence(
-        source_id: Annotated[str,Field(max_length=60,description='本次工具返回的证据ID，如web-1、calculation-1；空值列出最近10项索引')] = '',
+        source_id: Annotated[str,Field(max_length=60,description='本次ID，如web-1、calculation-1、execution-1、history-1；空值列出最近10项索引')] = '',
         query: Annotated[str,Field(max_length=120,description='可选字面关键词；只定位本次已送达的证据内容，不检索外部网页')] = '',
     ) -> dict:
         """查看本次已经收到的证据ID与精确原文；摘录校验失败时先读取，不反复猜空格或重新计算。"""
@@ -30,5 +30,6 @@ def make_read_evidence(session: ResearchSession) -> Tool:
         end=min(len(row['text']),left+1600)
         return {'id':source_id,'kind':row['kind'],'excerpt':row['text'][left:end],
                 'record_text_range':[left,end],'source_sha256':row['text_sha256'],
+                **({'read_coverage':ledger.web_coverage(row)} if row['kind']=='web' else {}),
                 'partial':left>0 or end<len(row['text']),'semantic_support':'not_certified'}
     return read_evidence

@@ -43,6 +43,7 @@ class ResearchSession:
     notes: list[Note] = field(default_factory=list)
     task_contract: TaskContract | None = None
     evidence: object | None = None  # Agent创建的本次证据账本，不从历史文件恢复。
+    failed_fetches: dict[str, str] = field(default_factory=dict)  # 已实际返回FetchError的操作目标，非引用来源
 
     def find_page(self, url: str) -> Page | None:
         """按规范化 URL 查找读过的页面（同时匹配请求地址和重定向后的最终地址）。"""

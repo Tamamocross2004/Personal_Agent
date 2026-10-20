@@ -104,7 +104,7 @@ def make_write_report(task_dir: Path, session: ResearchSession | None = None, *,
         replacements: Annotated[list[ReportReplacement], Field(max_length=16, description="patch 模式的原文/新文替换列表；定位均基于修订前原稿")] = [],
         base_sha256: Annotated[str, Field(description="patch 模式必填：最新审稿反馈中的报告 SHA-256")] = "",
         brief_extension_reason: Annotated[str, Field(max_length=600, description="简述稿明显超过默认软目标时，说明具体必答项为何需要这些内容；非硬上限豁免，泛称全面完整不充分")] = "",
-        claims: Annotated[list[Claim] | None, Field(max_length=8, description="选择1-8项关键结论：quote逐字摘自本稿；kind为direct/calculated/inference/unknown；supports引用本次user-1、history-1或工具返回的证据ID及逐字excerpt。推断填assumptions，历史填limits。修订稿需重交关联，否则旧关联失效；不自动认证语义")] = None,
+        claims: Annotated[list[Claim] | None, Field(max_length=8, description="选择1-8项关键结论：quote逐字摘自本稿；kind为direct(资料)/calculated(成功计算)/inference(推断)/unknown/observed(实际工具返回)。supports用真实ID和逐字excerpt，observed只能引execution，用户指令不是执行事实。每一条引用history的claim均须单独填limits（记录日期、适用限制，包括unknown），推断另填assumptions。复合句拆分；修订需重交关联；不认证语义")] = None,
     ) -> str:
         """把研究报告（Markdown）保存到本地。报告较长时可分多次写：先 overwrite 写开头，再 append 追加后续章节。
         返回值附有对报告的自动检查结果。"""

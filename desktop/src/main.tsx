@@ -127,6 +127,7 @@ const number = (value: number) =>
 const kindLabel: Record<string, string> = {
   direct: "直接资料",
   calculated: "计算所得",
+  observed: "工具实际返回",
   inference: "依赖假设",
   unknown: "未知 / 冲突",
 };

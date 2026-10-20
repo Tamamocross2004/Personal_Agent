@@ -15,7 +15,7 @@ from agent.planner import load_plan, unfinished_tasks
 if TYPE_CHECKING:
     from tools.session import ResearchSession
 
-URL = re.compile(r"https?://[^\s<>()\[\]\"'`，。；、）】》]+")
+URL = re.compile(r"https?://[^\s<>()\[\]\"'`，。；、（）【】《》]+")
 REFERENCE = re.compile(r"^\s*(?:\[(\d+)\]:?|([0-9]+)[.、])\s*(.*)$")
 CITATION = re.compile(r"\[(\d+)\](?!:)")
 IMAGE = re.compile(r"!\[[^\]]*\]\(\s*(<[^>]+>|[^\s)]+)(?:\s+[^)]*)?\)")
@@ -58,6 +58,7 @@ class QualityCheck:
     references: dict[str, list[str]] = field(default_factory=dict)
     sources: list[dict] = field(default_factory=list)
     images: list[str] = field(default_factory=list)
+    failed_operations: list[dict] = field(default_factory=list)
 
     def to_dict(self):
         return asdict(self)
@@ -146,6 +147,19 @@ def inspect_report(text: str, task_dir: Path, session: ResearchSession | None, *
         host = (urlsplit(url).hostname or "").lower()
         if host.startswith("api.") and url not in reference_urls:
             continue
+        if session is not None and url not in reference_urls:
+            from tools.session import normalize_url
+            failure = session.failed_fetches.get(normalize_url(url))
+            occurrences = [line for line in body_lines if url in line]
+            if failure and occurrences and all(
+                re.search(r'失败|未取得|未获得|无法读取|未能读取|不可用',line)
+                and not CITATION.search(line)
+                and not re.search(r'(?:价格|费用|单价|报价)\s*(?:为|是|[:：=])\s*\d',line)
+                for line in occurrences
+            ):
+                result.failed_operations.append({'url':url,'status':'fetch_failed','recorded_error':failure,
+                                                 'meaning':'操作目标而非已读引用来源'})
+                continue
         evidence_urls.add(url)
     for url in sorted(evidence_urls):
         kind = source_kind(url)

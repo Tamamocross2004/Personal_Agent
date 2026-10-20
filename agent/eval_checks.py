@@ -176,6 +176,11 @@ def session_from_events(events: list[dict]) -> ResearchSession:
     for event in events:
         if event["kind"] == "tool_call":
             calls[event["id"]] = (event["name"], json.loads(event["arguments"] or "{}"))
+        elif event['kind']=='tool_result' and event.get('name')=='fetch_url' and event.get('is_error'):
+            name,args = calls.get(event['id'],('',{}))
+            if event.get('content','').startswith('ERROR: FetchError:') and isinstance(args.get('url'),str):
+                from tools.session import normalize_url
+                session.failed_fetches[normalize_url(args['url'])] = event['content'][:1000]
         elif event["kind"] == "tool_result" and not event.get("is_error"):
             name, args = calls.get(event["id"], ("", {}))
             if name == "fetch_url":

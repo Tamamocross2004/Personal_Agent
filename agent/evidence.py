@@ -53,7 +53,7 @@ class EvidenceRef(BaseModel):
 class Claim(BaseModel):
     model_config = ConfigDict(extra='forbid')
     quote: str = Field(min_length=2, max_length=600)
-    kind: Literal['direct', 'calculated', 'inference', 'unknown']
+    kind: Literal['direct', 'calculated', 'inference', 'unknown', 'observed']
     supports: list[EvidenceRef] = Field(default_factory=list, max_length=4)
     assumptions: str = Field(default='', max_length=600)
     limits: str = Field(default='', max_length=600)
@@ -107,7 +107,7 @@ class EvidenceLedger:
                     start=item['start'],end=item['start']+shown, fetched_at=item['fetched_at'],
                     page_date=item['page_date'],page_date_kind='unverified_metadata',
                     page_text_sha256=item.get('page_text_sha256'),
-                    delivery_truncated=shown<len(item['text']))
+                    page_characters=item.get('page_characters'), delivery_truncated=shown<len(item['text']))
                 if source: ids.append(source)
         elif tool in ('calculator','run_python','days_between'):
             text = '工具输入：'+arguments[:4000]+'\n成功输出：'+content[:6000]
@@ -116,9 +116,37 @@ class EvidenceLedger:
             if source: ids.append(source)
         return ids
 
+    def execution(self, tool: str, arguments: str, content: str, call_id: str, is_error: bool) -> str | None:
+        """派发结果仅证明本次工具返回，不把失败变成成功计算/网页证据。"""
+        text = ('tool: '+tool+'\noutcome: '+('error' if is_error else 'success')
+                +'\narguments:\n'+arguments[:1000]+'\nreturned:\n'+content[:2000])
+        return self.add('execution', text, tool=tool, tool_call_id=call_id,
+                        is_error=is_error, delivery_truncated=len(arguments)>1000 or len(content)>2000,
+                        description='本次工具派发的真实返回；不证明网页事实、外部副作用或所有调用次数')
+
+    def web_coverage(self, source: dict) -> dict:
+        intervals = sorted((r['start'], r['end']) for r in self.records.values()
+                           if r['kind']=='web' and r.get('url')==source.get('url')
+                           and r.get('page_text_sha256')==source.get('page_text_sha256'))
+        end = total = 0
+        for left, right in intervals:
+            total += max(0, right-max(left,end))
+            end = max(end,right)
+        size = source.get('page_characters')
+        return {'delivered_characters':total, 'page_characters':size,
+                'full_page_delivered':bool(size is not None and total==size),
+                'meaning':'仅计本次保留的实际送达字符，缓存全文及未命中检索不算已读'}
+
     def validate(self, report: str, claims: list[Claim]) -> list[dict]:
+        missing_limits = [f'claims[{i}].limits（原句：{c.quote[:60]}）'
+                          for i,c in enumerate(claims) if not c.limits.strip()
+                          and any(self.records.get(r.source_id,{}).get('kind')=='history' for r in c.supports)]
+        if missing_limits:
+            raise ValueError('历史证据须说明记录日期与当前适用性的限制；请逐项填写'+'；'.join(missing_limits)
+                             +'。limits是每条claim的字段，不是只在报告正文写日期；unknown引用历史也要填。'
+                             '用read_evidence读取真实历史日期，不用当前系统日期补造。')
         result = []
-        for claim in claims:
+        for index, claim in enumerate(claims):
             if claim.quote not in report:
                 raise ValueError('结论原句不在当前报告中：'+claim.quote[:80])
             if claim.kind != 'unknown' and not claim.supports:
@@ -136,11 +164,27 @@ class EvidenceLedger:
                         +'；用read_evidence(source_id="'+ref.source_id+'", query="关键词")读取真实原文，不要反复猜ID或重算。')
                 if claim.kind == 'direct' and source['kind'] not in ('web','user'):
                     raise ValueError('direct仅用于用户材料/已读原文；历史摘要和计算不能冒充当前直接事实')
+                if claim.kind == 'observed' and source['kind'] != 'execution':
+                    raise ValueError('observed仅关联本次execution工具返回记录；用户要求不能证明实际执行')
                 refs.append({**ref.model_dump(),'excerpt':resolved,'requested_excerpt':ref.excerpt,
                     'locator':'exact' if resolved==ref.excerpt else 'whitespace',
                     'source_kind':source['kind'],'source_sha256':source['text_sha256']})
             if claim.kind == 'calculated' and not any(r['source_kind']=='calculation' for r in refs):
                 raise ValueError('calculated结论必须关联本次成功计算，不能只给原始数字')
+            if claim.kind == 'direct':
+                def numbers(text):
+                    from decimal import Decimal
+                    text = re.sub(r'\[\d+\]', '', text)  # 报告引用编号不作事实数字
+                    return {Decimal(n.replace(',','')) for n in re.findall(
+                        r'(?<![\d.])(?:\d[\d,]*(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?',text)}
+                supplied = set().union(*(numbers(r['excerpt']) for r in refs))
+                novel = numbers(claim.quote)-supplied
+                if novel:
+                    calculations = [r['id'] for r in self.records.values() if r['kind']=='calculation'][-8:]
+                    raise ValueError(f'claims[{index}].kind=direct原句含摘录未提供的数值{sorted(map(str,novel))}；'
+                                     '仅资料部分保留direct；计算部分拆成另一条claims，kind=calculated并关联本次成功计算'
+                                     f'{calculations}的真实excerpt（先read_evidence）。不能只改正文或重发同一kind。'
+                                     '若确为原始资料，请补上覆盖主体、数值和单位的真实摘录。原句：'+claim.quote[:100])
             if any(r['source_kind']=='history' for r in refs) and not claim.limits.strip():
                 raise ValueError('历史证据须说明记录日期与当前适用性的限制')
             result.append({**claim.model_dump(),'supports':refs,'link_status':'located',
@@ -204,6 +248,7 @@ class EvidenceLedger:
                 context = record['text'][max(0,pos-250):pos+len(ref['excerpt'])+250]
                 entry=candidate.setdefault(record['id'],{k:v for k,v in record.items() if k!='text'} |
                     {'contexts':[],'context_is_excerpt':len(context)<len(record['text']),
+                     **({'read_coverage':self.web_coverage(record)} if record['kind']=='web' else {}),
                      **({'history_header':record['text'].split('历史摘要：',1)[0][:800]} if record['kind']=='history' else {})})
                 if not any(context in old for old in entry['contexts']):
                     entry['contexts']=[old for old in entry['contexts'] if old not in context]+[context]

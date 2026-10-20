@@ -410,6 +410,14 @@ class Agent:
             else:
                 result, seconds = self._run_tool(name, arguments)
             content = _truncate(result.content, self.max_tool_result_chars)
+            if name == 'fetch_url' and result.is_error and result.content.startswith('ERROR: FetchError:') and self.research_session is not None:
+                from tools.session import normalize_url
+                try:
+                    requested = json.loads(arguments).get('url')
+                    if isinstance(requested,str):
+                        self.research_session.failed_fetches[normalize_url(requested)] = content[:1000]
+                except (ValueError,TypeError):
+                    pass
             if name == 'write_report' and result.is_error and '超过明确上限' in result.content:
                 length_rejected = True
                 rejected_length_calls.add(call.id)
@@ -418,9 +426,13 @@ class Agent:
                 ):
                     length_measurements.append({'scope':scope,'unit':unit,'actual':int(actual),
                                                 'maximum':int(maximum),'suggested_target':int(int(maximum)*.6)})
-            if self._evidence and not result.is_error:
-                ids = self._evidence.capture(name,arguments,content,call.id,result.evidence,
-                                             min(len(result.content),self.max_tool_result_chars))
+            if self._evidence:
+                ids = (self._evidence.capture(name,arguments,content,call.id,result.evidence,
+                                              min(len(result.content),self.max_tool_result_chars)) if not result.is_error else [])
+                if name in ('fetch_url','calculator','run_python','days_between'):
+                    observed = self._evidence.execution(name,arguments,content,call.id,result.is_error)
+                    if observed:
+                        ids.append(observed)
                 if ids:
                     content += '\n【本次证据ID】' + '、'.join(ids) + '；摘录须来自对应实际片段；需要原文用read_evidence读取。'
                     for source_id in ids:
@@ -781,7 +793,8 @@ class Agent:
             feedback = REPEAT_BLOCKED_RESULT
             if name == 'write_report' and not successes and sig in self._write_errors:
                 feedback += '\n上次保存拒绝的具体原因：' + self._write_errors[sig]
-                feedback += '\n不要重发同一内容；请合并重复解释、重写为明显更短的稿件，保留必答结论、依据和局限。'
+                feedback += ('\n不要重发同一参数；按上面具体拒绝原因修正。证据错误须修正claims的kind、supports或limits，'
+                             '只改正文、压缩篇幅不能修复关联；仅明确篇幅超限时才删减，保留必答结论、依据和局限。')
             return ToolResult(feedback, True), 0.0
 
         started = time.perf_counter()

@@ -347,7 +347,7 @@ def make_fetch_url(
                 continue
             readings.append({'url':page.url,'title':page.title,'start':left,'text':text,
                 'page_date':page.date,'fetched_at':page.fetched_at,'output_start':match.end(),'output_end':end,
-                'page_text_sha256':page_digest})
+                'page_text_sha256':page_digest,'page_characters':len(page.text)})
         return ToolResult(rendered,evidence=readings)
 
     def _fetch_direct(url: str) -> Page:
