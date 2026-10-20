@@ -39,6 +39,8 @@
 
 复核工具后续优化：兼容跳过项的无产物空值，新增绑定原始结果的模板导出、pending进度和逐题错误提示，中断评估保留部分产物版本。800项测试通过；第四批456个原文件哈希不变，人工表仍39项pending，原始37/39及未验收结论不变。没有新增API消耗，见[优化记录](docs/review-tool-compatibility-20261020.md)。
 
+按用户选择，助手已另存39项复核意见：24 pass、2 fail、13 uncertain，无待填写项；标明coding_assistant，不冒充人工盲审，不再等待用户填表。原始结果和阶段12未通过状态保留。见[本轮复核](docs/assistant-review-followup-20261020.md)。
+
 2026-10-20继续修复：新增真实工具返回observed/execution、失败URL操作说明、逐项历史limits反馈、已读范围和JSON字段类型审稿，修正引用ID/数组数字误拦。全量735 passed、前端构建通过；冻结另一批三轮正常各10/10，故障3/3、3/3、2/3，原始38/39，一份网络报告skipped_limit且内容核对仍有问题，**阶段12仍未验收**。后续数字格式修正仅离线及只读验证，未再跑新三轮。见[修复复检](docs/stage12-fixes-20261020.md)与[机器记录](docs/stage12-fix-evaluation-20261020.json)。原始35/39与所有失败均保留。
 
 2026-10-19 应用户要求提前增加独立桌面首版：Electron + React + TypeScript，FastAPI 复用现有研究入口。支持会话、真实执行事件、报告/CSV/图片、证据与质量面板、排队和停止；API Key 仍只读取项目 `.env`。使用与部署见 [桌面应用说明](docs/desktop-app.md)，早期检查见 [桌面验收](docs/desktop-acceptance-20261019.md)。阶段13提供本机检查点显式恢复。
