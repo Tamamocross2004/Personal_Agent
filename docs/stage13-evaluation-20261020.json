@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "implementation_revision": "6204bc39a8f16c2b91b9bbafa131e962de0006a6",
+  "runtime_sha256": "e391a9f6bfefc1570dd49b4bd46f92cf39a332b07b99abca4b8902ad8eb5abc3",
+  "scope": "local single-task v1 committed boundaries; no quality acceptance for stage12",
+  "engineering_check": "passed",
+  "stage12_acceptance": "not_accepted",
+  "tests": {
+    "passed": 776,
+    "seconds": 43.28,
+    "added_parameterized_cases": 21,
+    "real_process_kill_cases": 3
+  },
+  "desktop_build": "TypeScript and Vite passed",
+  "desktop_smoke": {
+    "resume_button": "passed",
+    "same_task": true,
+    "budget_preserved": true,
+    "page_errors": []
+  },
+  "cli_cached_response": {
+    "status": "complete",
+    "steps": 1,
+    "equivalent_tokens": 40.0,
+    "original_synthetic_call_events": 2,
+    "additional_call_or_error_events_after_resume": 0,
+    "real_provider_evaluation": false
+  },
+  "ready_local_demo": "workspace/evaluations/stage13-demo-user-v2",
+  "ready_demo_status": {
+    "available": true,
+    "resumable": true,
+    "reason": "可从已提交边界恢复，继承累计预算",
+    "phase": "response",
+    "status": "running",
+    "saved_at": 1792488479.8396375,
+    "pending": null,
+    "steps": 1,
+    "equivalent_tokens": 40.0,
+    "review_calls": 0
+  },
+  "artifact_sha256": {
+    "workspace/stage13-full-tests-release.log": "497ebd130d16478f63a2981af4c413dc910364ef4bbee943fdaaf8c40c93171c",
+    "workspace/stage13-cli-resume-release.log": "9c1635f913f0b3bf55737b4a00543477a6868e0c8a3a83995c3e849ebc543abb",
+    "workspace/stage13-ui-smoke-release.log": "2969792c460dc7ff2c2f5f8355b214fcee3d3b95ec82c86218c510c126144325",
+    "workspace/stage13-recovery-before.png": "4e8ee281e40e0781d14b3c34f1f654bd14a79bf31f069f24c5f6d825e46a811d",
+    "workspace/stage13-recovery-queued.png": "9b7d627cdbbc3d7c717eb2053c62606ea15234a850db7aa97333eb79485e1f66"
+  },
+  "code_sha256": {
+    "main.py": "b994847051d970c635aef78bde00314571f989f7a99bcaca05b4880259ef0779",
+    "agent/analysis_scope.py": "b8556cbeea6499a9a757496e9413541592237188257dce08235e875673c2c8e4",
+    "agent/artifacts.py": "7ceae3a76944ae1d1d3a137ab5aaaf04caac0b5a9516912e0e5fcb0a104bd989",
+    "agent/cache_probe.py": "c82b6e081ef9de13478facbb612964acd5f5ebb67ab23f6e6f8174e0d4f766bc",
+    "agent/checkpoint.py": "ff353e0e51ea8d0b895957b959d1b13f744b388a55c7ba7d36099e878be32d44",
+    "agent/compare.py": "93c4fa7d588c611aee103940a781e7be7d005dbec931d10c841de71296d02fec",
+    "agent/config.py": "80eb844649e6abfe32bd1d5ee637eadd3dbb4c4627574daf1f4fff2487554e05",
+    "agent/context.py": "8950fd47da6ae08c631f71bab0553d13dad60f4d1f107ca1248c2b9d455689d1",
+    "agent/display.py": "1d2b2e0c7f2509d70226b8f1c5d64eb3d0b861c2b7691e94ab9fcd1ab9c87e80",
+    "agent/errors.py": "927248d338a2183d10db07d64fbc53ff1674597a02aed51044f3de0d03c546ef",
+    "agent/evaluate.py": "45047cd09ecc02148e654f238e0b31c7a7517baaed42d9425a413b2dc4790da5",
+    "agent/eval_checks.py": "933dac5692ac3888c38b9b471f35456e2c2319dc2231dc96e7193b4fdef1f44c",
+    "agent/evidence.py": "5bccca0449ec583dc6725b89776b6cf57b701b434d24f9e07959e539c89f559d",
+    "agent/llm.py": "703907d24e06ad2c37537f35f73b820cc4b099f4b96017152f49f7c3e729e1c8",
+    "agent/loop.py": "5ac1a94211b5414881636a56ee5ccdd64b74a89629fd95052c133827a8011afd",
+    "agent/markdown_tables.py": "57a773edb3537803b39cb8abc367c8aa35b1dca3b5a09425527b94bb156a88c2",
+    "agent/memory.py": "081e47bb65419ac77431b027834fee0e1e7676e9bde06e7f574d2dc406f048f1",
+    "agent/numeric_evidence.py": "a8e353bef13203c854bb3b7f2cc5bb2ca32a3c9959a53358e2638e20fede3812",
+    "agent/planner.py": "a286d2c2e32759a1eb7797008873155c474b24ea0b976fe1ca5a7adf709f6bc1",
+    "agent/prompts.py": "3edcd9a9ab8c63763e78574c39147e530dafbb1e1b9ee6ff9f884e8a2b98bdfe",
+    "agent/quality.py": "9f1a56472741debe3f33d4fbdb39088f14644d3b82fa3bd2e322c603a8c502e2",
+    "agent/replay.py": "1cfefe16899bf260db0eef7b46ec415a8b7e4c189482fcf68f83337e6b5edf89",
+    "agent/resume.py": "5f3a2d488bdedc8f9e2b411aa4dc8b62bcb7d861b7b8f30c7a8168b138edb764",
+    "agent/review.py": "b8a6743dc86132f1661e2ed3bb34735c5aad0d412d7db6f5f3100793acf4d97a",
+    "agent/simulate.py": "38c350852963d531d92ca6f24a1a696d2ec17121148b19a5e14a408226051add",
+    "agent/task_contract.py": "cccffff19e0f7ccede5fb148e1cab8f2840aae296989e33c4834a6cd8a9440f7",
+    "agent/trace.py": "c18d18aa233e771ed47b8f4e8fa9dda19c43bef8dd12b23af17e2a91a0391387",
+    "agent/validation.py": "4a6cbee3044ff5a6becc7448c592a236e8c9daf087e62f00092f2122b980111f",
+    "agent/workspace.py": "ea2b3f1598e312436245aef4b411af38d46becb2e77223c1bb4c6373f77df4bf",
+    "agent/__init__.py": "5def5b6adbb4644c648153c5ed97f28d92e3c94c25be61e4af1db6f91b5ddf16",
+    "tools/basic.py": "c46cfb920c8d7c75740a0aed6b0e90cab47cf8f9233bfbe3672c2341fc0ddedf",
+    "tools/code_exec.py": "f3063955b75fc700c3cb9dcbc4994f0a0c46892a40d40c41350cb53f61f03dd0",
+    "tools/evidence.py": "96b493fba7d1c459cab13f5e2301446877df4a23e245138bec39022b553181f8",
+    "tools/fetch.py": "c07a7b32020b10c2597813c7b61a0294bf3c24f73fd19a558d8c4df10c136fa6",
+    "tools/notes.py": "6f3168e0a59ba8d731abf45d42f88b52d6d6f229428ebb5c4008c21f742933e4",
+    "tools/plan.py": "c0e0513ad4091626faa654d84cb1ace05703190aa063b0bbf60512fbebc50526",
+    "tools/registry.py": "ecd04c7eb39e846cae6454084a5fc54ae54f00b0248619c2a587a152c5440025",
+    "tools/report.py": "7415f26cab656d2d712d01f552888eaf8d801a91fc8df749438c125986b797e7",
+    "tools/search.py": "caa4be21783186f73a6d8cd7c867aa09f556a6b44f42174f1f4a502abf0b3d92",
+    "tools/session.py": "5daac452d1d1c841042e3e30d1a9ad3e0286cecd0119020b32b22eae12f872a2",
+    "tools/__init__.py": "64c7179acd69da73e179c09ca3216f53771742b46533b12d061b21c8de150620",
+    "desktop_app/manager.py": "21ebfc397e76a3931c230ea56b68390220ba259ca06025be4830c112b3e15025",
+    "desktop_app/server.py": "3f6fe3d063d5cc8d595d60c6bdfe394cfe6cb09ab3f6ddad65e98ff7af50fbb1",
+    "desktop_app/store.py": "9ba97ae354445468d64c5a6ac7b7c94dc3e9dbda591e44841a237036cb9ed5da",
+    "desktop_app/usage.py": "bceb8594f8ad25d2e335c682b1dc95710acd290ec063d5e3b9491714e061673e",
+    "desktop_app/worker.py": "e87c8e91071007276645362823bbfcff24d9569a4be22b856279e485af7a3155",
+    "desktop_app/__init__.py": "1e638229e5db3fd078cade2fbaa2b4a2f0efeba538f5fdd1781dc517cc5d9989",
+    "desktop/src/main.tsx": "5f785582d179f9d306ea518b6fe246de7957ed36a51f1133c35680d8e42fbd0f"
+  },
+  "boundaries": {
+    "automatically_resumable": [
+      "before planning dispatch",
+      "main response saved",
+      "tool batch committed",
+      "report saved before review dispatch",
+      "review committed",
+      "idempotent local postprocess"
+    ],
+    "requires_verification": [
+      "inflight model or unknown usage",
+      "inflight or partially committed tool batch",
+      "tool thread timeout",
+      "uncommitted planning or review result",
+      "interrupted finalization",
+      "artifact or runtime incompatibility"
+    ]
+  },
+  "limits": {
+    "checkpoint_bytes": 32000000,
+    "artifact_file_bytes": 20000000,
+    "artifact_total_bytes": 100000000,
+    "artifact_files": 512
+  },
+  "not_claimed": [
+    "arbitrary external exactly-once side effects",
+    "cross-machine migration",
+    "paid-model long-run recovery stability",
+    "hardware power-loss certification",
+    "manual resolution then in-place resume for uncertain operations"
+  ]
+}
