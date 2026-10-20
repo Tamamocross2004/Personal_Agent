@@ -50,7 +50,7 @@ from agent.errors import classify_api_error
 from agent.planner import format_plan_for_prompt, generate_plan, load_plan, unfinished_tasks
 from agent.quality import inspect_report, save_check, structure_repair_feedback
 from agent.evidence import EvidenceLedger, mapping_sha, write_json
-from agent.review import ReviewValidationError, build_review_messages, fingerprint, parse_verdict, review_feedback, save_review
+from agent.review import ReviewValidationError, build_review_messages, fingerprint, parse_review, review_feedback, save_review
 from agent.task_contract import TaskContract, extract_contract, save_contract_check
 from agent.prompts import (
     CONTINUE_PROMPT,
@@ -692,8 +692,10 @@ class Agent(CheckpointMixin):
                     raw_review = choice.message.content or ""
                     if choice.finish_reason != "stop":
                         raise ValueError("审稿回复不完整")
-                    issues = parse_verdict(raw_review, report)
-                    record = save_review(path, report, "partial" if truncated else "reviewed", issues)
+                    packet = json.loads(review_messages[1]['content']).get('claim_evidence')
+                    issues, support_review = parse_review(raw_review, report, packet)
+                    record = save_review(path, report, "partial" if truncated or support_review['status']=='incomplete'
+                                         else "reviewed", issues, support_review=support_review)
                     break
                 except (openai.APIError, ValueError, IndexError) as exc:
                     valid_issues = exc.valid_issues if isinstance(exc, ReviewValidationError) else []
@@ -715,7 +717,7 @@ class Agent(CheckpointMixin):
                     self._last_prompt = 0
                     self._len_at_last_call = 0
         # 只携带当前运行、同一文件的上次意见，不加载磁盘上的任意旧记录或失败回复全文。
-        self._last_reviews[path.name] = {k: record[k] for k in ("report_sha256", "status", "issues")}
+        self._last_reviews[path.name] = {k: record[k] for k in ("report_sha256", "status", "issues", "support_review") if k in record}
         self._last_report_texts[path.name] = report[:40000]
         feedback = review_feedback(record)
         if record.get('reason'):

@@ -64,12 +64,37 @@ class EvidenceRef(BaseModel):
     excerpt: str = Field(min_length=1, max_length=600)
 
 
+class Premise(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    text: str = Field(min_length=1, max_length=600)
+    basis: Literal['evidence', 'assumption', 'unknown']
+    supports: list[EvidenceRef] = Field(default_factory=list, max_length=2)
+
+
+def claim_refs(claim: dict) -> list[dict]:
+    """包含前提的定位引用；不能把假设文本当成来源。"""
+    return claim.get('supports', []) + [ref for premise in claim.get('premises', [])
+                                       for ref in premise.get('supports', [])]
+
+
+def restore_claim(claim: dict) -> Claim:
+    def refs(rows):
+        return [{k: r[k] for k in EvidenceRef.model_fields} for r in rows]
+    data = {k: claim[k] for k in Claim.model_fields if k in claim}
+    data['supports'] = refs(claim['supports'])
+    data['premises'] = [{**p, 'supports': refs(p['supports'])} for p in claim.get('premises', [])]
+    return Claim.model_validate(data)
+
+
 class Claim(BaseModel):
     model_config = ConfigDict(extra='forbid')
     quote: str = Field(min_length=2, max_length=600)
     kind: Literal['direct', 'calculated', 'inference', 'unknown', 'observed']
     supports: list[EvidenceRef] = Field(default_factory=list, max_length=4)
     assumptions: str = Field(default='', max_length=600)
+    reasoning: str = Field(default='', max_length=600, description='从所列前提到结论的推导；不是新增事实或假设。')
+    premises: list[Premise] = Field(default_factory=list, max_length=4,
+        description='可选前提：evidence附真实摘录；assumption明确新增假设；unknown明确缺口。不得为填字段编造假设。')
     limits: str = Field(default='', max_length=600)
     scope: Literal['excerpt', 'whole_document'] | None = Field(
         default=None, description='网页结论的覆盖范围；whole_document要求关联网页版本已完整送达。未填不代表全文已读。')
@@ -163,7 +188,8 @@ class EvidenceLedger:
     def validate(self, report: str, claims: list[Claim]) -> list[dict]:
         missing_limits = [f'claims[{i}].limits（原句：{c.quote[:60]}）'
                           for i,c in enumerate(claims) if not c.limits.strip()
-                          and any(self.records.get(r.source_id,{}).get('kind')=='history' for r in c.supports)]
+                          and any(self.records.get(r['source_id'],{}).get('kind')=='history'
+                                  for r in claim_refs(c.model_dump()))]
         if missing_limits:
             raise ValueError('历史证据须说明记录日期与当前适用性的限制；请逐项填写'+'；'.join(missing_limits)
                              +'。limits是每条claim的字段，不是只在报告正文写日期；unknown引用历史也要填。'
@@ -172,12 +198,17 @@ class EvidenceLedger:
         for index, claim in enumerate(claims):
             if claim.quote not in report:
                 raise ValueError('结论原句不在当前报告中：'+claim.quote[:80])
-            if claim.kind != 'unknown' and not claim.supports:
+            all_refs = claim_refs(claim.model_dump())
+            if claim.kind != 'unknown' and not all_refs:
                 raise ValueError('非unknown结论必须关联实际证据')
-            if claim.kind == 'inference' and not claim.assumptions.strip():
-                raise ValueError('推断必须说明假设和适用条件')
-            refs = []
-            for ref in claim.supports:
+            if claim.kind == 'inference' and not (claim.assumptions.strip() or claim.reasoning.strip()):
+                raise ValueError('推断必须说明reasoning推导或assumptions适用条件；无需额外假设时说明推导，不编造假设')
+            for premise in claim.premises:
+                if not premise.text.strip() or (premise.basis == 'evidence') != bool(premise.supports):
+                    raise ValueError('premises的evidence须关联真实摘录；assumption/unknown不附来源，且text不得为空白')
+            resolved_refs = []
+            for data in all_refs:
+                ref = EvidenceRef.model_validate(data)
                 source = self.records.get(ref.source_id)
                 if not source or sha(source['text']) != source['text_sha256']:
                     raise ValueError('证据ID不存在或哈希无效：'+ref.source_id+'；用read_evidence查看本次保留的ID。')
@@ -192,9 +223,10 @@ class EvidenceLedger:
                     check_artifact_version(self.path.parent, source)
                 if claim.kind == 'observed' and source['kind'] not in ('execution','artifact'):
                     raise ValueError('observed仅关联本次execution工具返回记录或artifact文件记录；用户要求不能证明实际执行')
-                refs.append({**ref.model_dump(),'excerpt':resolved,'requested_excerpt':ref.excerpt,
+                resolved_refs.append({**ref.model_dump(),'excerpt':resolved,'requested_excerpt':ref.excerpt,
                     'locator':'exact' if resolved==ref.excerpt else 'whitespace',
                     'source_kind':source['kind'],'source_sha256':source['text_sha256']})
+            refs = resolved_refs
             if claim.kind == 'calculated' and not any(r['source_kind']=='calculation' for r in refs):
                 raise ValueError('calculated结论必须关联本次成功计算，不能只给原始数字')
             if claim.artifact_version=='snapshot' and (claim.kind!='observed' or not claim.limits.strip()
@@ -233,7 +265,14 @@ class EvidenceLedger:
                                      '若确为原始资料，请补上覆盖主体、数值和单位的真实摘录。原句：'+claim.quote[:100])
             if any(r['source_kind']=='history' for r in refs) and not claim.limits.strip():
                 raise ValueError('历史证据须说明记录日期与当前适用性的限制')
-            result.append({**claim.model_dump(),'supports':refs,'link_status':'located',
+            mapped = claim.model_dump()
+            mapped['supports'] = refs[:len(claim.supports)]
+            cursor = len(claim.supports)
+            for premise in mapped['premises']:
+                size = len(premise['supports'])
+                premise['supports'] = refs[cursor:cursor+size]
+                cursor += size
+            result.append({**mapped,'link_status':'located',
                            'semantic_support':'not_certified'})
         return result
 
@@ -255,14 +294,13 @@ class EvidenceLedger:
             try:
                 restored=[]
                 for c in previous.get('claims',[]):
-                    for ref in c['supports']:
+                    for ref in claim_refs(c):
                         if self.records[ref['source_id']]['text_sha256']!=ref['source_sha256']:
                             raise ValueError('旧证据关联版本失效')
-                    restored.append(Claim.model_validate({**{k:c[k] for k in Claim.model_fields if k in c},
-                        'supports':[{k:r[k] for k in EvidenceRef.model_fields} for r in c['supports']]}))
+                    restored.append(restore_claim(c))
                 mapped = self.validate(report,restored)
                 for old,current in zip(previous.get('claims',[]),mapped):
-                    for before,after in zip(old['supports'],current['supports']):
+                    for before,after in zip(claim_refs(old),claim_refs(current)):
                         requested=before.get('requested_excerpt',before['excerpt'])
                         if locate_excerpt(self.records[after['source_id']]['text'],requested)!=after['excerpt']:
                             raise ValueError('旧摘录定位信息失效')
@@ -282,10 +320,10 @@ class EvidenceLedger:
 
     def packet(self, mapping: dict, budget: int = 14000) -> dict:
         items, sources, omitted = [], {}, 0
-        for claim in mapping.get('claims',[]):
+        for index, claim in enumerate(mapping.get('claims',[])):
             candidate={key:{**value,'contexts':list(value['contexts'])} for key,value in sources.items()}
             missing=False
-            for ref in claim['supports']:
+            for ref in claim_refs(claim):
                 record = self.records.get(ref['source_id'])
                 if not record:
                     missing=True
@@ -298,13 +336,14 @@ class EvidenceLedger:
                      **({'history_header':record['text'].split('历史摘要：',1)[0][:800]} if record['kind']=='history' else {})})
                 if not any(context in old for old in entry['contexts']):
                     entry['contexts']=[old for old in entry['contexts'] if old not in context]+[context]
-            item = {'claim':claim}
+            item = {'claim_index':index,'claim':claim}
             if missing or len(json.dumps({'items':items+[item],'sources':candidate},ensure_ascii=False))>budget:
                 omitted += 1
             else:
                 items.append(item)
                 sources=candidate
         return {'status':mapping.get('status','unmapped'),'items':items,'sources':sources,'omitted_items':omitted,
+                'total_claims':len(mapping.get('claims',[])),
                 'ledger_omitted_records':self.omitted,'semantic_support':'not_certified'}
 
 
@@ -321,13 +360,17 @@ def audit_mapping(root: Path, report_name: str = 'report.md') -> dict:
         if r['kind']=='web' and r['end']-r['start']!=len(r['text']): raise ValueError('网页偏移不匹配')
     report=path.read_text(encoding='utf-8')
     for claim in mapping['claims']:
+        restore_claim(claim)  # 旧格式仍可读；新前提字段也必须满足结构约束。
         if claim['quote'] not in report: raise ValueError('结论原句失效')
         if claim.get('scope') is not None:
-            web = [records[r['source_id']] for r in claim['supports'] if records[r['source_id']]['kind']=='web']
+            web = [records[r['source_id']] for r in claim_refs(claim) if records[r['source_id']]['kind']=='web']
             if not web or (claim['scope']=='whole_document' and any(
                     not reading_coverage(records.values(),r)['full_page_delivered'] for r in web)):
                 raise ValueError('网页结论范围与实际送达记录不匹配')
-        for ref in claim['supports']:
+        for premise in claim.get('premises', []):
+            if not premise['text'].strip() or (premise['basis']=='evidence') != bool(premise['supports']):
+                raise ValueError('前提来源类型与引用不一致')
+        for ref in claim_refs(claim):
             r=records[ref['source_id']]
             if ref['source_sha256']!=r['text_sha256'] or ref['excerpt'] not in r['text']:
                 raise ValueError('证据关联失效')
@@ -335,12 +378,12 @@ def audit_mapping(root: Path, report_name: str = 'report.md') -> dict:
                 from agent.artifacts import check_artifact_version
                 check_artifact_version(root,r)
         if claim.get('artifact_version')=='snapshot' and (claim['kind']!='observed' or not claim.get('limits','').strip()
-                or not claim['supports'] or any(records[r['source_id']]['kind']!='artifact' for r in claim['supports'])):
+                or not claim_refs(claim) or any(records[r['source_id']]['kind']!='artifact' for r in claim_refs(claim))):
             raise ValueError('历史快照关联缺少类型、来源或适用范围')
     return {'status':mapping['status'],'claims':len(mapping['claims']),
             'mapping_sha256':mapping_sha(mapping),
             'claim_kinds':sorted({c['kind'] for c in mapping['claims']}),
-            'source_kinds':sorted({r['source_kind'] for c in mapping['claims'] for r in c['supports']}),
+            'source_kinds':sorted({r['source_kind'] for c in mapping['claims'] for r in claim_refs(c)}),
             'records':len(records),'omitted_records':ledger['omitted_records'],
             'structural_links_valid':True,'semantic_support':'not_certified'}
 

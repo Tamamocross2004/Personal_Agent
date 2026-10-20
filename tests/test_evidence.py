@@ -314,7 +314,8 @@ def test_missing_links_defer_review_without_using_a_call(tmp_path):
                 research_session=session,review_reports=True,review_max_calls=1)
     agent.run('甲报价2元；输出价格未知。')
     records=[json.loads(s) for s in (tmp_path/'report.reviews.jsonl').read_text(encoding='utf-8').splitlines()]
-    assert [r['status'] for r in records]==['not_reviewed','reviewed']
+    assert [r['status'] for r in records]==['not_reviewed','partial']
+    assert records[-1]['support_review']['missing_claim_indices']==[0]
     assert agent._review_count==1 and audit_mapping(tmp_path)['status']=='mapped'
 
 

@@ -61,7 +61,12 @@ class OfflineModel:
             raise openai.APIConnectionError(request=httpx.Request('POST','https://offline.invalid'))
         if tools is None:
             if '独立报告审稿人' in messages[0]['content']:
-                return completion('{"issues":[]}')
+                payload = json.loads(messages[1]['content'])
+                # 仅离线界面夹具：合成核对记录，不表示真实模型或事实验收。
+                return completion(json.dumps({'issues':[], 'claim_checks':[
+                    {'claim_index':item['claim_index'], 'status':'supported',
+                     'reason':'离线界面夹具的合成核对意见。'}
+                    for item in payload.get('claim_evidence',{}).get('items',[])]}, ensure_ascii=False))
             return completion('{}', prompt_tokens=1500 if '预算不足' in self.question else 10)
         if '自动保存演示' in self.question:
             return completion('离线样例：模型生成此段文字时，程序尚未开始文件保存。')
@@ -94,7 +99,10 @@ class OfflineModel:
 def claims():
     return [{'quote':'业务状态未知。','kind':'unknown'},
             {'quote':'工具记录的退出码为零。','kind':'observed',
-             'supports':[{'source_id':'execution-1','excerpt':'退出码: 0'}]}]
+             'reasoning':'只描述本次工具记录，不推断业务状态。',
+             'premises':[{'text':'工具返回退出码为零。','basis':'evidence',
+                          'supports':[{'source_id':'execution-1','excerpt':'退出码: 0'}]},
+                         {'text':'业务结论尚未核实。','basis':'unknown'}]}]
 
 
 def seed_recovery(manager, title, *, corrupt=False):

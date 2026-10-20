@@ -1130,6 +1130,49 @@ function App() {
                             {kindLabel[claim.kind] || claim.kind}
                           </span>
                           <blockquote>{claim.quote}</blockquote>
+                          {claim.reasoning && (
+                            <p>
+                              <b>推导说明</b>
+                              {claim.reasoning}
+                            </p>
+                          )}
+                          {claim.premises?.map((premise: any, p: number) => (
+                            <div key={p}>
+                              <p>
+                                <b>
+                                  {(
+                                    {
+                                      evidence: "资料前提",
+                                      assumption: "新增假设",
+                                      unknown: "未知前提",
+                                    } as Record<string, string>
+                                  )[premise.basis] || premise.basis}
+                                </b>
+                                {premise.text}
+                              </p>
+                              <div className="sources">
+                                {premise.supports?.map(
+                                  (ref: any, j: number) => (
+                                    <button
+                                      key={j}
+                                      onClick={() =>
+                                        setSource({
+                                          ...detail.sources.records?.find(
+                                            (s: any) => s.id === ref.source_id,
+                                          ),
+                                          excerpt: ref.excerpt,
+                                        })
+                                      }
+                                    >
+                                      <BookOpen size={12} />
+                                      {ref.source_id}
+                                      <ChevronRight size={12} />
+                                    </button>
+                                  ),
+                                )}
+                              </div>
+                            </div>
+                          ))}
                           {claim.assumptions && (
                             <p>
                               <b>假设</b>
@@ -1142,6 +1185,37 @@ function App() {
                               {claim.limits}
                             </p>
                           )}
+                          {detail.review.status !== "stale" &&
+                            detail.review.support_review?.checks
+                              ?.filter((check: any) => check.claim_index === i)
+                              .map((check: any) => (
+                                <p key={check.claim_index}>
+                                  <b>
+                                    模型依据核对 ·{" "}
+                                    {(
+                                      {
+                                        supported: "支持",
+                                        contradicted: "存在矛盾",
+                                        insufficient: "依据不足",
+                                        uncertain: "不确定",
+                                      } as Record<string, string>
+                                    )[check.status] || check.status}
+                                  </b>
+                                  {check.reason}
+                                  {check.missing_evidence && (
+                                    <>
+                                      <br />
+                                      缺口：{check.missing_evidence}
+                                    </>
+                                  )}
+                                  {check.suggestion && (
+                                    <>
+                                      <br />
+                                      建议：{check.suggestion}
+                                    </>
+                                  )}
+                                </p>
+                              ))}
                           <div className="sources">
                             {claim.supports?.map((ref: any, j: number) => (
                               <button
@@ -1174,6 +1248,20 @@ function App() {
                     <div className="panel-intro">
                       <strong>执行与检查状态</strong>
                       <p>任务结束、审稿完成和事实正确是不同的判断。</p>
+                    </div>
+                    <div className="quality-row">
+                      <span>逐项依据核对</span>
+                      <b>
+                        {detail.review.status === "stale"
+                          ? "已过期"
+                          : (
+                              {
+                                complete: "已完成（模型意见）",
+                                incomplete: "未完成",
+                                not_requested: "无选定关联",
+                              } as Record<string, string>
+                            )[detail.review.support_review?.status] || "未记录"}
+                      </b>
                     </div>
                     <div className="quality-row">
                       <span>本轮模型</span>

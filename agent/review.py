@@ -70,7 +70,15 @@ analysis_methods 是当前明确计算的方法范围；概念性提及其他方
 "severity":"error|warning","quote":"报告中的原文","message":"问题及证据","suggestion":"修改建议"}]}。
 category 从 contradiction、unsupported、source_identity、citation、stale、data_alignment、other 中选一个。
 severity 只能是 error 或 warning。没有问题时只输出 {"issues":[]}，这不代表已独立核实所有事实。
-最多 8 个问题，不增加 summary、passed 等字段。"""
+最多 8 个问题，不增加 summary、passed 等字段。
+若claim_evidence.items非空，另返回claim_checks，逐个使用程序给出的claim_index，不自行重编号。
+每项包含target(quote/reasoning/assumptions/premises)、status(supported/contradicted/insufficient/uncertain)、reason、missing_evidence、suggestion。
+核对整项结论及其推导、假设和前提；target指出最需处理的部分。premises.basis=evidence只证明摘录定位，assumption/unknown不是资料事实。
+分别检查每个判断的主体、量词、条件方向、时间/版本、单位；复合结论的一部分有据不能代表整句有据。
+已有前提足以推出结论时不要求新增假设；reasoning是推导步骤，不是事实来源。额外假设只能支持明确写为条件性的结论，不能证明其在现实中满足。
+supported表示给定上下文支持这项带原有限定的陈述，仍只是模型意见。非supported须说明实质缺口和可操作建议；优先限定或删除无据部分，不强求额外研究。
+资料有歧义而报告恰当地保留歧义时可为supported，不为凑问题强选解释。未返回的逐项核对记为未完成，不等同默认支持。
+claim_checks的问题可定位到关联字段；issues仍只摘报告原文，不编造报告中不存在的quote。"""
 
 
 class ReviewIssue(BaseModel):
@@ -82,9 +90,20 @@ class ReviewIssue(BaseModel):
     suggestion: str = Field(min_length=1, max_length=1000)
 
 
+class ClaimCheck(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    claim_index: int = Field(ge=0, le=7, strict=True)
+    target: Literal['quote', 'reasoning', 'assumptions', 'premises'] = 'quote'
+    status: Literal['supported', 'contradicted', 'insufficient', 'uncertain']
+    reason: str = Field(min_length=1, max_length=600)
+    missing_evidence: str = Field(default='', max_length=600)
+    suggestion: str = Field(default='', max_length=600)
+
+
 class ReviewVerdict(BaseModel):
     model_config = ConfigDict(extra="forbid")
     issues: list[ReviewIssue] = Field(max_length=8)
+    claim_checks: list[ClaimCheck] = Field(default_factory=list, max_length=8)
 
 
 class ReviewValidationError(ValueError):
@@ -215,6 +234,45 @@ def parse_verdict(text: str, report: str) -> list[dict]:
     return [issue.model_dump() for issue in verdict.issues]
 
 
+def parse_review(text: str, report: str, packet: dict | None = None) -> tuple[list[dict], dict]:
+    """只验证审稿定位与覆盖；不根据模型意见程序认证蕴含。"""
+    issues = parse_verdict(text, report)
+    verdict = ReviewVerdict.model_validate_json(text)
+    items = {item['claim_index']: item['claim'] for item in (packet or {}).get('items', [])}
+    checks, seen = [], set()
+    for check in verdict.claim_checks:
+        index = check.claim_index
+        if index not in items or index in seen:
+            raise ReviewValidationError('claim_checks索引不在本次送达关联中或重复；只使用claim_index', issues)
+        claim = items[index]
+        if claim['quote'] not in report:
+            raise ReviewValidationError('逐项核对绑定的原句不在当前报告中', issues)
+        if check.target != 'quote' and not claim.get(check.target):
+            raise ReviewValidationError('claim_checks.target所指关联字段为空', issues)
+        if not check.reason.strip() or (check.status != 'supported' and
+                (not check.missing_evidence.strip() or not check.suggestion.strip())):
+            raise ReviewValidationError('逐项核对须有reason；非supported还须说明missing_evidence和suggestion', issues)
+        seen.add(index)
+        checks.append({**check.model_dump(), 'quote': claim['quote']})
+    # 把关联字段问题交回正常修订路径，quote取程序已绑定的报告原句。
+    # 不允许审稿模型借此摘录笔记为报告问题，也不因引用存在而自动标为supported。
+    for check in checks:
+        if check['status'] != 'supported' and not any(i['quote'] == check['quote'] for i in issues):
+            issues.append({'category':'contradiction' if check['status']=='contradicted' else 'unsupported',
+                'severity':'warning' if check['status']=='uncertain' else 'error',
+                'quote':check['quote'],
+                'message':f"关联#{check['claim_index']} {check['target']}：{check['reason']}；缺口：{check['missing_evidence']}",
+                'suggestion':check['suggestion']})
+    missing = sorted(set(items) - seen)
+    return issues, {'status':'incomplete' if missing or (packet or {}).get('omitted_items') else
+                    'complete' if items else 'not_requested',
+                    'checks':checks, 'missing_claim_indices':missing,
+                    'omitted_items':(packet or {}).get('omitted_items', 0),
+                    'counts':{s:sum(c['status']==s for c in checks)
+                              for s in ('supported','contradicted','insufficient','uncertain')},
+                    'meaning':'模型对选定结论的逐项意见；不认证事实或未关联文本。'}
+
+
 def save_review(path: Path, report: str, status: str, issues: list[dict], **extra) -> dict:
     from datetime import datetime
     record = {"report_sha256": fingerprint(report), "status": status, "issues": issues, **extra}
@@ -236,6 +294,11 @@ def review_feedback(record: dict) -> str:
     status = record["status"]
     if status != "reviewed":
         prefix = f"【报告审稿】状态 {status}，未完成完整审稿，不能声称审稿通过。"
+        support = record.get('support_review', {})
+        if support.get('status') == 'incomplete':
+            prefix += (f"\n逐项依据核对未完成：缺少关联索引{support['missing_claim_indices']}，"
+                       f"证据包另省略{support['omitted_items']}项；未核对不等于支持。"
+                       "保留未完成状态，不为补齐审稿扩大预算或改写已正确的正文。")
         if record["issues"]:
             prefix += (f"\n当前报告 SHA-256：{record['report_sha256']}；优先 write_report(mode='patch') 局部修订，修订后须重新审稿。"
                        "\n已发现问题仍需修正：\n") + "\n".join(

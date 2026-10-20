@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "cohort": "claim-support-smoke-20261020",
+  "policy": {
+    "normal_min_rate": 0.9,
+    "fault_min_rate": 1.0,
+    "rounds": 1,
+    "max_steps": 15,
+    "per_case_budget": 80000,
+    "total_budget_per_round": 320000,
+    "review_max_calls": 2,
+    "acceptance": "四个新任务仅作单轮功能试跑，助手按预定rubric核对，不是独立人工或阶段12三轮验收。全部原始失败保留；不以此宣称质量或成本优于旧版。"
+  },
+  "cases": [
+    {
+      "id": "s_chain",
+      "split": "holdout",
+      "title": "档案分组与可推出的资格",
+      "prompt": "不联网、不补日期。仅依据虚构规则：所有归入蓝册的档案均已签收；所有已签收档案均可进入整理队列。档案辰已归入蓝册。档案巳可进入整理队列，但没有给出它属于哪一册或是否签收。分别说明对辰、巳能推出什么、不能推出什么，别补造前提。保存report.md，含摘要、方法与范围、正文、结论、局限性、参考资料，全文最多500字；用claims关联关键判断，已有前提足够时无需额外假设。",
+      "rubric": [
+        "辰可推出已签收以及可进入整理队列，使用两条规则即可，不需另假设所有可整理档案均签收",
+        "巳只给定可进入整理队列，不能逆推已签收或归入蓝册，也不能断言未签收或不在蓝册",
+        "正文和关联中的reasoning/assumptions/premises须口径一致；给定规则应用具体对象属于推导，不冒充资料直接陈述个案"
+      ],
+      "network_forbidden": true,
+      "no_calendar_date": true,
+      "require_evidence": true
+    },
+    {
+      "id": "s_versions",
+      "split": "holdout",
+      "title": "产品手册与部署配置的主体",
+      "prompt": "不联网、不补日期。虚构材料：手册修订R写“首次安装时默认开启审计”；部署记录写“乙实例管理员已关闭审计”；手册修订S仅写“支持管理员配置审计开关”，没有写默认值。请分别描述R的默认行为、乙实例的配置状态和S的已知能力。说明这些材料是否相互矛盾、能否确认乙使用哪个修订，不要补版本归属。保存report.md，含摘要、方法与范围、正文、结论、局限性、参考资料，全文最多500字；用claims把不同判断分开关联真实依据。",
+      "rubric": [
+        "R描述首次安装默认开启，乙实例被管理员关闭属于具体配置，二者不是同一命题的直接矛盾",
+        "S支持配置开关不说明默认开启或关闭，不能借R默认值补S默认值",
+        "乙使用的手册/软件修订未给出，不能把实例状态当R或S所有部署的行为；关联区分资料主体和推断"
+      ],
+      "network_forbidden": true,
+      "no_calendar_date": true,
+      "require_evidence": true
+    },
+    {
+      "id": "s_observation",
+      "split": "holdout",
+      "title": "检索窗口与请求归属",
+      "prompt": "不联网、不补日期。虚构排查记录：日志检索只覆盖本次提供的窗口，检索条件为标记T，返回零条；没有提供其他标记、其他窗口或日志完整性证明。员工说“我提交了请求，但不知道系统用了什么标记”。请区分员工陈述、实际检索结果与尚不能确定的系统事件。不能据零条断言员工没提交或请求已成功处理，也不替员工选择标记。保存report.md，含摘要、方法与范围、正文、结论、局限性、参考资料，全文最多500字；用claims关联关键判断。",
+      "rubric": [
+        "零条仅是指定窗口和T条件下的检索结果，不是所有请求或所有窗口零事件",
+        "员工自述提交不等于系统收到/处理，标记和日志完整性未知不能自动补为T或完整",
+        "不得把用户提供的虚构检索记录写成本agent已执行查询的observed工具事实；推断或未知明确其依据与缺口"
+      ],
+      "network_forbidden": true,
+      "no_calendar_date": true,
+      "require_evidence": true
+    },
+    {
+      "id": "s_totals",
+      "split": "holdout",
+      "title": "部门输入、总量计算与文件读取",
+      "prompt": "不联网。虚构台账：青组接收17件、已核对11件；白组接收23件、已核对19件，两组没有重叠，未核对=接收减已核对。用run_python计算总接收、总已核对、总未核对，保存totals.json，严格三个键received、checked、unchecked，值均为JSON整数。实际读取文件核对字段和值。报告分别说明题给输入、推导总量和本地文件内容，不能由“已核对”推成“审核合格”或现实库存证明。保存report.md，含摘要、方法与范围、正文、结论、局限性、参考资料，全文最多500字；用claims分开关联资料、成功计算和文件读取。",
+      "rubric": [
+        "总接收40、总已核对30、总未核对10，实际JSON恰含三键且为整数",
+        "题设输入、汇总计算与本次文件读取是不同依据类型，direct不混入原材料未直接给出的总量",
+        "核对状态不等于审核合格或现实库存确认，不要求额外统计分析"
+      ],
+      "network_forbidden": true,
+      "require_evidence": true,
+      "required_tools": ["run_python", "read_evidence"],
+      "expected_json": {"totals.json": {"received": 40, "checked": 30, "unchecked": 10}}
+    }
+  ]
+}

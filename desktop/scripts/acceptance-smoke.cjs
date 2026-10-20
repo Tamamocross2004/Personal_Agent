@@ -289,6 +289,28 @@ async function verifyCrashCleanup() {
       .locator(".claim")
       .getByText("业务状态未知。", { exact: true })
       .waitFor();
+    assert.equal(detail.review.support_review.status, "complete");
+    assert.equal(detail.review.support_review.checks.length, 2);
+    await page
+      .locator(".claim")
+      .getByText("推导说明", { exact: true })
+      .waitFor();
+    await page
+      .locator(".claim")
+      .getByText("资料前提", { exact: true })
+      .waitFor();
+    await page
+      .locator(".claim")
+      .getByText("未知前提", { exact: true })
+      .waitFor();
+    await page
+      .locator(".claim")
+      .getByText("模型依据核对 · 支持", { exact: true })
+      .first()
+      .waitFor();
+    await page.screenshot({
+      path: path.join(evidence, `${evidencePrefix}-claim-support.png`),
+    });
     await page
       .locator(".claim")
       .getByRole("button", { name: "execution-1" })
@@ -299,6 +321,10 @@ async function verifyCrashCleanup() {
       .waitFor();
     await page.keyboard.press("Escape");
     await quality("reviewed");
+    await page
+      .locator(".inspector-body")
+      .getByText("已完成（模型意见）", { exact: true })
+      .waitFor();
     await page
       .locator(".tabs")
       .getByRole("button", { name: "用量", exact: true })
