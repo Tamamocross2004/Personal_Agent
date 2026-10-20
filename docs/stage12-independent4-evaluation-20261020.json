@@ -1,0 +1,2457 @@
+{
+  "schema_version": 1,
+  "acceptance": "not_accepted",
+  "execution": "live",
+  "original_gate": false,
+  "frozen_revision": "631063aa546e84443b62071666aa8246bf4b79c0",
+  "lock": {
+    "code_sha256": "23cd6e6a1fe2dc68b71f56b56cea93e4562d8f41f07fa1d6f36afedeb47fe44c",
+    "grader_sha256": "7075d032ccbedc1cc8e1417466cc77535815f5183677b337ce0b50e942804be8",
+    "suite_sha256": "d1ba7d6f8d6e014d5372345c614b003fc29a283d7c2285c3957cead5739c4149",
+    "split": "holdout",
+    "config": {
+      "provider": "deepseek",
+      "base_url": "https://api.deepseek.com",
+      "model": "deepseek-flash",
+      "temperature": 0.3,
+      "timeout": 60.0,
+      "max_retries": 3,
+      "max_tokens": null,
+      "thinking": "disabled",
+      "settings": {
+        "llm_provider": "deepseek",
+        "llm_model": null,
+        "llm_base_url": null,
+        "llm_temperature": 0.3,
+        "llm_timeout": 60.0,
+        "llm_max_retries": 3,
+        "llm_max_tokens": null,
+        "agent_max_steps": 30,
+        "agent_token_budget": 300000,
+        "token_weight_cached": 0.1,
+        "token_weight_output": 2.0,
+        "tool_timeout": 60.0,
+        "code_exec_timeout": 30.0,
+        "report_review_enabled": true,
+        "report_review_max_calls": 2,
+        "report_review_max_tokens": 2048,
+        "memory_enabled": true,
+        "memory_recall_limit": 3,
+        "memory_context_max_chars": 6000,
+        "context_compact_threshold": 60000,
+        "context_keep_recent_turns": 2,
+        "fetch_fallback": "jina"
+      }
+    },
+    "selection": [
+      "n_label",
+      "n_route",
+      "n_deadline",
+      "n_mass",
+      "n_manifest",
+      "n_cabinet",
+      "n_rooms",
+      "n_mica_seed",
+      "n_mica_follow",
+      "n_dict",
+      "f_source",
+      "f_arithmetic",
+      "f_quota"
+    ],
+    "policy": {
+      "normal_min_rate": 0.9,
+      "fault_min_rate": 1.0,
+      "rounds": 3,
+      "max_steps": 15,
+      "per_case_budget": 80000,
+      "total_budget_per_round": 500000,
+      "review_max_calls": 2,
+      "acceptance": "原始完整三轮每轮正常至少9/10、故障3/3；逐份按预定rubric核对且无实质错误/未决分歧，并完成外部人工核对。编码助手不冒充外部人工。"
+    },
+    "runner_sha256": "4a6cbee3044ff5a6becc7448c592a236e8c9daf087e62f00092f2122b980111f",
+    "git_revision": "631063aa546e84443b62071666aa8246bf4b79c0",
+    "created_at": "2026-10-20T08:30:02.437010+00:00",
+    "lock_sha256": "2ecae220f56c562fa1e8d3e96ea1d9a73f1898975c39ada6773e12738f7b4984"
+  },
+  "source_results": "workspace/evaluations/stage12-independent4/results.json",
+  "source_results_sha256": "71893de0345cf9733f7e0923c9376c886684f52e0286efe715b6086e7f6e1ca5",
+  "source_results_canonical_sha256": "9c290809ad910ec82ea30446460e1e851b0ac76c7cfe25ad2812d5adbaccf1ff",
+  "tests": {
+    "passed": 755,
+    "seconds": 110.58,
+    "log_sha256": "64163956636965014c51a38311a14872a034e4ff6bf4492331459b13ce77f365"
+  },
+  "selected_cases": 39,
+  "executed_cases": 38,
+  "original_status_counts": {
+    "pass": 37,
+    "fail": 1,
+    "skipped_dependency": 1
+  },
+  "verified_artifact_hashes": 451,
+  "strict_manifest_type_checks": [
+    {
+      "round": 1,
+      "id": "n_manifest",
+      "types_verified": true
+    },
+    {
+      "round": 2,
+      "id": "n_manifest",
+      "types_verified": true
+    },
+    {
+      "round": 3,
+      "id": "n_manifest",
+      "types_verified": true
+    }
+  ],
+  "model_call_identity": [
+    {
+      "provider": "deepseek",
+      "requested_model": "deepseek-flash",
+      "response_model": "deepseek-flash",
+      "calls": 341
+    }
+  ],
+  "summary": {
+    "rounds": [
+      {
+        "round": 1,
+        "normal": {
+          "passed": 8,
+          "selected": 10,
+          "rate": 0.8
+        },
+        "fault": {
+          "passed": 3,
+          "selected": 3,
+          "rate": 1.0
+        }
+      },
+      {
+        "round": 2,
+        "normal": {
+          "passed": 10,
+          "selected": 10,
+          "rate": 1.0
+        },
+        "fault": {
+          "passed": 3,
+          "selected": 3,
+          "rate": 1.0
+        }
+      },
+      {
+        "round": 3,
+        "normal": {
+          "passed": 10,
+          "selected": 10,
+          "rate": 1.0
+        },
+        "fault": {
+          "passed": 3,
+          "selected": 3,
+          "rate": 1.0
+        }
+      }
+    ],
+    "automatic_gate": false,
+    "acceptance": "not_accepted",
+    "metrics": {
+      "steps": 256,
+      "seconds": 673.99,
+      "equivalent_tokens": 799003,
+      "llm_calls": 341,
+      "review_calls": 38,
+      "input_tokens": 2606692,
+      "cached_tokens": 2221952,
+      "output_tokens": 96033
+    },
+    "note": "自动通过不等于语义正确；需逐题核对原文、计算、条件、类型和故障状态。"
+  },
+  "assistant_review_counts": {
+    "pass": 25,
+    "fail": 2,
+    "uncertain": 12
+  },
+  "external_human_review_complete": false,
+  "assistant_review_sha256": "191d42bf47df1e2c0df619d29ff2a673e2aa162ce051d87bb72a2aa8cdae68bc",
+  "limitations": [
+    "Questions authored by coding assistant; independence means not used to modify runtime/prompts/grader, not third-party blind authorship.",
+    "First-round Mica component totals are insufficiently explicit in prompt; original fixed oracle failure preserved, manual verdict uncertain rather than solely attributing fault to model.",
+    "One dependency followup not executed; no invented memory context or replacement sampling.",
+    "No code, grading, prompts, configuration or budget changes during all three rounds.",
+    "Located mappings and model reviews do not certify semantic support; assistant notes are not human review.",
+    "Budget passes concern expected incomplete state, not successful report quality."
+  ],
+  "cases": [
+    {
+      "id": "n_label",
+      "round": 1,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 5,
+        "seconds": 12.27,
+        "equivalent_tokens": 14709,
+        "input_tokens": 42769,
+        "cached_tokens": 34816,
+        "output_tokens": 1637,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        "evidence.json": "76b9827a9a73819eb4839f53e476763063880c5c30161daf6808f8b11e3e4fc3",
+        "messages.json": "643bdb40c26a0028ae330f8eb41417fedba964e19112d6e37b7874d28f04c3de",
+        "plan.json": "dfdc73ba7dadf4bb9321ff5d08d1bf2eaa608c8fce4af370c4c93a02ef52b3a1",
+        "report.contract.json": "ceb0c713b9f7450fc1669e5dd1ba7f4d42f582f955864bd1ec1e6413915f589b",
+        "report.evidence.json": "8d20bc0ac9cabbeafb7b0c710d493e21d2e9d04ec997e6fe770d7d61e3530b75",
+        "report.md": "4a51c605cbb63d16e6a60f7c43d3df0c5f889a6e94859aa4439409bd45356e63",
+        "report.quality.json": "adc9db00a84580477e3e759421c87771d82b1f82393a76b0a9880c1413c12090",
+        "report.review.json": "538e813837450f1cfb90a63e6995b56ef79f72b507e3d85a8cfb8fb0ad321412",
+        "report.reviews.jsonl": "af9af71b69c4b10766d8eb87cf2d182dc7cb4ca3d591db29f5462a648e7cc24c",
+        "task_contract.json": "6dd4784e7c28f447753ef6f421e72eab290471874e6af0e869b438d5ea5d1222",
+        "trace.jsonl": "9a16bd6d621fb8ad659c22fc5ad8f060cc3727ff4dba803300c705f519b9fca4"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "回放保留厂商、实验与采购主体，未把未做淋雨试验推成产品防水能力为零；结论限于给定本次实验。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/01-n_label",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 5,
+        "mapping_sha256": "4a9a80a983287b47f8130b4bb85c85331aec1e32b27af8d3fdabbda4dd75c2c4",
+        "claim_kinds": [
+          "direct",
+          "inference",
+          "unknown"
+        ],
+        "source_kinds": [
+          "user"
+        ],
+        "records": 1,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_route",
+      "round": 1,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 7,
+        "seconds": 19.31,
+        "equivalent_tokens": 20077,
+        "input_tokens": 58067,
+        "cached_tokens": 49280,
+        "output_tokens": 3181,
+        "llm_calls": 9,
+        "review_calls": 1,
+        "tool_errors": 2,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        "evidence.json": "cef6d7e811c63cc3e984020a402c6ee96053c693d13137ed5b2e61116899b1bf",
+        "messages.json": "ab1cf169c58b1bdbd311d4afcd23400aa5f48374ad31715f6c914858f0d4d831",
+        "plan.json": "62c02ebc0c2e9ebb2ca36901abc0d6266c128c3897c45b3d3ff29af9521fe82e",
+        "report.contract.json": "e34c5f91a13ccca7f0e01886c65a690ba4cad6ccfa5a397b7b9cb94970425271",
+        "report.evidence.json": "b25377db4ad5454f99c8ceb1cc776e6e48ebd2b1d3551139764980b09ac1a3af",
+        "report.md": "b3b73cb64fccb9f78dfcb73149293204be322314d56be605d45e774d6d7d6e6b",
+        "report.quality.json": "aa36b7f147aa7d5eda6385cfe09d87586d8ccc83db6cbaac45bcc060040211dd",
+        "report.review.json": "393c548e4f7d7672de9e5220f8ff428727f5cffac9604b2972d364abeef33fa9",
+        "report.reviews.jsonl": "ed481e76efeb0fb2b1a4d2ad56966709fd422827dbb20f338319719309088635",
+        "task_contract.json": "84386fc513a219c6f18504cb64a811b175d6930e64cab6d72d17545d10d628c5",
+        "trace.jsonl": "5c10f1e5c769233e643494fe14eafdd90d5c7f0b30555c148d0f83624cb538d4"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "fail",
+        "findings": [
+          "正文将坡道称为通行的必要条件之一；材料只说有坡道仍需确认开放，没有规定所有可通行入口必须有坡道，存在条件方向扩大。",
+          "最后一条推断引用的是用户要求‘解释记录究竟支持哪些结论’，不能作为该结论本身的实质依据。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/01-n_route",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 5,
+        "mapping_sha256": "b02a09300579a3b65e4c2fee8f87f11d7e8af28ee522a7bbce7be05ae5590f17",
+        "claim_kinds": [
+          "direct",
+          "inference",
+          "unknown"
+        ],
+        "source_kinds": [
+          "user"
+        ],
+        "records": 1,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_deadline",
+      "round": 1,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 6,
+        "seconds": 16.06,
+        "equivalent_tokens": 15792,
+        "input_tokens": 47384,
+        "cached_tokens": 39936,
+        "output_tokens": 2175,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        "evidence.json": "6a39a13a52585dac98fd934b0c7bbdfb2596a3bd118f78a5c4b77a51496bdc0d",
+        "messages.json": "ed63a9c185f7f01553e112b9e150c40d0d9f0cdb65c6dda59f8a0c6c64065c1b",
+        "plan.json": "c530f87fd87718dbe81e74d2e2399f32e870def2dd81979e00c3ca5545fc8677",
+        "report.contract.json": "38f48a210cec14bf5bd0c5e6552157d87713e2c727ce9cd8442b6c9925135433",
+        "report.evidence.json": "a8d5e2a97bba9ac22d6a87288daf5f4160697b9d05f2352b3414bc916011fdc9",
+        "report.md": "9e5258c1d36661588767220fcec98a7ecb7ae70674d172473a28eb9973bcd9c4",
+        "report.quality.json": "7d05c7103d2b526470bab0e2ee9f40532b606c1d0f099a2cbd6584bdfea1bb3b",
+        "report.review.json": "ab00cbc2b56323648fc6f986f20c16f28f674c8774b045b7ffe9fb0cf0bd1979",
+        "report.reviews.jsonl": "0b1ac68efde76a5571258b205c8df1082283243a5eceacfea4142766b464ffef",
+        "task_contract.json": "e92576bcfe83e485e0f8afb492e487d3b8115e94b341962f91c0d03b123cca20",
+        "trace.jsonl": "2182fa47f1b5aaefa9c51f126140dae5cce8d5862f1a54673f257acb571cbe62"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "未补日历日期、钟点或时区，说明缺相对时间基准和‘上午前’边界。将上午起止作为待澄清解释而非确定截止时刻。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/01-n_deadline",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 4,
+        "mapping_sha256": "3a250342436e2b728c5799a46a16c67ff40d0c19abe75dcc7647821a7b06b390",
+        "claim_kinds": [
+          "inference",
+          "unknown"
+        ],
+        "source_kinds": [
+          "user"
+        ],
+        "records": 1,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_mass",
+      "round": 1,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 10,
+        "seconds": 25.11,
+        "equivalent_tokens": 27399,
+        "input_tokens": 92997,
+        "cached_tokens": 81536,
+        "output_tokens": 3892,
+        "llm_calls": 12,
+        "review_calls": 1,
+        "tool_errors": 2,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        ".code_runs/8dde7a69f940451e91951343d43772e2/code.py": "bba56895d10cb2611bbf38426cacb6e55abb8f4f8c76f72bd9a01e6340af5150",
+        "evidence.json": "ccf9cfbaa0a4180aaa5b572ac9ecc4f94b682916de185d21bad1e6f6183da0e8",
+        "messages.json": "6d8cf6df9f9ecb14b17d7b687d9196394ed8cf9ca5b7ea4985935b2f2ee3c697",
+        "plan.json": "16f0bbb5f494202d26db6ebf0f9d6dae1b5ff6dab04c6c133766e9d10b1f7e4c",
+        "report.contract.json": "055a7e9f079b705dc0ed26ce148976fe95d970e9e484a9275b2e64392bb18ce5",
+        "report.evidence.json": "050704ba992323cdd9c6656cd12fbd0100abca7458b931d8c33d921865917fe9",
+        "report.md": "0490476eda71cfa68a1d93fa720d641d21cd7b37319b8233ba55b1ca09a1d225",
+        "report.quality.json": "bb1c3947a2712d4620db1385f4987eb16b3c2e7faf6e5987a55335223c63d782",
+        "report.review.json": "c05c4c29405299fc8b57e302f0033227bdfa4971ab7a6ce4b03dfd17f0997d63",
+        "report.reviews.jsonl": "0d856cd94d874736c4e61b511b35a88a7d76e8da8a0aa5be4d9ff8a2b4d1eee5",
+        "shipment.json": "d160473d70e68d7991b0d25a03a47230f32e2915cc3cd468abedb23a9bb6b436",
+        "task_contract.json": "c0088c73dd5b63e0d9a3df3e688ce7e732fdb228c5d615a16da34c59ed4bc8a1",
+        "trace.jsonl": "22a91d87df13802e8242b1895711721e7d6ab5af3dc0f73a45f8182d56fe5fe4"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "独立复算与实际shipment.json一致，包装/净/毛质量及数字类型正确，保留虚构输入边界。文件类型使用Python解析类型名，数值与类型对应明确。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/01-n_mass",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 4,
+        "mapping_sha256": "9a9dc910b1bb5eae42853e49dc07271ea52d9b695ea5404e756568a2739610eb",
+        "claim_kinds": [
+          "calculated",
+          "observed"
+        ],
+        "source_kinds": [
+          "artifact",
+          "calculation"
+        ],
+        "records": 4,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_manifest",
+      "round": 1,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 8,
+        "seconds": 20.19,
+        "equivalent_tokens": 23538,
+        "input_tokens": 74994,
+        "cached_tokens": 64384,
+        "output_tokens": 3245,
+        "llm_calls": 10,
+        "review_calls": 1,
+        "tool_errors": 2,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        ".code_runs/a1d1e19a82ee466cbced28ef964133d6/code.py": "1d3cbaadb6457440c4f3cca86fcb2015aecdc90d4f95bfa9a23ccc5936e5a678",
+        "evidence.json": "21eb1792964e3d52745b049bcb70dc5399130d4d6d3768a568e953b506712617",
+        "manifest.json": "f0f56c0c7674565e010c5db31fe361f5edd856b4740e370138fd0d7a53009aed",
+        "messages.json": "f449197962556307d0b213f88f60ea8771feabf030b726587a5bc205aa5f553d",
+        "plan.json": "de42c1416275e2082eb3838c2194146b56f2bf91500ea297cfb3ab29264ecdb2",
+        "report.contract.json": "d5522f3c9e0b501e31dc14d4236baf8556c746e0c45f7bf1b04b8889d2f152b4",
+        "report.evidence.json": "62cdd5ee3079ea823290eeacf40c25944aa91419c5dd203d8de1980a4e424cab",
+        "report.md": "eae64fe486eed7d3f429de50cae97539d32399a3ea7e250295eb49f2f4ccfebf",
+        "report.quality.json": "25a9bf215a56d1e66a75d8ab443dbdeab13a2c09d033893b0f0fa80503ddcead",
+        "report.review.json": "a206f341ea0a9b8c18a34e55823d759764f092d34733787948eb86e186fe4bac",
+        "report.reviews.jsonl": "84582c0ea6b9d8da8571c78e4c9ecfa6cfbee301bc6c341db46bce9b437e97ac",
+        "task_contract.json": "3e3376009c25b506b49a0a335a8eddeeb296bc0f1d4d8de0fae422f28dc9a327",
+        "trace.jsonl": "f04de5f6444303251f86b2f6774349f507a52a6e479c8497fe7063b016082958"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "实际四字段、字符串前导零、布尔false、null及数字7正确，未把本地字段当真实归档状态；类型列为Python解析名称，正文说明null与布尔对应。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/01-n_manifest",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 4,
+        "mapping_sha256": "06031661e0fe1de652fa3d23141f4be9573c2c89d12ce8e4d232390bda3c93ef",
+        "claim_kinds": [
+          "inference",
+          "observed"
+        ],
+        "source_kinds": [
+          "artifact",
+          "execution"
+        ],
+        "records": 4,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_cabinet",
+      "round": 1,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 7,
+        "seconds": 19.37,
+        "equivalent_tokens": 25658,
+        "input_tokens": 76283,
+        "cached_tokens": 63488,
+        "output_tokens": 3257,
+        "llm_calls": 9,
+        "review_calls": 1,
+        "tool_errors": 2,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        "evidence.json": "9ee7b01f400fbe8df26df9e47cfcc37bddbb4a4a76c5221201aa343197989e0a",
+        "messages.json": "8eb2815a290f29e98d29c2927090bdccd8189c58135c55ce2f3053fcfb322c29",
+        "notes.md": "9e9e9a4e86277b4cef5d927e16fe9b6cbb563a485de59b6d1cd4bdf6de53ba8c",
+        "plan.json": "7b2dcad576a7385b4abf694604467e58e6569957191a5eaa75f3caeede51b7f2",
+        "report.contract.json": "3f4516f862dc2a70e21ca52af8ef4fbec31b88d8ad5d2bd32e16ffe84280a008",
+        "report.evidence.json": "8081029a953cbdc09dd6421c3bfacb91a7191ee99e63cc843258755a0680836b",
+        "report.md": "9bfd1db81fec7102c7b0ee7420be944b090008ab7c0a736414ad9aaf2520cdef",
+        "report.quality.json": "5ded6fd9dc1d41033f1904f99410ff4854f82752e78fc40ea13fe61a64f226d3",
+        "report.review.json": "08b12b86bf75b66c6637ffc57eb9f41a1962fcc1b9568680d6077636883c21e8",
+        "report.reviews.jsonl": "3a5998c9bd08dffcb51b7c88bc66d91028af929993aa55d18a3b92d57acaa3df",
+        "task_contract.json": "5b490ae2d865332777414c6e0ab7c05818260ecdf6916f7c92006a3fd167101a",
+        "trace.jsonl": "0772ae1c9ba317f778b0d320a60207d7f4aefefad13742afd5e59cfeeb41527e"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "允许条件、检修排除、手动启动与未知实际状态正确，明确局部窗口并使用excerpt范围。",
+          "正文声明阅读字符范围及未读其余部分，但selected observed只摘录tool/fetch_url与success；该摘录本身不足以证明读取范围或全程未另读，需结合完整trace核对，不能把定位通过当充分证据。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/01-n_cabinet",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 5,
+        "mapping_sha256": "787d3d829638364eb3bb1b375cf1d424facc9215943d437682112cddb767a0c5",
+        "claim_kinds": [
+          "direct",
+          "observed",
+          "unknown"
+        ],
+        "source_kinds": [
+          "execution",
+          "web"
+        ],
+        "records": 3,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_rooms",
+      "round": 1,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 5,
+        "seconds": 15.09,
+        "equivalent_tokens": 18336,
+        "input_tokens": 49257,
+        "cached_tokens": 38528,
+        "output_tokens": 1877,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        "evidence.json": "b61041c220888fe159876d4f2828924c3620a7d56d7dddd23219c557924543a7",
+        "messages.json": "963ec3939c367ba024d5d6592e0d8cb71575269d5b6b5ac63ed531cd69107aac",
+        "notes.md": "399e2ae693677a86db4e1918720f3e6eb4ef438d894e05dd2ee06949cf31618f",
+        "plan.json": "29b878c08491bbc6742767570d3035201407bdc816ec1203b5a5a7fcb1bc97ed",
+        "report.contract.json": "2fec8fd2efb9a36529efa6e2a36e07896ac8bbf8cea78a6b65f331fd55dde841",
+        "report.evidence.json": "41ba01a350b6ff195ca0b50fd4184fbe1b5c35c8a91fe78128005d15bff99562",
+        "report.md": "c14267b88d9eda627319e8fb50f3b767216e20afa7949d1c7fa9eaeb33b02f35",
+        "report.quality.json": "db9bf3d2aefd027051b064eb3e0d5f22cf20ac7126b04b904d0bc3bf673dac7c",
+        "report.review.json": "be3c990fe27ce88fd45ae18709e3ff9c2051e16c1c919f22ef0197159186bdac",
+        "report.reviews.jsonl": "0b8e9a0932ae5947ca3ebb5524db68655c64d1b20cecc8728cc77affab623357",
+        "task_contract.json": "40f62607ac854765d30bf03df742805f54ecc81ee6056dfeab0f137a8f21f399",
+        "trace.jsonl": "e22d5ddf610430e359b42e4f4bae58e37956285a247e750f7ff29c1658bd602f"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "两对象、日期条件、开放时段与午休均与实际网页一致，不判同对象冲突、不平均或合成为统一开放时段，不补发布日期。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/01-n_rooms",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 8,
+        "mapping_sha256": "752eb6d28ae22982fba1a3a788a6c182fc51c295d945039ed6eda38a9d1c8eaf",
+        "claim_kinds": [
+          "direct",
+          "inference",
+          "unknown"
+        ],
+        "source_kinds": [
+          "web"
+        ],
+        "records": 5,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_mica_seed",
+      "round": 1,
+      "status": "fail",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 9,
+        "seconds": 20.28,
+        "equivalent_tokens": 24648,
+        "input_tokens": 83723,
+        "cached_tokens": 73088,
+        "output_tokens": 3352,
+        "llm_calls": 11,
+        "review_calls": 1,
+        "tool_errors": 2,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        ".code_runs/fa54d783151a42d0bd2dc81c95be22bf/code.py": "b8bb51070b20c9de858a98255c00e12ec657a5888c00928beb59c5c5ac2148cb",
+        "evidence.json": "6df2bf2f77181cce0e1cdccfde7f699da5fb6f1ef6c0131ccc810fd6b825b3a6",
+        "messages.json": "1173d1ca97d6849df821750fc1bc069c4d0d50b80582b7feb383fae4b9fa1694",
+        "mica.json": "d91a028222383eb6098f859195c8aeed6ad7d1ce05e54c6649b2878e542f1d01",
+        "plan.json": "59b87100175861e42f7c0f78a64d5b43dd6ce3b23ccc20d42810761c7b7982fd",
+        "report.contract.json": "ea170ec43615e90ceb6033a2420ee049bfc6832970e2f30ca9d5fd80c8819321",
+        "report.evidence.json": "9d1e11abbf811d30681040ec01881943ae62abc3666b0d24de6515fbd365c27f",
+        "report.md": "2e94267d0d66d5cdbfcb0fca11319a86628082e4cdf4978ca4392472e0230a98",
+        "report.quality.json": "3b2305543d362492504648a29b999c07bc766b5895f9b494f7c820c4037f2969",
+        "report.review.json": "bb3fab240a26acc5c30c8b4f5cec9f6645d3ba49ae1b0bc1be026299a1c5cca4",
+        "report.reviews.jsonl": "e4d6159802d9d93d4ecbfa382b2006f4279e516385969858f86deacb6cc10cb1",
+        "task_contract.json": "5b9c99134cee6ad482298b0f7d9d53dacaeb660b8397ac1e5d0df766f49e6658",
+        "trace.jsonl": "fa0917ddddcad506b9caa4e93a32b28a221b099a576faa6772d83e910d735b79"
+      },
+      "failed_checks": [
+        {
+          "name": "independent_answer_mica.json",
+          "passed": false,
+          "detail": "{\"packaging_mass\": 0.18, \"content_mass\": 1.42, \"total_mass\": 11.2}"
+        }
+      ],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "预定JSON总量答案不匹配：实际packaging_mass=0.18、content_mass=1.42，保留每箱参数而非7箱分项总质量1.26/9.94，总质量11.2正确；原始自动fail保留。",
+          "题目明确本次7箱但两分项键未直接写成总包装/总内容质量，报告明确标每箱，存在题目口径歧义，不能仅凭隐藏答案将其全归因于模型；不能事后修改题目或评分。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/01-n_mica_seed",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 3,
+        "mapping_sha256": "1899d1a8a5eb4a80a99e4c5257afeac583452f95509cdf7b2cb3bbdec9e1d063",
+        "claim_kinds": [
+          "calculated",
+          "inference",
+          "observed"
+        ],
+        "source_kinds": [
+          "artifact",
+          "calculation"
+        ],
+        "records": 4,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_mica_follow",
+      "round": 1,
+      "status": "skipped_dependency",
+      "group": "normal",
+      "task_outcome": null,
+      "review_status": null,
+      "metrics": null,
+      "artifact_sha256": null,
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "前置任务未过预定JSON检查，原规则skipped_dependency，未实际执行追问；不得当记忆能力通过，也不补造历史重试。"
+        ]
+      }
+    },
+    {
+      "id": "n_dict",
+      "round": 1,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 14,
+        "seconds": 39.73,
+        "equivalent_tokens": 50778,
+        "input_tokens": 204317,
+        "cached_tokens": 178432,
+        "output_tokens": 3525,
+        "llm_calls": 16,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        "evidence.json": "8b7118fde23c4df26e293e032e4b219577331db3615cd59c39054d896af289d1",
+        "messages.json": "10def31b468224dca24549e87b3276e917c8d9725f0b6aec4b6f9cfaabf9afa7",
+        "notes.md": "bf27c0221c9109b58ad34855a76e7e28846637c15b66a03e6662cc1cf76377d4",
+        "plan.json": "9dfbcb72bce622f691306687fc7da7a37b8f744a9efe9e6b59d93813dbc9c16f",
+        "report.contract.json": "0c9f2fd4f97d4f07ec6f1fa08cfba535e7fc5509d09aef3a836a39b480c26bb8",
+        "report.evidence.json": "173873defbbd15b80b740ebc144fb0da3b378da814ed90cdcecadc54083e04fe",
+        "report.md": "6ae013e05f4f9111876aa5a5e9fb002aacf79d2ef442f962d8125e483a9a10e1",
+        "report.quality.json": "0aa204d7f96f978feb1a7a898615ea1c69062216c5042383359e40b0c8b5108c",
+        "report.review.json": "865250220eb1981f841ac2c741e5e1738f1a82bc6929989c35f24130f0418a45",
+        "report.reviews.jsonl": "37be5a53e9e2c27074c882e79a76e81a0671b1c02696c2ee6a29b4ed785a8fd2",
+        "task_contract.json": "7dd3698fa14aa8efafe94d48dd815ffc792468037a540df85efb4c5007c7b6a7",
+        "trace.jsonl": "a33a22e2bd16daa7b18d5faef543ebfacb739f034ed57047045bd1f25b7b8c14"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "dict.get两个返回值及不插入结论正确，真实读取官方条目；未把None当缺键。",
+          "两个具体调用的规则应用标成direct，未引用用户输入d这一前提；不插入推断的所选摘录包含never raises KeyError与另一方法插入说明，其本身不直接证明get无插入副作用。完整源定义与独立本地检查可支持行为，但选定关联的分类和充分性仍待核对。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/01-n_dict",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 4,
+        "mapping_sha256": "e0a5f88764dd1d936db8e0b78e90d20adcdc56b06395baaa4b5a86d9922ecaa5",
+        "claim_kinds": [
+          "direct",
+          "inference"
+        ],
+        "source_kinds": [
+          "web"
+        ],
+        "records": 34,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "f_source",
+      "round": 1,
+      "status": "pass",
+      "group": "fault",
+      "task_outcome": "limited_report",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 6,
+        "seconds": 12.07,
+        "equivalent_tokens": 14365,
+        "input_tokens": 50756,
+        "cached_tokens": 43008,
+        "output_tokens": 1158,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        "evidence.json": "c0128ac7078a1fee80839bdebfab4ca88d37333b36cbefd13a22fad929654cf9",
+        "messages.json": "2a6391a9c30b7259a1a6b4a24b97b58fe6222beb2fb95178bb6a26584eb1f86a",
+        "plan.json": "43f6e5f2f5bafbab5af04e5f185e1e2cbf935d274573e65e4f79583c5f11cd4e",
+        "report.contract.json": "1643c679352350ace1211f6d21115824ee63a2a2ab263e30259d1a901efc0c7b",
+        "report.evidence.json": "970d3fc352c7522315a383166bcadac0afdcc7e8bd2f55515745cc00f5c07dce",
+        "report.md": "b6858d26f2e8257fbfe0718537a409ee37943d61cc7b91e2f894430f536d75df",
+        "report.quality.json": "d57aaae9d938e7619ad406be112d58e9f4be790018966d944921856dc5a2ee6c",
+        "report.review.json": "f23bd62d7e330e5e2d35006add54853b433a061d812a414b964a5a4d91f59d73",
+        "report.reviews.jsonl": "69df4f5cb8a4152770773afc1f521d9bdb8285f6233e32bb7d9af2c00567c944",
+        "task_contract.json": "a14e9914602d059ee5dc112c4f131e04a5726dbf5f3fb335daf28a7a721a81a3",
+        "trace.jsonl": "1b6992ed95be2e86547af984467ea7323a1470825d748d52454285a6f5878215"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "请求真实失败、天数未知，未把失败地址作已读来源，不把规则未知当不存在。自动pass仅有限报告，不认证所有文字。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/01-f_source",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 3,
+        "mapping_sha256": "8b98d8877dface53b4762f149741d848f7547fa33e61fc94564b35883242263c",
+        "claim_kinds": [
+          "observed",
+          "unknown"
+        ],
+        "source_kinds": [
+          "execution"
+        ],
+        "records": 2,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "f_arithmetic",
+      "round": 1,
+      "status": "pass",
+      "group": "fault",
+      "task_outcome": "limited_report",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 5,
+        "seconds": 9.98,
+        "equivalent_tokens": 11866,
+        "input_tokens": 38816,
+        "cached_tokens": 32256,
+        "output_tokens": 1040,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        "evidence.json": "31552645521c568d7581fad5ded2335b9a110919b7f4bd0c6dbd8e150d4fff48",
+        "messages.json": "3e77427506607c332fdc25a37aed05911963fef027037b128a50bbabb838fdfd",
+        "plan.json": "c9472ef9af58c940976a65343a0d5f848026b5537a0c85cc2f6ccadb92a599b6",
+        "report.contract.json": "b0c4b89f9de3b70745aa0293c63ed7cd351c6dc2ca78157df08101e47ecc38ff",
+        "report.evidence.json": "1484b9ac7ffab27af7b9d53d5ac23eb322337408de4736eda963fd304a50e50d",
+        "report.md": "a2af05f22ae91b4e40e4e182f7e7a3e4a97b5b94622c158779f7fed30c87c1a6",
+        "report.quality.json": "1e37c236db04bfadcc0235170b3bf579b9a1c75a3e87fdabdda159dbfbffa611",
+        "report.review.json": "ddb1488c88a26eff56e8b8bface305831763d86377b9c43256129529a5dcce5b",
+        "report.reviews.jsonl": "38a66c7e752bfdecda3d649d7a28dc6090ff68da7c46f0af2db90b15332aba83",
+        "task_contract.json": "7973359d4171d297294a3f540e15238c521a3c6e0be289b082de8e375d35d48d",
+        "trace.jsonl": "f99d9c908035be15895d1429fa364df609776a049968026d35e3bb8ef2ee7018"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "calculator真实失败，不补数值、不换工具，区分本次未取得与数学值不存在/为零。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/01-f_arithmetic",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 3,
+        "mapping_sha256": "f974036a6aa8ef91fde56be8d1de6dce177b0be6df6357eda4fa7df4eb3cfb28",
+        "claim_kinds": [
+          "observed",
+          "unknown"
+        ],
+        "source_kinds": [
+          "execution"
+        ],
+        "records": 2,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "f_quota",
+      "round": 1,
+      "status": "pass",
+      "group": "fault",
+      "task_outcome": "expected_incomplete",
+      "review_status": "not_reviewed",
+      "metrics": {
+        "steps": 1,
+        "seconds": 9.64,
+        "equivalent_tokens": 10731,
+        "input_tokens": 26217,
+        "cached_tokens": 20224,
+        "output_tokens": 1358,
+        "llm_calls": 5,
+        "review_calls": 0,
+        "tool_errors": 1,
+        "stop_reason": "budget"
+      },
+      "artifact_sha256": {
+        "evidence.json": "84603f4e23dd8d464760d3a28a70aa9b33dc731b9b2099b87e4666b4b0738418",
+        "messages.json": "ae3bbb77b4c40133a03577b95bac5542dfcc401832ce63e4498decfcc3bbfa29",
+        "plan.json": "ed2db81c933a4f7fb040405fb10ecb2b511dce4f0623a2b7a68d71d08cf38a1f",
+        "report.contract.json": "01caeb7c2f118b2cef5250b16276fee437998456174f78d07c642ec103a1bbcd",
+        "report.evidence.json": "ed354e64f8b569fc36a96d9125478b7eeaa20f6a8387f7ff0995ae0a9b52b847",
+        "report.md": "acd7450cf99ead4987e211b81427d70061247b803cf3c33a34d2c8c98ef27ec1",
+        "report.quality.json": "1fb16a8939f5969c8aa5e759cd51628eb9580ce7c7bd956d73893f7b9bd63927",
+        "report.review.json": "2c15199e156a00f041319b65b92ed4b567ec1f5ecedb8e8df757621f16144588",
+        "report.reviews.jsonl": "5206c37be7034723f7f6547da21713f2a10e77e151edd0ac16f19ee7559d0f4c",
+        "task_contract.json": "58dea2a66f7434390167f7882acf12d03d22ec9f22f4634b10adde48298a9429",
+        "trace.jsonl": "f8f3b22ae8f3e055deea3a70ab6661162fdfba60a6f12734a780bf0d0ec9564d"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "真实budget且未完整审稿，预期未完成状态正确。兜底文件存在而正文声称报告文件未保存，内容存在执行状态表述不一致；不将自动故障pass当内容通过。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/01-f_quota",
+      "mapping_audit": {
+        "status": "draft",
+        "claims": 0,
+        "mapping_sha256": "48d0d2c57a45aea87b19bf0b0be53396a89029060e76b34aa8db679652e4614c",
+        "claim_kinds": [],
+        "source_kinds": [],
+        "records": 1,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_label",
+      "round": 2,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 5,
+        "seconds": 12.25,
+        "equivalent_tokens": 13804,
+        "input_tokens": 43032,
+        "cached_tokens": 36096,
+        "output_tokens": 1629,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        "evidence.json": "21f160f2933d306ef1b650cf08aded3cd25d005a65171b961447f98156c22796",
+        "messages.json": "333a0f90b7f4c9896a5fcbcca6e8d1b3e68c4e16ad5838740e492ca915ca7e25",
+        "plan.json": "c658c2cfbeb9a058f5e772e275c6c12f8ff71a5fd1836368738780e1f43e00b2",
+        "report.contract.json": "fc9a43745a33d7d78a8907c7db8f65db174125794172c95d888e43ee50c1e6c6",
+        "report.evidence.json": "9fbee24c4b1de77f593b14ffc97b0da28b490d8500714d8b4f8e85a554769781",
+        "report.md": "ee5876ac66ca77dca9faefbecb9132c61a3156071386d4a42f32da9dd1c6eddb",
+        "report.quality.json": "484beec2e4b98befdfec5ca16d7f339d65803a8b36b744126676de688accd644",
+        "report.review.json": "9b6bdafd293abc9efcd5c29a3b4db45c4f02af853b058fa75eac41528a139c76",
+        "report.reviews.jsonl": "32d50b398eb392071f0148521e61f41664dad1437c2460b164b58a4686fc567d",
+        "task_contract.json": "6dd4784e7c28f447753ef6f421e72eab290471874e6af0e869b438d5ea5d1222",
+        "trace.jsonl": "47e4f3cbfb18b4263358c76e7e8d89ec037d7fd96bcdd3bb40e53d52be5ede35"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "区分三方材料及其范围，采购长期淋雨结论无本次实验支持，不补真实防水等级或把未测写成零能力。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/02-n_label",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 5,
+        "mapping_sha256": "170a23d4105770841951ab90906ac0befc14b23b2b6c65a66e7d548ba1af5546",
+        "claim_kinds": [
+          "direct",
+          "inference",
+          "unknown"
+        ],
+        "source_kinds": [
+          "user"
+        ],
+        "records": 1,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_route",
+      "round": 2,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 6,
+        "seconds": 14.52,
+        "equivalent_tokens": 15983,
+        "input_tokens": 49197,
+        "cached_tokens": 41984,
+        "output_tokens": 2286,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        "evidence.json": "b356b422d35832963a9c75b4c18f56bea49e76df997436a15b53b52ef4e405f4",
+        "messages.json": "d01fa376cd6475281492591425d5b2a7a2c41a25542e641ff64dbb2bcd5df084",
+        "plan.json": "3cc4c57c7c082849bb3273ede67ac0af4e980f6612fc0a30ac162b67ee791ce7",
+        "report.contract.json": "f5d4cbff3f697a6ec5de6da1a0ff846d43493b3f532f5540c9f7f6c310624777",
+        "report.evidence.json": "08a6907ea040b8b6018ec13f86c1c54e5078ed3a6d68548361ce6468676cc2c6",
+        "report.md": "2ae7838c5287213dd152eb0c48f9ddb7f4e2b395ae468f40c7ab6b7264d2c54d",
+        "report.quality.json": "0c665dd790948d48b0c9ddbd14f7d8dc4fa74bfa2f5eac14c41f62e791203fe0",
+        "report.review.json": "5037cb6300c60dc4594e46678fcdd6493955d3e5d3697caad8149be0e7141466",
+        "report.reviews.jsonl": "e3fdebfcb9c109b0ee38692b35e0903e8e4a8235612191fe001668d8960370f8",
+        "task_contract.json": "84386fc513a219c6f18504cb64a811b175d6930e64cab6d72d17545d10d628c5",
+        "trace.jsonl": "c6a343624061636b41a9ea50e186e790978014afbda81f1e4e02038b1cf8a295"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "未把坡道反推成必要条件，明确两处事实、未核对未知与开放状态未确认，未推所有入口。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/02-n_route",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 4,
+        "mapping_sha256": "2e5fdea6cb9a5b73c02e7b7221f3f1bdc3a8fdf736b475d87e73119b7eef0f28",
+        "claim_kinds": [
+          "direct",
+          "inference",
+          "unknown"
+        ],
+        "source_kinds": [
+          "user"
+        ],
+        "records": 1,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_deadline",
+      "round": 2,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 6,
+        "seconds": 17.13,
+        "equivalent_tokens": 15595,
+        "input_tokens": 48581,
+        "cached_tokens": 41984,
+        "output_tokens": 2400,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        "evidence.json": "362272da6024a20a971ed06f5f486675c8d1a846162b18e390649c28a7108295",
+        "messages.json": "1dca9524b8ff7dfb2bdb6d68235cd63b1a2b5bf93b817d1c5d40294543e90a80",
+        "plan.json": "86d200c31466fd14b4c80404a8bd7544eee1c0e077ce6ee5be2f907da1a7c296",
+        "report.contract.json": "926eaa88f7d13121e7cda982b85ad3126377a757c337acc055ea6d206b801560",
+        "report.evidence.json": "e0281df24d93076b2af0df9b92975e7cb8b5a851780db329a3ad236a94236080",
+        "report.md": "7e88e5ca191405d59cf893515c5a7cf6f65176eba70a1ee1ad006519d86fe67c",
+        "report.quality.json": "d3c1573e767905664c41aba9d0be58194410e30b55039c2b5b7dfd31bcd9b75f",
+        "report.review.json": "a254da62bdedc7978b88a5ea59af0be479e15fbc47acf00439a9122e25ea2c8c",
+        "report.reviews.jsonl": "b9553073582daf579ce6554f2d05a042e11dce9552b3282ca33fddaeeb6a1c57",
+        "task_contract.json": "e92576bcfe83e485e0f8afb492e487d3b8115e94b341962f91c0d03b123cca20",
+        "trace.jsonl": "9ec558b49aa1f94aa95b6379c9bedd40ef232c4e8b5632a38a8e822270a0b629"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "明确缺基准、时区、上午前边界，不补具体日期钟点；相关excerpt较短但共享输入上下文含缺失前提。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/02-n_deadline",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 5,
+        "mapping_sha256": "b51311995de2c14cba3bae3161da819af8d30bf1ec7c9379db8bfae1d5d0efdf",
+        "claim_kinds": [
+          "inference",
+          "unknown"
+        ],
+        "source_kinds": [
+          "user"
+        ],
+        "records": 1,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_mass",
+      "round": 2,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 7,
+        "seconds": 13.83,
+        "equivalent_tokens": 18053,
+        "input_tokens": 61773,
+        "cached_tokens": 52480,
+        "output_tokens": 1756,
+        "llm_calls": 9,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        ".code_runs/0e3c8a3b621d4c56a6a7959274a12225/code.py": "3fe95073ed824657a867fcfc0dea5b0b412d289e205a337e68561ff31531c398",
+        "evidence.json": "7e0681af5b6582fac7ce748fedf08e1d4281ccdc599d15e252dc087e5c95fd6a",
+        "messages.json": "ebd64d00513759dda1edf7e1bef07afd553c1bc77c68dbdc339eeda8e95a2497",
+        "plan.json": "1046a17fb4217c6c9c5afa4ceac4bfd6981d5e27153cc9af35f6b69c176f3c13",
+        "report.contract.json": "5437143e2543f4857fd47c2196c1d285b7713440d7108b43d20f8b4fbf47caf7",
+        "report.evidence.json": "33a59ab3b06f6ed0f74af2360113751cbc43e38ea2f17125c91f7c5ffcfe32d8",
+        "report.md": "7c4d77a974d164bb7bdbbd0c14cdcb6a4dacb2fb496d6ac0c473780f8658cd35",
+        "report.quality.json": "7f952ba04df1f2edfe9e65caa80ec38ac3f2d2a68395065b8aa776fad4a7d3e0",
+        "report.review.json": "3a49e9f53824c587a3a49ed42bc36e97bdf3a83a877a3bc445dab6c9f9e65bb5",
+        "report.reviews.jsonl": "3c82b8a9d610552e871fd406afb115f03f5bc7e7b5e845818ceb9f6f2b5c325f",
+        "shipment.json": "d160473d70e68d7991b0d25a03a47230f32e2915cc3cd468abedb23a9bb6b436",
+        "task_contract.json": "c0088c73dd5b63e0d9a3df3e688ce7e732fdb228c5d615a16da34c59ed4bc8a1",
+        "trace.jsonl": "e60bf52b17c14141068d47fd7656de470bb57bb5d3168fb5a2c43a00b2354163"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "fail",
+        "findings": [
+          "计算数值及实际JSON均正确。",
+          "局限称‘JSON以float存储，本组数值可精确表示’不准确：JSON文本与Python float混淆，本地Decimal.from_float验证1.74与30.24不能在当前Python二进制float中精确表示；28.5可以。额外精度解释未经依据且错误。",
+          "脚本实现Decimal的observed仅摘tool/run_python与success，不能单凭这两行证明实现方式，实际代码可核对。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/02-n_mass",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 4,
+        "mapping_sha256": "79a7772e1e1150055d0be3ea0332ce1d6907919cbb549d78f8d06b542398b14b",
+        "claim_kinds": [
+          "calculated",
+          "observed"
+        ],
+        "source_kinds": [
+          "artifact",
+          "calculation",
+          "execution"
+        ],
+        "records": 4,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_manifest",
+      "round": 2,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 6,
+        "seconds": 12.47,
+        "equivalent_tokens": 15368,
+        "input_tokens": 51286,
+        "cached_tokens": 43264,
+        "output_tokens": 1510,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        ".code_runs/61b0f99bb3a54aaba3c5941453100020/code.py": "1d3cbaadb6457440c4f3cca86fcb2015aecdc90d4f95bfa9a23ccc5936e5a678",
+        "evidence.json": "8934d18b1184c5b304d9916952e2b02f973595d3201a1191492059eb083b0d3e",
+        "manifest.json": "f0f56c0c7674565e010c5db31fe361f5edd856b4740e370138fd0d7a53009aed",
+        "messages.json": "ebc757ded011ab2032243f833ffef86da5b809d4cb89b9d82f5fe17766cabc91",
+        "plan.json": "9adf0832c726e3ee87c661a00335d6f789d4992dd5f8cc33ff0ffc76f4d9db28",
+        "report.contract.json": "5ea370219138f95ef5a534d2d4aa5d004b7c99a99a6f1dd4051adaa64c26b944",
+        "report.evidence.json": "ce9e64288920f53279352b74e4b0446b64123d88ddbb20fe7652c69b5ff9efb5",
+        "report.md": "8d94c06e97106250b43b62b8e128c544122990ca3a77fa94dc2a56866a6abf6a",
+        "report.quality.json": "bddcd9e279c782f4c69ae01fd33d5083c419977c1eb8d7dce279444dbc11a095",
+        "report.review.json": "fcbe5c5a7b8aaeed9b28a4db91bb040406ab6dee6f93d0d6a50a3bc50ac56589",
+        "report.reviews.jsonl": "1726100557f9ca49a837ef5adacbc02aedc0e6ec1c6cf46121c73da1b34ba0aa",
+        "task_contract.json": "3e3376009c25b506b49a0a335a8eddeeb296bc0f1d4d8de0fae422f28dc9a327",
+        "trace.jsonl": "0697c55a4d545bf77033d9e29f3bfdf7fdca08f5ff927d152902ba89bcec6001"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "实际文件四字段类型与值正确，前导零/null/布尔保留，未据文件推断现实归档或审核人存在。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/02-n_manifest",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 3,
+        "mapping_sha256": "4fd0d5193e321979b813fe1155e65773e111e26e84718fc89a912e4f409469ff",
+        "claim_kinds": [
+          "inference",
+          "observed"
+        ],
+        "source_kinds": [
+          "artifact",
+          "execution"
+        ],
+        "records": 4,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_cabinet",
+      "round": 2,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 7,
+        "seconds": 21.85,
+        "equivalent_tokens": 26934,
+        "input_tokens": 80712,
+        "cached_tokens": 67840,
+        "output_tokens": 3639,
+        "llm_calls": 9,
+        "review_calls": 1,
+        "tool_errors": 2,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        "evidence.json": "710e11e49007723eabdefe32822f36ebb326a9051ffb0dd60b94b45617a47d23",
+        "messages.json": "46b64e48bc5466a636f72a7be4d2ed63980e6eead4f89aff8878ca4b37845a5e",
+        "notes.md": "9883c839b9e3f1116320bc8c2a7c8c0baed239064bff2de186f0ceb35b58ed6a",
+        "plan.json": "2b0411ea8725ada47973f679d752511996a78be262af9fa7a1c7e292e36a6262",
+        "report.contract.json": "ead90322bb89a390973c647bfb4920ac5460fe41d0582a5ed8d3ab7c68f03803",
+        "report.evidence.json": "21186dc304d4f6d8ae7af7e3d30bfb7df1dad6567d5c2204afc4d22cb556b524",
+        "report.md": "23b6c0db31a60d7a422f3f58f7a3dc8cf1667250dda43eda96ff216b5d32a97e",
+        "report.quality.json": "ff3b90c227e0f651964b256636b90a149841ce62269a00ae35cdfd3d983185bf",
+        "report.review.json": "1844f7c1882e0d3e909bc99375bc386ff948ac674a37cb1d3a3f2c30438e1782",
+        "report.reviews.jsonl": "cafa7fa17dd99b8ae0e27f68a018ba8c77053c7a1ab5da5b3b15b98ca2b9dd7b",
+        "task_contract.json": "5b490ae2d865332777414c6e0ab7c05818260ecdf6916f7c92006a3fd167101a",
+        "trace.jsonl": "e581531b2487aaa7dc967abe1ab94b01ee796902f4474d8d63b367899d30926b"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "核心阈值、门闭/通电、检修排除与手动/已运行区分正确，observed摘录包含实际窗口元数据。",
+          "方法中‘外观、布置说明段与抽湿无关’未明确限于已读段，可能泛化未读章节；结尾又称其余部分未读，不足以认证对未读章节的统一归类。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/02-n_cabinet",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 5,
+        "mapping_sha256": "c2dd4e7e57365d8f711456d0d59f727e0a2b914c7ed2c643a683f5b586cec7b5",
+        "claim_kinds": [
+          "direct",
+          "observed"
+        ],
+        "source_kinds": [
+          "execution",
+          "web"
+        ],
+        "records": 3,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_rooms",
+      "round": 2,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 5,
+        "seconds": 12.59,
+        "equivalent_tokens": 17600,
+        "input_tokens": 49840,
+        "cached_tokens": 39936,
+        "output_tokens": 1851,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        "evidence.json": "e10570cc4df4a28d5b1ac2a4dca369b98411ac9ce7fd6dc24a0313ac7702812a",
+        "messages.json": "648f5460e942a85bbd60418726b00e87448d16025412b44403ce8a8e5849ca77",
+        "notes.md": "2ddf9745318562e30223d807e4c819182945776c7db7e6aa2299da1530a27640",
+        "plan.json": "6b450865dad551b77717b198c1d53283b325d57239a52fef14a48ac94cb0ee0e",
+        "report.contract.json": "0b08ed7f430d2dc8d93d1d583bf900652c5e2fc59cc0fb55f8a9db93b633a6f4",
+        "report.evidence.json": "b81eabd6520106391d75e50236a390dd8de5568263fa414f1bd53f9c645fef5d",
+        "report.md": "eac759c87100c2d03f25cf9385abc70e37fd78477a2c9a1fb8884c6cb98b6dce",
+        "report.quality.json": "9c6f55bc425b0012d1c36acfc749e45b1ebb8038fca5d9deec4c1f40e4ee08fa",
+        "report.review.json": "b8440034a7a6eff146749f1856e4eb42d768be060c866e5a775fd97630ca80f0",
+        "report.reviews.jsonl": "67e51e6e60b078703027847be77333074cda8a5c6b1882ddf4e780a2e9452dd0",
+        "task_contract.json": "40f62607ac854765d30bf03df742805f54ecc81ee6056dfeab0f137a8f21f399",
+        "trace.jsonl": "e83e78650a603d6ee29bbf46769c7e7b84ca26e26006ba1fcd18ba087c63c289"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "两页完整送达、whole_document匹配实际覆盖；时段/午休/对象/适用日准确，不补发布日期、不合并承诺。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/02-n_rooms",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 8,
+        "mapping_sha256": "1e1558dd956b209f566d329933ab843be8644b18e5954e337c6cefa8d4dd82ed",
+        "claim_kinds": [
+          "direct",
+          "inference"
+        ],
+        "source_kinds": [
+          "web"
+        ],
+        "records": 5,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_mica_seed",
+      "round": 2,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 11,
+        "seconds": 25.9,
+        "equivalent_tokens": 30825,
+        "input_tokens": 117873,
+        "cached_tokens": 107136,
+        "output_tokens": 4687,
+        "llm_calls": 13,
+        "review_calls": 1,
+        "tool_errors": 3,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        ".code_runs/244a38f3604b4999b745902bd2be70e7/code.py": "31917a2c5efffec398fd7edd9638cba3926aa7307524d3b1946ada8a5162fe64",
+        "evidence.json": "5bbd4b9746ff1aa4bbd7eccf3ce4c6808693a333d015bcb151380ae0e17df48c",
+        "messages.json": "c82814ed42761a1560b6e0055922d0e0b2c0d902f583b91387e9f788fae4f141",
+        "mica.json": "695ee49e68b1bc3b9bf6165518c3ab3e00d2448b3d3be59c4ca0bee96f18c0cf",
+        "plan.json": "d94d03333f23e2a69b8ff320874619138f290843a40ccd4259c41387e1fa4624",
+        "report.contract.json": "f39ab1fac531487f625accd35fbd1e4c92b004a82f1868f5fcd16855e161f2c6",
+        "report.evidence.json": "14ee15c93556c8d58511e62383f59597d419a88b80cc7d129ef59a19db4cd374",
+        "report.md": "670bd6f736e1f965dada1c946d5784b8a6dafd95ea8f01db38629ceb2888b240",
+        "report.quality.json": "02d4949953509454263ebbe98c3af2532f596686b2958fb7248de8de50e68c1b",
+        "report.review.json": "27b4d78eedc19822c1deffebf1f10339687849980fab613bc89ea48664a0928f",
+        "report.reviews.jsonl": "31a2f5430a71c426c2e6ef21deac572479ccd2860be99cb87859d0eddeade7fd",
+        "task_contract.json": "5b9c99134cee6ad482298b0f7d9d53dacaeb660b8397ac1e5d0df766f49e6658",
+        "trace.jsonl": "8f3e295377ab5ff70872808c7766933df4e77f8076b79dd6a37bea9c5b200340"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "JSON与7箱独立答案一致，参数假设/组成限制及文件版本范围明确。",
+          "‘参数为用户指定虚构假设、非实际测量’标observed却只引用脚本中Decimal参数的execution摘录；脚本采用参数不证明其用户来源或测量身份，来源种类与证明范围仍待核对。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/02-n_mica_seed",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 3,
+        "mapping_sha256": "b6de4788da5aa469f3830a1ae7efe98ae4bff9826a79000b1ff6348eadedb198",
+        "claim_kinds": [
+          "calculated",
+          "observed"
+        ],
+        "source_kinds": [
+          "artifact",
+          "calculation",
+          "execution"
+        ],
+        "records": 4,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_mica_follow",
+      "round": 2,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 9,
+        "seconds": 23.41,
+        "equivalent_tokens": 29846,
+        "input_tokens": 96385,
+        "cached_tokens": 83712,
+        "output_tokens": 4401,
+        "llm_calls": 11,
+        "review_calls": 1,
+        "tool_errors": 3,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        ".code_runs/b6c319f39ade4a36bfbf17b700d81cf9/code.py": "446a40c6f27a927352c80e66f86f8012e1463d66d5d6295060c342ea545aa0b0",
+        "evidence.json": "97f2265063e22cba4002c4d08cd2255c904fd3681002a5dbf9b33df394d5b4db",
+        "memory_context.json": "7f18c84806af5cf03fb335bf97f908e4e5b19e8b1b1ecb914c62614a29b6e4b3",
+        "messages.json": "baec920f15bbd7036fc1d74cdcb538e525e86e0e2cf0b5b757ff22aaf2a10904",
+        "mica.json": "51a2518718fcd1e1626a0409e45843983184326d0ecb27af97ca7c7926d39db3",
+        "plan.json": "94af6c31aef8fb4ee262b9f4037f7d74103f84f833c0f5bdbb3921504293118e",
+        "report.contract.json": "8e63a6b7a7bbe5bd78e657de114db448bc82601eb763edfe337830b7e7f6a7bc",
+        "report.evidence.json": "96c9b80729dfc6a22220b97c7b6cb2e3647e4c31e7fd25e97288fb1069873bbb",
+        "report.md": "acb0838cad500a885dfeaac6f6656c719193113d3e2e5f8dff1d2f106ba056ed",
+        "report.quality.json": "2f67b4e05ab2900ea695788f9aee451a0b76356414a6082b49bb109df8193577",
+        "report.review.json": "4e55726e8b9de1b0b9e878233e0869df74cf1d5bac1b5857252141d1a991937f",
+        "report.reviews.jsonl": "a9db91657db28d6603f7e18197db6384dc3e939820ba855d9e5253e07c94572a",
+        "task_contract.json": "181c84e45e9de19aa2d3bcc9f30706c2a927c87ce72880da2596fff6d6225abc",
+        "trace.jsonl": "1eaf67befef52cc206d6a7931dcb42142d02d9331fac3347b67c1b0c01028f7a"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "实际召回同轮record_id=1，13箱独立计算和JSON三键正确；日期、checked/reviewed零问题、mapped未认证与原历史metadata一致，history关联有limits，未把旧审稿当当前真实性。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/02-n_mica_follow",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 3,
+        "mapping_sha256": "8568824423c7dbca6bd409fc1a4f602dab515d1b7d7f24148f471b114ae791e4",
+        "claim_kinds": [
+          "calculated",
+          "inference",
+          "observed"
+        ],
+        "source_kinds": [
+          "artifact",
+          "calculation",
+          "history"
+        ],
+        "records": 5,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_dict",
+      "round": 2,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 15,
+        "seconds": 48.53,
+        "equivalent_tokens": 62488,
+        "input_tokens": 208980,
+        "cached_tokens": 176256,
+        "output_tokens": 6069,
+        "llm_calls": 18,
+        "review_calls": 2,
+        "tool_errors": 3,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        "evidence.json": "1ae34dd562650b5eb11f60372425d49a7ef3d628b47da35065a3f4b31a968445",
+        "messages.json": "1fe4c52f6baa8531ed7d5889f67d86631163687ad667a170d50f8f6ad1a37214",
+        "notes.md": "f0870734b9b92fc14c32b21521fa176d151da29d3cba3e592574857bf148945e",
+        "plan.json": "ca0d8f2adc3510d9dfd5846e5857eabd8839a0141760fd71e2c2a51e218e66c1",
+        "report.contract.json": "688c3b436e1b2cc5b44f6db3afd8db5b14a1ec7f95dc5d1ffcfc703377ddff47",
+        "report.evidence.json": "1a076d49fbe729e816a6fba094ab00d9a9fc3621afb7293a572afd196faeab02",
+        "report.md": "115ececa9c4ed50a4e1ced1d2d52d7bfcf1593bb32d0053f5c03d129a7db046a",
+        "report.quality.json": "3ac27114e69b760f7acd3bc3baf365f16f7b479d60c90b6510b917a91b075aa6",
+        "report.review.json": "b57f71e8ef3e4aaa840eab3bede89d22882d3b8cfc747579e881b3da94a98bb4",
+        "report.reviews.jsonl": "87e38d0e5a20f1b28167188d7d367c7f977cc56bd2cd5adb5e0dafb6171070be",
+        "task_contract.json": "7dd3698fa14aa8efafe94d48dd815ffc792468037a540df85efb4c5007c7b6a7",
+        "trace.jsonl": "4ed10e42cee6bdb387e6478cdff0e5915e58b0ee0c1d0be74fd45d766cd63f2c"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "两个返回值与不插入行为正确，真实读官方条目并将无插入作为附假设推断，比首轮明确。",
+          "具体调用的字典存在/缺键结论标direct，所引仅文档的一般规则未包含用户给定字典实例，存在规则应用与直接原文分类边界，不能由located认证该分类。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/02-n_dict",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 3,
+        "mapping_sha256": "ee9a29000c7ca19ce534a9d611eab439d14055bd22d30cbb028fd4a53a087d03",
+        "claim_kinds": [
+          "direct",
+          "inference"
+        ],
+        "source_kinds": [
+          "web"
+        ],
+        "records": 20,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "f_source",
+      "round": 2,
+      "status": "pass",
+      "group": "fault",
+      "task_outcome": "limited_report",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 8,
+        "seconds": 17.55,
+        "equivalent_tokens": 20076,
+        "input_tokens": 73962,
+        "cached_tokens": 64384,
+        "output_tokens": 2030,
+        "llm_calls": 11,
+        "review_calls": 2,
+        "tool_errors": 2,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        "evidence.json": "6017c913a39944d3f14e9af27cd86ef1c3e959949abdae78867bc679b6f627f9",
+        "messages.json": "00bb28dfcaa8e500d42ab8c338fac2a524ab538c9f51dce22dc3f97c7619bc91",
+        "plan.json": "7f8c8bbba68148b1e2f8b50f711b2627b2dd8b083f9ec17074d8384847248c3a",
+        "report.contract.json": "6ba5735bc2eaadf1f5183d3ac05594d04d00239b345f7ad410ed8113e8083d9c",
+        "report.evidence.json": "d8e18b8e88821d0a00c0dd97fa949eaffe1bc29aae53ba8e407cbe61e50d1f3e",
+        "report.md": "065c56375f0a0632a8aad66cfb34c76c2db259d1a7b4a738da261966585bfa79",
+        "report.quality.json": "53cf239372dbe9f48c322d20210e16cfd1c547f4742628cdd9c490c9398fa8d0",
+        "report.review.json": "7d31a6abdbfc46ae6f1e8da1510957bd14b5c44146a6192150ad38f1064494ff",
+        "report.reviews.jsonl": "003a772f37b34a3db8ce41326398f06530868fbe9a23d09164328f7a8cd4be94",
+        "task_contract.json": "a14e9914602d059ee5dc112c4f131e04a5726dbf5f3fb335daf28a7a721a81a3",
+        "trace.jsonl": "fe5d073de163ee43802a3ed886e6d1968d545da426488cc119bef9c6d8fe8068"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "真实fetch失败与未知预约规则分开，未当已读资料、不猜值，明确环境注入导致无法区分网络或站点问题。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/02-f_source",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 3,
+        "mapping_sha256": "260a42a60d6db3cb882fd9af3411b5de5c52953310e5cb383c050224f493048a",
+        "claim_kinds": [
+          "inference",
+          "observed",
+          "unknown"
+        ],
+        "source_kinds": [
+          "execution"
+        ],
+        "records": 2,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "f_arithmetic",
+      "round": 2,
+      "status": "pass",
+      "group": "fault",
+      "task_outcome": "limited_report",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 5,
+        "seconds": 9.66,
+        "equivalent_tokens": 11176,
+        "input_tokens": 39035,
+        "cached_tokens": 33408,
+        "output_tokens": 1104,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        "evidence.json": "6fa794c4d8d1d2c036798dd7bd5b8344b2220ea3f7741ba6f7b5f4204d2ea1bd",
+        "messages.json": "1f43c790942e6a7a60b5f4ccdb18240886539d69826d796495e83210fe108f92",
+        "plan.json": "3bfa4453a59fde282f483082d618c67d0c0e8f5f524dfc132fd5f07d06231059",
+        "report.contract.json": "c120fddaf0f74cd190761f423be58a70cf743f74bcaf8fbd486fe82002268864",
+        "report.evidence.json": "d018fc55013c326ce7df12e84ded1cfb9cfdaf93c1996020a2ed67a194bf91c1",
+        "report.md": "5d599a4cf754208e8594be2243b50c6c8f48be6fd3a3fa1bd123d0499a33b47f",
+        "report.quality.json": "3d7f2a332db32f15327834996319deee8dec73ec0a11eaced9f180085e14272d",
+        "report.review.json": "ed4e14d85867de471fd45f62df6e6a236e2c149cabfa725d16f0967fc0c2cafc",
+        "report.reviews.jsonl": "5d960c7f078a48a826769bee4ecb32be1a94128135e1c14d5b315810b79215e5",
+        "task_contract.json": "7973359d4171d297294a3f540e15238c521a3c6e0be289b082de8e375d35d48d",
+        "trace.jsonl": "377a30899768317f9cf48336c5438b857ec2b72b5292e4328aced40f4f03567e"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "计算服务真实失败，没有补算或猜值，按约定不提供替代值；报告未将失败说成差值为零或不存在。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/02-f_arithmetic",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 3,
+        "mapping_sha256": "6921273f31c1b700c4b59f4eb4b03991692ca972ba4157b53c6b91fd43d1685f",
+        "claim_kinds": [
+          "observed",
+          "unknown"
+        ],
+        "source_kinds": [
+          "execution"
+        ],
+        "records": 2,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "f_quota",
+      "round": 2,
+      "status": "pass",
+      "group": "fault",
+      "task_outcome": "expected_incomplete",
+      "review_status": "skipped_budget",
+      "metrics": {
+        "steps": 1,
+        "seconds": 8.63,
+        "equivalent_tokens": 9637,
+        "input_tokens": 26393,
+        "cached_tokens": 21120,
+        "output_tokens": 1126,
+        "llm_calls": 5,
+        "review_calls": 0,
+        "tool_errors": 0,
+        "stop_reason": "budget"
+      },
+      "artifact_sha256": {
+        "evidence.json": "740a72809489523ed02eb964096d8168f65de316e4e6e5a0a5e16b01c9fb0b3a",
+        "messages.json": "65a2ad3ef1ec31bae6f92f904510f385e964825d92ad9b59882f888aabd8ad8e",
+        "plan.json": "747154fb569f9439dabe366508d15a92e1063e97aaf35627dea59f9f66991ef2",
+        "report.contract.json": "76f28038902a2d41b53a34b9712e0feb99d39b3a7c8c6618958f452046e5d9b2",
+        "report.evidence.json": "4fbf5cade55ed6db6b0937884635cac13fc236d94c4024042f142d31f1348dc7",
+        "report.md": "161ce2b6ae2c900502eb3de20d66d26d5906255cfcf0e67b58ed0db6afc53693",
+        "report.quality.json": "9b27f72208d79cb502f186c6ef0aecb5863f9bcef71420a32aab64b9e6ed7454",
+        "report.review.json": "1057fa92744ec91114db9b9f81785b1b907eb9fcc78e214ae2d7034a2f9dc777",
+        "report.reviews.jsonl": "e53e6c6cda4181543915d1fcfa0e3d5a89d78702dd39c186f989d3fc1cd92e52",
+        "task_contract.json": "58dea2a66f7434390167f7882acf12d03d22ec9f22f4634b10adde48298a9429",
+        "trace.jsonl": "327045fc228472c846e779f753bd44580b69bc519833ce1840ac14ff449074f2"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "仅就预期预算故障范围通过：真实budget、未审稿、报告保留不完整提示，不推断业务真实状态。不当正常任务成功。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/02-f_quota",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 3,
+        "mapping_sha256": "a197cb4e8517d31960cb87b9e0759e489a9518f309208d63c79acdec4ae3bdd5",
+        "claim_kinds": [
+          "direct",
+          "inference",
+          "unknown"
+        ],
+        "source_kinds": [
+          "user"
+        ],
+        "records": 1,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_label",
+      "round": 3,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 5,
+        "seconds": 12.19,
+        "equivalent_tokens": 13654,
+        "input_tokens": 43291,
+        "cached_tokens": 36608,
+        "output_tokens": 1655,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        "evidence.json": "96642107336251fbbaf4406e4f82d2fd15e051301d141f884fdd9645152f35f4",
+        "messages.json": "aa07a48a220b07af5ed055837be474e15319c4e30ceba45fa1d53509b648175f",
+        "plan.json": "186e9ffa44bb0012aaf98aac6e110325e67e5add04e8bc54527d9284c47a5b67",
+        "report.contract.json": "1fc78e5816ba9e471204226176c2b9100a5cf40dcff7967329185b98391efd2f",
+        "report.evidence.json": "996301eef09d10d5b7763ff918577d45b925d5b83cb2b32c7fd65c37fce1632a",
+        "report.md": "81c70b634fae0644d950d0eeb101d3e5e40251d34f5cf09279f0fb9fef2835ba",
+        "report.quality.json": "b9df9b896c37067df56f03af9cb79da0ddde6a72bf93a337dec67bc750955423",
+        "report.review.json": "e0d8dc6814627167d42299dd83f4a31bddf938b8e4a3505cf63c9b6a175dd24e",
+        "report.reviews.jsonl": "45153b53ef671f7ee8d317df99d01f1d0f6a3803bb73cf93a5fd5fdbe1c3f600",
+        "task_contract.json": "6dd4784e7c28f447753ef6f421e72eab290471874e6af0e869b438d5ea5d1222",
+        "trace.jsonl": "6e51bea6dccaf6ae55d5b7fa16d1ce2298822ac927928aaf5963a7a69757926e"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "材料主体与实验范围清楚，不从未测推零能力，采购摘要未获本次实验支持；不补防水等级/时长。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/03-n_label",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 5,
+        "mapping_sha256": "1858c22143f33e5b51b4dab2c2d06067e3be4f5fb4f46a242e614b8e7e5858ab",
+        "claim_kinds": [
+          "direct",
+          "inference",
+          "unknown"
+        ],
+        "source_kinds": [
+          "user"
+        ],
+        "records": 1,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_route",
+      "round": 3,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 6,
+        "seconds": 15.78,
+        "equivalent_tokens": 14937,
+        "input_tokens": 48314,
+        "cached_tokens": 41728,
+        "output_tokens": 2089,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        "evidence.json": "f3b6bfc3443de56a32989ccf20b1f0603d555d6736c06192fd108624aa2e9ec2",
+        "messages.json": "e32f4d0bb573d2196c5490d778c963dab2bfaff98d0e039e41926c43ed81be8c",
+        "plan.json": "c875d4ffd55b5d7664371424a559d9ca4b7a1d9cd69371163608d3c0b2601c53",
+        "report.contract.json": "1efd8cdd78ef08b26c1cc32f21685749d2d612e796fa4ffff02ad39079d32828",
+        "report.evidence.json": "06fa96564e10e5c1574a37282014d829cc491dfde54b6a8937017afb1b2857f5",
+        "report.md": "f5495581664d8cbefc8ad5a89d26b140242a6e0f909bb735eb12a90fda26989a",
+        "report.quality.json": "7ed2b079cea09a3f96353c674f373acf242018f0648d757550c9c53d18d1ce47",
+        "report.review.json": "eec4ca0cf5100d4f6b7ce8cf72fbe96de1a51215e5a275f7da244843ce179409",
+        "report.reviews.jsonl": "628df2d6ad0847def241d1453b546777168fd20426dc144ca4bbd520ff8f640c",
+        "task_contract.json": "84386fc513a219c6f18504cb64a811b175d6930e64cab6d72d17545d10d628c5",
+        "trace.jsonl": "f64015d650972e0cf7e5b4d9a459809fbe41d3561d9fd564163545b1f223709f"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "两处已核对与其余未知分开，保留开放条件、不反推坡道为必要条件，不扩大到所有入口随时通行。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/03-n_route",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 5,
+        "mapping_sha256": "395452e14a7d006f857086e8e3ab2c84df87b4a95c731c88673e75eff3fba643",
+        "claim_kinds": [
+          "direct",
+          "inference",
+          "unknown"
+        ],
+        "source_kinds": [
+          "user"
+        ],
+        "records": 1,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_deadline",
+      "round": 3,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 5,
+        "seconds": 14.62,
+        "equivalent_tokens": 14959,
+        "input_tokens": 41280,
+        "cached_tokens": 34688,
+        "output_tokens": 2449,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        "evidence.json": "75952e02fe3909f53c73fcd519313794e35deab1addebf8a26ca076ac22cc536",
+        "messages.json": "70da660b8a28392a1fe4f4665b13b9803d14a38028ce1988cc867128739ed98d",
+        "plan.json": "7d259ba166bd56352888df882201c58d01a6402174fd5bace101e424d279bf53",
+        "report.contract.json": "ff5754c1400efd33ab61871c3df62c2bea8f7c29914ed7acf5f59862d2607685",
+        "report.evidence.json": "8de079fc6b24f179459f627bfc49c9d19d183361edaa7a266a5992b221f4448f",
+        "report.md": "950837ba897d3005f548aef38002c52dd99b2e21053c9ee41b822c639ec0adb8",
+        "report.quality.json": "67c916ebf90f99a241641cc3b461f9cd60c963eef9025ef4f051bb5ac83926e1",
+        "report.review.json": "744d23e3c2bb18f40a7310c0e07ffc5e3e5bfb718ae544705f6ae805175b0d3c",
+        "report.reviews.jsonl": "a28193eede90e8f2157f2b2fb81d8774cf7fe47b1e98520d7f01059312036db7",
+        "task_contract.json": "e92576bcfe83e485e0f8afb492e487d3b8115e94b341962f91c0d03b123cca20",
+        "trace.jsonl": "93dbc1ca84fe96a1c6c433462e27e056bf1e6006da49a5dff650defa7c5adb9c"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "缺基准日、时区及边界，不用系统日期补造具体截止时刻，列出澄清项。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/03-n_deadline",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 6,
+        "mapping_sha256": "9f1f0b4b5c68abb587afa7693af6cccf81de495a51e4dbf2b3717cec2e7f0073",
+        "claim_kinds": [
+          "inference",
+          "unknown"
+        ],
+        "source_kinds": [
+          "user"
+        ],
+        "records": 1,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_mass",
+      "round": 3,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 9,
+        "seconds": 20.24,
+        "equivalent_tokens": 24324,
+        "input_tokens": 84633,
+        "cached_tokens": 75008,
+        "output_tokens": 3599,
+        "llm_calls": 11,
+        "review_calls": 1,
+        "tool_errors": 2,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        ".code_runs/74a378244d2b4ed9bd79e0388ea8278a/code.py": "6a60b3efd3ff07f4f32e684060a6330c52506f4260e9c51256def05b4984e21c",
+        "evidence.json": "acbc1f84e13ce9e146fe919ee6040f300afadae69bf218a12b9cf062d7f6288a",
+        "messages.json": "6f53c986a08278f7cd0f984a1b7a013b85aef7e007821c74500aa9869f5aa152",
+        "plan.json": "3d20a875a5ddd6d4fff8b873058d1853b4ea09cb94cd189ed49918b14b334c8a",
+        "report.contract.json": "bd86848d43d60b9eaf959a920b5cbfc8ca07849b9996849301adfcf8b8ddb0cf",
+        "report.evidence.json": "9d2e1bf3f2e408e79bb1deb3a10312f87423e966f8f90787dbe033a3b90b2753",
+        "report.md": "a2abbd70a53440de56cfa170dcd29740c79964657526b5099fdbdb4aa89cf8bf",
+        "report.quality.json": "25e659ed9cf83f5427920a4c01eb4616eeeb5bb752acd4b630e93ebc31d0c174",
+        "report.review.json": "e67bd152c6ce9a7899cc848f70de5083c73d918d22c0be9e0fce053a2e5d2abf",
+        "report.reviews.jsonl": "132f31bfdbe34c7bf0518591ebf81a27096806a2eb48b30953c7f7524f6326ff",
+        "shipment.json": "d160473d70e68d7991b0d25a03a47230f32e2915cc3cd468abedb23a9bb6b436",
+        "task_contract.json": "c0088c73dd5b63e0d9a3df3e688ce7e732fdb228c5d615a16da34c59ed4bc8a1",
+        "trace.jsonl": "d3cce1eb2f3aa1d55d563cec802d7a70ce2838c84765a88421b88b6402c73e52"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "计算与实际JSON三项总量及数字类型正确。",
+          "‘JSON不保留尾零’将本次float序列化表现概括为JSON格式性质；JSON词法允许1.740，本地json.loads配Decimal也可保留该表示。实际数值未变，但泛化解释需收窄。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/03-n_mass",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 5,
+        "mapping_sha256": "400d90401530ee4ef25d73da08f9fd063d4d07fe4885c9b1b7ee9d7daf5432f5",
+        "claim_kinds": [
+          "calculated",
+          "inference",
+          "observed"
+        ],
+        "source_kinds": [
+          "artifact",
+          "calculation"
+        ],
+        "records": 4,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_manifest",
+      "round": 3,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 9,
+        "seconds": 19.35,
+        "equivalent_tokens": 22726,
+        "input_tokens": 83074,
+        "cached_tokens": 73984,
+        "output_tokens": 3119,
+        "llm_calls": 11,
+        "review_calls": 1,
+        "tool_errors": 2,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        ".code_runs/5d818a83aa0b49cfa4307960bdbc0413/code.py": "1d3cbaadb6457440c4f3cca86fcb2015aecdc90d4f95bfa9a23ccc5936e5a678",
+        "evidence.json": "3b7a970b1876e789f8d398fb28cfaae960c3f19c6f3a76bc2229912cb4778472",
+        "manifest.json": "f0f56c0c7674565e010c5db31fe361f5edd856b4740e370138fd0d7a53009aed",
+        "messages.json": "02464568230b2543570fb39350749cdca5a4d6631ee296cc8894cb00dbf3ea61",
+        "plan.json": "251e116ad5d9a95be306ac3caf76477a33d3b484a04525bfb6befcb40ad266fa",
+        "report.contract.json": "07e34fc9810d25ddc622f08c7be017fb35dc61254f4b96cc69d192b7da6bfed3",
+        "report.evidence.json": "6fd30247536e292ac4d8f3ea9e7343120b8a0f43702f4fad800cc898b112d3d8",
+        "report.md": "4c835ca57356e08f01dd0dd5cce02afd0900ec3dbc94133822c14851ec398ad0",
+        "report.quality.json": "7360dbaa9b0797b80cebe03332e82be0cf3005ff65fd3df2ff1b44fa9c0c7a99",
+        "report.review.json": "2b925f4ab5fafd443b1eb145c59cacde9b1407c13cb4b8802b3b5e118ce19722",
+        "report.reviews.jsonl": "89392ac3f699b9e9846e164227f41a49fd45f1a33774dec0b01554a4a915c459",
+        "task_contract.json": "3e3376009c25b506b49a0a335a8eddeeb296bc0f1d4d8de0fae422f28dc9a327",
+        "trace.jsonl": "1eb1f1660283b00a3720ae61a96277177eabb98195a3260b24e6678ab5a677df"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "实际字符串/布尔/null/数字类型正确且保留前导零，明确现实归档与审核人存在不能由文件推断。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/03-n_manifest",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 3,
+        "mapping_sha256": "269bb50285e1d3a12bb0617027c57ccf86aefe64e1ed93acdf4f517e080c9f04",
+        "claim_kinds": [
+          "inference",
+          "observed"
+        ],
+        "source_kinds": [
+          "artifact",
+          "execution"
+        ],
+        "records": 4,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_cabinet",
+      "round": 3,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 4,
+        "seconds": 11.53,
+        "equivalent_tokens": 17849,
+        "input_tokens": 43140,
+        "cached_tokens": 32128,
+        "output_tokens": 1812,
+        "llm_calls": 6,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        "evidence.json": "8ea0470470eaf78c1a13d0f5f2da18776590a129fbd994c6c236c7c6840ec28d",
+        "messages.json": "e105990162eed717576d24d76d279d763bda141e2fdc7d1b7daba3d98b90f17e",
+        "notes.md": "4b55e08bc68ae5929754cc3e76fadb053e5a33e391b7dfd61b97383fa1aadc75",
+        "plan.json": "bbd54c87a1be27b84b0585cf6ad83d12a249c9af6b2260d845bb7416a5269b26",
+        "report.contract.json": "2fdafbec2114d016393928b6593c01d08922ccc1b60e818d4fefa3fd3672d9b6",
+        "report.evidence.json": "f6d77380764fc213b9886b1ca4416bc9f2ff05c54489c3a53c19c5e468747e57",
+        "report.md": "1c568115011f9e90edda7eac75c1126d302e3d679340297405580450ae5f1979",
+        "report.quality.json": "bc185b9919b97400f452eb475f6d5e946aaad8869638c3684e5c8abf088d94b8",
+        "report.review.json": "45e0b218335e9df629cd4605907fce53bfd0cd65ca775d204d7574ccb80dd1ab",
+        "report.reviews.jsonl": "943ba13b8cb9d8169c466a3a3c94bbb2013faa8d1105b6af5aa0b22edf9ea0a5",
+        "task_contract.json": "5b490ae2d865332777414c6e0ab7c05818260ecdf6916f7c92006a3fd167101a",
+        "trace.jsonl": "4b82c567c6ee5c78dc98822992c101864c338b284f5033fa2ad6634ed3730699"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "正文条件、55%严格阈值、检修禁令与手动/事实区别正确，局部窗口范围明确，不作全文无规定结论。",
+          "将‘资料未提供记录’与‘未提供不等于湿度为零或未启动’合为direct，只引原文未提供记录；复合结论含逻辑推论，关联分类仍需核对。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/03-n_cabinet",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 5,
+        "mapping_sha256": "6f6e8a7a6c0fb69827f401b1df8816b58e3337db4b8e4ec3fadb32b7baa90930",
+        "claim_kinds": [
+          "direct",
+          "observed"
+        ],
+        "source_kinds": [
+          "execution",
+          "web"
+        ],
+        "records": 3,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_rooms",
+      "round": 3,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 6,
+        "seconds": 14.5,
+        "equivalent_tokens": 20491,
+        "input_tokens": 60344,
+        "cached_tokens": 50432,
+        "output_tokens": 2768,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        "evidence.json": "92ed6dd77443702712daadc4b39b3988c28ac5b7b1e2064edddf3bd92d15b6b8",
+        "messages.json": "64d1b4785891ed1b814db00cde719d5917cb10e62536c5541dcbfac79095c6ac",
+        "notes.md": "ceda135db0e66ae11204ee48393146d4f846b657c1aeffdac2e4b044c7a8d6c7",
+        "plan.json": "337b60ce2dbcb459ffa4abd7dbb100e9a568636b3fc72d961c4cea78274eb645",
+        "report.contract.json": "e64f6201f6352e497559c89bbdd57f89e04ed0094fb4d4b5dc8abb6f2b060292",
+        "report.evidence.json": "0ddcfc4389d3bc29eab29acf519abbcb2e87e3be673de11c53d8dc3d242c846a",
+        "report.md": "3e19fca9ea13e21797c7f563d39d012e54280fc4d3bcc053ccc36feb80fdc6a6",
+        "report.quality.json": "111fc4a04f6709e6f95a6e803d1ec04b7fc0eb88b9ac56c433015c844b7792b8",
+        "report.review.json": "ef14640388ae750af2629a43e934cbb385ace721b19ac8300d733aa2c7afd087",
+        "report.reviews.jsonl": "63a86f6bc6d4cd0f304361e73280b8862c6694affa89f693c9d96ca5dcba2473",
+        "task_contract.json": "40f62607ac854765d30bf03df742805f54ecc81ee6056dfeab0f137a8f21f399",
+        "trace.jsonl": "1359578ad27d3909c99d3d719294158ae1f0d160fc06f6d2fb6074978a0288ea"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "两页完整读取，whole_document匹配覆盖，各房间/时段/午休及不同适用日正确，不补日期或统一承诺。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/03-n_rooms",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 8,
+        "mapping_sha256": "b1298af030bf73c0db90af4c069a3dee82fe0a7a86dbea6fe2ee521c89abca8c",
+        "claim_kinds": [
+          "direct",
+          "inference",
+          "unknown"
+        ],
+        "source_kinds": [
+          "web"
+        ],
+        "records": 5,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_mica_seed",
+      "round": 3,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 5,
+        "seconds": 13.14,
+        "equivalent_tokens": 15556,
+        "input_tokens": 44861,
+        "cached_tokens": 36352,
+        "output_tokens": 1706,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        ".code_runs/5eca9a1b3fde4218b50032bb703bf643/code.py": "c2acca6a3d3f2bc973dd8f9e1cccc9d7f5a4031a1a0f6e203ed072c515d4490d",
+        "evidence.json": "84bb8cd0cfd85c1b413e0e52813c490a57c650e8d425cf343c84ead5ddc7e634",
+        "messages.json": "273af3b5aa9b8fa62ebcc67341f7f3e2c9a226ae2d78a144d0fb67f9db6f7a37",
+        "mica.json": "695ee49e68b1bc3b9bf6165518c3ab3e00d2448b3d3be59c4ca0bee96f18c0cf",
+        "plan.json": "f0e8b51b2e11bdaa4f80187b4a419d7dfa981280377027277af9a6a626f25100",
+        "report.contract.json": "0b8e8d3bdb05d37448f54ed7516c9f0f1033a18ce7e14256b88d11be0a09e912",
+        "report.evidence.json": "2f03a875ecd2cfdb65dfd83f22c3f979b514f7ac759493f7a9aaf152076b95f2",
+        "report.md": "40fe55d20785bd017b64d5fcda0ac3a96d5f7534c6ae32821d7efb866f4b90a2",
+        "report.quality.json": "cfa24db2d1b2d1033470cce4d7fded58416944f98fb9bfb48e1e1e5ad99d24ab",
+        "report.review.json": "9ff91212fba4be7195ea5b5d0236344990cafdc868911d149a5561688c2bc701",
+        "report.reviews.jsonl": "7b4149de88f160d62e188d0bfabbeacd6082274813f9d6c13d4dd16f31fd94d0",
+        "task_contract.json": "5b9c99134cee6ad482298b0f7d9d53dacaeb660b8397ac1e5d0df766f49e6658",
+        "trace.jsonl": "57ce3a71227fdd264a8f1ad09fe273ecce2396e49342fa05147c4e1c00175c02"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "7箱分项与总量的实际JSON和计算正确，原始虚构参数用user来源直接关联，未当现实称重结果；文件类型与值对应。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/03-n_mica_seed",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 4,
+        "mapping_sha256": "f33ea7f430dad67815ab7e3bbc40a8833e3afabaeeecd9903d57c6fee24e9652",
+        "claim_kinds": [
+          "calculated",
+          "direct",
+          "observed"
+        ],
+        "source_kinds": [
+          "artifact",
+          "calculation",
+          "user"
+        ],
+        "records": 4,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_mica_follow",
+      "round": 3,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 6,
+        "seconds": 16.67,
+        "equivalent_tokens": 22786,
+        "input_tokens": 61066,
+        "cached_tokens": 49280,
+        "output_tokens": 3036,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        ".code_runs/1afb62535c64420ba7734d74c9fb5fd2/code.py": "2f66c8d6c9cd6d4a8578e076ffe5c692ee24f4d5c528124d2ceb7e4062817e00",
+        "evidence.json": "4fd2f9da4ba2319b4ffb7d9cd72e6d850f939c5884f01eee3ff8183bdff8406d",
+        "memory_context.json": "a11c5ce878721257daad8deeea171ca82e0af39cea212c097b0b0c0b315a960e",
+        "messages.json": "d71b42c0ee6185f4fa9130c53ea6035567eb9efd1f6606d281d30969cbfefdf2",
+        "mica.json": "51a2518718fcd1e1626a0409e45843983184326d0ecb27af97ca7c7926d39db3",
+        "plan.json": "639f5a831d963599a0ccfb170c044ec0319e8081857cdfe558c11dd5a526b4c6",
+        "report.contract.json": "019795e3380daaae570e30a0a5a10c28bc08154bdd478936c7b41c2a52cab3b4",
+        "report.evidence.json": "fefe0a71b054771dfab573ae12aafe6a77f08c26825ee144a3ce31de6cb10e50",
+        "report.md": "cbaf94fbebdbc87c0c6070181ee98a7a6aa67b91ea12aeb30f8887b6164ba9b7",
+        "report.quality.json": "2146acd71ccbba96270532f5088f3879614af9453c0c45bc49b80e8bd794a488",
+        "report.review.json": "a234a8495ea81091de93941f396586463704e44d81ede9923dd4a3e629e5c829",
+        "report.reviews.jsonl": "7635beac8b364e5526667373d8d6fdfe8b792f29de3ee9b1c8405ad746a6cdcf",
+        "task_contract.json": "181c84e45e9de19aa2d3bcc9f30706c2a927c87ce72880da2596fff6d6225abc",
+        "trace.jsonl": "8c6a1ffef9a6e42ee3d1827aecacb52397d5298d9d75d5605ad6c36a3b4f0fe3"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "真实召回同轮历史，13箱计算与文件正确，日期与历史metadata相符，history关联有适用限制，不认证真实商品质量。‘均0问题’应仅指历史机械/审稿问题数，不把mapped扩大为语义通过。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/03-n_mica_follow",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 4,
+        "mapping_sha256": "f96fec9b15831d890ae3d1720540e7bfda37779d6390945c9de058b516a7c1f3",
+        "claim_kinds": [
+          "calculated",
+          "inference",
+          "observed"
+        ],
+        "source_kinds": [
+          "artifact",
+          "calculation",
+          "history"
+        ],
+        "records": 5,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "n_dict",
+      "round": 3,
+      "status": "pass",
+      "group": "normal",
+      "task_outcome": "normal",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 13,
+        "seconds": 41.07,
+        "equivalent_tokens": 43305,
+        "input_tokens": 160816,
+        "cached_tokens": 140288,
+        "output_tokens": 4374,
+        "llm_calls": 15,
+        "review_calls": 1,
+        "tool_errors": 2,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        "evidence.json": "038fcda285cc0576185728b1829097bbfd9c4735a20cb6496f034767c376ea35",
+        "messages.json": "f06db34b72db5f56cca26702398aab6442d3a87c16c3ccf6e49d64f0ef00d765",
+        "notes.md": "b74159883ef94623875e9bf8db9854231f4894406967306e3b9f084bc9b9498c",
+        "plan.json": "5a651b9df834b62e263cb9a07a382a3bf6e8993773d5178aac8aa825a9d32fd0",
+        "report.contract.json": "e62b0b590c073a62b34bb38b97e308f82eaff6148f0110f6bb5d4c9faad92a1a",
+        "report.evidence.json": "ce46014d5908897330d11affd43fc4f2d3c6d14ff877b6943a799f8656ffbf2f",
+        "report.md": "938f404fdc30cdb5d8e69327baf5d8ae4717a924b6bc97cb5e70fb4672e09740",
+        "report.quality.json": "9690be6b79dda7a8b5c6a3992fe360d285837edceee0ebee46d6de426802413e",
+        "report.review.json": "5c77240df9b3c2c9cf74f0a6a66d1748dd40feeb389ac50b809e77ad3a7da485",
+        "report.reviews.jsonl": "806346981a11b32a2fd281c023b181891db77b2277f099d7b952dc3694730369",
+        "task_contract.json": "7dd3698fa14aa8efafe94d48dd815ffc792468037a540df85efb4c5007c7b6a7",
+        "trace.jsonl": "6f42be146772b1f99dfc021f819d192b7e2ca82e909025252cd88a369625c577"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "两个返回值与不插入结论正确，实际官方读取且不插入标推断并解释与setdefault对照。",
+          "具体字典实例的规则应用仍标direct，仅引一般规则未关联用户实例；分类与充分性边界与前两轮一致，保留人工核对。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/03-n_dict",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 5,
+        "mapping_sha256": "059cab0d1a697bf84ffbceb59f8efc625c39784167b866af78391eb0822398d0",
+        "claim_kinds": [
+          "direct",
+          "inference"
+        ],
+        "source_kinds": [
+          "web"
+        ],
+        "records": 15,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "f_source",
+      "round": 3,
+      "status": "pass",
+      "group": "fault",
+      "task_outcome": "limited_report",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 9,
+        "seconds": 19.62,
+        "equivalent_tokens": 22877,
+        "input_tokens": 84801,
+        "cached_tokens": 75264,
+        "output_tokens": 2907,
+        "llm_calls": 12,
+        "review_calls": 2,
+        "tool_errors": 3,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        "evidence.json": "a88460c925cf60c4c75a6909a11ae2e4a5bb7ba066194c8840587716e9b982f3",
+        "messages.json": "81e065a95e68dfb82d515d169df296763ff85c3a0b640f0f278b3641c12db520",
+        "plan.json": "a11849171236dc224b99fa76e8434d418d199f94831bccb4adc20cffa94d7e05",
+        "report.contract.json": "3bb5491a28beb5ac0bcb240be772fcd35f55dd1b4bb7efa056032d17a55d86bd",
+        "report.evidence.json": "000793a01d94bb8aa9ead60b5cd33998168cbdfb3c3937a317028ece37d3c3d1",
+        "report.md": "320ff42479ede60d3ce6147b9183da8618aff0bee5140f330f4649cc753a643e",
+        "report.quality.json": "8d4ea6f9307e0b1caf68b16a4654dc8b63963fee9a371f5c2409f3ec3da0e949",
+        "report.review.json": "a1983b9c913f6328776f1d1cd790c56b8aae219495f06ee36cc9748f31312691",
+        "report.reviews.jsonl": "424d36ca4cb3a168217455007cc9720601b65f598ccaf212f05a1e7cf6fb5cde",
+        "task_contract.json": "a14e9914602d059ee5dc112c4f131e04a5726dbf5f3fb335daf28a7a721a81a3",
+        "trace.jsonl": "0f43028b56e14b3d4f4c2d0aac2b95e0e52ac9fb45797da310b814a50a9e6f06"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "实际请求失败与规则未知区分，无数值猜测、不将失败地址作已读文档，未证明站点或规则不存在。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/03-f_source",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 2,
+        "mapping_sha256": "27d52f613b7349fa4dcd22a781394095043cc0784c5be26a9ec144d3ba3fae5d",
+        "claim_kinds": [
+          "observed",
+          "unknown"
+        ],
+        "source_kinds": [
+          "execution"
+        ],
+        "records": 2,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "f_arithmetic",
+      "round": 3,
+      "status": "pass",
+      "group": "fault",
+      "task_outcome": "limited_report",
+      "review_status": "reviewed",
+      "metrics": {
+        "steps": 4,
+        "seconds": 8.73,
+        "equivalent_tokens": 10004,
+        "input_tokens": 31966,
+        "cached_tokens": 26496,
+        "output_tokens": 942,
+        "llm_calls": 6,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "artifact_sha256": {
+        "evidence.json": "1fc39c5a880eb7e1edd661e77db96d211d1d073186207e3cc8643a95ea67e08b",
+        "messages.json": "c81af6bd6960119ea0a0f51195e112a3dbff5731da018938ca5dea776c327737",
+        "plan.json": "9de9e5f75eaf884d5cd7d999ac7d88deb80b532ddd040151a7ef0bd7f6d7cc60",
+        "report.contract.json": "af1188a92abe2531075a298620e121ba5249722ecc2e330f242f74971172b4fb",
+        "report.evidence.json": "a11a3a325abc6b446d99dc8cd3bc762b05bc6814c204f38de6a3f6932e26ecfc",
+        "report.md": "339e0754df0494586babf27314dc9da427aed95256938b8858c768ba373e30cb",
+        "report.quality.json": "4b4f0cc3896dbf76e4b693154a9309470c4499e19ff443179c28aa4da9336f19",
+        "report.review.json": "ccaf2ebd1582b76045420adde7f17ca04fd1d722d54743a654b87d2847555c47",
+        "report.reviews.jsonl": "434328b395a80477a80c7e4e9e6bc0b20cb69d883dce01276d82422690be8a7c",
+        "task_contract.json": "7973359d4171d297294a3f540e15238c521a3c6e0be289b082de8e375d35d48d",
+        "trace.jsonl": "529098c5e9009359cdc53ed374c55e93c6b4b2a0a8e62d9b23abc0aeb8ecd88c"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "仅实际calculator失败，按约定不补算或猜值，未知限于本次尚未取得答案，不当正常完成。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/03-f_arithmetic",
+      "mapping_audit": {
+        "status": "mapped",
+        "claims": 2,
+        "mapping_sha256": "64cfb87967db8e158b0b9ec82001348e0c8b225f1f6426372af004661a45c73c",
+        "claim_kinds": [
+          "observed",
+          "unknown"
+        ],
+        "source_kinds": [
+          "execution"
+        ],
+        "records": 2,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    },
+    {
+      "id": "f_quota",
+      "round": 3,
+      "status": "pass",
+      "group": "fault",
+      "task_outcome": "expected_incomplete",
+      "review_status": "not_reviewed",
+      "metrics": {
+        "steps": 1,
+        "seconds": 9.13,
+        "equivalent_tokens": 10253,
+        "input_tokens": 26477,
+        "cached_tokens": 21120,
+        "output_tokens": 1392,
+        "llm_calls": 5,
+        "review_calls": 0,
+        "tool_errors": 1,
+        "stop_reason": "budget"
+      },
+      "artifact_sha256": {
+        "evidence.json": "828eb3376aef9bb70975692e8b15cab5af0690b20458288ab92f869d65b3025e",
+        "messages.json": "637e0106ad3954afffb9058ac5163a47917dacee67fdb6966a83ce76f7eaf58c",
+        "plan.json": "ead193cf520cbae5debf5f633e74cbe78883f90e097a8f3d3f586e9da64748c0",
+        "report.contract.json": "9d537fb4753fec24a7c1e37d7e39607a19d48a520ffaa19cd91739da81440cff",
+        "report.evidence.json": "760e07441b45c6144af4d08f1f32d2d6e2de2ba0b2ce01f2a0931443c4065d25",
+        "report.md": "68bb93625be118c99a8cfacbbf7a7afd5b5acb3ac95171d9ee201b524180c3ec",
+        "report.quality.json": "abf314296a452cf4a028dc519eb242ca6221beb150991bc37e0c9b13cfc3042a",
+        "report.review.json": "13d73a4952e5e6c883e85981ee4eb23a6d48427ea45e5cc693c924e543973372",
+        "report.reviews.jsonl": "701a7130217668f7df320167cfbf90ebd16a5ff2828e450c35f8b86a515aa20c",
+        "task_contract.json": "58dea2a66f7434390167f7882acf12d03d22ec9f22f4634b10adde48298a9429",
+        "trace.jsonl": "e49180bf86992117c1c15b635023e2956b4934c96afcb6101d28c11929bc44d2"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "真实budget且未审稿，预期未完成状态正确；兜底报告已存在，正文却称文件未落盘，执行状态表述不一致，不能当报告内容通过。"
+        ]
+      },
+      "task_dir": "workspace/evaluations/stage12-independent4/cases/03-f_quota",
+      "mapping_audit": {
+        "status": "draft",
+        "claims": 0,
+        "mapping_sha256": "838bbef06b7d376c10051447b820404d6866590f2856133525020e000b972970",
+        "claim_kinds": [],
+        "source_kinds": [],
+        "records": 1,
+        "omitted_records": 0,
+        "structural_links_valid": true,
+        "semantic_support": "not_certified"
+      }
+    }
+  ],
+  "review_copy_normalization": "Skipped dependency has no artifact_sha256 in original results; generated original template uses {}, while review expects null. Independent review copies normalized to null only for that item; original results/template unchanged, verdict remains uncertain/pending.",
+  "review_output_sha256": "d44bffdbfc015f03d23dac3d2324bf42a4e0db233b514d576d76a8a67c3e34dc",
+  "human_pending_copy_sha256": "1cb4b3467cee3927f4015f52ab765865b4a8c3da605f9e3f5e31e87b1b83e060",
+  "review_output_status": {
+    "acceptance": "not_accepted",
+    "human_review_complete": false,
+    "semantic_clean": false
+  }
+}
