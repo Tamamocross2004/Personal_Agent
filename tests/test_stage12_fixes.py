@@ -100,6 +100,15 @@ def test_numeric_presence_allows_decimal_notation_and_grouping(tmp_path):
     assert ledger.validate(c.quote,[c])
 
 
+@pytest.mark.parametrize('source,quote',[
+    ('记录为[3,8]','两个数为3和8'),
+    ('记录为[100,200]','两个数为100和200'),
+])
+def test_numeric_arrays_are_not_thousands_groups(tmp_path,source,quote):
+    ledger=EvidenceLedger(tmp_path,source)
+    assert ledger.validate(quote,[Claim(quote=quote,kind='direct',supports=[{'source_id':'user-1','excerpt':source}])])
+
+
 def test_history_feedback_locates_every_missing_limits_even_unknown(tmp_path):
     ledger = EvidenceLedger(tmp_path,'沿用旧假设')
     ledger.add('history','记录日期2026-09-01，输入单价13元。',source_id='history-1')

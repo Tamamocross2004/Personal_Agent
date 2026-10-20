@@ -175,10 +175,19 @@ class EvidenceLedger:
                 def numbers(text):
                     from decimal import Decimal
                     # 标准编号及本次真实证据ID是引用标记，不是原句中的事实数值。
-                    text = re.sub(r'\[([^\[\]\n]+)\]',
-                                  lambda m: '' if m[1].isdigit() or m[1] in self.records else m[0], text)
+                    def bracket(match):
+                        if match[1].isdigit() or match[1] in self.records:
+                            return ''
+                        try:
+                            values = json.loads(match[0],parse_float=Decimal,parse_int=Decimal)
+                            if isinstance(values,list) and all(isinstance(v,Decimal) for v in values):
+                                return ' '.join(map(str,values))
+                        except ValueError:
+                            pass
+                        return match[0]
+                    text = re.sub(r'\[([^\[\]\n]+)\]',bracket,text)
                     return {Decimal(n.replace(',','')) for n in re.findall(
-                        r'(?<![\d.])(?:\d[\d,]*(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?',text)}
+                        r'(?<![\d.])(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?',text)}
                 supplied = set().union(*(numbers(r['excerpt']) for r in refs))
                 novel = numbers(claim.quote)-supplied
                 if novel:

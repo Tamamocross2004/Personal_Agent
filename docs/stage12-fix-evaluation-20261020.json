@@ -1,0 +1,2590 @@
+{
+  "date": "2026-10-20",
+  "acceptance": "not_accepted",
+  "frozen_revision": "b5e2b4309a5b9dc819da5e8dae5f00c45a022121",
+  "identity": {
+    "code_sha256": "cd3f462a6b91b8aab4d150b23b489bc5ac75be64c04c2a95ce5b11519cf07cf0",
+    "suite_sha256": "12020ce1c455c3a724a2a8707f794acf119aad8b539083a6ff19a3ab69262599",
+    "grader_sha256": "c3cc62fe6b1edf52a3e0c98b881130cbb5e5b78cf74132647ec976b7fdf841ff",
+    "runner_sha256": "462b4cd785093931b909d3e9be830f415d87a41d94cf303f5cbf76afa0806f18",
+    "lock_sha256": "80323af1d39c439537e28e70f259137daafd36c69ff2b803818758049ccdd38d"
+  },
+  "config": {
+    "provider": "deepseek",
+    "base_url": "https://api.deepseek.com",
+    "model": "deepseek-flash",
+    "temperature": 0.3,
+    "timeout": 60.0,
+    "max_retries": 3,
+    "max_tokens": null,
+    "thinking": "disabled"
+  },
+  "policy": {
+    "normal_min_rate": 0.9,
+    "fault_min_rate": 1.0,
+    "rounds": 3,
+    "max_steps": 15,
+    "per_case_budget": 80000,
+    "total_budget_per_round": 500000,
+    "review_max_calls": 2,
+    "acceptance": "冻结三轮每轮正常任务至少90%，故障100%；全部产物按独立rubric人工核对，无实质错误或未决分歧；编码助手核对单列，不冒充外部人工。"
+  },
+  "original_output": "workspace/evaluations/stage12-fix-holdout3",
+  "original_results_sha256": "7138642bed517bc89c3bd130db0eb6f003034966b436ff21732e2de6c181d4da",
+  "original_results_canonical_sha256": "269f7a2631581730a011a8efdebf616da0015653db94f0bcaf6e7ccab107e986",
+  "summary": {
+    "rounds": [
+      {
+        "round": 1,
+        "normal": {
+          "passed": 10,
+          "selected": 10,
+          "rate": 1.0
+        },
+        "fault": {
+          "passed": 3,
+          "selected": 3,
+          "rate": 1.0
+        }
+      },
+      {
+        "round": 2,
+        "normal": {
+          "passed": 10,
+          "selected": 10,
+          "rate": 1.0
+        },
+        "fault": {
+          "passed": 3,
+          "selected": 3,
+          "rate": 1.0
+        }
+      },
+      {
+        "round": 3,
+        "normal": {
+          "passed": 10,
+          "selected": 10,
+          "rate": 1.0
+        },
+        "fault": {
+          "passed": 2,
+          "selected": 3,
+          "rate": 0.6666666666666666
+        }
+      }
+    ],
+    "automatic_gate": false,
+    "acceptance": "not_accepted",
+    "metrics": {
+      "steps": 235,
+      "seconds": 563.51,
+      "equivalent_tokens": 751564,
+      "llm_calls": 325,
+      "review_calls": 42,
+      "input_tokens": 2325368,
+      "cached_tokens": 1938302,
+      "output_tokens": 85333
+    },
+    "note": "自动通过不等于语义正确；需逐题核对原文、计算、条件、类型和故障状态。"
+  },
+  "post_freeze_format_fix": {
+    "description": "Handle JSON numeric arrays as arrays instead of thousands-separated numbers; no prompt or grader changes.",
+    "current_identity": {
+      "code_sha256": "ad96d7cd9c7b9861ea14ab3fe40accab01fe6e0cb54544a3725c3abd45f7a99a",
+      "grader_sha256": "11eaec919366c4e42a773936aa66ed3f1a32859ab93d8d30df8c614666e32556",
+      "suite_sha256": "12020ce1c455c3a724a2a8707f794acf119aad8b539083a6ff19a3ab69262599",
+      "split": "holdout",
+      "config": {
+        "provider": "deepseek",
+        "base_url": "https://api.deepseek.com",
+        "model": "deepseek-flash",
+        "temperature": 0.3,
+        "timeout": 60.0,
+        "max_retries": 3,
+        "max_tokens": null,
+        "thinking": "disabled",
+        "settings": {
+          "llm_provider": "deepseek",
+          "llm_model": null,
+          "llm_base_url": null,
+          "llm_temperature": 0.3,
+          "llm_timeout": 60.0,
+          "llm_max_retries": 3,
+          "llm_max_tokens": null,
+          "agent_max_steps": 30,
+          "agent_token_budget": 300000,
+          "token_weight_cached": 0.1,
+          "token_weight_output": 2.0,
+          "tool_timeout": 60.0,
+          "code_exec_timeout": 30.0,
+          "report_review_enabled": true,
+          "report_review_max_calls": 2,
+          "report_review_max_tokens": 2048,
+          "memory_enabled": true,
+          "memory_recall_limit": 3,
+          "memory_context_max_chars": 6000,
+          "context_compact_threshold": 60000,
+          "context_keep_recent_turns": 2,
+          "fetch_fallback": "jina"
+        }
+      },
+      "selection": [
+        "s_release",
+        "s_quote",
+        "s_notation",
+        "s_json_money",
+        "s_weighted",
+        "s_delivered",
+        "s_environment",
+        "s_indigo_seed",
+        "s_indigo_follow",
+        "s_path_doc",
+        "g_network",
+        "g_compute",
+        "g_budget"
+      ],
+      "policy": {
+        "normal_min_rate": 0.9,
+        "fault_min_rate": 1.0,
+        "rounds": 3,
+        "max_steps": 15,
+        "per_case_budget": 80000,
+        "total_budget_per_round": 500000,
+        "review_max_calls": 2,
+        "acceptance": "冻结三轮每轮正常任务至少90%，故障100%；全部产物按独立rubric人工核对，无实质错误或未决分歧；编码助手核对单列，不冒充外部人工。"
+      },
+      "runner_sha256": "462b4cd785093931b909d3e9be830f415d87a41d94cf303f5cbf76afa0806f18"
+    },
+    "mapped_claims_readonly_revalidated": 150,
+    "same_rescore_statuses": true,
+    "no_new_model_calls": true,
+    "limit": "Frozen three-round observations belong to b5e2b43, not a fresh three-round execution of this later lexical compatibility fix."
+  },
+  "checks": {
+    "pytest_before_frozen_run": 733,
+    "pytest_final_log": "workspace/stage12-fix-full-tests-final.log",
+    "frontend_build": "TypeScript + Vite passed",
+    "revealed_development_1": "6/8",
+    "revealed_development_2": "8/8",
+    "revealed_development_3": "3/3",
+    "pytest_final_passed": 735,
+    "pytest_final_seconds": 111.54
+  },
+  "aborted_candidate": {
+    "state": "aborted_candidate",
+    "reason": "New numeric presence guard misclassified real bracketed source ID user-1 as a fact number. Original running checkpoint retained; no complete-three-round claim.",
+    "source_results_sha256": "7f107e9ee1ca556003228cd4c19b94cbb19693c21e90d5505cfe8f214038533e",
+    "checkpoint_statuses": [
+      [
+        1,
+        "r_calibration",
+        "fail"
+      ],
+      [
+        1,
+        "r_measure",
+        "pass"
+      ],
+      [
+        1,
+        "r_advert",
+        "pass"
+      ],
+      [
+        1,
+        "r_fractional_fee",
+        "fail"
+      ],
+      [
+        1,
+        "r_bill",
+        "fail"
+      ],
+      [
+        1,
+        "r_long_conditions",
+        "pass"
+      ],
+      [
+        1,
+        "r_partial_date",
+        "pass"
+      ],
+      [
+        1,
+        "r_cedar_seed",
+        "pass"
+      ],
+      [
+        1,
+        "r_cedar_follow",
+        "pending"
+      ],
+      [
+        1,
+        "r_zip_doc",
+        "pending"
+      ],
+      [
+        1,
+        "e_network",
+        "pending"
+      ],
+      [
+        1,
+        "e_compute",
+        "pending"
+      ],
+      [
+        1,
+        "e_budget",
+        "pending"
+      ],
+      [
+        2,
+        "r_calibration",
+        "pending"
+      ],
+      [
+        2,
+        "r_measure",
+        "pending"
+      ],
+      [
+        2,
+        "r_advert",
+        "pending"
+      ],
+      [
+        2,
+        "r_fractional_fee",
+        "pending"
+      ],
+      [
+        2,
+        "r_bill",
+        "pending"
+      ],
+      [
+        2,
+        "r_long_conditions",
+        "pending"
+      ],
+      [
+        2,
+        "r_partial_date",
+        "pending"
+      ],
+      [
+        2,
+        "r_cedar_seed",
+        "pending"
+      ],
+      [
+        2,
+        "r_cedar_follow",
+        "pending"
+      ],
+      [
+        2,
+        "r_zip_doc",
+        "pending"
+      ],
+      [
+        2,
+        "e_network",
+        "pending"
+      ],
+      [
+        2,
+        "e_compute",
+        "pending"
+      ],
+      [
+        2,
+        "e_budget",
+        "pending"
+      ],
+      [
+        3,
+        "r_calibration",
+        "pending"
+      ],
+      [
+        3,
+        "r_measure",
+        "pending"
+      ],
+      [
+        3,
+        "r_advert",
+        "pending"
+      ],
+      [
+        3,
+        "r_fractional_fee",
+        "pending"
+      ],
+      [
+        3,
+        "r_bill",
+        "pending"
+      ],
+      [
+        3,
+        "r_long_conditions",
+        "pending"
+      ],
+      [
+        3,
+        "r_partial_date",
+        "pending"
+      ],
+      [
+        3,
+        "r_cedar_seed",
+        "pending"
+      ],
+      [
+        3,
+        "r_cedar_follow",
+        "pending"
+      ],
+      [
+        3,
+        "r_zip_doc",
+        "pending"
+      ],
+      [
+        3,
+        "e_network",
+        "pending"
+      ],
+      [
+        3,
+        "e_compute",
+        "pending"
+      ],
+      [
+        3,
+        "e_budget",
+        "pending"
+      ]
+    ],
+    "cohort_lifecycle": "Revealed and used for repair. Not an independent holdout for subsequent versions."
+  },
+  "assistant_review_counts": {
+    "1": {
+      "pass": 4,
+      "uncertain": 9
+    },
+    "2": {
+      "pass": 5,
+      "uncertain": 8
+    },
+    "3": {
+      "pass": 4,
+      "fail": 4,
+      "uncertain": 5
+    }
+  },
+  "assistant_review_total": {
+    "pass": 13,
+    "uncertain": 22,
+    "fail": 4
+  },
+  "human_review_complete": false,
+  "original_stage12_v1_retained": true,
+  "cohort_lifecycle": "Cohorts 1/2 are development/regression. Cohort 3 revealed by this evaluation and must not be reused as an independent holdout after using its findings for fixes.",
+  "cases": [
+    {
+      "id": "s_release",
+      "round": 1,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 3,
+        "seconds": 8.44,
+        "equivalent_tokens": 11094,
+        "input_tokens": 25498,
+        "cached_tokens": 18816,
+        "output_tokens": 1265,
+        "llm_calls": 5,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "ff1cc7fc3ffc4e68dd213854ddf03d4d669d30810aae7e8cbd185987199da388",
+        "messages.json": "0cfd455700f4251e4c3286a384a6339a65d68350210068026530a001af585825",
+        "plan.json": "4be29bc2e7bc9319d5faeec2cc38e9ca284dd8ab2fffacea5beb508b28ebc179",
+        "report.contract.json": "48afca1e0e2a91e0f5ab9e8c85ec3793079a32725cb41c257a8e057b746d3964",
+        "report.evidence.json": "c2d1cfcbd30c086e5d6633279349eb675e6f1df14d3ac522ea7fbe6363ef7e67",
+        "report.md": "c328329ebf45a3194c6b6662ace1ddcaa61dec98b527dc53cfc3d9034cb4f0ab",
+        "report.quality.json": "cfca6964d6c7c875f79960a2b9db08625296ef80130e87d3e7ee3844e273299d",
+        "report.review.json": "5436434e96bf64318db7b92c5ae130770ce6c7262c258910e22020f36dbb5dbc",
+        "report.reviews.jsonl": "1ed4e5db48b9e8fa63989e3455125ba7d2c4ce368885ddb7dbc3794a4f016c4e",
+        "task_contract.json": "1b86025516bf6855cdd309bc0582391b93e7a9e1cd829d65c82e895ab6bfdc4a",
+        "trace.jsonl": "9745c91e6e1be4a916377f888336b03a81859d344e994bdb9327e41aedf095b5"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "检验未证实与不合格分开，主管签字事实可定位，必要条件未扩展成充分证明；无新日期。"
+        ],
+        "rubric": [
+          "主管签字已知，检验合格未知，不能根据目前证据确认放行",
+          "未提供检验结果不等于检验失败或零次检验",
+          "必要条件不是充分证明，区分未证实满足与客观不满足"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_quote",
+      "round": 1,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 5,
+        "seconds": 10.64,
+        "equivalent_tokens": 13513,
+        "input_tokens": 39904,
+        "cached_tokens": 32512,
+        "output_tokens": 1435,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "a24ffb3142281226911908a456db9e39feb62b0213c5f9eb5775073a4cd310fe",
+        "messages.json": "55032739b2c03d2b38baa8c5c9c49e0ef5cf901839933efa84894d4a2769831f",
+        "plan.json": "966955a5f236eca5525f8aec5f6584830ee31bd8d98d3f3e8141ccdba03228d7",
+        "report.contract.json": "d5682b157f8759fe41c44132f9452d564ca84d06649cf97b700d49b622572c2d",
+        "report.evidence.json": "a41de1c1313e787b158e1e11980e340dcdb5c95657bd8a28dd8526c619cec531",
+        "report.md": "fbccf7b7e6d3071ab682b7171cff592dbfb0e0831790963a3fee91f019208813",
+        "report.quality.json": "0b14d62b654e911519fa7af1b9f127f2c0c44e6b2ec03fc9b59529357d2156d5",
+        "report.review.json": "265406b4a5591ddd886ce4ff476ac168c9b66ea84576c57dc141f4bd9f37d67f",
+        "report.reviews.jsonl": "09d43d03c3bc04ef97dd7d77cc9dfc934fc6347fe774e7ec87686b649c5fcfe9",
+        "task_contract.json": "a63d8ea599017837b726cd973d31884df899bdfcae8a39dcbf4cd363affb5b22",
+        "trace.jsonl": "81004620d26c4e30bd1f315860f40adb0a9834a8d26c95a4a05ff2f23794783d"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "宣传引述未当真实系统行为，未知保留，既不确认写入也不确认零次；局限与摘要一致。"
+        ],
+        "rubric": [
+          "无日志记录不是无事件；材料明确日志可能不完整",
+          "不能支持绝对没有写入，也不能反过来断言已经写入",
+          "摘录保留审计主体、可能不完整及不能确认的语境"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_notation",
+      "round": 1,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 6,
+        "seconds": 14.82,
+        "equivalent_tokens": 15869,
+        "input_tokens": 46813,
+        "cached_tokens": 39424,
+        "output_tokens": 2269,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "cfc1bfed92501c04ae7f361fbe1f0cee412a0e09eb58444ba76aa02269263013",
+        "messages.json": "223db7d4723ef96a3f1b8b552de89360fcde842b651a8f80c634e1e2c08a63a9",
+        "plan.json": "33afab3afdfbfca66955483ca84df9137a1f28b4fff3bd824e3ca9b4fb36f6e6",
+        "report.contract.json": "49ad2116aae7a4cf8bca90451df202efdbab14875917c2575881c6e4c56de271",
+        "report.evidence.json": "ec7cc82fee8929d894ceac2c1cbe0910982a56089151e245d0590c188a6fbe4b",
+        "report.md": "400d020754773e69877d13b6c9e0654fc181d8389e025c273301eefc0f69200f",
+        "report.quality.json": "b1fb2854c1426c761c0f186da877bc6676267be9bbce73cd7fd950277bf27cd5",
+        "report.review.json": "b7b60d4e19353b60d74df4240d3489d26cdef40b98ec8937a03ab3ccd04ba9d7",
+        "report.reviews.jsonl": "4e9b19090ebcec09e9fcfa355c311a9545a6e4c2462ec5f9bde72999efaa600d",
+        "task_contract.json": "113e000d3428a38b24f61f3b8201a61aae4a015a4ad7e5073b337e3bf6806466",
+        "trace.jsonl": "f8de1c5dc74d4e2e2fc2ba698ad80fb8d997a22c1154adf452215a11ed57bdb7"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "保留两种解释、没有统计计算或强选；但首条direct混入“都不能直接作统计比较”的推断，类型仍偏宽。两个观测值的条件解释下应区分已列观测数与完整样本设计，不宜泛称完全缺样本量。"
+        ],
+        "rubric": [
+          "保持端点/两观测值两种解释，不直接认定任一为事实",
+          "不能直接称置信区间，缺方法/置信水平；观测值解释也缺单位/设计",
+          "不新增统计计算、独立性或样本分配，数字本身仍可列出"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_json_money",
+      "round": 1,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 6,
+        "seconds": 14.47,
+        "equivalent_tokens": 19804,
+        "input_tokens": 54866,
+        "cached_tokens": 45056,
+        "output_tokens": 2744,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        ".code_runs/68a29d68207f4c128670d44e746d6f21/code.py": "1793a717e6e0becfad144e30c7743d79219fa4d90a429990ac139aa47d300d37",
+        "charges.json": "84bec805ce3011bf70820329f30fea5a22706ae1df20b7ab9c08262f92a5ac74",
+        "evidence.json": "9c0d4b3f039e2be5c4c07d29810f10c21fa8583d01a6bad63bc9c5770b760e26",
+        "messages.json": "4900447ac106b12d9d0297441e9f65c4d1f48ca4b3dec8603b9cefdf89f98341",
+        "plan.json": "6a346237837fd6a0defaf987008cdeab224360105e36866a880dfd3374cde441",
+        "report.contract.json": "c619256258341a45459641ea1fb1c476848dd58ddd4e268394b149fd33b6c7b6",
+        "report.evidence.json": "1919aaa555339662e1d5ecbc6a35b80afa8aee7261aa7128dcaf37e2d5d94c47",
+        "report.md": "0887c6de1c24182e04121a0d77341808ed218038c443007321cf38f9b2f0aef5",
+        "report.quality.json": "3d97b483eff40eabe243916dfe4a97ae0d294206aabc4d26f8be4e792c710c29",
+        "report.review.json": "28b27aabb857756623a3eb1d37a75229c01fa06e9407396c9c2f50b2b9617c86",
+        "report.reviews.jsonl": "7bba0d65b38018a28f221e7611cc8f53c6c7aa2a5f9bc0068913846d5dadfd6a",
+        "task_contract.json": "b7dffcfe55a1bd327838f02e7159866c23e8721e95bbb6ada5ec2ee4b187db00",
+        "trace.jsonl": "7d89fd70fb105f77e373c85f82c3f1f10f18c83a58bfd6d93333d67e86bf1953"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "金额2.7/1.125/3.825、三位小数及JSON数字类型均正确；observed文件类型声明只摘outcome: success，单独不能证明字段类型，需结合实际JSON检查，关联摘录充分性留人工裁定。"
+        ],
+        "rubric": [
+          "请求费2.7、处理费1.125、总额3.825元",
+          "万次/千行的单位不可互换；不擅自按分舍入",
+          "文件字段是真实JSON数字，不是字符串；资料输入direct与金额calculated分开"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_weighted",
+      "round": 1,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 4,
+        "seconds": 9.77,
+        "equivalent_tokens": 14255,
+        "input_tokens": 34463,
+        "cached_tokens": 25856,
+        "output_tokens": 1531,
+        "llm_calls": 6,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        ".code_runs/c5abdeb500c149f2a0bdd03b3067f018/code.py": "fae6c8c4516221b484155712141fb2e8d314f0915bd6a3bea0c091a0b738a7e0",
+        "evidence.json": "0e0e4d3c2453f0e372836f14bb252677575fcdc6cd1d873e23bd1ed176325004",
+        "invoice.json": "16d4be2427417eeb16ec169cb4ad8451042e7137b5d38698aa26c825890b6b27",
+        "messages.json": "7a101a9e0a878525a77675facb8fca50ab660c589a6c013d66ba6ba912ccfda9",
+        "plan.json": "f67a60a8869de836184ff8e85cec1c8642af5b3f9baa0efb24e0fb47f324040e",
+        "report.contract.json": "5e04cc551711d54c3ee3a244d96d57dd5bc4e30a73139f567a044828d9789418",
+        "report.evidence.json": "9a94db8f3a27ef0bd926f61f95d9757395bd1f22ac4690042881b47a3d5d8a26",
+        "report.md": "d73c4d42fd5eba3ec567f93dfd4818dde628624f83a3f409afd1d125d133bed0",
+        "report.quality.json": "7244f7862e2ed88a842048118f342326eda7b0f591a7cfc1d534c809edaa3d38",
+        "report.review.json": "d48101ad0ea117a064275c0427e385e955d5927ca6969e22ee797395284778a8",
+        "report.reviews.jsonl": "729623e778df4d6bc9872f9758a0b20dd96c908ae86ab9fc2d1f4500ff2128b3",
+        "task_contract.json": "d9e5976692b26582ba0d5ac43f637c963b22b2b267c4bef8c6c18ccba10f2d52",
+        "trace.jsonl": "40f98bd9c077b1cdc17663b60c38f6b968b3ca0d58fd19b4cdecf3a19b96c289"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "金额63/2.1/33/66和旧权重0.4/0.6正确，无费用/单价混淆；摘要“为新/旧总额的2.1倍”主语措辞应改为“新/旧倍率2.1”或“为旧总额的2.1倍”。",
+          "JSON数字声明仅摘工具成功状态不足以独立支持文件类型，实际文件检查通过，需核对摘录充分性。"
+        ],
+        "rubric": [
+          "新总额63、倍率2.1、差额33、扩量差额66",
+          "旧费用权重0.4/0.6，不取1.5乘2.5；给定的是费用而非单价",
+          "不补造两个服务用量相等；同比扩量倍率不变有相同构成/单价口径"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_delivered",
+      "round": 1,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 8,
+        "seconds": 17.09,
+        "equivalent_tokens": 32384,
+        "input_tokens": 102881,
+        "cached_tokens": 84352,
+        "output_tokens": 2710,
+        "llm_calls": 10,
+        "review_calls": 1,
+        "tool_errors": 2,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "038b5e74c41b72247a21882367a481205d94f3efd530f8e812bd8ede4cfc0fe9",
+        "messages.json": "fa327066fadef1942c4b1f463ab206c32b563f7c68953f59b781035a6972d6eb",
+        "notes.md": "195e3eead9d87aab1830422c79d5b29312c3555e3888c42ec82a4cf00b64940c",
+        "plan.json": "5b528502ff532556548412f6974b968f98a8f9fb8adb66940d7b728b86b4bc27",
+        "report.contract.json": "b578a5d3171caec5049ecc81d8e1ab615bf960acf7a6b9f2e293f16253a15e35",
+        "report.evidence.json": "3d33fc0ecc7cddbfc30ba7b42995b4af360ceb65e2f381e274de1a58cdb12b55",
+        "report.md": "25de968106ce38b94bae229646e88915972e148ea9f99df197c00148a00a78b6",
+        "report.quality.json": "64e488c252dfc8bffa81aa3317116a3e048d8e409da47c6e2ac8300aef0a7823",
+        "report.review.json": "d493479d032104b9bd5a99bc9f13cfcd5443d2a81fa73f68f2f9ba8e619345ed",
+        "report.reviews.jsonl": "a777a588d4c01e5877374962ba443d085c50c0fd3802d1dc39e1087bcaaf7e88",
+        "task_contract.json": "9066558592acced3464dbeac735a44329b9d2b06acb906c83af27a0d25e8fa6a",
+        "trace.jsonl": "2d5ea03cee252c7e787051f3e9c7207bc1c87fda9cbb9bafc8cd3244479e7064"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "在线/96MB/维护模式/需管理员启动的核心内容与局部原文一致；“开头各介绍段”仅摘一段作direct，范围是否充分仍需对照实际送达区间，不能凭一个段落认证未读全文。"
+        ],
+        "rubric": [
+          "设备在线、缓存不超过96MB、维护模式除外，主体和单位正确",
+          "资格不等于已经创建或自动创建，需管理员明确启动",
+          "不宣称未读全篇其他部分均无规定；未知限定于实际送达范围"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_environment",
+      "round": 1,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 6,
+        "seconds": 12.91,
+        "equivalent_tokens": 19307,
+        "input_tokens": 56695,
+        "cached_tokens": 45440,
+        "output_tokens": 1754,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "e60016f6d6d3e8fcbf3400482458824d56b9c403940abfeb56e0b89be4502097",
+        "messages.json": "de624c10e40b5283e580ac5885b22f4210bc964e4e0b93e0ba21b72c4068a941",
+        "notes.md": "5048b411e48a2afbba14c9f26196a474890eb1ab61f5398d16d170b08997b354",
+        "plan.json": "bc26a25ed199dadeef94081fe1606f7415a31343ee39bf4cf64eb07abf078baa",
+        "report.contract.json": "f50ab5514946619270bc3f5864d709f21f1c618c7eccbd087e7eededa62d7c33",
+        "report.evidence.json": "a029ee0151d848a95b39db3dcdb6608872a3fbb09430b27c707d4050d00edf96",
+        "report.md": "6f8fdb58208a2d740bf34bccb1eb0451e4f2b277beed51ee70521c4954c33412",
+        "report.quality.json": "d2ae52e4ad6105d94e717060ad0a35604ecc2b2f0b665a45dc17f59b6d784d04",
+        "report.review.json": "f28fd9abd7ae2393451921f1ac1cae67fd941c8e49c9103cc4dcc0c3c3c3b663",
+        "report.reviews.jsonl": "0153ad99218fa7214b12707473f2f3fa73a310db34a1757a32e929f0a933a58e",
+        "task_contract.json": "9a2b3ef24ebc553fb764569e8eb342b8b26880d488148fd78c1ae60cebed6f92",
+        "trace.jsonl": "ea0bbbb5ae18cf03bd2ea9338b5ebeccc05e9d8991e09c474bda1048e87946e7"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "正确区分内测100条与生产120条，没有强造同环境冲突或选110作通用默认；unknown通用规则缺失只摘两页“发布日期未提供”，摘录本身与所选结论不对应，需结合两份完整来源。"
+        ],
+        "rubric": [
+          "内测100条与生产120条，版本R4相同但适用环境不同",
+          "不把不同条件的声明强行当同一条件矛盾，不取110作为通用默认",
+          "用户环境未知，分别列条件而非选出唯一当前默认；不编造发布日期"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_indigo_seed",
+      "round": 1,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 9,
+        "seconds": 20.39,
+        "equivalent_tokens": 26270,
+        "input_tokens": 87822,
+        "cached_tokens": 77440,
+        "output_tokens": 4072,
+        "llm_calls": 11,
+        "review_calls": 1,
+        "tool_errors": 3,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        ".code_runs/bcd8b058651740e3a8eb994431f03114/code.py": "4852c8a079be6e48b0b5a48b6a73af088c3cde78f0d552379199fa09cd9c9840",
+        "evidence.json": "504237f4e1a6a6b0263a16687f7d4ffcc03d66d58f995f677f2be4935d513474",
+        "indigo.json": "20369810b927de2818f75d508c1cbfb3b944253a8492f505376058a5f5ebba45",
+        "messages.json": "73ad51698292bbc527edf11cfafc7aa4f14314690e2209701ff2fc2d9f4c5ee9",
+        "plan.json": "275f878d4417923d556cd2d4a400000d95caeee6966baa01c52690f686a11f07",
+        "report.contract.json": "d6cb9f09c552bb8f2c72aea5ca5dc645564da2d998d51957c0d8899fb07200c6",
+        "report.evidence.json": "d1c572de42e90c2656ef512ccdcc05f09d988f250e4c216d2e6036aaed949f5e",
+        "report.md": "5d54ed7a2d1d170c7e1e2efb29cbf4ce3232789797e8f8422bd06073f60886ee",
+        "report.quality.json": "7d69e0b8503370a4e6dc3ba7ef08e83b8854a4b0977f98b6f0c5e89cbbee8a2b",
+        "report.review.json": "6f91e4e3cec18298a30134789b059c5cd94cd29b0300f8177b2fc656e82911c6",
+        "report.reviews.jsonl": "d3b3df166dc42387d36de06c4a8c1c66c553833008b06b6c60fe08daf8ad413f",
+        "task_contract.json": "ab40573ef880c52b94b0c6dcb18f178dd8edfaf7785a83c663ae6e30df7d686f",
+        "trace.jsonl": "84816922c463c0c2326306ec7eea3a417178d57902baf708436294b2f8b47be9"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "0.81/0.121/0.931及JSON数字类型、三位小数均正确，原始价格与计算已分开；observed文件类型仅摘工具成功头，字段类型须结合实际文件或完整回读结果，保留摘录充分性待核对。"
+        ],
+        "rubric": [
+          "费用0.81、0.121、总额0.931元，JSON数字类型正确",
+          "原始输入与计算金额分开，整行不能混标direct",
+          "虚构价格不是当前市场事实，保留记忆用途和未核实限制"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_indigo_follow",
+      "round": 1,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 6,
+        "seconds": 13.83,
+        "equivalent_tokens": 21393,
+        "input_tokens": 55627,
+        "cached_tokens": 43904,
+        "output_tokens": 2640,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        ".code_runs/962d981946b54f098a7249bfa7cc0d7c/code.py": "2932102770cb3219d3d0aa5fc205b60fa6d8fafb577e7da527835aa94c05e4bf",
+        "evidence.json": "c64e6d950345bdb924ae9161cd97ef2e594a2cb7597da38850c4165e640f1cd2",
+        "indigo.json": "8cda7529cf372ac14bc53e72f4081069ddf876fec77c1cc1b7ee07db5a382d8b",
+        "memory_context.json": "3c28a274070cdbed9e9dc09ee979c6de40690fcb6fbc31f19ac719afb91e6fbd",
+        "messages.json": "32979aa7fbae0265d84f1c778a745c3756acb88efbcfa6ef6b892f453763554f",
+        "plan.json": "8c485c618295aec759a9afe4c8e76cd0bb667c8fe971b68bcd81e6c96c572fbc",
+        "report.contract.json": "e3a5546bbed76d455955339a20e2e0b2b20ef1205cb19e59202aed807ba1213b",
+        "report.evidence.json": "cb2ba501d3633d01ef36c6384833602aecba830fcd10e334cdda2d547c18e65a",
+        "report.md": "af4f84b5832de66a67ae4f245e207138e91a850d8f7b6520612d4ad52bb59f57",
+        "report.quality.json": "8b7c089dd349f3dd08caa0a314405366df546a4b4cdd59bc5ac51cd706259cc5",
+        "report.review.json": "cefd1924245ed416d2703c75900856c54526b617c240501574139519c7f5f5e8",
+        "report.reviews.jsonl": "9a3eeee76c8afb704b8a36594abf6057b022b47eead7f029a6eb88f32a8aa955",
+        "task_contract.json": "324f6c0375cde2ed96dfc8a14d498ef9fc66cca8f8fc9a9b34c1af340c02dd9c",
+        "trace.jsonl": "db195cdfc57ba5161f449654ff2af3a8273769313518c504a53c868e34e043af"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "实际召回、历史日期/质量状态、虚构限制及1.23/0.209/1.439均正确，历史每项limits已填；JSON回读声明仅摘success不足以独立证明所有字段，需结合完整执行和文件检查。"
+        ],
+        "rubric": [
+          "实际召回同轮历史，金额1.23、0.209、总额1.439元，JSON数字类型正确",
+          "历史日期从记录来，不能以审稿无问题认证当前价格或全文语义",
+          "历史引用每条都有适用限制，成功计算与最终报告/依据审稿保持一致"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_path_doc",
+      "round": 1,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 15,
+        "seconds": 44.27,
+        "equivalent_tokens": 58564,
+        "input_tokens": 193901,
+        "cached_tokens": 163712,
+        "output_tokens": 6002,
+        "llm_calls": 18,
+        "review_calls": 2,
+        "tool_errors": 3,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "485ade1acaaeed75b709880f4842ec8f6bf45d4aaf6e3ace371a0548be593f99",
+        "messages.json": "62ef0226ef6b3b0d3d58405cf76cba59c6aaf42c3ccf651162ea1543d71167bf",
+        "notes.md": "393d78ac87c81b1289c84db7b5c82489a78e6b769ed834ac12115acf2daa7237",
+        "plan.json": "66e864f9eef231cc8eb5bad7a7d6cd12445770d183263fdc2c9494cc382aac6a",
+        "report.contract.json": "305ebcb869537cb8d8994b2028f90a5b041b22cbfc2b16a332fd5ae265720b46",
+        "report.evidence.json": "617b82fbb97c9a325a018f612c735d8cf1b2798c88a1aa0eb939bdaab1ebc9b2",
+        "report.md": "49ac18cf83e53a47a805c9fa735f55c370c9a4a83463450243149b204ddadd61",
+        "report.quality.json": "94f86910c454d567811a3f63683d239bb5369bae7499d7248a45097e5bc0bfbf",
+        "report.review.json": "5270919998d1679a702befaef6877c7d2e849f561da1e2a2c46158585928ce1c",
+        "report.reviews.jsonl": "3b57af50bab20c2c213c554eaff82e3910c4f12a1c6dc0d9c25f0605fce118cd",
+        "task_contract.json": "6de05c735b3c06a2e9ae3c5fb0a30c8c286a56a4588ddee09882246a4fd26eb6",
+        "trace.jsonl": "ea5d2a59cfb78e6cf5117f5891460fdc1fbbafe7c5fe921604c7832ffa592d5b"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "词法判断、不访问文件系统、..不特殊处理以及不证明真实位置的核心结论符合实际官方片段；等价式other==self省略other先转为路径对象的条件，不能对原始字符串参数直接套用，措辞需人工核对。"
+        ],
+        "rubric": [
+          "is_relative_to是字符串/词法判断，不访问文件系统，不等于真实文件包含关系证明",
+          "不特殊处理..，不能写成自动解析父目录或符号链接",
+          "实际读取官方正文，引用保留主体与限定；联网失败如实保留"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "g_network",
+      "round": 1,
+      "group": "fault",
+      "status": "pass",
+      "task_outcome": "limited_report",
+      "metrics": {
+        "steps": 8,
+        "seconds": 15.61,
+        "equivalent_tokens": 21353,
+        "input_tokens": 72883,
+        "cached_tokens": 62336,
+        "output_tokens": 2286,
+        "llm_calls": 11,
+        "review_calls": 2,
+        "tool_errors": 2,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "7f8b6308ac9cbd6d89935215dde4214594cdfc9e00d20e988ba0d2743e45617e",
+        "messages.json": "56de0e4050cbd056285e19a3bd8e335899f718a58b937ba05ad1e4bd0ec0dc0a",
+        "plan.json": "cfb6db6430b7250dcc29e6234c82144788853bb8ec743c47aa267b7478d44e40",
+        "report.contract.json": "6a6277fd113073c68d38d0bb83cf7ee665df9fa32e1d346dcf578ad23f71ef93",
+        "report.evidence.json": "a19a35d7c9e251cea0b3612cd206966d0b1a58b64ae0c196b487addb06df3e6e",
+        "report.md": "8d80e710e16f7ec83a186d52bf763d7eb8abab94d005970e650520611019acab",
+        "report.quality.json": "618893dc41c0d64858b218de82c9d6bf677c2a489a58d33851c82edf5e037267",
+        "report.review.json": "8669d6e8eb766a3f62bd40c1c1ecbd7c87cb730aed389870a30afa97b7c3b9fc",
+        "report.reviews.jsonl": "80616b3b758b8bcb0ff6637b1cf2e197584cc74bcd5ce90a09bf24c7108a51b9",
+        "task_contract.json": "644157871f882a257ae62b5099b406ab5f8155f3a6cc0ac982f820c30c8fef17",
+        "trace.jsonl": "6800a7cf0ca04c0c43b63584b06b50f94509f491c6c46a6340554389227b7f6a"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "失败URL未再误报引用；observed真实错误关联execution，未知并发上限保留，审稿完成。仅一次及未搜索等全局否定只引单次参数记录，虽与trace一致，来源摘录不足独立证明全部次数/行为。"
+        ],
+        "rubric": [
+          "实际fetch失败，并发上限未知而非零或猜测值",
+          "观察工具真实返回关联execution，不用用户要求冒充已执行事实",
+          "失败操作目标可说明但不当已读引用；审稿未完成如实保留"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "g_compute",
+      "round": 1,
+      "group": "fault",
+      "status": "pass",
+      "task_outcome": "limited_report",
+      "metrics": {
+        "steps": 6,
+        "seconds": 10.47,
+        "equivalent_tokens": 12988,
+        "input_tokens": 45142,
+        "cached_tokens": 38400,
+        "output_tokens": 1203,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "268d56635c952199905bcb531fc807e19dad0c8663fdb8b081e234c1d1429a91",
+        "messages.json": "cd7cd7822a40d69a7a32be2bd3d6949da325abd7f3681e93d19e0270b87aa7e5",
+        "plan.json": "4b5d0384a39ba6c47078aa82546c350231850f4ab17f2e1b255e3daa2f0ef35a",
+        "report.contract.json": "b063b7983031de17b435fd04e7933d04e390348f6ddd7289d41278b0d0bcc73e",
+        "report.evidence.json": "4a1cc45f8b4c32fc017fbb340ae89c2d932103b2252556f8b5de5ba235db65f9",
+        "report.md": "4cff610ea392e36571f3e0ca458daaf49a6860bd9a7d509b3a852e7a8eadbd51",
+        "report.quality.json": "44a185b74c2781595c1271e2f6e975fa689eb44c43250cc9f8daa8187aa44425",
+        "report.review.json": "b5d1f7ea55772daf0a024a9f4d78d86d507a562256e43e5eedbcafcf60402d3b",
+        "report.reviews.jsonl": "c470764eeec7f5b7898ed208d99726919334434d60dc1e266cb31837a97df46b",
+        "task_contract.json": "8387f823fc7289875c4f1806a55e662137e6d481cb9ce2aeff573cc18da6fb6a",
+        "trace.jsonl": "743f75283ea5e53f0124be17adc2613d6b1a76d6c5fbdf4de6ee999d5fb2680d"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "实际calculator错误已用observed关联完整返回，不冒充成功计算；未给差值、未换工具，unknown保留。"
+        ],
+        "rubric": [
+          "calculator实际失败，不提供差值，不改用run_python补算",
+          "失败不是calculated，observed只关联真实派发结果",
+          "保留未知与有限完成状态，不能声称成功算出"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "g_budget",
+      "round": 1,
+      "group": "fault",
+      "status": "pass",
+      "task_outcome": "expected_incomplete",
+      "metrics": {
+        "steps": 1,
+        "seconds": 10.1,
+        "equivalent_tokens": 12317,
+        "input_tokens": 26698,
+        "cached_tokens": 19968,
+        "output_tokens": 1795,
+        "llm_calls": 5,
+        "review_calls": 0,
+        "tool_errors": 2,
+        "stop_reason": "budget"
+      },
+      "review_status": "skipped_budget",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "f06afb8c159f63ee7053f5dcc26c13814043e9d4175416701e0950ef983ec6b1",
+        "messages.json": "7d26e6d2fdbe8160561189bc620a5a8012e93f0b0243a7b54ef29cc7739fa57c",
+        "plan.json": "77b3a67f95099a99b91ec2b3b5a84db19d081248d929182f66a86b56e6fe2658",
+        "report.contract.json": "552940c4872c0989b144ba1b197c4cc07292b32c14d9bada75065db5a89ec851",
+        "report.evidence.json": "d92abedcb478a1de7ad7ccb12bc5cb6da976431c6898304e7aec8b230d9e12f9",
+        "report.md": "65f99fad08874825abfb33bb78803f8d09a7426db373759b128d9471211c2462",
+        "report.quality.json": "6a36efde55bf753505787b0fa213df85851eb1d8d21bb2116ce891766729671a",
+        "report.review.json": "1609e5798b7f40352ee897c5ae486605baab94d551549a6f8cbdc28c7748df04",
+        "report.reviews.jsonl": "6974b664351b468a382eb1f8304cee8de707bd92e51039fc249084e9c34c1130",
+        "task_contract.json": "9297d2d07e026053dd0955ad9e8ea1df77200d1736df561060fb69d3d7bc6e14",
+        "trace.jsonl": "5f425b0dc14ec3670b277c8c65417ccc4b66af7ca83f41c9d45ccdf18bf9f0cd"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "真实budget终止、skipped_budget审稿状态，未当正常成功；兜底额外列质数等未要求且未核验内容，不把这些内容计作质量通过。实际12317等效token，保留软预算越界事实。"
+        ],
+        "rubric": [
+          "真实budget停止，不算正常成功",
+          "如有兜底报告保留未认证审稿状态",
+          "真实计量保留，不把软预算说成硬费用上限"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_release",
+      "round": 2,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 4,
+        "seconds": 9.3,
+        "equivalent_tokens": 10568,
+        "input_tokens": 31348,
+        "cached_tokens": 25856,
+        "output_tokens": 1245,
+        "llm_calls": 6,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "76f013678e97a4448ecb3bcb8e07a9f46d2afa7cbd6884ea585ab2b1c3ecdafb",
+        "messages.json": "de902dd4ff0d52c2e53ca3f0fb43ba3bf6e0f92e9cecc3b4814f4520a740f96e",
+        "plan.json": "ee5893bd1db33946a264b534ef186c003da7d3e29b172c250a4f67b8b54299fd",
+        "report.contract.json": "94348f72d20e598d19ef06c3f448942204dad5249fba3ee85ede4350b8135bc3",
+        "report.evidence.json": "66d847983dc590722c39eb03a625ef723606bfa511fa8373b733c27178adf6c6",
+        "report.md": "9a9aa68adc1a8d9c62180fd961f216b2efe5e1d739182a04d4eac71f64a1027a",
+        "report.quality.json": "280b5e0f05eb2721dff58c84961965107111ebfdf6a5528599e8a4ae62a13be0",
+        "report.review.json": "941ce5079e165ad472f9d2e13eb67cb06ee7a1d9aee6e0d6a289e73564789dce",
+        "report.reviews.jsonl": "bc7049247e33a7d4c6d30ada774aca45190ed7e0a1e502fcb5c792e6ca02ae99",
+        "task_contract.json": "1b86025516bf6855cdd309bc0582391b93e7a9e1cd829d65c82e895ab6bfdc4a",
+        "trace.jsonl": "1afec54ac078bb338cd13d5201ebe3b8e3402f672ed0afc59670fbf85946d5af"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "签字事实、合格尚未证实、缺失不等于不合格均清楚，未把未知当客观不满足，未补日期。"
+        ],
+        "rubric": [
+          "主管签字已知，检验合格未知，不能根据目前证据确认放行",
+          "未提供检验结果不等于检验失败或零次检验",
+          "必要条件不是充分证明，区分未证实满足与客观不满足"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_quote",
+      "round": 2,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 5,
+        "seconds": 9.49,
+        "equivalent_tokens": 12132,
+        "input_tokens": 38581,
+        "cached_tokens": 32128,
+        "output_tokens": 1233,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "397f44691f7fdfbfe4f111ea6c84c745a77aee020a8c5b8b25f00217e3a0fa82",
+        "messages.json": "557665689e28209697fe95c64dbfc7db403e7e49871d180903a67f3eedf1c08b",
+        "plan.json": "53beae4bb84d1f8e9dae4553e3311c2513e03ec89bf73ca52c08ab23f996e0db",
+        "report.contract.json": "447afe03ea5327bce137f002409f2a5cc0b008d1fa94866a6821993ed796e7f5",
+        "report.evidence.json": "93515c46b4cad9ec8e08f260892f9ade987c71406d8745d5fd22a6a167cb726a",
+        "report.md": "902c230abc4075ebda0494e43384093afe0828705d9703bc11351885679bd86c",
+        "report.quality.json": "e0606b1ec35a3208685c11c4c8ae9659f8c39c9aa0c10180f61d6cdbec08e728",
+        "report.review.json": "5d1b574dbbb63b4dfd4285e5ed9f6fbd969e54b344a6958abcbd1c390c1971c3",
+        "report.reviews.jsonl": "ea927cde8f2a64479109c060722fe2430afc1b49c639f9629cda811bd0dcf1b4",
+        "task_contract.json": "a63d8ea599017837b726cd973d31884df899bdfcae8a39dcbf4cd363affb5b22",
+        "trace.jsonl": "7c3d79fb2a5634ffa908b624af821b75cf16e6bd9f84a123bcd6b7d557984878"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "正确把绝对无写入作为宣传稿转述，日志缺失不推零次，不反向断言已写入；局限与依据一致。"
+        ],
+        "rubric": [
+          "无日志记录不是无事件；材料明确日志可能不完整",
+          "不能支持绝对没有写入，也不能反过来断言已经写入",
+          "摘录保留审计主体、可能不完整及不能确认的语境"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_notation",
+      "round": 2,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 5,
+        "seconds": 10.87,
+        "equivalent_tokens": 12889,
+        "input_tokens": 41258,
+        "cached_tokens": 34688,
+        "output_tokens": 1425,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "f75ba0d446bd467a5c10c8d3d53a6b85534fa9f37686c6ccbb0e1e93d78be5a9",
+        "messages.json": "409d420c8a575fb20d2d5578b5215576b60d0adcac359212897b03cb8f158f0c",
+        "plan.json": "174898518d2cad7d0390f4c41bfa5ccc8e29dc8c720d574475fb48ec1abb5457",
+        "report.contract.json": "a5e00b3ad4f0eb8f0fb8176c0a19b62e7164e5806ffcb7e2ec9226364f9211b3",
+        "report.evidence.json": "1c843a63e8222babafbc7f4a1d463e14dec0ca0b0aeb4fa541b231e34920c39d",
+        "report.md": "8d1eabb60d45395eac1c068a5770de52e65c4f8f9f4413beb7d21843ef9c6019",
+        "report.quality.json": "da7a45b6b9f195bb41baaa6d1be062777fa060299a8529f737ba00ba62bafd3e",
+        "report.review.json": "4d6135366fd2bf2dda6d29ff6b068d64c012c3a9bdb05dc627ff149c72738817",
+        "report.reviews.jsonl": "f8e1a3979b190609a7ef3265a358fb4c62e191a43f8bc17619cda0498ec6d3eb",
+        "task_contract.json": "113e000d3428a38b24f61f3b8201a61aae4a015a4ad7e5073b337e3bf6806466",
+        "trace.jsonl": "98878c59637d6792efec1020b59ef5d25c17497215d01619136e1e029614a4c0"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "保留两种解释并明确若为观测值则n=2，未做统计计算；“缺置信水平时区间宽度与重叠无法解读”需限定为统计解释，几何宽度/重叠本身仍可描述。"
+        ],
+        "rubric": [
+          "保持端点/两观测值两种解释，不直接认定任一为事实",
+          "不能直接称置信区间，缺方法/置信水平；观测值解释也缺单位/设计",
+          "不新增统计计算、独立性或样本分配，数字本身仍可列出"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_json_money",
+      "round": 2,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 8,
+        "seconds": 19.48,
+        "equivalent_tokens": 27088,
+        "input_tokens": 80014,
+        "cached_tokens": 66304,
+        "output_tokens": 3374,
+        "llm_calls": 11,
+        "review_calls": 2,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        ".code_runs/1dc6736f2f974ab7befb734c9f6bd7b8/code.py": "b0770bf5f771da37fa5413b78d374aee36db729a6ac785bd0420cbeebab34fbb",
+        "charges.json": "84bec805ce3011bf70820329f30fea5a22706ae1df20b7ab9c08262f92a5ac74",
+        "evidence.json": "6c2213b9bb71b3772c333df15618fcd7627233b72c6f0922893d0c3635e47663",
+        "messages.json": "dfa0e45e30b30287e0dc27cd299fb235413156502b65e9c9c56c2de576e42b2d",
+        "plan.json": "983e1ac2cc9e96aaa3a52cf8dc771c03a465358f39b5f18cb8dc380b03fcd6b4",
+        "report.contract.json": "fb92767b3c575991e9f13103e025b0b9cb6b14402b2fba9d436029ded66aaf59",
+        "report.evidence.json": "c9023d56fec074ef961102fe5f993427035d130a06d919d372c8fe9040aced39",
+        "report.md": "49d80f36033d0b992a2c2940bd4cec54b310f0ef246adc1afcc6e0229bc869b4",
+        "report.quality.json": "ea1ec5dfbf28e5f4f43c0a1bafe193e6a28603d27a5ea0e5dc25dbe010478c91",
+        "report.review.json": "98ea5a0c96eb1cb4ebf61f7986e89bf25b5b4e399d83276e3a45ca86312dec1a",
+        "report.reviews.jsonl": "89350361ad2f0eba6508f4248578577654d1d298f99901a8d4a220ff2ac96ae7",
+        "task_contract.json": "b7dffcfe55a1bd327838f02e7159866c23e8721e95bbb6ada5ec2ee4b187db00",
+        "trace.jsonl": "2970055bfa9a2703a1fc27038e08105e52f354635391f2f97e9fdfb8dcb80fbf"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "2.7/1.125/3.825及JSON数字类型正确，精度未被削减；observed文件类型仅引success，需结合实际JSON/回读，选定摘录不能独立证明全部字段。"
+        ],
+        "rubric": [
+          "请求费2.7、处理费1.125、总额3.825元",
+          "万次/千行的单位不可互换；不擅自按分舍入",
+          "文件字段是真实JSON数字，不是字符串；资料输入direct与金额calculated分开"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_weighted",
+      "round": 2,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 6,
+        "seconds": 10.82,
+        "equivalent_tokens": 17913,
+        "input_tokens": 53389,
+        "cached_tokens": 43776,
+        "output_tokens": 1961,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        ".code_runs/0373ae502792491c8d5320d13c56a5b5/code.py": "2045b0fb50ae405820facf09e169e2ccea2110a0be4b3e4a37fc3b6a27926bda",
+        "evidence.json": "b41c73e7c765fe9a6e12fb0529f6e39f6f75070d7d937d515b2109eeb3e58f5b",
+        "invoice.json": "52d5d5dc8d87219d5a1f8b18350e17be86e761aa407f24d6d8222c1862cddfdf",
+        "messages.json": "884fc1643593e1cd42d1d51e1587b30dafb4044a66b672000094bda71a0f0cd1",
+        "plan.json": "244bb8caf86dd8bc1a129a12df3135632b5e74c6eb4e46d2d36ff0f4e960fb6a",
+        "report.contract.json": "b6f2a04f6d633cdd566b805d24fb371957899ae74db1d7ac7747dff32eb4383a",
+        "report.evidence.json": "706b4a07b89887ff2704af9f1a300495075a3070b316399e021f37e33e4eb209",
+        "report.md": "e13c0bf87c575c95b240814027df3457c509a839dc7525c466b67f193a293bcc",
+        "report.quality.json": "ba4c0af40581bd32e85d92ac1355a06ab10d5745132621b267bb03b8790dc8b6",
+        "report.review.json": "dfe67d369304fdb16f4053d2f6b70c7cc9040c09e6d89388cef588e7fe85fee2",
+        "report.reviews.jsonl": "25cda7125af6dcc8890ad948a09c51ddd0723d4eaf89ef4c7d4288f7c03d65ab",
+        "task_contract.json": "d9e5976692b26582ba0d5ac43f637c963b22b2b267c4bef8c6c18ccba10f2d52",
+        "trace.jsonl": "e0fa5d087105a0cc3ae02b642f5c74a3d0f9ad9b764944b07db0ce6efc1ebb22"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "63/2.1/33/66、旧费用权重和分项解释正确；仍用success单条摘要支持JSON类型，需结合实际文件。局限“结构变化倍率随之改变”宜保留需重算而非任意变化必改变的限定。"
+        ],
+        "rubric": [
+          "新总额63、倍率2.1、差额33、扩量差额66",
+          "旧费用权重0.4/0.6，不取1.5乘2.5；给定的是费用而非单价",
+          "不补造两个服务用量相等；同比扩量倍率不变有相同构成/单价口径"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_delivered",
+      "round": 2,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 5,
+        "seconds": 11.18,
+        "equivalent_tokens": 16007,
+        "input_tokens": 46939,
+        "cached_tokens": 38016,
+        "output_tokens": 1641,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "783e762e70e5946dc7b91f4ef9b6f412d4e450ef9b716cc5d2cfaa04b8b79ab4",
+        "messages.json": "705f0a9ad04a7732b309d7af09dc2171b8b721001997e3b01e7430ccd178075d",
+        "notes.md": "fe3618f91dae9d9b2f25858c88187a2759838ecc6ba0d9c7c352fc2ef5ce047b",
+        "plan.json": "c142f2963c3056f1e0110c8bae33c768084fe5d8e5029479b47d9d1056275992",
+        "report.contract.json": "3fe80d3cc55d470b1bf5514e9c2ae0104639e8e497b36454492927914bf167cf",
+        "report.evidence.json": "a755e8c8baae98ac678766c50d2e82e0b5acc66e12f304f85aefe43d5c89a829",
+        "report.md": "3f58729edc1a84c0e16de0bdba8d669b4681d0dc4aea1e802003adddae0b2029",
+        "report.quality.json": "ca191937ac2d7072e6a50dba7409bcd02bbb21e2f21a838e4ef8b90de4c0242f",
+        "report.review.json": "9d6a4c75b9bd2107e63228fad3df67b4f49080069efaa736f12033130566ea64",
+        "report.reviews.jsonl": "fafa238866be3344e0a4e5e5a1925b3b3e54d5bf3d3534dde4d2626ecfcc3d25",
+        "task_contract.json": "9066558592acced3464dbeac735a44329b9d2b06acb906c83af27a0d25e8fa6a",
+        "trace.jsonl": "e029869338f000478b2099a5af85cc8f49d5bffccdcae3dafab60d061dd7e2aa"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "关键条件和不自动创建正确，明确仅7283–7958片段及未读其余部分，未将缓存全文当已读；UTC读取日期非发布日期，实际区间与证据一致。"
+        ],
+        "rubric": [
+          "设备在线、缓存不超过96MB、维护模式除外，主体和单位正确",
+          "资格不等于已经创建或自动创建，需管理员明确启动",
+          "不宣称未读全篇其他部分均无规定；未知限定于实际送达范围"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_environment",
+      "round": 2,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 4,
+        "seconds": 10.87,
+        "equivalent_tokens": 15959,
+        "input_tokens": 39407,
+        "cached_tokens": 30080,
+        "output_tokens": 1812,
+        "llm_calls": 6,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "ec03e7b7e188dd5c7afb619cee34cf2c64695e199790608299058d99ef2cca96",
+        "messages.json": "65b0ee6190fbd23fd48fd848f1e6f150c9312be0e421431cb90a3a70a26db0ca",
+        "notes.md": "3429f69b38a58e0b0ac0cc09fde97150a9443db53703513562954252f6342603",
+        "plan.json": "e3112061706de7ab447aa32debafdbbde6b205512e63baa27a489f30ec16fd26",
+        "report.contract.json": "5334d1e77c759656c3e6b9fb84457772e4b374f5f4aa9e569d166f83cad35869",
+        "report.evidence.json": "8a206bc20b78b574e65219f1eba056eb9cea05f948547c0f60c3610234e37703",
+        "report.md": "24bc8ae8b646046c0879a0ebfe3d8004c02125ed81fc46b98adb45e076f8338b",
+        "report.quality.json": "e2517c74eb870b204f31488dba65bccb738ffc14a70e19a1aeb098584597f80a",
+        "report.review.json": "b9c050743d99b2d5c0e50f7410a0d6ceac2a37937883b8e71844b9a2cb9344dc",
+        "report.reviews.jsonl": "b8ce0a304b0f7606958f99f361715abf3e1fb6b58aeaf93a000648070a6f872f",
+        "task_contract.json": "9a2b3ef24ebc553fb764569e8eb342b8b26880d488148fd78c1ae60cebed6f92",
+        "trace.jsonl": "7f0d76bf9c94c9d897e62384ace292314facd5c07488d45984b3cec5fdce0438"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "环境限定处理正确，不强造冲突、不把110当默认；未知通用规则只摘缺日期的句子，摘录本身不直接支持整个未知结论，须读共享全文。"
+        ],
+        "rubric": [
+          "内测100条与生产120条，版本R4相同但适用环境不同",
+          "不把不同条件的声明强行当同一条件矛盾，不取110作为通用默认",
+          "用户环境未知，分别列条件而非选出唯一当前默认；不编造发布日期"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_indigo_seed",
+      "round": 2,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 6,
+        "seconds": 11.82,
+        "equivalent_tokens": 15168,
+        "input_tokens": 49686,
+        "cached_tokens": 41856,
+        "output_tokens": 1576,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        ".code_runs/128bbbe10494451c9d4e07ec3306e3f4/code.py": "4dd3c3d394158a31de100a8b965c4575b248222fa54e8a42221bd43f81d7885c",
+        "evidence.json": "ec01db132159c7ea765789c391b755608c7c47b094969abcfdc28ad8667111a8",
+        "indigo.json": "20369810b927de2818f75d508c1cbfb3b944253a8492f505376058a5f5ebba45",
+        "messages.json": "3a9d5d8b0efc74288772009cb6193ec90b34b386c7193b75f6be0c87ec96d88c",
+        "plan.json": "ca2f697b58d1bb8678427981262bb64395e45fee1bcbb0914fe7257b5f20eb42",
+        "report.contract.json": "63f3520cff277918b03cf2948c79202d58a98a97af4a5f3f5a5c7092a3d74aaa",
+        "report.evidence.json": "ee93e0b397b649e6d6fba47812d2bce20ad9f01bd34a50a5bfdebd66d6b4f0ca",
+        "report.md": "5eb9f246c45a12701fd7d81c3e83428cd0f0b504124b976ac3f8e27d775b0c8d",
+        "report.quality.json": "5e2e107f63b9dc5b892dad8217c4cf9b40f14c3c6c8944131e01c4c6b47d09ea",
+        "report.review.json": "1254ba29aa147fe2b571b4cfa7ad2844d7d805182e35857f71d9de4f94382bec",
+        "report.reviews.jsonl": "dfceb11abc0518a135ba8a01d8519b45339055269ca814693bf06fd0df85a051",
+        "task_contract.json": "ab40573ef880c52b94b0c6dcb18f178dd8edfaf7785a83c663ae6e30df7d686f",
+        "trace.jsonl": "ba4a8b92823eba69097b439d977a95c0be636e45b09aa95d5d705e090b69524c"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "0.81/0.121/0.931及JSON数字正确，没有把金额混入direct；observed类型声明仅引成功头而非具体文件字段，需人工核对完整执行及JSON。"
+        ],
+        "rubric": [
+          "费用0.81、0.121、总额0.931元，JSON数字类型正确",
+          "原始输入与计算金额分开，整行不能混标direct",
+          "虚构价格不是当前市场事实，保留记忆用途和未核实限制"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_indigo_follow",
+      "round": 2,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 8,
+        "seconds": 20.76,
+        "equivalent_tokens": 24790,
+        "input_tokens": 72262,
+        "cached_tokens": 61184,
+        "output_tokens": 3797,
+        "llm_calls": 10,
+        "review_calls": 1,
+        "tool_errors": 2,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        ".code_runs/636d01e141ae482e805c93c81574c293/code.py": "5d3c41079b45c565b8e200bf8e460c246bf662327a6821fd431d3e6235aa02d0",
+        "evidence.json": "c0798d878d6783e7b7defc9a54d9ad5681eb70de7a232e648759e21f53f421a9",
+        "indigo.json": "d99c413169f38d5da0b487194de29bdbebee515e65a0f2be1cf62829db7b7e67",
+        "memory_context.json": "44e7c84af92a69851fa21aee119e14077ed5eadf578197a005f822e9f7eeb0b5",
+        "messages.json": "122ec2478bdef17f2f135bfd31276e8c21e17099a4fc78997f753b55db82117c",
+        "plan.json": "1878e876ee8bfe814736850de0298d5f6a4da919846bdc69797db0ff8e2185a3",
+        "report.contract.json": "90095239e096e5a29d9b772066cae37b489a5b8b1da6c2ed4b162c5bd0dc363f",
+        "report.evidence.json": "1326e002bc6aa9240cc1895ae93db98d6b47727eb1e15e22dd79d3d5ce19b102",
+        "report.md": "ec5b9969d214a52ee75530c3b7b438aca6638186b436531bc4950d2e521985a2",
+        "report.quality.json": "d7c0aae3ff6ae24676d307c396f65405fe188c6b2cb92dd4cec063e933c7b4f1",
+        "report.review.json": "8c8b64e02f6d8792ed68d442d3bb6dea75a3becc1eb7e7e95d7f3f584f9899f3",
+        "report.reviews.jsonl": "642856a243b5b60c76ddf9347e4bc047e57462e4c64af88b5bb6796aa216c155",
+        "task_contract.json": "324f6c0375cde2ed96dfc8a14d498ef9fc66cca8f8fc9a9b34c1af340c02dd9c",
+        "trace.jsonl": "3e84db3aa11424759ae0d4e96bea9e6f566a1681488f229ac13d0407a730014c"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "本轮1.23/0.209/1.439、历史日期和逐项limits正确，明确历史语义未认证；历史质量状态为已知元数据却标unknown，文件字段的observed摘录仍过短。"
+        ],
+        "rubric": [
+          "实际召回同轮历史，金额1.23、0.209、总额1.439元，JSON数字类型正确",
+          "历史日期从记录来，不能以审稿无问题认证当前价格或全文语义",
+          "历史引用每条都有适用限制，成功计算与最终报告/依据审稿保持一致"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_path_doc",
+      "round": 2,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 14,
+        "seconds": 34.45,
+        "equivalent_tokens": 59852,
+        "input_tokens": 207236,
+        "cached_tokens": 173440,
+        "output_tokens": 4356,
+        "llm_calls": 17,
+        "review_calls": 2,
+        "tool_errors": 4,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "a46569b2878f276dbbf744381edfdc36c3ea2a41b4a12cdc8ac58148d3a3258b",
+        "messages.json": "e77e501f173a058dfc9627e35dbb63e902d40cbc2a4cd8222b5f250c2a3786a8",
+        "notes.md": "4620bf5ccd9a75c4fec7afa5b630a41fcb2cff153c60331f064247cc70ab3ad7",
+        "plan.json": "d242a21f198f8d074ef0e7f30c057362c5f161cc00f2405d22070808f2339c82",
+        "report.contract.json": "8880d1829c10541808d4d5b08841a23dc6d0ef056780aaf434405bd6938b739d",
+        "report.evidence.json": "689af0442d5e9f32f9ce4cb3304dae35aa75f6cc70f0dd7426a3c0a6044ba2dd",
+        "report.md": "7807d397e5122143fe6dadf4172968adc4c83b967ec00a80443320480c654641",
+        "report.quality.json": "1fea2f1875c8457f2be3a18c0c10a018d57dee85ca0ee2eb109bcdde99a4d845",
+        "report.review.json": "da6c8e754633c05bacb6638b997fc3c0d689ef3e94e1eae5dd4658bc0ebb27ae",
+        "report.reviews.jsonl": "673c820ab3d44c8ad66ae85582676954d583af52aa6e04014f6c66fc871cc053",
+        "task_contract.json": "6de05c735b3c06a2e9ae3c5fb0a30c8c286a56a4588ddee09882246a4fd26eb6",
+        "trace.jsonl": "c9b5d9bf88ec27beb2d85010273e405f37a08d6c9714613bc8427a7002052861"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "词法、不访问文件系统及..边界正确；direct复合句把“不证明真实文件归属”的推断同等价式一起标为资料原话，unknown缺失声明只摘一般定义，类型/摘录仍需人工裁定。"
+        ],
+        "rubric": [
+          "is_relative_to是字符串/词法判断，不访问文件系统，不等于真实文件包含关系证明",
+          "不特殊处理..，不能写成自动解析父目录或符号链接",
+          "实际读取官方正文，引用保留主体与限定；联网失败如实保留"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "g_network",
+      "round": 2,
+      "group": "fault",
+      "status": "pass",
+      "task_outcome": "limited_report",
+      "metrics": {
+        "steps": 8,
+        "seconds": 17.07,
+        "equivalent_tokens": 20554,
+        "input_tokens": 72948,
+        "cached_tokens": 63616,
+        "output_tokens": 2430,
+        "llm_calls": 11,
+        "review_calls": 2,
+        "tool_errors": 2,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "5d7b922d291e5968c6493acfabce655aafcdb6d7f1a66b97a49767f681f58502",
+        "messages.json": "c6a547fae2ceda8bd54674e9a25734ceb59444032cd7943438ff9992b0c4cc69",
+        "plan.json": "0557bdeb77903dd04960af0266d4b848f9de9102b88983bb92959c4748c2ca4c",
+        "report.contract.json": "522cd8c2c0a7045372b535daa67f0650f4e65022bf737fe846b3ea32ea828f5b",
+        "report.evidence.json": "43faf456b0a4f42f5e620732671833fec744b5848cc811eeee5fc6adc65a944a",
+        "report.md": "63966a835e2ae220d616d8a5b0e148294567ac3016143b1af7823d66672a1982",
+        "report.quality.json": "de8626a60d356f9b3db3c6558a704b51c86ef27f34c816a0793d9422c2c32d13",
+        "report.review.json": "ff322ea870456e23253129c15919ecbeb118c872b558cb99d6a0ac8463a7d703",
+        "report.reviews.jsonl": "da081bb4da9bf6fe3dac63aab1c7d86b7619423aed8907d51ec66414cc0d075a",
+        "task_contract.json": "644157871f882a257ae62b5099b406ab5f8155f3a6cc0ac982f820c30c8fef17",
+        "trace.jsonl": "a40b0fdf533671a377c97d6c2f0f2c2107ac8f0430a2fe9d5dce078f9171d7f2"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "实际失败及未知状态正确，无引用误报和skipped_limit；单次参数摘录仍不足独立证明全任务只调用一次或未做其他搜索，实际trace可核对。"
+        ],
+        "rubric": [
+          "实际fetch失败，并发上限未知而非零或猜测值",
+          "观察工具真实返回关联execution，不用用户要求冒充已执行事实",
+          "失败操作目标可说明但不当已读引用；审稿未完成如实保留"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "g_compute",
+      "round": 2,
+      "group": "fault",
+      "status": "pass",
+      "task_outcome": "limited_report",
+      "metrics": {
+        "steps": 5,
+        "seconds": 9.2,
+        "equivalent_tokens": 10336,
+        "input_tokens": 36994,
+        "cached_tokens": 31871,
+        "output_tokens": 1013,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "686e6bb9037bb3cdae5aeeee8561a74815d478fbeaa3758a105a5051c6487c66",
+        "messages.json": "f96461c91652edd28c5f0f94c92b70592025132b8b8fd1d793ab7a02a9037270",
+        "plan.json": "f3a0b2e6adf5aefd624409f65c81a1ab3efa46eb52f68a101808d547c525d5a0",
+        "report.contract.json": "5db7ba2b4b89be55b45cb5b815c6768bad3ae089e2f177f79a434ea2534381be",
+        "report.evidence.json": "f2469d844fc94512cd7e6eefa62fc6be4852536af0ba525e0e643933c26a44f6",
+        "report.md": "97394b969e0732fcfc2b6492005db31787e26242aef8dcd23d5ffd2b772b0ff6",
+        "report.quality.json": "2f91af4425f3dc701e420a71448be799bd4beb387dbec0719a74c7c52355e53e",
+        "report.review.json": "336c6cfb410cbb32e59e67ba5b0b3defefd9da0b71bf8820529e8f9d19ef8893",
+        "report.reviews.jsonl": "b4be1b6b40a7e0e019c057369b76f10c6ccec6234e97bee7090e6ee2dfaec090",
+        "task_contract.json": "8387f823fc7289875c4f1806a55e662137e6d481cb9ce2aeff573cc18da6fb6a",
+        "trace.jsonl": "4906f29e8df9881f99e2f9f9631bab4a841a4ded208bdcb96d88561bee4026e9"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "实际错误已用observed关联完整参数和返回，不猜差值，不用其他工具，保留未知。"
+        ],
+        "rubric": [
+          "calculator实际失败，不提供差值，不改用run_python补算",
+          "失败不是calculated，observed只关联真实派发结果",
+          "保留未知与有限完成状态，不能声称成功算出"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "g_budget",
+      "round": 2,
+      "group": "fault",
+      "status": "pass",
+      "task_outcome": "expected_incomplete",
+      "metrics": {
+        "steps": 1,
+        "seconds": 8.28,
+        "equivalent_tokens": 10013,
+        "input_tokens": 25622,
+        "cached_tokens": 20352,
+        "output_tokens": 1354,
+        "llm_calls": 5,
+        "review_calls": 0,
+        "tool_errors": 2,
+        "stop_reason": "budget"
+      },
+      "review_status": "skipped_budget",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "05719600faa717199be44ecbb08b99d4e26d6fa9fef64baeae2c57672924f8f1",
+        "messages.json": "fb2823707d2c95790de120838b16a8b46572b5fb0d07dd5c5c578df0547a870e",
+        "plan.json": "36103c108e2914f153d298f21b8deea5188f9c45183444ebe47ea0930bc11d07",
+        "report.contract.json": "a54938576a60a99f118b6c5b4b1a9f4d83566556f968535f4919b5416dbf5677",
+        "report.evidence.json": "a0afdfa9f11b19cbd47891cc86813fbae038bdefff55be55cf42e343e13ca8d8",
+        "report.md": "70e93feba8442fa3c6499500829540506fd97b103ef8547e68378301095f797b",
+        "report.quality.json": "fbfa9c1e05c4e9b7ee6efa39c31041a6d357bb491a8771ba4dfcedcacf889d9a",
+        "report.review.json": "7cd8dc0b216fb6e5a6e4818240e11d5ad282d4782e87f37f74e2e032656dfa43",
+        "report.reviews.jsonl": "c6baae1d2d8a91530181134fea854bbb15f493c72d690f6b645707cdb45e4f70",
+        "task_contract.json": "9297d2d07e026053dd0955ad9e8ea1df77200d1736df561060fb69d3d7bc6e14",
+        "trace.jsonl": "9e6c1a0e80ae9fc1f3396022155fa62152267e4fcd384e5e00ec6b8952260a38"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "真实budget结束，未认证审稿；额外数论性质与手工差值仍未工具复核，不把报告内容当正常研究通过。"
+        ],
+        "rubric": [
+          "真实budget停止，不算正常成功",
+          "如有兜底报告保留未认证审稿状态",
+          "真实计量保留，不把软预算说成硬费用上限"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_release",
+      "round": 3,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 4,
+        "seconds": 9.13,
+        "equivalent_tokens": 10471,
+        "input_tokens": 31544,
+        "cached_tokens": 26112,
+        "output_tokens": 1214,
+        "llm_calls": 6,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "7cf7282e60ca04eba80668419d6157a6881fa2ce6d16d38ffc64526693346a75",
+        "messages.json": "178b8666a95c66ed045d5f7c26c8d72f17cbdd88cf118a1bb604023a6294a31f",
+        "plan.json": "661f4835889ae96b6d4b893c989f39ff78e23c49b776b57d2896f98490276243",
+        "report.contract.json": "dc9be49cb6f63de2fac8b52304f93212c2b18f78456f2e0d016e81144b8e7592",
+        "report.evidence.json": "1bdb8da30b369c0362e4f97c52cdce7248843ea2f66362fcc936ddaa6049cedd",
+        "report.md": "e68024f6928ae4649db45ccc5703276d5998c4f8db3c222992931d189a526582",
+        "report.quality.json": "9bd36c81f3c278e8b7a1f129d4bedc86c5969ab4e0b98ff38407a71da5b9a4d4",
+        "report.review.json": "842aa955f51a761a7b82ee8cf328b8e404dfba3aebacc34156b54399a17e8928",
+        "report.reviews.jsonl": "bd49ac6c0bb43d94e99fde858c7c09bff439ff47a7a962c17b40b7b71e28db12",
+        "task_contract.json": "1b86025516bf6855cdd309bc0582391b93e7a9e1cd829d65c82e895ab6bfdc4a",
+        "trace.jsonl": "fa70b3e11900fac938cdb558969bce2f3eae3284cf7f799ccb2d66139ffd3767"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "签字事实与检验未知分开，缺失不等于不合格，必要条件和未证实口径一致。"
+        ],
+        "rubric": [
+          "主管签字已知，检验合格未知，不能根据目前证据确认放行",
+          "未提供检验结果不等于检验失败或零次检验",
+          "必要条件不是充分证明，区分未证实满足与客观不满足"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_quote",
+      "round": 3,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 5,
+        "seconds": 10.27,
+        "equivalent_tokens": 11936,
+        "input_tokens": 38787,
+        "cached_tokens": 32768,
+        "output_tokens": 1320,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "be76d5cc66fd6c3fbfa93cc3835166b80450fbc529dccb6c964bb6a6335215f4",
+        "messages.json": "8b4e5a972fba7977ce64e12aff03d26915db99f25eedbbc59c1d67b51d1f390d",
+        "plan.json": "fa08d2073d4dd00229d978a4e111b1ce8cbc027446c5bf86de0d792ed3f51ae2",
+        "report.contract.json": "47cf0276d01878cccd585cbce34dfcb388177613c07d019b5c39b5b040638ea6",
+        "report.evidence.json": "8fc6ab2eab83318f0ac61e4f32fee49fc5847ba01bdb3b422cb49a70dca24443",
+        "report.md": "4b6ec2f071357892472ac7b0056fa80aad8cdb4174dc43bd6bd307c980686b3b",
+        "report.quality.json": "de3bb9d681e9d802e68b30fb6db92c9cdaf263d3f489db30bc37ebe8106be877",
+        "report.review.json": "7fdbcfc563988875d797880d2881a67cfed52cdc71e87b4a99eadedd3c097008",
+        "report.reviews.jsonl": "b9c6bc846bdd7dcc42b2eac2042b9449187ee3c0668976783bf653c56a8044ef",
+        "task_contract.json": "a63d8ea599017837b726cd973d31884df899bdfcae8a39dcbf4cd363affb5b22",
+        "trace.jsonl": "295b814821ea35f677c2a52567e4773b8d1764fd921cec32881471d9a3c1af8d"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "保留宣传稿转述与日志可能不完整的范围，没有推成无事件或已发生写入；未添加日期。"
+        ],
+        "rubric": [
+          "无日志记录不是无事件；材料明确日志可能不完整",
+          "不能支持绝对没有写入，也不能反过来断言已经写入",
+          "摘录保留审计主体、可能不完整及不能确认的语境"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_notation",
+      "round": 3,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 5,
+        "seconds": 13.17,
+        "equivalent_tokens": 13813,
+        "input_tokens": 42059,
+        "cached_tokens": 35200,
+        "output_tokens": 1717,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "adb4beeeaee89e7fe5fba6da7ec78757dbb075d10018f7dfd87393b69d4853df",
+        "messages.json": "282ccf782000de20ffae442e2528d3169c68c5f19bbdb3eba948f124ab7179ce",
+        "plan.json": "c0ab2c752ac14ad19ee66728a63554895959a217a5fbf8a79f4befd165101a74",
+        "report.contract.json": "f74a7087eb0e5180405d13ad6c7f14130c0dbe06ed8d802065a36f8b00f11ae9",
+        "report.evidence.json": "6226ad7013bffb7d26aa7e11fa0d0c7277cc72f27f36ed7e1c6bbfe9d8588ad6",
+        "report.md": "1b9f752dd94e747ec1bf7a638e1f92b895939148f15371bc2880562463a0dfe0",
+        "report.quality.json": "f903cf8d1028e2aa2a205f506af121f9f923c8f20af5d496802f9a519faecda9",
+        "report.review.json": "57543da86935a457ab608a807a4d21b64ae0f7b0e5f9c3581438e1bd53b19c1a",
+        "report.reviews.jsonl": "e1f3b67e42d0262c6cf30332c103431ccd69adc5fc6c2496872cf77b61b36269",
+        "task_contract.json": "113e000d3428a38b24f61f3b8201a61aae4a015a4ad7e5073b337e3bf6806466",
+        "trace.jsonl": "e0ff331d33f20093f45438a274ea5f4ee74ec1c205665595b3faf31c43d03a2b"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "fail",
+        "findings": [
+          "“每组仅2个值，不足以支撑任何比较”及“差异方向与大小均未知”过度扩大未知；统计推断条件不足不妨碍描述给定数字/端点的大小或差异。"
+        ],
+        "rubric": [
+          "保持端点/两观测值两种解释，不直接认定任一为事实",
+          "不能直接称置信区间，缺方法/置信水平；观测值解释也缺单位/设计",
+          "不新增统计计算、独立性或样本分配，数字本身仍可列出"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_json_money",
+      "round": 3,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 5,
+        "seconds": 10.59,
+        "equivalent_tokens": 14626,
+        "input_tokens": 43288,
+        "cached_tokens": 35456,
+        "output_tokens": 1624,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        ".code_runs/c7c674c1e32843dca8c23e262cc69501/code.py": "a679d5a2dc9e2db3c27c83aea324743d3d5b4c08c58c846ec44305bbfbf25ce8",
+        "charges.json": "84bec805ce3011bf70820329f30fea5a22706ae1df20b7ab9c08262f92a5ac74",
+        "evidence.json": "292764bb57919cf54b6274f689fdf7e04e1d41149c1e499bd1b3ea50e9be1231",
+        "messages.json": "4cd0c04f769a7b6f85c73813cff8c5adbbc327b1524232864a2f2c5feb3a3ec7",
+        "plan.json": "25cac00965cac21393ed62aa1388ab97982bb8466f24b7a1321da6a4e12c7ef8",
+        "report.contract.json": "d4e036d6b29f1e158d0e7479dfb6508e6b74a14126c0c085734eb57db37fe275",
+        "report.evidence.json": "1c61abfc92d8707562bdd023553a8fb97971259957f3bc53a9fcd042f7a5d50b",
+        "report.md": "ed36315ed1d94cf8c76d5b5dad828cd99370929b45ca6bf105475614834c72c1",
+        "report.quality.json": "b5ba61c942a446d269811b8fedcfdcb07dfafde70bb60c1a952cc50674e7e2d1",
+        "report.review.json": "2a1569af995d781b97e615072f7fbb2bd4494d6b4e50f11996a4f0c6fbdb0eb8",
+        "report.reviews.jsonl": "c07eabd0203e6fae9f3caa479d994cea66311426486f28aa6861b3cf6f8b3d87",
+        "task_contract.json": "b7dffcfe55a1bd327838f02e7159866c23e8721e95bbb6ada5ec2ee4b187db00",
+        "trace.jsonl": "e21cfe28b41751adcb411811e743bc7d5c936393f1e616ae831959d5a5af6a13"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "2.7/1.125/3.825及JSON数字类型正确，未改精度；工具成功头不足单独证明文件字段，须结合实际JSON/完整执行。"
+        ],
+        "rubric": [
+          "请求费2.7、处理费1.125、总额3.825元",
+          "万次/千行的单位不可互换；不擅自按分舍入",
+          "文件字段是真实JSON数字，不是字符串；资料输入direct与金额calculated分开"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_weighted",
+      "round": 3,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 4,
+        "seconds": 9.84,
+        "equivalent_tokens": 11955,
+        "input_tokens": 33408,
+        "cached_tokens": 26752,
+        "output_tokens": 1312,
+        "llm_calls": 6,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        ".code_runs/f62697742d574c2a847c51725ea06b53/code.py": "149ec181a11d3cf6b63379cba4fe0f8208942ab0fffe1706ef2120a4267b1772",
+        "evidence.json": "d53c8382cd968c91387c53db37055df3aff93820bb7bed21727b050b9cddd2dd",
+        "invoice.json": "52d5d5dc8d87219d5a1f8b18350e17be86e761aa407f24d6d8222c1862cddfdf",
+        "messages.json": "843aab1e1e5221fd246b0cd99c8c7f7e7ec1d233da599cbeb9bf02f2f2e7bd81",
+        "plan.json": "3b7e8ed6d77589b4b2ed14abae12dfdba9c108781dacf39440962db2ce97e4ae",
+        "report.contract.json": "3bb5958b1263fe5b4f85c1291d5094d51da3ee1acd045381a40691865433ce42",
+        "report.evidence.json": "7bbbcc350b9ed605cc1e897610ca0af30bb02516f44d22c28e7958f1c0b37e1a",
+        "report.md": "2f5fca63b3b0fa1b80aeb42e88ac3695fb4581eff1978297e8ae166a0647f917",
+        "report.quality.json": "2796c4f833b0bcff5fe32fdc8dbc676aa6ce4687eb557a618e314136ead8a842",
+        "report.review.json": "36df9c822b5c216888cf0b5c23adfe948ab7d88ffa09984ad25c34b007d385c2",
+        "report.reviews.jsonl": "b3e3252355f399ee079cc82d9611a0f20e4626da71f6bccff84384b22d038852",
+        "task_contract.json": "d9e5976692b26582ba0d5ac43f637c963b22b2b267c4bef8c6c18ccba10f2d52",
+        "trace.jsonl": "682da28bd830a89791e052562fb88cfb2cfcf1bc7ce461a47fdf0085d7542c99"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "fail",
+        "findings": [
+          "金额63/2.1/33/66正确；方法假设“单价与用量不变，仅费率按倍率调整”将单价不变与费率变化混写，需区分给定费用倍率和单位价格。"
+        ],
+        "rubric": [
+          "新总额63、倍率2.1、差额33、扩量差额66",
+          "旧费用权重0.4/0.6，不取1.5乘2.5；给定的是费用而非单价",
+          "不补造两个服务用量相等；同比扩量倍率不变有相同构成/单价口径"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_delivered",
+      "round": 3,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 5,
+        "seconds": 12.89,
+        "equivalent_tokens": 16761,
+        "input_tokens": 46506,
+        "cached_tokens": 37888,
+        "output_tokens": 2177,
+        "llm_calls": 7,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "8d12aced0d45f42660151945f142951dfe64aa40ca43f3760bde7db4a12f20cc",
+        "messages.json": "9948ec88ab376d9f28479cecdfde8f015cc5a33ae2fefaf7964b216172bb2f9a",
+        "notes.md": "725d36b0a2d8d69bedbe96f4555292ff8d14439ea59f8f522c2acc289088402d",
+        "plan.json": "10a84c7f66b4709003cf7af809ce7b18865eafafebc15a93ab18ec08a6ec3148",
+        "report.contract.json": "a3e83a2b153a6779d63a70f5c0f8c30700ddb8b2c3aa55e8cdcc1e6eebdba726",
+        "report.evidence.json": "d96c1f9742c762551a917fb713b6f34d3ea1a0f28861d69725e8b7f91f6f247c",
+        "report.md": "a4d1baa4ecfca689e4bda1092eb24f524fbff1e3a5364e66b99a6656f38881c4",
+        "report.quality.json": "5dd152d51ce6c9fc97c04376fb4195a2a566c3d3fe5783c1eefe7e59ad3dd0fc",
+        "report.review.json": "109748fb7e1990bee9ee3eb36dac1ec1cc6bda724c92f7e79aa7cf85da658340",
+        "report.reviews.jsonl": "090081631494b23a3f9f3f8ef8677d9417f889c09cec5ffe01e930e25d4661ee",
+        "task_contract.json": "9066558592acced3464dbeac735a44329b9d2b06acb906c83af27a0d25e8fa6a",
+        "trace.jsonl": "a67593ae5cce2275cf12b5c287fe6ce54bc10bb9bc4ee7a3da8ed0bdbfc0848e"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "fail",
+        "findings": [
+          "核心资格条件和不自动备份正确，但局部query窗口后仍声称“其余段落仅描述指示灯，未补充备份规定”，把未读范围概括为全文。"
+        ],
+        "rubric": [
+          "设备在线、缓存不超过96MB、维护模式除外，主体和单位正确",
+          "资格不等于已经创建或自动创建，需管理员明确启动",
+          "不宣称未读全篇其他部分均无规定；未知限定于实际送达范围"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_environment",
+      "round": 3,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 6,
+        "seconds": 11.33,
+        "equivalent_tokens": 17677,
+        "input_tokens": 56446,
+        "cached_tokens": 46592,
+        "output_tokens": 1582,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "4f67d2454b54fa3b158a2d7b3bbe1ac9c45396d54dc00f51002bef1777e75dca",
+        "messages.json": "d4fb996f9123ed606f4bfe020e0f3e852b195003529e7148ec625a285e079f53",
+        "notes.md": "a0a720847efc4edf64387d958f66edf307830f9b7f776608d24e53e96f5e780e",
+        "plan.json": "eae6996e6583b90fb6e73af24eb59a93de2a8f23d049614a59118c0b17fe7423",
+        "report.contract.json": "ee704691666c73758d3926872d700e96ac2b0343003a1f53cfa09a8417ac48b6",
+        "report.evidence.json": "e85480096a4af539d90df5d5bd18440bae293116fe9d35c02cd890e4636ae7c6",
+        "report.md": "5912ffc276acb44d22c16a0796d414fcf23f372f593aa4825233fc5b52aeade6",
+        "report.quality.json": "64ff96f884a0f30b55c4eb776c76c1b690575decea18da07a1b704e34abbe924",
+        "report.review.json": "efe4091ec168a96a62ea9b9eda2528b93b00a4e229e5ea8dedfc03ea0e6b26b9",
+        "report.reviews.jsonl": "4b62e87a29961c196d1211f5d49503b661bcdd1715db8acf89d43ecd89e2923f",
+        "task_contract.json": "9a2b3ef24ebc553fb764569e8eb342b8b26880d488148fd78c1ae60cebed6f92",
+        "trace.jsonl": "0c5b878a0c14696a868be86bf6088dc7def4d4f67d9aaa9d2eaa21b09f74c311"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "按不同环境处理100/120正确，没有取110作默认；通用规则未知仅引用缺日期摘录，需结合完整已读来源核对。"
+        ],
+        "rubric": [
+          "内测100条与生产120条，版本R4相同但适用环境不同",
+          "不把不同条件的声明强行当同一条件矛盾，不取110作为通用默认",
+          "用户环境未知，分别列条件而非选出唯一当前默认；不编造发布日期"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_indigo_seed",
+      "round": 3,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 6,
+        "seconds": 11.81,
+        "equivalent_tokens": 16294,
+        "input_tokens": 50625,
+        "cached_tokens": 42112,
+        "output_tokens": 1785,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 0,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        ".code_runs/be5651555ac548e0b2a9fab94ceed33f/code.py": "93ca46c7e22b3359b18fcd15da72b4959652216b7c28ed1e782107508feff2a5",
+        "evidence.json": "d9e539746243fcf88c13448b874feecf130aef9eb5cadf72c566d1305984955a",
+        "indigo.json": "20369810b927de2818f75d508c1cbfb3b944253a8492f505376058a5f5ebba45",
+        "messages.json": "de8f05c5e6a0353a285eff6b3b5186f3793bc77834c33ce5af10c7dfa5430e6d",
+        "plan.json": "1e8ab03568faf89d5f18deababdb616915d13d5de16291e35d5602eda9e4ae58",
+        "report.contract.json": "0f5f543a7915f460245b79a6eba3ac58afe7e48b1377d117d090088066812ed8",
+        "report.evidence.json": "dd0b79b7f6fbfc2dbf8452efcdafb6932b6704a15b8c20a96287e3acba2af4af",
+        "report.md": "1bb6aa0daec72d80b4b215de796cfe9164899d8d68f3f7a6768a1d3ba83be3ef",
+        "report.quality.json": "a2affd7e190d647c06cb49812efcdc779784d7b4c32008c3f851e2c2783fe986",
+        "report.review.json": "d9def71879f46bb85cf4d6fce18334c04b3857840c04f95ed94c9fdf0f57dd3c",
+        "report.reviews.jsonl": "99a719156f3fc02870512695a7d3e7db122f8cb1147ab7cad73b201162ac5e1e",
+        "task_contract.json": "ab40573ef880c52b94b0c6dcb18f178dd8edfaf7785a83c663ae6e30df7d686f",
+        "trace.jsonl": "dd94cfbd294d5c8e708385bc0e9d789ee7b663cfdf563b91df5702c9a3aae537"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "0.81/0.121/0.931及JSON数字正确，原始单价/用量与金额类型已分开；文件类型的observed仍仅摘success，证据摘录充分性待核对。"
+        ],
+        "rubric": [
+          "费用0.81、0.121、总额0.931元，JSON数字类型正确",
+          "原始输入与计算金额分开，整行不能混标direct",
+          "虚构价格不是当前市场事实，保留记忆用途和未核实限制"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_indigo_follow",
+      "round": 3,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 6,
+        "seconds": 18.73,
+        "equivalent_tokens": 25269,
+        "input_tokens": 63289,
+        "cached_tokens": 51584,
+        "output_tokens": 4203,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 2,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        ".code_runs/e9aeb92cceb64426b82a9b2cad930e16/code.py": "381a2c13a74ef082b48466c9c48e6e26e19255704ae328dd8608a52d191b741c",
+        "evidence.json": "f7edf14758d7fb41997de9f9934a0d44c4c329e41d9744aee45a95da684b3666",
+        "indigo.json": "d99c413169f38d5da0b487194de29bdbebee515e65a0f2be1cf62829db7b7e67",
+        "memory_context.json": "93dda4cdcf1200c9752d948a7224c5acda65abf2ffd84a58ba855c9bb0568f1e",
+        "messages.json": "354a6d93a08a73b3372910f125dfdbf46e75581862c30fc5d2b40a04b65b876a",
+        "plan.json": "5dbc530219d96fe6c753048f2a5704efa501691c40601a1e17f0f7eed0166fae",
+        "report.contract.json": "d83b432c3bae6cac169d1a651dc6ed17577e1f73ac5865c2cbc8631786c2cffa",
+        "report.evidence.json": "eeb81a2594d2c9f708436df644276ba2abfb0e777fbe9fa536174235f9ff41f7",
+        "report.md": "8d84af6fccbd2ffc942ea801cc90b44e6074308f94cf43d87bbd467ceae2874a",
+        "report.quality.json": "6fc256ad927a3ca4acedeee596dad2f3deec3a25c7d7114aa578e20f8b3a736a",
+        "report.review.json": "548c155d3d09120dc7afd96c06dd65029a42aa65d89125a05cf716a0917d72be",
+        "report.reviews.jsonl": "3bdefc1bd15908643cce89021ec19c862bd05fde09d8f18624a68d590766e36e",
+        "task_contract.json": "324f6c0375cde2ed96dfc8a14d498ef9fc66cca8f8fc9a9b34c1af340c02dd9c",
+        "trace.jsonl": "822ead6f4e4800ba4da94f240743ea602b0a0895b0c2893d6c6cfea75f689e89"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "召回、日期、逐条历史limits及1.23/0.209/1.439正确，明确历史语义未认证；JSON字段类型仍需结合实际文件而非单条success。"
+        ],
+        "rubric": [
+          "实际召回同轮历史，金额1.23、0.209、总额1.439元，JSON数字类型正确",
+          "历史日期从记录来，不能以审稿无问题认证当前价格或全文语义",
+          "历史引用每条都有适用限制，成功计算与最终报告/依据审稿保持一致"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "s_path_doc",
+      "round": 3,
+      "group": "normal",
+      "status": "pass",
+      "task_outcome": "normal",
+      "metrics": {
+        "steps": 12,
+        "seconds": 30.06,
+        "equivalent_tokens": 37238,
+        "input_tokens": 135398,
+        "cached_tokens": 118400,
+        "output_tokens": 4200,
+        "llm_calls": 14,
+        "review_calls": 1,
+        "tool_errors": 2,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "d5fd011f6e8bd9eb20306e63d4856c16d85301f75ebb9644769cbab35a621fa4",
+        "messages.json": "43eccb6b57070d7bbcf3c3a4d9859665fa87b299a5359e14546d77c632df879d",
+        "notes.md": "a1aa4828b1cc1f0c92997b2d31d97af635876b658d079c0d8d3a16e593238218",
+        "plan.json": "c591c9282b79e0931f9fd16e003c2d51d58423be051c813f5fa8de98a8270555",
+        "report.contract.json": "24f45a076f2d2287f18bfc638eab32ffc842c54cefbead3245afc48d23231ba2",
+        "report.evidence.json": "c34da75cfc3f81b97c553e482f5994843c56f43997e65d4615f8a5e11ca0b648",
+        "report.md": "e73cda5ea00e2fa8123bf9ec21b7c60ec0c7442b2953adf582d769069f715bc3",
+        "report.quality.json": "7ce2577ba0a89af3999a94183cbc608a25bd3733ffd17d37eda769aab45f0946",
+        "report.review.json": "48e41891cd6e875f60275c483c0b65b3fa6dc1124826d6e8b3db3ecd6d17900f",
+        "report.reviews.jsonl": "ab908b71c1ca6948bb9ce7c0597d2b9747f19d730b3372e602891dd17d11ee70",
+        "task_contract.json": "6de05c735b3c06a2e9ae3c5fb0a30c8c286a56a4588ddee09882246a4fd26eb6",
+        "trace.jsonl": "08ac62bf4ae772a8f94774dc291ba43f133d5ba3b2453102f60129ce0e6c2377"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "uncertain",
+        "findings": [
+          "不访问文件系统和..边界符合官方原文；direct仍将推断混入复合句，例子及resolve建议的摘录只到通用定义/标题，需读共享完整片段，不能单靠短摘录认证整句。"
+        ],
+        "rubric": [
+          "is_relative_to是字符串/词法判断，不访问文件系统，不等于真实文件包含关系证明",
+          "不特殊处理..，不能写成自动解析父目录或符号链接",
+          "实际读取官方正文，引用保留主体与限定；联网失败如实保留"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "g_network",
+      "round": 3,
+      "group": "fault",
+      "status": "fail",
+      "task_outcome": "limited_report",
+      "metrics": {
+        "steps": 8,
+        "seconds": 18.7,
+        "equivalent_tokens": 21150,
+        "input_tokens": 74526,
+        "cached_tokens": 65280,
+        "output_tokens": 2688,
+        "llm_calls": 11,
+        "review_calls": 2,
+        "tool_errors": 2,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "skipped_limit",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "cf029edc875f958485ceb11890679d41b2abb6c1921bca31872881582ab83b14",
+        "messages.json": "547d37b6e49a42618d434c4916138844c69b72e79c16142efdb60a9c034d9d8c",
+        "plan.json": "d2aacc47aa01de1b4638b4dfb7712ba635768ec02461cfa7f7ecc214e9280db4",
+        "report.contract.json": "5550d941b7ef5c3aeb22c3aa4f2876e7d6f6964a2a758f34f50165305c435c3b",
+        "report.evidence.json": "abd45b49da0d81e996d43139d83afeaba39552b3a7ce0828794d78414181fd79",
+        "report.md": "468c18d5d0bc2171dc5363f1ce1535db85d094348dbf747c14a0104fd2188f3d",
+        "report.quality.json": "75a00b55b58b1e11c2cd6af3157a4eccf2b0a5257216c84234401b9458488a4f",
+        "report.review.json": "d7d86af36c30d645749bb655fdddb132732cda29194d7476925504dd51b705c5",
+        "report.reviews.jsonl": "6a1dfd4cd856f30b4ecf1c5f3266e5cd9b4d0a94c5ad0a92e5018983cfcd4984",
+        "task_contract.json": "644157871f882a257ae62b5099b406ab5f8155f3a6cc0ac982f820c30c8fef17",
+        "trace.jsonl": "139c3a9f0fb0856f28846261682e6bc91f059f286efd7eb75ab205d7423300d2"
+      },
+      "failed_checks": [
+        {
+          "name": "review_complete_and_clean",
+          "passed": false,
+          "detail": "skipped_limit"
+        }
+      ],
+      "assistant_review": {
+        "verdict": "fail",
+        "findings": [
+          "实际工具错误已正确关联execution，并发上限未知；但摘要核验状态失败、局限又说核验状态无法确定，混淆执行状态与待查事实，最终skipped_limit。"
+        ],
+        "rubric": [
+          "实际fetch失败，并发上限未知而非零或猜测值",
+          "观察工具真实返回关联execution，不用用户要求冒充已执行事实",
+          "失败操作目标可说明但不当已读引用；审稿未完成如实保留"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "g_compute",
+      "round": 3,
+      "group": "fault",
+      "status": "pass",
+      "task_outcome": "limited_report",
+      "metrics": {
+        "steps": 6,
+        "seconds": 11.38,
+        "equivalent_tokens": 11954,
+        "input_tokens": 45267,
+        "cached_tokens": 39679,
+        "output_tokens": 1199,
+        "llm_calls": 8,
+        "review_calls": 1,
+        "tool_errors": 1,
+        "stop_reason": "final_answer"
+      },
+      "review_status": "reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "06d2e3fde555c314071bab2165fc37c4612fdda2e246adec0af2e6fd1f9ea135",
+        "messages.json": "1081889b26713ed08dbe7454213d9b4045a9e5baed7b78bcb7b558272e2c809d",
+        "plan.json": "13c7882a509bf9d41751846c3bdbf1f2a244adedd0118e263933027643136b51",
+        "report.contract.json": "3e876f6a23f7a66c4d2be2447154b8f12f6f1b8d7e3556a7d0f06cd8af7922af",
+        "report.evidence.json": "6ca7bc06196e323ef7826ff15b00f20f513b136b2e74640f9273dd6f451dbb64",
+        "report.md": "674d0359455c5e3371c445ff604591181961357054a66ab0665ed70500711386",
+        "report.quality.json": "31ed0db2b7c785b6c0aa9f2001e0322c4c50703ca3ea695ffaa53d032d23eed3",
+        "report.review.json": "50a689ed165b040968572fbf5c2cbf0b0f01a9474207601ab1700f41ac4e8274",
+        "report.reviews.jsonl": "8f03f24a513663c90074cc0ec225f6930a61611a3ec0723884a89d9cf69e5253",
+        "task_contract.json": "8387f823fc7289875c4f1806a55e662137e6d481cb9ce2aeff573cc18da6fb6a",
+        "trace.jsonl": "2e1d5d88d7fae77930dbea497ce8ac7d95c2050982d510ba5436f3275540d84d"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "观察到真实calculator错误，无成功差值且不换工具，未知/未核验保留。"
+        ],
+        "rubric": [
+          "calculator实际失败，不提供差值，不改用run_python补算",
+          "失败不是calculated，observed只关联真实派发结果",
+          "保留未知与有限完成状态，不能声称成功算出"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    },
+    {
+      "id": "g_budget",
+      "round": 3,
+      "group": "fault",
+      "status": "pass",
+      "task_outcome": "expected_incomplete",
+      "metrics": {
+        "steps": 1,
+        "seconds": 9.21,
+        "equivalent_tokens": 10040,
+        "input_tokens": 25348,
+        "cached_tokens": 20096,
+        "output_tokens": 1389,
+        "llm_calls": 5,
+        "review_calls": 0,
+        "tool_errors": 1,
+        "stop_reason": "budget"
+      },
+      "review_status": "not_reviewed",
+      "model_identity": {
+        "requested_models": [
+          "deepseek-flash"
+        ],
+        "response_models": [
+          "deepseek-flash"
+        ],
+        "all_calls_identified": true
+      },
+      "artifact_sha256": {
+        "evidence.json": "7c6b462692e6b6675cf0a88d814d102c2700a9d9471aefa0d72563a190b1b52f",
+        "messages.json": "19d0ac821f3d7044c773fcefd47e7fce8953481345368f8f9ad67f4362d365ce",
+        "plan.json": "c4fea9951f2fcf03c0397bf7eb07066a70b5929e5669677b55616d4123760067",
+        "report.contract.json": "0eaff8c70f44e61d4201f189f3c748421c7e2556173c2257bdec499cf62284b7",
+        "report.evidence.json": "ca84402bc2cb8739094b689df722590ca4d1df4aa61d4e522899268b70e9b07b",
+        "report.md": "61541610b01c6f31374a11f3a2673b0bb1f131e80c292b89f52b4a2fcea599db",
+        "report.quality.json": "bfcc06649140f41f2b67cde141c2275221efce64b8d6ff0919f8999d43158194",
+        "report.review.json": "89e5bcc4e6ff6d4fd55408cad73d68dd930b7cf1dfa6b3cebfe27bb30c93dcce",
+        "report.reviews.jsonl": "3ff91ae5c03dc7b6ae5b07fd295d8d12d15146d6a40f9ad2c4428cbac22e730b",
+        "task_contract.json": "9297d2d07e026053dd0955ad9e8ea1df77200d1736df561060fb69d3d7bc6e14",
+        "trace.jsonl": "6ef3dec96fc3419d706f611c407fcfadb3a3e5f3c49a1b6a6fcc0e3471baff17"
+      },
+      "failed_checks": [],
+      "assistant_review": {
+        "verdict": "pass",
+        "findings": [
+          "真实budget、兜底not_reviewed，未将手工数论扩展算正常成功；额外未要求的性质未经过工具复核，仍是提前结束的有限产物。"
+        ],
+        "rubric": [
+          "真实budget停止，不算正常成功",
+          "如有兜底报告保留未认证审稿状态",
+          "真实计量保留，不把软预算说成硬费用上限"
+        ],
+        "reviewer_kind": "coding_assistant"
+      }
+    }
+  ]
+}
