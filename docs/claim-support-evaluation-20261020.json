@@ -1,0 +1,489 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-20",
+  "implementation_revision": "5e6089afa6278e545a5be69fdcadef71b7a691ff",
+  "implementation_base_revision": "92c612c",
+  "scope": "claim premises and per-claim review engineering; single-round smoke only",
+  "tests": {
+    "passed": 837,
+    "seconds": 55.22,
+    "new_cases": 24
+  },
+  "build": "passed",
+  "desktop": {
+    "status": "passed",
+    "scope": "isolated offline engineering acceptance; no paid model request",
+    "checks": [
+      "native startup, preload and authenticated loopback API",
+      "submit -> subprocess tools -> report/chart/CSV/evidence/review/usage; SSE EOF reconnect",
+      "search, rename, archive/unarchive preserve research and never call model",
+      "reload is read-only; synchronous repeated send creates one run",
+      "review limit remains skipped_limit, not passed",
+      "automatic fallback shows current save, original model text and unreviewed state; edit makes provenance stale",
+      "budget exhaustion remains partial with original limit; Escape closes settings",
+      "unknown API outcome shows needs_verification and failed/unknown usage; resume blocked",
+      "cooperative stop and UI resume reuse committed response, same task and cumulative usage",
+      "subprocess recovery after a committed tool batch does not repeat that tool",
+      "corrupt checkpoint has visible refusal and disabled resume",
+      "missing CSV visible; malformed image URL does not crash; changed report makes review stale",
+      "long history stays at reader position; 1050x700 has no document overflow",
+      "force stop preserves uncertain checkpoint; normal desktop exit cleans backend",
+      "restart preserves index; unexpected Electron death cleans backend and worker; restart never auto-runs"
+    ],
+    "page_errors": [],
+    "fixture": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\agent-stage14-XzGU5W"
+  },
+  "first_desktop_attempt": "source changed during run; recovery correctly refused; failure log retained",
+  "original_files_checked": 456,
+  "original_files_changed": 0,
+  "raw_smoke_artifacts_checked": 54,
+  "raw_smoke_artifacts_changed": 0,
+  "smoke": {
+    "rounds": 1,
+    "automatic_pass": 4,
+    "total": 4,
+    "automatic_gate": false,
+    "assistant_counts": {
+      "pass": 2,
+      "fail": 0,
+      "uncertain": 2,
+      "pending": 0
+    },
+    "reviewer_kind": "coding_assistant",
+    "blind_review": false,
+    "metrics": {
+      "steps": 18,
+      "seconds": 53.34,
+      "equivalent_tokens": 70665,
+      "llm_calls": 26,
+      "review_calls": 4,
+      "input_tokens": 172984,
+      "cached_tokens": 134784,
+      "output_tokens": 9493
+    },
+    "model_request_calls_recorded": 26,
+    "review_calls": 4,
+    "model_claim_checks": 18,
+    "model_check_results": "all supported; assistant retained two semantic uncertainties",
+    "review_input_tokens": 24981,
+    "review_output_tokens": 1071,
+    "evidence_packet_estimated_tokens": 5863,
+    "new_inferences_with_reasoning_no_added_assumptions": 6,
+    "findings": [
+      {
+        "id": "s_chain",
+        "automatic_status": "pass",
+        "metrics": {
+          "steps": 4,
+          "seconds": 11.04,
+          "equivalent_tokens": 16181,
+          "input_tokens": 36653,
+          "cached_tokens": 26496,
+          "output_tokens": 1687,
+          "llm_calls": 6,
+          "review_calls": 1,
+          "tool_errors": 0,
+          "stop_reason": "final_answer"
+        },
+        "assistant_verdict": "uncertain",
+        "findings": [
+          "辰的签收和队列资格按两条规则推出，巳的签收/册属保留未知；正文、reasoning未增加额外假设。",
+          "但第二条关联与正文连写“规则只给充分条件，逆命题不成立”：现有前提只能说明逆命题未被证明，并不保证逆命题为假。上下文保留未知，故记歧义/不确定而非确定失败；模型逐项审稿未指出这处强措辞。"
+        ],
+        "claims": 3,
+        "support_review": {
+          "status": "complete",
+          "checks": [
+            {
+              "claim_index": 0,
+              "target": "quote",
+              "status": "supported",
+              "reason": "由“所有归入蓝册的档案均已签收”和“辰已归入蓝册”可推出辰已签收，再由“所有已签收档案均可进入整理队列”推出辰可进入整理队列；这是有效的充分条件链式推理，未添加额外假设。",
+              "missing_evidence": "",
+              "suggestion": "",
+              "quote": "辰：已归入蓝册，故已签收，进而可进入整理队列。"
+            },
+            {
+              "claim_index": 1,
+              "target": "quote",
+              "status": "supported",
+              "reason": "巳已知可进入整理队列，但两条规则均为充分条件，不能由后件反推前件，因此不能推出巳已签收或归入蓝册；报告同时说明逆命题不成立，符合给定前提。",
+              "missing_evidence": "",
+              "suggestion": "",
+              "quote": "不能推出其已签收，也不能推出其归入蓝册——规则只给充分条件，逆命题不成立"
+            },
+            {
+              "claim_index": 2,
+              "target": "quote",
+              "status": "supported",
+              "reason": "用户明确未给出巳的册属与签收状态，报告将其标为未知而非否定，属于对资料缺失的恰当保留，未补造前提。",
+              "missing_evidence": "",
+              "suggestion": "",
+              "quote": "其册属与签收状态均为未知，不补造。"
+            }
+          ],
+          "missing_claim_indices": [],
+          "omitted_items": 0,
+          "counts": {
+            "supported": 3,
+            "contradicted": 0,
+            "insufficient": 0,
+            "uncertain": 0
+          },
+          "meaning": "模型对选定结论的逐项意见；不认证事实或未关联文本。"
+        },
+        "inferences_without_extra_assumptions": 2
+      },
+      {
+        "id": "s_versions",
+        "automatic_status": "pass",
+        "metrics": {
+          "steps": 4,
+          "seconds": 11.22,
+          "equivalent_tokens": 15964,
+          "input_tokens": 39021,
+          "cached_tokens": 30208,
+          "output_tokens": 2065,
+          "llm_calls": 6,
+          "review_calls": 1,
+          "tool_errors": 0,
+          "stop_reason": "final_answer"
+        },
+        "assistant_verdict": "pass",
+        "findings": [
+          "R首次安装默认值、乙管理员配置、S可配置能力分别保留主体，未知S默认值和乙所用修订没有被补造。",
+          "直接资料与兼容性推断分开，reasoning不把乙强行归入R或S；3项有来源前提实际摘录与本次user-1上下文一致。"
+        ],
+        "claims": 6,
+        "support_review": {
+          "status": "complete",
+          "checks": [
+            {
+              "claim_index": 0,
+              "target": "quote",
+              "status": "supported",
+              "reason": "用户材料原文明确写“手册修订R写‘首次安装时默认开启审计’”，报告转述与之一致，未添加版本或日期。",
+              "missing_evidence": "",
+              "suggestion": "",
+              "quote": "首次安装时默认开启审计[1]"
+            },
+            {
+              "claim_index": 1,
+              "target": "quote",
+              "status": "supported",
+              "reason": "用户材料原文写“部署记录写‘乙实例管理员已关闭审计’”，报告转述一致，主体为乙实例管理员。",
+              "missing_evidence": "",
+              "suggestion": "",
+              "quote": "管理员已关闭审计[2]"
+            },
+            {
+              "claim_index": 2,
+              "target": "quote",
+              "status": "supported",
+              "reason": "材料原文写S仅载“支持管理员配置审计开关”且“没有写默认值”，报告表述与之一致。",
+              "missing_evidence": "",
+              "suggestion": "",
+              "quote": "支持管理员配置审计开关；材料未载默认值[3]"
+            },
+            {
+              "claim_index": 3,
+              "target": "quote",
+              "status": "supported",
+              "reason": "默认值是安装初始设定，管理员关闭是后续配置操作，两者层面不同可并存；该推理仅基于给定两条前提，未额外补事实。",
+              "missing_evidence": "",
+              "suggestion": "",
+              "quote": "不矛盾。R描述安装默认值，乙记录描述管理员操作后的实例状态，层面不同"
+            },
+            {
+              "claim_index": 4,
+              "target": "quote",
+              "status": "supported",
+              "reason": "材料确未提供乙实例修订号，也未提供S默认值，因此无法据默认值反推乙所用修订，报告结论为“不能”恰当。",
+              "missing_evidence": "",
+              "suggestion": "",
+              "quote": "不能。材料未载乙实例的修订号，也未载S的默认值，无法据默认值反推"
+            },
+            {
+              "claim_index": 5,
+              "target": "quote",
+              "status": "supported",
+              "reason": "材料缺失默认值不能推出默认关闭，报告将其列为局限性并明确“不等于默认关闭”，符合证据边界。",
+              "missing_evidence": "",
+              "suggestion": "",
+              "quote": "S默认值缺失不等于默认关闭"
+            }
+          ],
+          "missing_claim_indices": [],
+          "omitted_items": 0,
+          "counts": {
+            "supported": 6,
+            "contradicted": 0,
+            "insufficient": 0,
+            "uncertain": 0
+          },
+          "meaning": "模型对选定结论的逐项意见；不认证事实或未关联文本。"
+        },
+        "inferences_without_extra_assumptions": 2
+      },
+      {
+        "id": "s_observation",
+        "automatic_status": "pass",
+        "metrics": {
+          "steps": 4,
+          "seconds": 14.57,
+          "equivalent_tokens": 16249,
+          "input_tokens": 37477,
+          "cached_tokens": 29440,
+          "output_tokens": 2634,
+          "llm_calls": 6,
+          "review_calls": 1,
+          "tool_errors": 1,
+          "stop_reason": "final_answer"
+        },
+        "assistant_verdict": "uncertain",
+        "findings": [
+          "员工自述和题给检索记录为direct用户材料，未伪称本agent实际执行查询；提交/处理/标记均保留未知。",
+          "正文及第2索引关联写“无其他标记、其他窗口或完整性证明”，摘录却是“没有提供其他标记、其他窗口或日志完整性证明”。该简写可能把资料未提供扩大为不存在；按本次材料范围理解也可能成立，保留不确定。",
+          "第3索引unknown的选定摘录只是任务指令，不能单独证明缺口；审稿包user-1共享上下文仍有真实原始记录，故不判为无资料但记录选摘不充分。第4索引前提中窗口范围也依赖共享上下文，不是短摘录单独证明。"
+        ],
+        "claims": 5,
+        "support_review": {
+          "status": "complete",
+          "checks": [
+            {
+              "claim_index": 0,
+              "target": "quote",
+              "status": "supported",
+              "reason": "用户输入原文明确写“员工说‘我提交了请求，但不知道系统用了什么标记’”，报告将其表述为员工自述，并注明未经日志核实，主体与限定一致。",
+              "missing_evidence": "",
+              "suggestion": "",
+              "quote": "员工自述提交了请求但不知系统标记"
+            },
+            {
+              "claim_index": 1,
+              "target": "quote",
+              "status": "supported",
+              "reason": "用户输入原文给出检索只覆盖本次提供的窗口、条件为标记T、返回零条，报告摘要与正文表述一致，未扩大范围。",
+              "missing_evidence": "",
+              "suggestion": "",
+              "quote": "检索仅覆盖本次窗口、条件为标记T、返回零条"
+            },
+            {
+              "claim_index": 2,
+              "target": "quote",
+              "status": "supported",
+              "reason": "用户输入原文明确“没有提供其他标记、其他窗口或日志完整性证明”，报告表述为“无其他标记、其他窗口或完整性证明”，与原文等价。",
+              "missing_evidence": "",
+              "suggestion": "",
+              "quote": "无其他标记、其他窗口或完整性证明"
+            },
+            {
+              "claim_index": 3,
+              "target": "quote",
+              "status": "supported",
+              "reason": "记录未提供提交回执、处理记录或系统标记字段，报告将提交、处理、标记三项列为尚不能确定，符合任务要求区分未知系统事件。",
+              "missing_evidence": "",
+              "suggestion": "",
+              "quote": "请求是否提交、是否被处理、实际标记为何，均尚不能确定"
+            },
+            {
+              "claim_index": 4,
+              "target": "reasoning",
+              "status": "supported",
+              "reason": "前提为检索条件仅标记T、窗口有限且零命中，系统实际标记与处理状态无记录；由此只能否定该条件下命中，不能推出未提交或已成功处理，也不应替员工选择标记，推导成立。",
+              "missing_evidence": "",
+              "suggestion": "",
+              "quote": "零条只说明该窗口内标记T无命中，不能断言未提交或已成功处理，也不替员工选择标记"
+            }
+          ],
+          "missing_claim_indices": [],
+          "omitted_items": 0,
+          "counts": {
+            "supported": 5,
+            "contradicted": 0,
+            "insufficient": 0,
+            "uncertain": 0
+          },
+          "meaning": "模型对选定结论的逐项意见；不认证事实或未关联文本。"
+        },
+        "inferences_without_extra_assumptions": 1
+      },
+      {
+        "id": "s_totals",
+        "automatic_status": "pass",
+        "metrics": {
+          "steps": 6,
+          "seconds": 16.51,
+          "equivalent_tokens": 22271,
+          "input_tokens": 59833,
+          "cached_tokens": 48640,
+          "output_tokens": 3107,
+          "llm_calls": 8,
+          "review_calls": 1,
+          "tool_errors": 1,
+          "stop_reason": "final_answer"
+        },
+        "assistant_verdict": "pass",
+        "findings": [
+          "独立整数复算：17+23=40，11+19=30，(17-11)+(23-19)=10；实际totals.json恰含三键且type均为int（排除bool）。",
+          "成功run_python确实输出分组6/4和总量，实际文件读取已登记artifact版本/类型；最终关联资料/计算/文件分别为direct/calculated/observed。",
+          "初稿把派生6/4混入direct，既有数值约束在保存前拒绝，随后改正；该失败保留，不归因于新增逐项模型审稿。正文未将已核对等同合格或现实库存证明。"
+        ],
+        "claims": 4,
+        "support_review": {
+          "status": "complete",
+          "checks": [
+            {
+              "claim_index": 0,
+              "target": "quote",
+              "status": "supported",
+              "reason": "题给输入明确给出青组17/11、白组23/19，报告引用一致。",
+              "missing_evidence": "",
+              "suggestion": "",
+              "quote": "青组接收 17、已核对 11；白组接收 23、已核对 19。"
+            },
+            {
+              "claim_index": 1,
+              "target": "quote",
+              "status": "supported",
+              "reason": "按题设未核对=接收−已核对得6和4；两组无重叠，直接相加得40/30/10，与run_python输出一致。",
+              "missing_evidence": "",
+              "suggestion": "",
+              "quote": "青组未核对 6、白组未核对 4；总接收 40，总已核对 30，总未核对 10。"
+            },
+            {
+              "claim_index": 2,
+              "target": "quote",
+              "status": "supported",
+              "reason": "artifact样本内容为三键40/30/10，field_types均为int，与报告描述一致。",
+              "missing_evidence": "",
+              "suggestion": "",
+              "quote": "totals.json 内容为 `{\"received\": 40, \"checked\": 30, \"unchecked\": 10}`，仅三键，字段类型均为 int。"
+            },
+            {
+              "claim_index": 3,
+              "target": "quote",
+              "status": "supported",
+              "reason": "题给仅提供接收与已核对件数，未提供合格判定或现实库存信息，报告明确限定不推成合格或库存证明，符合要求。",
+              "missing_evidence": "",
+              "suggestion": "",
+              "quote": "“已核对”只表示完成核对动作，不等于审核合格；本台账为虚构数据，不构成现实库存证明。"
+            }
+          ],
+          "missing_claim_indices": [],
+          "omitted_items": 0,
+          "counts": {
+            "supported": 4,
+            "contradicted": 0,
+            "insufficient": 0,
+            "uncertain": 0
+          },
+          "meaning": "模型对选定结论的逐项意见；不认证事实或未关联文本。"
+        },
+        "inferences_without_extra_assumptions": 1
+      }
+    ],
+    "comparison": "no old-version same-task baseline; no quality or cost improvement claim",
+    "stage12_acceptance": "unchanged not accepted; not a three-round gate",
+    "assistant_review_validation": {
+      "review_status": "complete",
+      "acceptance": "not_accepted",
+      "counts": {
+        "pending": 0,
+        "pass": 2,
+        "fail": 0,
+        "uncertain": 2
+      },
+      "human_review_complete": false,
+      "semantic_clean": false
+    }
+  },
+  "grader_functions_ast_unchanged": {
+    "agent/validation.py:assess": true,
+    "agent/validation.py:aggregate": true,
+    "agent/validation.py:number_tree": true,
+    "agent/eval_checks.py:assess_run": true
+  },
+  "source_sha256": {
+    "agent/evidence.py": "cf809131e26b4f0155b2b4c17d443a051c2b67bdefb8db324a39cc74b88aa021",
+    "agent/review.py": "a8d225705780a44aa1d36f2daa1d2c95b48cf9114a701e91ef362099a7233cd6",
+    "agent/loop.py": "d3396e9d9835fd556523c93c610066098a25cdd4fa364c63702644e9a233034a",
+    "agent/prompts.py": "3127f56fa24075c7d55f6c50b1d02450bd766d2e701e21bae88b6e36851972d2",
+    "tools/report.py": "670673316163d8859fb90ab691ea858fad6f8a41e3dd42b191f6a5b7f1acee9c",
+    "desktop/src/main.tsx": "36a28f27d079c0782ab42fbc1ce44f953d2f9597fae48faba8a156e15d3dd72e",
+    "agent/claim_support_smoke_cases.json": "d6b120970bc388ea5a6560db424f7a5157aa857e9533ea9c870cdfd035f6165c",
+    "tests/test_claim_support.py": "c07a79acff6c3bc4595c575f7bf67a70d63651648ba0c60c6b0e81cbefdf74f4",
+    "tests/desktop_acceptance_fixture.py": "f5ac8cd9e531d787ec66afbafc5ceaf00be30db4d082595aaa8c5b7422838576",
+    "desktop/scripts/acceptance-smoke.cjs": "dad7e6bd7209f91ad407e2b49a7c5cfe592e02640843746498cbd71f0308fa4c"
+  },
+  "raw_artifact_sha256": {
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_chain\\.agent-checkpoint.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_chain\\.agent-checkpoint.sqlite3": "c5281c7545cda928bf7671234fd93861667b18f6584d6a34effa1d54ddf3594d",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_chain\\evidence.json": "6577586c862b4f3776029a8dcac487007a365f5d92935aed3b6878561651a8be",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_chain\\messages.json": "bc9cafbb97c26575a53df13865d116a6144fa95e56cd009a6022e241431a649c",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_chain\\plan.json": "21c1481321c4164b7a589890d348fd1fb6940d25379c83e0cc2c30e9380b6f11",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_chain\\report.contract.json": "bbeb50517b1bae9f2bface9994200b0aa7f3acb602b7a013388a23b3dd1c642e",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_chain\\report.evidence.json": "0d9174fc1942a72d8f25a172a813e9db1f7841262e3d993670d5db985469d175",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_chain\\report.md": "4b82487100882eab28af870d34ad038228a500b4655d5f8061be2d97f5930f8f",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_chain\\report.quality.json": "b5730e743baf7778cb4ff464e2d37ccde322b4221579c757fdb9520f28da28e7",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_chain\\report.review.json": "042762ad8df5a2e40104e8f6fefaea05ca78e1949ab56bd4ac782f2bf7037b38",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_chain\\report.reviews.jsonl": "d01a9bc1219ae5973d5cce52013322a83cd4fcb2db1c66509a54fb987636a94b",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_chain\\task_contract.json": "fbf9ddbd0227fd196a0f6732d732797f36a8e46f17f97ed553a39323c7f2bd1a",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_chain\\trace.jsonl": "38217511cab035319b7a3c8df9c571609e2cf3408782b74aebad12f6ff2a1268",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_versions\\.agent-checkpoint.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_versions\\.agent-checkpoint.sqlite3": "a83abe777c2177a539b926627e86c65d7c8b040fb4ff978ab1e827a983e4d87f",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_versions\\evidence.json": "6005d068f9a23da2b81779a4d21276fb5a8b400af80380c99bfb7a8640d537e6",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_versions\\messages.json": "a0eb2680a51a000ecebebade77475348c19cbb38a3e5d891534cc786f8149cd6",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_versions\\plan.json": "6c452a1969f2e532e558c70f76218296c340afc4e790921c073ed7d670b9d8c5",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_versions\\report.contract.json": "4a015630537a06d55d67f8efa24461d2b4323628c2f9d772be2c35cb2dd96ff7",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_versions\\report.evidence.json": "04dc7b4a427839116c4ed633fa6a95c129c0b56bdb48f6cff7ec76f5236060f3",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_versions\\report.md": "4b8b03fcdb790b6ffb294af7dfd5fcbb8e80cfafb3af3ee9d9923f386b6f7d4b",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_versions\\report.quality.json": "8254f664425b1f6eea2329860d851e94affd630f47848019a716be99f0580479",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_versions\\report.review.json": "4080b16d7319d9a274dc43ee2e99f66f94e90f19dd2edc86783ec40ed6b6efe9",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_versions\\report.reviews.jsonl": "9de0abfb13688bb0153124c216157fdc78bbd2d9ab9b74a9a711a8e7d81c6ac9",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_versions\\task_contract.json": "dd349f835f67f1eee3338b90ccda191c2e63c3e2a598cd0e12cdb15505917a35",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_versions\\trace.jsonl": "a0f855397e7628e62f84153e3ec49c8f6b08c2bd261eb48e115cd4b470e8dc91",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_observation\\.agent-checkpoint.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_observation\\.agent-checkpoint.sqlite3": "079defe3b4575e4a90ac1e3f6d47cf892b88d766715488fd7203c84106821162",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_observation\\evidence.json": "3a442ab08d0fdaf6248893cbd944dba7df63d6f5a13fd6377646fa51181c4a51",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_observation\\messages.json": "313ee9cdc484855c837ed9b4747dfd72717ab32f4bce96037eaef5bfaacdbdd0",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_observation\\plan.json": "026c73f4fa980886a208d7a4dd38142435671bb2f1e6b4b48959ddb23623dc0e",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_observation\\report.contract.json": "f4c5516865700bfca03ab3e88fb96316657d9104eb5a2a9c0f1940b3c557f385",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_observation\\report.evidence.json": "d65a60333f9fa9bd6b4eeea96b9d48a7c2160dbd19edbc976363ee914f9649c5",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_observation\\report.md": "982a20a5d839f459be441326e3720933b7dbc13cd46b8ec18a5ee963eec7bfa7",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_observation\\report.quality.json": "2be9fd71bd4b7bb09723ebd5760e652d697a6b05c31513e7ff85ec404823d0c2",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_observation\\report.review.json": "c18c1a2709750fafc2eceb59e45c9d3358cf3e2eb6c054d48f8432fc2e8af3e7",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_observation\\report.reviews.jsonl": "156c705d9de28614588a24a3031b574e7b93950d4a8821c1181e0fe0aaa83f3e",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_observation\\task_contract.json": "2fef9cc82efc80f988b5eef4410f5614019d344bba4cfbec5b5437bf4e1a8648",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_observation\\trace.jsonl": "3c16bde8f17afe7bd0b6875e22c6f660ddf5f05b867abcc82844e4e12b95b902",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_totals\\.agent-checkpoint.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_totals\\.agent-checkpoint.sqlite3": "45906fe6e6d2a143820e1ea2fd9aefb360359909b48f3e2d800086b54f3aecd7",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_totals\\.code_runs\\acf60d7b422d409fb37cb6596ca068da\\code.py": "c9c56e3917963757e7a9c7cf483b6f2863012b295918a40a8d63f53a6fd08e88",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_totals\\evidence.json": "50575ab35e8c4e5dd977bed787659eeb1a8783b951d6f2c634179f3c2cf72766",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_totals\\messages.json": "a24ad93c434a22f9710e80e5a2673756bd4b8e90e2c983613c84f2bfdefbba54",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_totals\\plan.json": "d4b530b8ae03a10d5189fe15172ebd174e50c660fefccde5bcb6a88c085e474f",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_totals\\report.contract.json": "f6e78717f59c6af0d6a8c84dcac9e61ad92752368314eafcca0c717563fac1a5",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_totals\\report.evidence.json": "df72d6f1f23687743208933767c4622782428a3c902c7777687c7e2355b9a72b",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_totals\\report.md": "eb2ba9d283a73b8c154f70c0369964e90fc9d309a223c5b5ed2196b1ede2c27a",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_totals\\report.quality.json": "1aa1e5e8cd06a9982177df42a15ea47dcc06d7b96b9c62f8eb9a5ba13784ea2f",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_totals\\report.review.json": "1a136f8668816a59c61b5721cea1b3c4b50f5968edd5610f58daacc846585b90",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_totals\\report.reviews.jsonl": "168db468f5960f592ecc3a32367cac89ac7e82da189bad567689c16244d268ec",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_totals\\task_contract.json": "b79f554e2dbf7e4d3df8371621f43786fbd9007d7e2554eafa6d80f8bcb2463f",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_totals\\totals.json": "37a536eea7be78eb024b556a5c8e0e0bb4d4fce88a9b70746322d5588f65e772",
+    "workspace\\evaluations\\claim-support-smoke-20261020\\cases\\01-s_totals\\trace.jsonl": "784516166e60a561e18b8d8fc815a1e501772d29a91497cef418c64767db1345"
+  },
+  "evidence_sha256": {
+    "workspace/claim-support-full-tests-release-20261020.log": "e5e551e5b71ff648f0d9264aac3fd2d497d4aed53648773562079519389a8334",
+    "workspace/claim-support-build-20261020.log": "543c1a27a3d41dd1d7b0e1ecbb601746701f215c0d9b43384ee8815f14ee2da9",
+    "workspace/claim-support-ui-20261020.log": "55b9b21b0fdecf58962201086d78c152d733c5bcdbe0b3f3431928b383e80e0d",
+    "workspace/claim-support-ui-release-20261020.log": "c510656288371b340466f6aa475f98b62958e9652fc75beb71c2656c1222a6d3",
+    "workspace/claim-support-release-20261020-claim-support.png": "50f27062902f9b7830a53d4cf6beea741c088016de64fed94b731a155c31bdc7",
+    "workspace/claim-support-release-20261020-ui-results.json": "0ad9223d6d7860b3b8388d4a61ca4cf5d297f3c3e7036aed4b8a731753502170",
+    "workspace/claim-support-smoke-live-20261020.log": "40113f14dea32b445427a0f7f5a5da3263fa4897417ee9cf1b60cdde8fe87568",
+    "workspace/claim-support-smoke-lock-20261020.json": "ee8f4dc6c5282eddd059507e45c392b4e09ccbf3ed879513479979b394c6ec91",
+    "workspace/evaluations/claim-support-smoke-20261020/results.json": "efdbbe49ac03bac29e4f88782862db95d6beb483cf3f192d692b0460d4626452",
+    "workspace/evaluations/claim-support-smoke-20261020-assistant-review/review-decisions.json": "ed3e1ca87ad1994de5d70f2c116be0bffb849d5e45e793f3cfd3cf1b19cc4d4f",
+    "workspace/evaluations/claim-support-smoke-20261020-assistant-review/review-evidence.json": "a78fdc600d62deab72eb6e129436f2c8eab544dde1cb2474f39a34fcd3a27fa4",
+    "workspace/evaluations/claim-support-smoke-20261020-assistant-review/checked/review.json": "f19a4612eeca9a35185d9c09f3c2096a6ac61ad865153b253da67db629c5e132"
+  }
+}

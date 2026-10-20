@@ -31,6 +31,40 @@ npm.cmd --prefix desktop run smoke:acceptance -- --evidence-prefix my-claim-supp
 
 冻结前复检：全量837 passed（55.22秒），其中新增24项；TypeScript/Vite构建通过，15组隔离桌面流程通过、page_errors为空，新增前提/推导/模型意见截图已目视核对。第四批456个原文件哈希不变。日志：workspace/claim-support-full-tests-release-20261020.log、claim-support-build-20261020.log、claim-support-ui-release-20261020.log及claim-support-release-20261020-ui-results.json。此前836项测试通过后追加了异稿证据包拒绝测试，最终全量另跑837项；未替换失败日志。
 
+## 冻结后的真实单轮结果
+
+实现冻结在`5e6089a`，使用项目`.env`中的DeepSeek-flash配置，temperature=0.3、thinking=disabled；未在四项运行期间改源码、题目、规则或预算。原始自动4/4，4份最终稿均reviewed、关联包完整；模型返回18条supported意见，但这不替代逐份复读。
+
+|任务|自动|编码助手复核|发现|
+|---|---|---|---|
+|档案分组与资格|pass|uncertain|主体结论保留未知；“不能反推”与“逆命题不成立”连写可能把未被证明扩大为为假。|
+|版本、默认值与实例|pass|pass|三类主体区分，乙使用哪个修订与S默认值未补造；资料与推断分别关联。|
+|日志检索窗口|pass|uncertain|“未提供其他”缩成“无其他”可能扩大缺失范围；某项unknown选摘只是用户要求，真实缺口仍需共享原文上下文支持。|
+|台账总量与文件|pass|pass|独立复算40/30/10，实际文件三键均为整数；输入/计算/读取分类最终分开，未推成合格或现实库存证明。|
+
+助手复核已完成，无pending；身份为同一开发/出题编码助手，非独立人工或盲审。原始自动分数不改。`agent.validation review`退出1，review_status=complete、acceptance=not_accepted；用户无须填写。单轮不是原三轮门槛，本项完成工程交付，不给阶段12打验收标签。
+
+合计18步、53.34秒任务耗时、70665等效tokens、26次已记录模型调用（含4次审稿）。审稿输入24981 tokens、输出1071 tokens；四份证据包估计共5863 tokens，是包的估计量，不是相对旧版的新增成本。没有同题旧版对照，不声称节省费用或提高成功率，也不把token折算为实际账户扣款。
+
+6条推断实际使用reasoning且assumptions为空，显示模型能够使用新机制；本次没有触发真实模型的负面逐项意见，负面意见进入修订的机制仅由离线测试验证，不能宣称这轮证明漏错减少。模型审稿仍遗漏上述两处不确定解释。总量题初稿把6/4混入direct被已有数值约束拒绝，日志题初稿超长被已有篇幅约束拒绝，随后恢复；这不是新增审稿的功劳，不删失败轨迹。
+
+54个新任务原文件与456个旧文件均核对未变；评分入口`assess/aggregate/number_tree/assess_run`相较修复前AST不变。新增前提定位进入证据核对，因此冻结整体摘要会变化，不把摘要相同作为声称。
+
+本机结果和已填助手表：
+
+- [原始结果](/D:/code/personal_agent/workspace/evaluations/claim-support-smoke-20261020/results.json)
+- [助手意见](/D:/code/personal_agent/workspace/evaluations/claim-support-smoke-20261020-assistant-review/review-decisions.json)
+- [正式只读复核输出](/D:/code/personal_agent/workspace/evaluations/claim-support-smoke-20261020-assistant-review/checked/review.json)
+- [机器记录及版本摘要](claim-support-evaluation-20261020.json)
+
+查看报告与回放无需额外模型调用。例如：
+
+```powershell
+.\.venv\Scripts\python.exe -X utf8 -m agent.replay workspace/evaluations/claim-support-smoke-20261020/cases/01-s_chain
+```
+
+这四题现已揭盲，后续只能作为开发资料，不再冒充独立验收。本轮不据这些具体措辞继续添加拦截规则。
+
 ## 兼容性
 
 旧证据格式可读取，不补造前提或逐项审稿。新的模型审稿缺少`claim_checks`时保留未完成；旧历史审稿不重写。源码变化仍使旧检查点拒绝恢复，首版不迁移。外部人工不再作为开发等待事项，正式阶段12仍按原标准保持未验收。

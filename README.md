@@ -392,7 +392,8 @@ REPORT_REVIEW_MAX_TOKENS=2048
 
 `write_report` 可用 `claims` 提交最多 8 条关键结论：报告原句 `quote`、类型 `kind`、
 依据 `supports`（`source_id` 与 `excerpt`），以及 `assumptions`、`limits`。
-类型为 `direct`（直接资料）、`calculated`（计算）、`inference`（依赖假设的推断）、`unknown`（未知或冲突）。
+类型为 `direct`（直接资料）、`calculated`（计算）、`inference`（推断）、`unknown`（未知或冲突）、`observed`（本次工具/文件记录）。
+推断可用 `reasoning` 说明已有前提到结论的步骤，无需额外假设时不必编造 `assumptions`。可选 `premises` 区分有真实摘录的 `evidence` 前提与未确认的 `assumption`、`unknown`；复合结论可按子句分别关联。
 这些类型由模型填写，有限检查只验证来源类别等约束，不能证明分类和推理正确。
 不提供关联仍可保存报告，但完整稿保持 `unmapped`，暂不消耗语义审稿次数。
 
@@ -400,6 +401,8 @@ REPORT_REVIEW_MAX_TOKENS=2048
 只能读取本次索引，不读取未展示的缓存全文。网页日期类型未核实，抓取时间单独保存；历史日期不证明当前事实。
 改稿未提供新关联时保守使全部旧关联过期；只改关联也会使旧审稿失效，复审仍受原预算和次数上限约束。
 摘录允许仅空白差异匹配，最终保存原始子串，不能用相似措辞冒充原文。
+
+新审稿记录附 `support_review`，逐项保留模型对选定结论的支持判断、证据缺口和建议。缺少逐项意见或证据包省略时保持 `partial`；来源可定位不等于模型已核对或结论成立。桌面“依据”与“质量”面板可查看，过期版本不沿用。见[实现与试跑记录](docs/claim-support-20261020.md)。
 
 在项目根目录核对已有任务，无需 API Key：
 
