@@ -36,6 +36,8 @@
 4. “历史背景”用于下一轮。开启后优先使用本会话上一轮已结束报告，作为有日期、未认证的历史资料；没有本会话报告时沿用现有 CLI 的历史召回。关闭后不注入或保存研究记忆。当前问题始终单独提取任务约定。
 5. 左侧可搜索、重命名和归档会话。“导入已有任务”只索引 `workspace` 顶层带 trace 的任务，不运行模型、不更改旧报告，不导入评估目录中的批量用例。索引保存在 `workspace/desktop.sqlite3`，原始产物仍在各自任务目录。
 
+Enter发送、Shift+Enter换行；Escape关闭设置、重命名或依据弹窗。翻看历史时新事件保留当前滚动位置，回到底部后继续跟随。事件连接意外中断会提示并从最后已读位置重连，不会因此重新提交研究；未知的历史步数和用量显示“未记录”。新建会话等待期间输入的问题会保留。
+
 ## 调用与成本统计
 
 选中一轮研究，右侧打开 **用量**，或点击回答下方的“次模型 / 金额”入口。页面展示规划、研究、审稿及其他用途的调用数、输入/输出token与费用分项；同时列出返回/失败次数、含重试的请求尝试数、额外重试、缓存命中/未命中和命中率。模型请求完成或明确失败后更新，等待中的请求尚未计入。旧日志没有记录的失败或重试不能补算，显示下限及说明。
@@ -65,8 +67,10 @@
 ```powershell
 .\.venv\Scripts\python.exe -m pytest -q
 npm.cmd --prefix desktop run build
-# 先关闭已有应用；测试拦截提交，不创建研究、不调用模型
-npm.cmd --prefix desktop run smoke
+# 隔离workspace与隐藏窗口；真实执行入口，模型使用离线夹具
+npm.cmd --prefix desktop run smoke:acceptance
+# 仅进程意外退出与重启检查
+npm.cmd --prefix desktop run smoke:lifecycle
 ```
 
 启动服务日志在 `workspace/desktop-service.log`；每轮完整事件为任务目录的 `trace.jsonl`。该目录中 `.desktop-console.log` 是工作进程输出，`.desktop-request.json`、`.desktop-result.json` 为内部状态，不在界面文件列表展示。不要将工作目录或 `.env` 发布到远程仓库。

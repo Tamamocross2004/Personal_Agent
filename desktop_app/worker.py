@@ -3,34 +3,13 @@ import argparse
 import json
 import os
 import threading
-import time
 from dataclasses import asdict
 from pathlib import Path
 
 from agent.config import Settings,load_llm_config
 from agent.llm import LLMClient
 from main import research,resume_research
-
-
-def watch_parent(pid):
-    if os.name=='nt':
-        import ctypes
-        from ctypes import wintypes
-        kernel=ctypes.windll.kernel32
-        kernel.OpenProcess.argtypes=[wintypes.DWORD,wintypes.BOOL,wintypes.DWORD]
-        kernel.OpenProcess.restype=wintypes.HANDLE
-        kernel.WaitForSingleObject.argtypes=[wintypes.HANDLE,wintypes.DWORD]
-        kernel.CloseHandle.argtypes=[wintypes.HANDLE]
-        handle=kernel.OpenProcess(0x100000,False,pid)
-        if handle:
-            kernel.WaitForSingleObject(handle,0xFFFFFFFF)
-            kernel.CloseHandle(handle)
-        import subprocess
-        subprocess.run(['taskkill','/PID',str(os.getpid()),'/T','/F'],capture_output=True,creationflags=subprocess.CREATE_NO_WINDOW)
-    else:
-        while True:
-            time.sleep(1)
-            if os.getppid()!=pid:os._exit(130)
+from desktop_app.lifecycle import watch_parent
 
 
 def main():

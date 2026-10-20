@@ -86,6 +86,7 @@ class Manager:
 
     def submit(self,sid,question,options):
         with self.lock:
+            if self.closed.is_set():raise ValueError('本地任务服务已停止，请重启应用后再提交')
             if self.store.session(sid)['archived']:raise ValueError('请先取消归档再提交')
             # 先核对所选配置，配置错误不创建看似运行中的任务。
             load_llm_config(provider=options['provider'],model=options['model'],settings=self.settings)
@@ -115,6 +116,7 @@ class Manager:
 
     def resume(self,rid):
         with self.lock:
+            if self.closed.is_set():raise ValueError('本地任务服务已停止，请重启应用后再恢复')
             row=self.store.run(rid)
             if row['state'] in ACTIVE:raise ValueError('任务已在运行或排队，不能重复恢复')
             if self.store.session(row['session_id'])['archived']:raise ValueError('请先取消归档再恢复')
@@ -125,6 +127,9 @@ class Manager:
                 for name in ('.desktop-stop','.desktop-result.json'):
                     (root/name).unlink(missing_ok=True)
             return self.store.set_run(rid,'resuming',{'error':'已请求从检查点恢复，继承原步数、预算和审稿次数。'})
+
+    def worker_command(self,path):
+        return [sys.executable,'-m','desktop_app.worker',str(path),'--parent',str(os.getpid())]
 
     def tick(self):
         with self.lock:
@@ -154,7 +159,7 @@ class Manager:
             self.log=(path/'.desktop-console.log').open('ab' if resuming else 'wb')
             env=os.environ.copy(); env['PYTHONIOENCODING']='utf-8'
             try:
-                self.process=subprocess.Popen([sys.executable,'-m','desktop_app.worker',str(path),'--parent',str(os.getpid())],
+                self.process=subprocess.Popen(self.worker_command(path),
                     cwd=PROJECT_ROOT,env=env,stdout=self.log,stderr=subprocess.STDOUT,
                     creationflags=subprocess.CREATE_NO_WINDOW if os.name=='nt' else 0,start_new_session=os.name!='nt')
             except OSError as exc:

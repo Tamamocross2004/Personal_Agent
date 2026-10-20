@@ -12,6 +12,8 @@
     "start": "electron .",
     "dev": "vite --host 127.0.0.1",
     "smoke": "node scripts/smoke.cjs",
+    "smoke:acceptance": "node scripts/acceptance-smoke.cjs",
+    "smoke:lifecycle": "node scripts/acceptance-smoke.cjs --lifecycle-only",
     "format": "prettier --write src electron scripts package.json tsconfig.json index.html"
   },
   "dependencies": {

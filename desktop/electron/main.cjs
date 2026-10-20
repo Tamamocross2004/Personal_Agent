@@ -65,6 +65,8 @@ function startBackend() {
       [
         "-m",
         "desktop_app.server",
+        "--parent",
+        String(process.pid),
         "--ui-dir",
         path.join(root, "desktop", "dist"),
       ],

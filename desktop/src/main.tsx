@@ -171,8 +171,30 @@ function App() {
     Record<string, { tokens: number; tools: number }>
   >({});
   const feed = useRef<HTMLDivElement>(null);
+  const followFeed = useRef(true);
+  const mutation = useRef(false);
+  const sessionRequest = useRef(0);
+  const archiveFilter = useRef(archived);
+  archiveFilter.current = archived;
+  const selectedSession = useRef(sid);
+  const selectedRun = useRef(rid);
+  selectedSession.current = sid;
+  selectedRun.current = rid;
+  const [streamState, setStreamState] = useState("");
+  function chooseSession(id: string) {
+    if (id === selectedSession.current) return;
+    selectedSession.current = id;
+    selectedRun.current = "";
+    followFeed.current = true;
+    setSid(id);
+    setRid("");
+    setRuns([]);
+    setDetail(null);
+  }
   async function refreshSessions() {
-    setSessions(await api("/sessions?archived=" + archived));
+    const request = ++sessionRequest.current;
+    const list = await api("/sessions?archived=" + archiveFilter.current);
+    if (request === sessionRequest.current) setSessions(list);
   }
   useEffect(() => {
     (async () => {
@@ -208,7 +230,7 @@ function App() {
     const refresh = async () => {
       try {
         const list: Run[] = await api(`/sessions/${sid}/runs`);
-        if (live) {
+        if (live && selectedSession.current === sid) {
           setRuns(list);
           setRid((old) =>
             list.some((r) => r.id === old) ? old : list.at(-1)?.id || "",
@@ -235,7 +257,7 @@ function App() {
     const refresh = async () => {
       try {
         const value = await api(`/runs/${rid}`);
-        if (live) setDetail(value);
+        if (live && selectedRun.current === rid) setDetail(value);
       } catch (e) {
         if (live) setError(String(e));
       }
@@ -251,6 +273,7 @@ function App() {
     if (!rid || !ready) return;
     const controller = new AbortController();
     let cursor = 0;
+    setStreamState("连接中");
     setEvents((old) => ({ ...old, [rid]: [] }));
     setStatistics((old) => ({ ...old, [rid]: { tokens: 0, tools: 0 } }));
     (async () => {
@@ -264,6 +287,8 @@ function App() {
             },
           );
           if (!r.ok || !r.body) throw Error("事件连接中断");
+          if (controller.signal.aborted) return;
+          setStreamState("已连接");
           const reader = r.body.getReader(),
             decoder = new TextDecoder();
           let buffer = "",
@@ -289,6 +314,7 @@ function App() {
               const value = JSON.parse(data.slice(6));
               if (type === "state") {
                 ended = true;
+                setStreamState("");
                 break;
               }
               setEvents((old) => ({
@@ -316,9 +342,11 @@ function App() {
             }
           }
           await reader.cancel();
-          return;
+          if (ended) return;
+          throw Error("事件流提前结束");
         } catch (e) {
           if (controller.signal.aborted) return;
+          setStreamState("连接中断，正在重连；任务未重新提交");
           await new Promise((r) => setTimeout(r, 2000));
         }
       }
@@ -326,11 +354,22 @@ function App() {
     return () => controller.abort();
   }, [rid, ready, resumeVersion]);
   useEffect(() => {
-    if (feed.current) feed.current.scrollTop = feed.current.scrollHeight;
-  }, [runs.length, events[rid]?.length]);
+    if (feed.current && followFeed.current)
+      feed.current.scrollTop = feed.current.scrollHeight;
+  }, [runs.length, events[rid]?.at(-1)?._cursor]);
   useEffect(() => {
     setSource(null);
   }, [rid]);
+  useEffect(() => {
+    const dismiss = (e: KeyboardEvent) => {
+      if (e.key !== "Escape" || e.isComposing) return;
+      setSource(null);
+      setSettings(false);
+      setRenaming(null);
+    };
+    window.addEventListener("keydown", dismiss);
+    return () => window.removeEventListener("keydown", dismiss);
+  }, []);
   useEffect(() => {
     if (!rid) return;
     const controller = new AbortController();
@@ -361,18 +400,26 @@ function App() {
     )?.modified,
   ]);
   async function create() {
+    if (mutation.current) return;
+    mutation.current = true;
+    setBusy(true);
+    setDraft("");
     try {
       const s = await api("/sessions", { method: "POST" });
       setArchived(false);
       setSessions((old) => [s, ...old]);
-      setSid(s.id);
-      setDraft("");
+      chooseSession(s.id);
     } catch (e) {
       setError(String(e));
+    } finally {
+      mutation.current = false;
+      setBusy(false);
     }
   }
   async function submit() {
-    if (!draft.trim() || busy) return;
+    if (!ready || !draft.trim() || mutation.current || current?.archived)
+      return;
+    mutation.current = true;
     setBusy(true);
     setError("");
     try {
@@ -380,20 +427,24 @@ function App() {
       if (!sessionId) {
         const s = await api("/sessions", { method: "POST" });
         sessionId = s.id;
-        setSid(s.id);
+        chooseSession(s.id);
       }
       const row = await api(`/sessions/${sessionId}/runs`, {
         method: "POST",
         body: JSON.stringify({ ...options, question: draft }),
       });
-      setRuns((old) => [...old, row]);
-      setRid(row.id);
-      setDraft("");
-      setTab("report");
+      if (selectedSession.current === sessionId) {
+        setRuns((old) => [...old.filter((r) => r.id !== row.id), row]);
+        setRid(row.id);
+        setDraft((value) => (value === draft ? "" : value));
+        setTab("report");
+        followFeed.current = true;
+      }
       await refreshSessions();
     } catch (e) {
       setError(String(e));
     } finally {
+      mutation.current = false;
       setBusy(false);
     }
   }
@@ -401,22 +452,28 @@ function App() {
     if (!rid) return;
     try {
       await api(`/runs/${rid}/stop?force=${force}`, { method: "POST" });
-      setDetail(await api(`/runs/${rid}`));
+      const value = await api(`/runs/${rid}`);
+      if (selectedRun.current === rid) setDetail(value);
     } catch (e) {
       setError(String(e));
     }
   }
   async function resume() {
-    if (!rid || busy) return;
+    if (!rid || mutation.current) return;
+    mutation.current = true;
     setBusy(true);
     try {
       const row = await api(`/runs/${rid}/resume`, { method: "POST" });
-      setRuns((old) => old.map((r) => r.id === rid ? row : r));
-      setDetail(await api(`/runs/${rid}`));
-      setResumeVersion((v) => v + 1);
+      const value = await api(`/runs/${rid}`);
+      if (selectedRun.current === rid) {
+        setRuns((old) => old.map((r) => (r.id === rid ? row : r)));
+        setDetail(value);
+        setResumeVersion((v) => v + 1);
+      }
     } catch (e) {
       setError(String(e));
     } finally {
+      mutation.current = false;
       setBusy(false);
     }
   }
@@ -439,7 +496,7 @@ function App() {
         method: "PATCH",
         body: JSON.stringify({ archived: !s.archived }),
       });
-      if (s.id === sid) setSid("");
+      if (s.id === selectedSession.current) chooseSession("");
       await refreshSessions();
     } catch (e) {
       setError(String(e));
@@ -474,7 +531,11 @@ function App() {
           </div>
           <span className="local-dot" title="本地应用" />
         </div>
-        <button className="new-session" onClick={create}>
+        <button
+          className="new-session"
+          disabled={!ready || busy}
+          onClick={create}
+        >
           <Plus size={17} />
           新建研究
         </button>
@@ -500,7 +561,10 @@ function App() {
                 key={s.id}
                 className={"session " + (s.id === sid ? "selected" : "")}
               >
-                <button className="session-title" onClick={() => setSid(s.id)}>
+                <button
+                  className="session-title"
+                  onClick={() => chooseSession(s.id)}
+                >
                   <FileText size={15} />
                   <span>
                     {s.title}
@@ -588,7 +652,15 @@ function App() {
             </button>
           </div>
         )}
-        <div className="conversation" ref={feed}>
+        <div
+          className="conversation"
+          ref={feed}
+          onScroll={(e) => {
+            const box = e.currentTarget;
+            followFeed.current =
+              box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+          }}
+        >
           {!runs.length ? (
             <div className="welcome">
               <div className="welcome-symbol">
@@ -670,11 +742,18 @@ function App() {
                           <span>执行过程</span>
                           <small>
                             {statistics[rid]?.tools || 0} 次工具调用 ·{" "}
-                            {number(run.result.equivalent_tokens ?? usage)} 等效
-                            token
+                            {run.result.equivalent_tokens != null || active(run)
+                              ? number(run.result.equivalent_tokens ?? usage)
+                              : "未记录"}{" "}
+                            等效 token
                           </small>
                         </summary>
                         <div className="event-list">
+                          {streamState && (
+                            <p className="muted stream-state" role="status">
+                              执行事件：{streamState}
+                            </p>
+                          )}
                           {timeline
                             .filter((e) =>
                               [
@@ -895,14 +974,35 @@ function App() {
                 <span>{time(detail.created_at)}</span>
               </div>
               <div className="inspector-body">
-                {detail.checkpoint && (detail.checkpoint.available || ["interrupted", "failed", "cancelled", "needs_verification"].includes(detail.state)) && (
-                  <div className="panel-intro">
-                    <strong>检查点恢复</strong>
-                    <p>{detail.checkpoint.reason}</p>
-                    {detail.checkpoint.available && <p>累计 {detail.checkpoint.steps} 步 · {number(detail.checkpoint.equivalent_tokens)} 等效 token · {detail.checkpoint.review_calls} 次审稿</p>}
-                    <button className="primary" disabled={busy || active(detail) || !detail.checkpoint.resumable} onClick={resume}>从检查点恢复</button>
-                  </div>
-                )}
+                {detail.checkpoint &&
+                  (detail.checkpoint.available ||
+                    [
+                      "interrupted",
+                      "failed",
+                      "cancelled",
+                      "needs_verification",
+                    ].includes(detail.state)) && (
+                    <div className="panel-intro">
+                      <strong>检查点恢复</strong>
+                      <p>{detail.checkpoint.reason}</p>
+                      {detail.checkpoint.available && (
+                        <p>
+                          累计 {detail.checkpoint.steps} 步 ·{" "}
+                          {number(detail.checkpoint.equivalent_tokens)} 等效
+                          token · {detail.checkpoint.review_calls} 次审稿
+                        </p>
+                      )}
+                      <button
+                        className="primary"
+                        disabled={
+                          busy || active(detail) || !detail.checkpoint.resumable
+                        }
+                        onClick={resume}
+                      >
+                        从检查点恢复
+                      </button>
+                    </div>
+                  )}
                 {tab === "usage" && (
                   <UsagePanel
                     value={detail.usage}
@@ -913,14 +1013,20 @@ function App() {
                   />
                 )}
                 {tab === "report" &&
-                  (content ? (
+                  (fileError ? (
+                    <Empty text={fileError} />
+                  ) : content ? (
                     <article className="markdown document">
                       <Markdown
                         remarkPlugins={[remarkGfm]}
-                        components={markdownComponents(rid, (name: string) => {
-                          setSelectedFile(name);
-                          setTab("files");
-                        })}
+                        components={markdownComponents(
+                          rid,
+                          (name: string) => {
+                            setSelectedFile(name);
+                            setTab("files");
+                          },
+                          detail.files,
+                        )}
                       >
                         {content}
                       </Markdown>
@@ -958,8 +1064,14 @@ function App() {
                         <FolderOpen size={14} />
                       </button>
                     </div>
-                    {/\.(png|jpg|jpeg|webp)$/i.test(selectedFile) ? (
-                      <ProtectedImage run={rid} name={selectedFile} />
+                    {fileError ? (
+                      <Empty text={fileError} />
+                    ) : /\.(png|jpg|jpeg|webp)$/i.test(selectedFile) ? (
+                      <ProtectedImage
+                        key={`${rid}:${selectedFile}:${detail.files.find((f) => f.name === selectedFile)?.modified}`}
+                        run={rid}
+                        name={selectedFile}
+                      />
                     ) : selectedFile.endsWith(".csv") ? (
                       <CSV text={content} />
                     ) : selectedFile.endsWith(".md") ? (
@@ -972,6 +1084,7 @@ function App() {
                               setSelectedFile(name);
                               setTab("files");
                             },
+                            detail.files,
                           )}
                         >
                           {content}
@@ -1106,11 +1219,19 @@ function App() {
                     </div>
                     <div className="quality-row">
                       <span>等效 token</span>
-                      <b>{number(detail.result.equivalent_tokens || usage)}</b>
+                      <b>
+                        {detail.result.equivalent_tokens != null ||
+                        active(detail)
+                          ? number(detail.result.equivalent_tokens ?? usage)
+                          : "未记录"}
+                      </b>
                     </div>
                     <div className="quality-row">
                       <span>任务步数</span>
-                      <b>{detail.result.steps ?? "执行中"}</b>
+                      <b>
+                        {detail.result.steps ??
+                          (active(detail) ? "执行中" : "未记录")}
+                      </b>
                     </div>
                     {detail.result.error && (
                       <div className="issue">{detail.result.error}</div>
@@ -1324,7 +1445,15 @@ function App() {
 function markdownComponents(
   run: string,
   openFile?: (name: string) => void,
+  versions: Detail["files"] = [],
 ): any {
+  const decode = (value: string) => {
+    try {
+      return decodeURIComponent(value);
+    } catch {
+      return value;
+    }
+  };
   return {
     a: ({ href, children }: any) => (
       <a
@@ -1348,8 +1477,9 @@ function markdownComponents(
         <span className="muted">[外部图片：{alt}]</span>
       ) : (
         <ProtectedImage
+          key={`${run}:${src}:${versions.find((f) => f.name === decode(src || ""))?.modified}`}
           run={run}
-          name={decodeURIComponent(src || "")}
+          name={decode(src || "")}
           alt={alt}
         />
       ),
@@ -1366,6 +1496,7 @@ function ProtectedImage({
 }) {
   const [url, setUrl] = useState("");
   useEffect(() => {
+    setUrl("");
     let current = "",
       live = true;
     fileResponse(run, name)

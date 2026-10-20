@@ -7,6 +7,7 @@ import mimetypes
 import os
 import secrets
 import socket
+import threading
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -157,7 +158,11 @@ def create_app(manager:Manager,token:str,ui_dir:Path|None=None):
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--port',type=int,default=0);parser.add_argument('--ui-dir',type=Path)
+    parser.add_argument('--parent',type=int)
     args=parser.parse_args()
+    if args.parent:
+        from desktop_app.lifecycle import watch_parent
+        threading.Thread(target=watch_parent,args=(args.parent,),daemon=True).start()
     token=os.environ.pop('PERSONAL_AGENT_DESKTOP_TOKEN',None) or secrets.token_urlsafe(32)
     manager=Manager(PROJECT_ROOT/'workspace')
     sock=socket.socket();sock.bind(('127.0.0.1',args.port));sock.listen(128)

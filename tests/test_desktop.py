@@ -188,6 +188,19 @@ def test_manager_failure_does_not_leave_silent_running_queue(manager,monkeypatch
     assert manager.closed.is_set() and manager.store.run(row['id'])['state']=='failed'
 
 
+def test_stopped_manager_rejects_new_submissions_and_resume_without_mutation(manager):
+    row=new_run(manager)
+    manager.close()
+    before=manager.store.runs()
+    folders={p.name for p in manager.root.iterdir()}
+    with pytest.raises(ValueError,match='服务已停止'):
+        manager.submit(row['session_id'],'不能进入死队列',OPTIONS)
+    with pytest.raises(ValueError,match='服务已停止'):
+        manager.resume(row['id'])
+    assert manager.store.runs()==before
+    assert {p.name for p in manager.root.iterdir()}==folders
+
+
 def test_stopping_between_tools_keeps_first_result_and_skips_second(tmp_path):
     from agent.loop import Agent
     from tools.registry import ToolRegistry,tool

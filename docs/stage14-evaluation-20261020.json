@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-20",
+  "baseline_revision": "ffa38cf5f14b211bc449c7f36c4594e6fa24d954",
+  "scope": "Windows local single-user project-directory desktop v1; offline engineering acceptance",
+  "engineering_check": "passed",
+  "stage12_acceptance": "not_accepted",
+  "stage12_raw_result": "37/39; external human review pending",
+  "core_runtime_sha256": "e391a9f6bfefc1570dd49b4bd46f92cf39a332b07b99abca4b8902ad8eb5abc3",
+  "core_runtime_changed": false,
+  "paid_model_requests": 0,
+  "tests": {
+    "passed": 777,
+    "seconds": 50.4,
+    "new_pytest_cases": 1
+  },
+  "build": "TypeScript and Vite passed",
+  "ui": {
+    "status": "passed",
+    "checks": [
+      "native startup, preload and authenticated loopback API",
+      "submit -> subprocess tools -> report/chart/CSV/evidence/review/usage; SSE EOF reconnect",
+      "search, rename, archive/unarchive preserve research and never call model",
+      "reload is read-only; synchronous repeated send creates one run",
+      "review limit remains skipped_limit, not passed",
+      "budget exhaustion remains partial with original limit; Escape closes settings",
+      "unknown API outcome shows needs_verification and failed/unknown usage; resume blocked",
+      "cooperative stop and UI resume reuse committed response, same task and cumulative usage",
+      "subprocess recovery after a committed tool batch does not repeat that tool",
+      "corrupt checkpoint has visible refusal and disabled resume",
+      "missing CSV visible; malformed image URL does not crash; changed report makes review stale",
+      "long history stays at reader position; 1050x700 has no document overflow",
+      "force stop preserves uncertain checkpoint; normal desktop exit cleans backend",
+      "restart preserves index; unexpected Electron death cleans backend and worker; restart never auto-runs"
+    ],
+    "page_errors": [],
+    "new_draft_response_delay_ms": 400,
+    "normal_exit_cleanup": true,
+    "actual_electron_process_crash_cleanup": true,
+    "worker_cleanup": true,
+    "restart_auto_resume": false
+  },
+  "shortcut": {
+    "exists": true,
+    "script": "scripts/launch-desktop.vbs",
+    "working_directory": "D:/code/personal_agent",
+    "production_shortcut_launched_for_test": false
+  },
+  "source_hash_basis": "working tree bytes before commit; line endings may differ after checkout",
+  "source_sha256": {
+    "desktop/electron/main.cjs": "324351c0b259a586a270f38754149ad1e023218df66346c1a860f2bd8b4bd647",
+    "desktop/electron/preload.cjs": "1091b51cfc73c5607a79157de30577c1154953bfe8abb41ebbbc6aa1548d15a7",
+    "desktop/package.json": "5e1ffae5b02707239dc0adc26b680e376288f9853306fd1f19cb10caca8335c1",
+    "desktop/src/main.tsx": "100b811008f11e9db04c7f127d6e960f0f5c519e7707dbfb0ae8556972fce6f5",
+    "desktop_app/manager.py": "080f5acaf5f6e32dfedad7ec73a2dd6a7b278be765930925476cda0a32ea9cb4",
+    "desktop_app/server.py": "f6146ffba1be2fd72783a6d2ae3568c76765bb17e8b534fe0a8f0b69e67a9ed8",
+    "desktop_app/worker.py": "b90ce9cd6262cfbe7e59fbd0ee33b65c086fb456348f9db9036b1cefcce44f45",
+    "desktop_app/lifecycle.py": "d211196684167f71c4c7c10544863148c674ad84750f77cf62185bfa719ebe62",
+    "tests/test_desktop.py": "544aa281c563ffeb75dddc5999fdd26b1fb0d4acdabcbb30080c8980b61fe61c",
+    "tests/desktop_acceptance_fixture.py": "c5d8154a8e053e1ea52a3b7a6a288d59f8488390c27af29b0b938c09c44ec3c0",
+    "tests/desktop_acceptance_worker.py": "4d96cfb175644e98ee83f48160c22810fb1fb3959892f9a22a271e500502d66a",
+    "tests/desktop_acceptance_server.py": "5da14f8efec43a29ce4e610a7127b0b1fa2650a7357b2de8cde829889a60ebd3",
+    "desktop/scripts/acceptance-smoke.cjs": "eb281609a8a6ec757640e86f4f32ed93070fd2015fa42154e956024a53cab332"
+  },
+  "artifact_sha256": {
+    "workspace/stage14-full-tests-1.log": "9e60bf27108a97214b2923502706f18b718f7871271cc380c734bd343a65c5c0",
+    "workspace/stage14-build-4.log": "db52875c05f39c2179c2c4615f077c7f2f069a32d14b3e439057cadf76f30946",
+    "workspace/stage14-ui-smoke-release.log": "83f12990365af7cd3fc3f86f921ade5cc50d6c8e924d97aac71e979faa3dbc02",
+    "workspace/stage14-ui-smoke-release-2.log": "45578853dc5bf9e7b04210ab0d77797f042c0e87c8421e5e6765427f52a66640",
+    "workspace/stage14-ui-results.json": "9bb9f745a1db086b8e6a1bb0180db3ac004957b26a7a65f633ef6d202fa89c29",
+    "workspace/stage14-completed.png": "ebc98a0fdf7d775780fa7a2718c63ca86c460932c91f1c6ea35244e49f6231f4",
+    "workspace/stage14-small-window.png": "6ebf933f6e90ae6e704496941cb8e4920c23ee52298fb1dff80e67d557f65440",
+    "workspace/stage14-lifecycle-probe-2.log": "f82b3d5bd1ab07ddf3880e02cb08739d32c95e5f50ba819a8fdeb97b3975c4d5",
+    "desktop/dist/assets/index-CBhVM7bz.css": "cc88d081f8cea593e44033ae460233ba2b1bf12ab7e03afb925ff6d284a26c10",
+    "desktop/dist/assets/index-Cyi0GwCm.js": "7aacbc4126e87572dc6d1c366b6abfffe4a781fa4feee26889f8b460d39740b4",
+    "desktop/dist/index.html": "4b49f56a7d576a617ee8ba0cdb06a4b21af86cdd77b9a3f5cb1c598c67f50b8c"
+  },
+  "retained_failed_runs": [
+    "workspace/stage14-ui-smoke-1.log",
+    "workspace/stage14-ui-smoke-2.log",
+    "workspace/stage14-ui-smoke-3.log",
+    "workspace/stage14-ui-smoke-4.log",
+    "workspace/stage14-ui-smoke-5.log",
+    "workspace/stage14-lifecycle-probe-1.log"
+  ],
+  "limits": [
+    "No new live provider or real web evaluation",
+    "No long-duration, power-loss or cross-machine acceptance",
+    "No installer, automatic updates, multi-user or other OS acceptance",
+    "Review/mapping/finished state do not certify semantic correctness",
+    "Stage13 conservative recovery boundaries remain unchanged"
+  ]
+}
