@@ -1,0 +1,740 @@
+{
+  "schema_version": 1,
+  "purpose": "development integration only; not independent acceptance",
+  "acceptance": "not_accepted",
+  "external_human_review": false,
+  "semantic_support": "not_certified",
+  "tests": {
+    "passed": 755,
+    "seconds": 63.65,
+    "log_sha256": "81659be5ba1b80448099117de04bb7de1ffb53c26a40e7de47d9ee9ccd9ac967"
+  },
+  "desktop_build": "passed",
+  "original_artifact_hashes_verified": 144,
+  "runs": [
+    {
+      "source": "workspace/evaluations/stage12-mechanisms/results.json",
+      "source_sha256": "da95424dd36c65d0e3f9f338393818b993fdad62595ae27410f5826a66bf2ff2",
+      "frozen_revision": "9f5f6d89cc8bee26c18d4d91bff5f2238de79329",
+      "code_sha256": "4d471fbf0bcdb6240a865585a40a49a2f8933cff3a73286ebd909ec083f632ff",
+      "suite_sha256": "97d55d1cb6f35bc5d6522b2f87f59d69bf7d7845e86659db89f1d2fe08b5915f",
+      "summary": {
+        "rounds": [
+          {
+            "round": 1,
+            "normal": {
+              "passed": 2,
+              "selected": 3,
+              "rate": 0.6666666666666666
+            },
+            "fault": {
+              "passed": 3,
+              "selected": 3,
+              "rate": 1.0
+            }
+          }
+        ],
+        "automatic_gate": false,
+        "acceptance": "not_accepted",
+        "metrics": {
+          "steps": 47,
+          "seconds": 121.95000000000002,
+          "equivalent_tokens": 152362,
+          "llm_calls": 65,
+          "review_calls": 5,
+          "input_tokens": 511861,
+          "cached_tokens": 446464,
+          "output_tokens": 21159
+        },
+        "note": "自动通过不等于语义正确；需逐题核对原文、计算、条件、类型和故障状态。"
+      },
+      "cases": [
+        {
+          "id": "m_config",
+          "round": 1,
+          "status": "pass",
+          "group": "normal",
+          "review_status": "reviewed",
+          "metrics": {
+            "steps": 6,
+            "seconds": 14.63,
+            "equivalent_tokens": 19969,
+            "input_tokens": 49958,
+            "cached_tokens": 38272,
+            "output_tokens": 2228,
+            "llm_calls": 8,
+            "review_calls": 1,
+            "tool_errors": 1,
+            "stop_reason": "final_answer"
+          },
+          "artifact_sha256": {
+            ".code_runs/dcc42797c5b548068c45c82b8dd7e5ca/code.py": "adb50eb497ecf16ba5640d2f60b995bac56b592cae34cc06969417006ca159dc",
+            "evidence.json": "2e0dfc6e4978da0c7cd38f37f7171c4bdcaabfb94ae657fc024e64f952a3c336",
+            "messages.json": "c3e5631c3a51016508601a6d32449e200ba1bf4ee3fd2638458acb79aa116f48",
+            "plan.json": "a0fc7bf1566116a8fa0226ae208f48ad9b849c4cf660618491adc419138418e2",
+            "report.contract.json": "8b3b10e58157fcbfe54226285b31f2cd024b55c00550582a1a4c3e053f996b3c",
+            "report.evidence.json": "07602a0027036557d8e675e4d51b80688b416f318326625726fa6c4aabb2a3e7",
+            "report.md": "f37b29d7212eb95a430dd6915d61f1f160dfc73c9b4fc56bbd09986a38e97e76",
+            "report.quality.json": "98d9ecc6343d836f8375e8fda36cb0c2c439985632bdfbaf9abe9171d43a9161",
+            "report.review.json": "6e13132684f0245eb4474310c84adce7dcd6604fc7b399259852a9bd061b61db",
+            "report.reviews.jsonl": "c83c405fb6d3d5616a8b6d7c0e0eb5bd41e6da60b6be776719e13bcc3ceac3cf",
+            "settings_export.json": "c621e9e419c98038c6440eab4162e12c2deec8d6f03d7029495efa4c1fff862d",
+            "task_contract.json": "ebc584b56ccc01c9619244df581bc917aad1baf1f75aab1485cf02ba6168b5e2",
+            "trace.jsonl": "c3340eed753b72629e63d154249f8e60a44e6314845dff7fc256d482f155401c"
+          },
+          "task_dir": "workspace/evaluations/stage12-mechanisms/cases/01-m_config",
+          "mapping_audit": {
+            "status": "mapped",
+            "claims": 5,
+            "mapping_sha256": "dfb7ff49520526b3bf29f8a2204ba5762edaceb4f73773f42c022d46a07f2e5c",
+            "claim_kinds": [
+              "observed",
+              "unknown"
+            ],
+            "source_kinds": [
+              "artifact",
+              "execution"
+            ],
+            "records": 4,
+            "omitted_records": 0,
+            "structural_links_valid": true,
+            "semantic_support": "not_certified"
+          },
+          "failed_checks": []
+        },
+        {
+          "id": "m_replace",
+          "round": 1,
+          "status": "fail",
+          "group": "normal",
+          "review_status": "not_reviewed",
+          "metrics": {
+            "steps": 15,
+            "seconds": 42.13,
+            "equivalent_tokens": 53448,
+            "input_tokens": 194657,
+            "cached_tokens": 175232,
+            "output_tokens": 8250,
+            "llm_calls": 20,
+            "review_calls": 0,
+            "tool_errors": 10,
+            "stop_reason": "max_steps"
+          },
+          "artifact_sha256": {
+            ".code_runs/05f055615ec743908681a5c9d0ca15df/code.py": "31d9f121054b7b7055ad84169bec587e8074e60582d2dd93ff14b4c1092e401c",
+            ".code_runs/7fc5c06a30304d5393a3cecaf9548c95/code.py": "e8483cf658c3d776a823b205e79cebf7cebf6a1ef172adfa860f92e841275399",
+            "batch.json": "a3c86f8a234cef9aa174e12199478b5e36fdc416c1d19528beb97e6b77923acc",
+            "evidence.json": "97cfda68f90aa4306dede31da90cc166350ed9e5fbbaf71607b43cfe3bfc79f4",
+            "messages.json": "b8e5a1496fabdec346d7627a734741b58c24e0fa6744f2e577d2368559d88b15",
+            "plan.json": "5e8af3036371dfc7a6a5a0caf2d8d2c044d01a79e34a72e44f3e27bad46809eb",
+            "report.contract.json": "97595e0b02c6b6f44e976911063121e08a66e2f576935db4b5f7ca858d4df09b",
+            "report.evidence.json": "217fc0d7585a6ab25f6da53727eb4c024ec81640e4e5c1f5557e028e1308d6f9",
+            "report.md": "e2fd3c0d84f52684ed925929aa07d2c6ebb81b152f0a509b6055cc329d0e90b9",
+            "report.quality.json": "067add324dc9c70903e6abada1c3d76cb9327785f30e85a9daa4de7eff29e670",
+            "report.review.json": "3069241f89e1c1e42e805b352db44897ec44db605d191910693c35247c72d9cf",
+            "report.reviews.jsonl": "40aab064328052d26d617f90edf8aa1b97cb065c860b9d4d300428469ae8566e",
+            "task_contract.json": "34a5952476fc9d0750b2a8077137509a418977569bbb8ad1081626a7ebae62f5",
+            "trace.jsonl": "da0190e2ff195724770c2ef82a5a3a865fc00a056b9e81628e3c1e821fd8482d"
+          },
+          "task_dir": "workspace/evaluations/stage12-mechanisms/cases/01-m_replace",
+          "mapping_audit": {
+            "status": "draft",
+            "claims": 0,
+            "mapping_sha256": "c6b09fae170d16920f20dbba2359909467a1268d748b6cbdba98129ae598a5c2",
+            "claim_kinds": [],
+            "source_kinds": [],
+            "records": 7,
+            "omitted_records": 0,
+            "structural_links_valid": true,
+            "semantic_support": "not_certified"
+          },
+          "failed_checks": [
+            {
+              "name": "normal_completion",
+              "passed": false,
+              "detail": "max_steps"
+            },
+            {
+              "name": "task_contract_hard_limits",
+              "passed": false,
+              "detail": "body/characters 实际 541，超过明确上限 500（最多500字）。"
+            },
+            {
+              "name": "evidence_current_and_mapped",
+              "passed": false,
+              "detail": "{\"status\": \"draft\", \"claims\": 0, \"mapping_sha256\": \"c6b09fae170d16920f20dbba2359909467a1268d748b6cbdba98129ae598a5c2\", \"claim_kinds\": [], \"source_kinds\": [], \"records\": 7, \"omitted_records\": 0, \"structural_links_valid\": true, \"semantic_support\": \"not_certified\"}"
+            },
+            {
+              "name": "evidence_source_artifact",
+              "passed": false,
+              "detail": ""
+            },
+            {
+              "name": "mechanical_quality",
+              "passed": false,
+              "detail": "body/characters 实际 541，超过明确上限 500（最多500字）。"
+            },
+            {
+              "name": "review_matches_evidence_mapping",
+              "passed": false,
+              "detail": ""
+            },
+            {
+              "name": "review_complete_and_clean",
+              "passed": false,
+              "detail": "not_reviewed"
+            }
+          ]
+        },
+        {
+          "id": "m_page",
+          "round": 1,
+          "status": "pass",
+          "group": "normal",
+          "review_status": "reviewed",
+          "metrics": {
+            "steps": 11,
+            "seconds": 28.87,
+            "equivalent_tokens": 32699,
+            "input_tokens": 117819,
+            "cached_tokens": 107136,
+            "output_tokens": 5651,
+            "llm_calls": 13,
+            "review_calls": 1,
+            "tool_errors": 5,
+            "stop_reason": "final_answer"
+          },
+          "artifact_sha256": {
+            "evidence.json": "c471f8dc5ca1d63fc77a68c65e6d791f63a480e6243fe138a5bd979b87024575",
+            "messages.json": "4107d2bd90a0eecb885ce84617adccaa04640d7926ac34b7d2544782eb9c2cd9",
+            "notes.md": "c6fdf4f611090821302b0f3e1b5651c95492f3077d7ec484864d27eae8618d19",
+            "plan.json": "af7e2891355adc6c6ed54f615e1803b78d13dc589b30ce1e9cc7431095f65161",
+            "report.contract.json": "038e139068044db307e3a67dba41b8a57d97fb8e610a287ab9bd61123bb152ea",
+            "report.evidence.json": "619ecf5f2abf41a5675bdde3a417cb177ad510f74882f0f9c97a962e54aa4dcb",
+            "report.md": "efc05a207933698833f9fa395b95dad3c8aac4d4a4ecc54c730db13bafb812f9",
+            "report.quality.json": "c05f606ba4bc29540cfd442489d5cc05cc0b46b090e7689a6a069aa34a71539b",
+            "report.review.json": "8b0adabe309010dd2c5d3993e89b89c6b206a36e1213d4e833c1249eb9770f12",
+            "report.reviews.jsonl": "a0e23f150d90bcfe59ed979bd232b0e071a918ee2cb871d55dc321616eac16f1",
+            "task_contract.json": "be56e369a2bb887a066d584fedb53db2b3d08ded84a9a99d7af9d743cc76c1a4",
+            "trace.jsonl": "7db64966f76106369efd4f762c6aab54346c37512e2aff574a121f79354269fa"
+          },
+          "task_dir": "workspace/evaluations/stage12-mechanisms/cases/01-m_page",
+          "mapping_audit": {
+            "status": "mapped",
+            "claims": 7,
+            "mapping_sha256": "ee207aefa9a1c8ca5da976db17e89679e900a63fa0a6dd1c2f8e724a51e4b76f",
+            "claim_kinds": [
+              "direct",
+              "unknown"
+            ],
+            "source_kinds": [
+              "web"
+            ],
+            "records": 3,
+            "omitted_records": 0,
+            "structural_links_valid": true,
+            "semantic_support": "not_certified"
+          },
+          "failed_checks": []
+        },
+        {
+          "id": "m_network",
+          "round": 1,
+          "status": "pass",
+          "group": "fault",
+          "review_status": "reviewed",
+          "metrics": {
+            "steps": 8,
+            "seconds": 15.52,
+            "equivalent_tokens": 20760,
+            "input_tokens": 73786,
+            "cached_tokens": 63616,
+            "output_tokens": 2114,
+            "llm_calls": 11,
+            "review_calls": 2,
+            "tool_errors": 2,
+            "stop_reason": "final_answer"
+          },
+          "artifact_sha256": {
+            "evidence.json": "257201bba36243d99e64934865e20db797defe0afd6f6098945fdf10ea07a183",
+            "messages.json": "da36037cb6288464209f3018b4dff64f25e8ee2fccd9b70f245a59e2bfa656e3",
+            "plan.json": "141df905088e70a857d8bd453fa3bdedc5aa61618f565ccd163a5f4eac0d513b",
+            "report.contract.json": "57b180e3238955a3badb81a4c3d8f2f435ae4b38c157d1db70726610e3ca05e3",
+            "report.evidence.json": "57719f888a456d07b4da981f658554e690d5e6f996ce4781e01fa33381e93067",
+            "report.md": "bd24c45042071a3d1675879fbdeeb5a0c8be60fbc7beccd5b58a85d91517b583",
+            "report.quality.json": "e62ca42036258ca978c17b5216499c44b58513e0a27bf8ba9802fc68dd4e7836",
+            "report.review.json": "99cbda946f4aceac78b234e7eb3452b2a42d87db036915ee7119e450513e87b7",
+            "report.reviews.jsonl": "0c8b282e3ab4571b854bfb3e09edb05e7bae85d380c28ce4852c5892355a7f95",
+            "task_contract.json": "48c7ed2bfcd4594220941ad3eaffea15830bf999b96991f631c54c7417c32c0f",
+            "trace.jsonl": "05b442ab8631fc177e4e249b5bf7c4031c46153edf9ef4d98387251c264d36d1"
+          },
+          "task_dir": "workspace/evaluations/stage12-mechanisms/cases/01-m_network",
+          "mapping_audit": {
+            "status": "mapped",
+            "claims": 2,
+            "mapping_sha256": "fae6b7aad8bd57c109c124a97a8b47a76981dc9b2f87a562aee68ecef6de8100",
+            "claim_kinds": [
+              "observed",
+              "unknown"
+            ],
+            "source_kinds": [
+              "execution"
+            ],
+            "records": 2,
+            "omitted_records": 0,
+            "structural_links_valid": true,
+            "semantic_support": "not_certified"
+          },
+          "failed_checks": []
+        },
+        {
+          "id": "m_compute",
+          "round": 1,
+          "status": "pass",
+          "group": "fault",
+          "review_status": "reviewed",
+          "metrics": {
+            "steps": 6,
+            "seconds": 10.62,
+            "equivalent_tokens": 14575,
+            "input_tokens": 50668,
+            "cached_tokens": 43008,
+            "output_tokens": 1307,
+            "llm_calls": 8,
+            "review_calls": 1,
+            "tool_errors": 1,
+            "stop_reason": "final_answer"
+          },
+          "artifact_sha256": {
+            "evidence.json": "5c14cee349c432160ea3de5a694fbdebaa76b58731d76359f6c67ea3ea99ebad",
+            "messages.json": "076d7867fbb1d760b49c2cbfc66d57a54711f61b41e8580cbd61e20e5299dc8f",
+            "plan.json": "72f3874dcaa519c1e370a137b0705d01ca9c025de6f5fe88ca1a41acfa2edc11",
+            "report.contract.json": "284f9aa3d3c6057ff70485a9bc29bf095e15baa301f76809b54b1ede6a5bf683",
+            "report.evidence.json": "696e0e2490f1d26a08963cf682c9a2ea7b72619628c2eb62eef87d98206ec73c",
+            "report.md": "24d581b96843f0e88ba396da5e6a30b503c3c9ed93f011080cf1c4a31cd7ccba",
+            "report.quality.json": "af357de5323329dc1cee38c421fd591a31e97959e7e65dffb6a618d2e47683bb",
+            "report.review.json": "a5213714718d74f697fb15c02b58707f40ea0d0d8aa3b30186b4f77dac773ae5",
+            "report.reviews.jsonl": "6907774b9116641253b9785a563dd5dabbe5b3ed1a91cdd23966491d8ef7a8ee",
+            "task_contract.json": "858cdba76f0d381102db8aa8a6adfe0828c7d36ea7317237285d1e65cdaae64e",
+            "trace.jsonl": "139b0f63c2026af8b6af99987148a2891eb89b364f91a66be4e567d9dddb9096"
+          },
+          "task_dir": "workspace/evaluations/stage12-mechanisms/cases/01-m_compute",
+          "mapping_audit": {
+            "status": "mapped",
+            "claims": 2,
+            "mapping_sha256": "ecc6a00ed5c03e59a161803390366eabba807d066d41310c21743cbed744519d",
+            "claim_kinds": [
+              "observed",
+              "unknown"
+            ],
+            "source_kinds": [
+              "execution"
+            ],
+            "records": 2,
+            "omitted_records": 0,
+            "structural_links_valid": true,
+            "semantic_support": "not_certified"
+          },
+          "failed_checks": []
+        },
+        {
+          "id": "m_budget",
+          "round": 1,
+          "status": "pass",
+          "group": "fault",
+          "review_status": "not_reviewed",
+          "metrics": {
+            "steps": 1,
+            "seconds": 10.18,
+            "equivalent_tokens": 10911,
+            "input_tokens": 24973,
+            "cached_tokens": 19200,
+            "output_tokens": 1609,
+            "llm_calls": 5,
+            "review_calls": 0,
+            "tool_errors": 2,
+            "stop_reason": "budget"
+          },
+          "artifact_sha256": {
+            "evidence.json": "515185a643cb6c37415f04868fcd4cf82c92f4492c39f41c799dc2796b629f67",
+            "messages.json": "23fb55eb506a47866da7eb41c41b0634592330cdc988fd17e696a9dd9075e888",
+            "plan.json": "303fec9f2700e526c53a9d163832394f1d5cf71f9b40c74bc76d28ab8ad5d025",
+            "report.contract.json": "effd732d7428163c31bcdfdf2a306c3426775909831c476a416806c2ac595c34",
+            "report.evidence.json": "4a5aaed48a90f98b027e652520200fd01ac3f34c3b46f44f65235dfd3f5615cb",
+            "report.md": "7e86c56523ab971a8791f9866be506f9b9bf7276a964e1d853919a673b8d3a74",
+            "report.quality.json": "8cfe8a8b6a6790888ade2e509a46e992641eda393e9d723cadef92a23e8239f1",
+            "report.review.json": "96321ff703a408b71a136d9bcfdeab04811fc67a3bb4509daceeb931f64b02d1",
+            "report.reviews.jsonl": "e2d7d69dcfe953bce70dc3e45636c3889d1670e8b4e0069aa054d61cc80cabe2",
+            "task_contract.json": "02378f8c1c2e3fc650676d5da031258228409a275cced890f7994d077c00cc4e",
+            "trace.jsonl": "91a2e5eec345f71e58cde7a341c3916d027f7b09991001b178f150fd38b150f1"
+          },
+          "task_dir": "workspace/evaluations/stage12-mechanisms/cases/01-m_budget",
+          "mapping_audit": {
+            "status": "draft",
+            "claims": 0,
+            "mapping_sha256": "6b4d5bbca966a61ec197e10ec2c9cfd0ac676699c4f4fd3f67ea310c41f012c6",
+            "claim_kinds": [],
+            "source_kinds": [],
+            "records": 2,
+            "omitted_records": 0,
+            "structural_links_valid": true,
+            "semantic_support": "not_certified"
+          },
+          "failed_checks": []
+        }
+      ]
+    },
+    {
+      "source": "workspace/evaluations/stage12-mechanisms-final/results.json",
+      "source_sha256": "319a5c51814a1367969707783eea2483f2e2313df776d91f3c3866c6ed206dd1",
+      "frozen_revision": "a00d89418cbd033cf4238433a2b9089db70e7cc3",
+      "code_sha256": "a62429d6f6bf43ee9652c0dde705b430e4477daf9f49d6fc1dde3f143ebdfdec",
+      "suite_sha256": "97d55d1cb6f35bc5d6522b2f87f59d69bf7d7845e86659db89f1d2fe08b5915f",
+      "summary": {
+        "rounds": [
+          {
+            "round": 1,
+            "normal": {
+              "passed": 3,
+              "selected": 3,
+              "rate": 1.0
+            },
+            "fault": {
+              "passed": 3,
+              "selected": 3,
+              "rate": 1.0
+            }
+          }
+        ],
+        "automatic_gate": false,
+        "acceptance": "not_accepted",
+        "metrics": {
+          "steps": 43,
+          "seconds": 112.76,
+          "equivalent_tokens": 130721,
+          "llm_calls": 58,
+          "review_calls": 6,
+          "input_tokens": 425873,
+          "cached_tokens": 369024,
+          "output_tokens": 18484
+        },
+        "note": "自动通过不等于语义正确；需逐题核对原文、计算、条件、类型和故障状态。"
+      },
+      "cases": [
+        {
+          "id": "m_config",
+          "round": 1,
+          "status": "pass",
+          "group": "normal",
+          "review_status": "reviewed",
+          "metrics": {
+            "steps": 6,
+            "seconds": 14.06,
+            "equivalent_tokens": 18700,
+            "input_tokens": 50120,
+            "cached_tokens": 39296,
+            "output_tokens": 1973,
+            "llm_calls": 8,
+            "review_calls": 1,
+            "tool_errors": 1,
+            "stop_reason": "final_answer"
+          },
+          "artifact_sha256": {
+            ".code_runs/3c4d0a3cbd9745d582e192d30a6a4e8e/code.py": "76d0747d4c38f8463297e700ffc67d52a3877b31a0aeab32cc5bd4aeddc79cfa",
+            "evidence.json": "6caea0fc58e755b7dee04e0b1091bc9c25ba7cca61084e0ccf99a55b6089ab7c",
+            "messages.json": "33bd0aa657796dbaab3bfcee24174584bca4f8cd00b490d68c145b34dda37f5c",
+            "plan.json": "2d0bc1834c89664da798c4bb6fa1f1cd4a3e0d9d71cb01a97915d6a04c9c4c64",
+            "report.contract.json": "7a6e3dcf94d4903151df2c1045ef864b7cf39f69c2481e89a6d3ccb4cbfa0c0f",
+            "report.evidence.json": "ae82c45b7548c6eb49ac18b14525f19c8f513801c59c2cf924fafaa0ce5a70c9",
+            "report.md": "4f118012b563e35392994d192604a8e011236f6c2d6e18d5049f3aa1663abf0c",
+            "report.quality.json": "6177b6d841091742692ca119c8d031b004d87a67d04d7096f31873d2fe80af84",
+            "report.review.json": "aa4aa3788b513da24710c8b0744f3cf6ece203a984e6743c581414cacbe58574",
+            "report.reviews.jsonl": "21c6e4266702a2ade49bc788644b59e5c6856269bcdcb491eba6dab72bc8b4ac",
+            "settings_export.json": "469332b79434adaf2c38da6e36bc5dc519b884576092ac0d592ae95be6ec63d8",
+            "task_contract.json": "ebc584b56ccc01c9619244df581bc917aad1baf1f75aab1485cf02ba6168b5e2",
+            "trace.jsonl": "9b8e97c05319e91e05a39b77457b47532a44e7022ead15fbef0a85a27d17c4d1"
+          },
+          "task_dir": "workspace/evaluations/stage12-mechanisms-final/cases/01-m_config",
+          "mapping_audit": {
+            "status": "mapped",
+            "claims": 3,
+            "mapping_sha256": "4281f47f83d0bb9361817e674ff4e4d424620b648fcd40157ed05ed4da5cdc85",
+            "claim_kinds": [
+              "inference",
+              "observed"
+            ],
+            "source_kinds": [
+              "artifact",
+              "execution"
+            ],
+            "records": 4,
+            "omitted_records": 0,
+            "structural_links_valid": true,
+            "semantic_support": "not_certified"
+          },
+          "failed_checks": []
+        },
+        {
+          "id": "m_replace",
+          "round": 1,
+          "status": "pass",
+          "group": "normal",
+          "review_status": "reviewed",
+          "metrics": {
+            "steps": 12,
+            "seconds": 27.19,
+            "equivalent_tokens": 31522,
+            "input_tokens": 113740,
+            "cached_tokens": 102016,
+            "output_tokens": 4798,
+            "llm_calls": 14,
+            "review_calls": 1,
+            "tool_errors": 4,
+            "stop_reason": "final_answer"
+          },
+          "artifact_sha256": {
+            ".code_runs/106e72fd32524de0b9d698b680e922fe/code.py": "e8483cf658c3d776a823b205e79cebf7cebf6a1ef172adfa860f92e841275399",
+            ".code_runs/bb855c6c46c64ebabc9244f37dc17be4/code.py": "23030c0d22a4ae1bdc4a4c06913f14a4302b202d250caeb6a08d66162d847e0e",
+            "batch.json": "a3c86f8a234cef9aa174e12199478b5e36fdc416c1d19528beb97e6b77923acc",
+            "evidence.json": "729f155af0e3bfb899cba7dcd454881120fdb838b5af0052ec1c65085cb5c8e4",
+            "messages.json": "3ae3a030f3b8c2ebcfe11e073babed7bed8bd6299738d696834088f5ea7b2036",
+            "plan.json": "941daf9a14e443cdc3e6be96d8bcd6a21126b881d7d71e33ccbd374e4d828a30",
+            "report.contract.json": "6a98dfde13a3e915fe1388cb766e177bef0c60faff5853702e3c3383d7a9d2ef",
+            "report.evidence.json": "6a6c038f948022fd8837576e137892429cb930002dd13a271942de544d164a9d",
+            "report.md": "b41e24492a70b1bf93459548be2b52d87ea202fdd9fb4ceb3f496fb48de1ee7e",
+            "report.quality.json": "4b95ddddd7f2e7e09b08cdd916413165a3d97187116779f052ae03739ce5931f",
+            "report.review.json": "99ee05d6c021a36bb2ffaa960666d5145f17308729a1bf62c9ee596e56c3d794",
+            "report.reviews.jsonl": "f33ddd775d738887e350c07b2c8e57185c099c25808c19b7ee25dcfd671d83f0",
+            "task_contract.json": "34a5952476fc9d0750b2a8077137509a418977569bbb8ad1081626a7ebae62f5",
+            "trace.jsonl": "8e1190f986a63eb1364cfabf7b06d37ab929f2c0e1c9371ad62b41ddecb1b95f"
+          },
+          "task_dir": "workspace/evaluations/stage12-mechanisms-final/cases/01-m_replace",
+          "mapping_audit": {
+            "status": "mapped",
+            "claims": 4,
+            "mapping_sha256": "cf03e448cf91b6d777b9f7d0a520a1bc893ec07620f1e986fbad6a1f2b6fb870",
+            "claim_kinds": [
+              "observed",
+              "unknown"
+            ],
+            "source_kinds": [
+              "artifact",
+              "execution"
+            ],
+            "records": 7,
+            "omitted_records": 0,
+            "structural_links_valid": true,
+            "semantic_support": "not_certified"
+          },
+          "failed_checks": []
+        },
+        {
+          "id": "m_page",
+          "round": 1,
+          "status": "pass",
+          "group": "normal",
+          "review_status": "reviewed",
+          "metrics": {
+            "steps": 10,
+            "seconds": 28.48,
+            "equivalent_tokens": 31239,
+            "input_tokens": 108052,
+            "cached_tokens": 97408,
+            "output_tokens": 5427,
+            "llm_calls": 12,
+            "review_calls": 1,
+            "tool_errors": 4,
+            "stop_reason": "final_answer"
+          },
+          "artifact_sha256": {
+            "evidence.json": "b4083856056313aa561e871f1825d97b33b5a3568088ab1c633bc09bf712582f",
+            "messages.json": "5695a1605a25799ac14708aef177b4f4817d6b9fc74057fc8f3077b59e8bf7eb",
+            "notes.md": "9e42641d5c8fc12bd9d06df984ce66963ab83163e100a9acfa8a812abf4da043",
+            "plan.json": "d044b1bde4028277ff940b93976b398aad2ed72ce96ca338ea7efa433fef5245",
+            "report.contract.json": "d0231a65920ab86c070c34b4df4b4d59e56614e7dfa39631980ae4f46119e136",
+            "report.evidence.json": "78e6ae3c293bbaf3af9c7ea30398446cae4b34da34a85e6125c082bbd636a40e",
+            "report.md": "7a56fc6bba79d3466bf9916a12040d9eeb4eda8f692543ec090fd9a0232bc65d",
+            "report.quality.json": "6bb824e50d527d585668418503abcb97fce62c34488fc2d7cff6191935072686",
+            "report.review.json": "44395273162ff018a149062237f4d266efb906ea103798c67e41889af17614cd",
+            "report.reviews.jsonl": "c5f1a42ae15d11501d88be853221cebdb3ad15beb11bfcdda2cb71848f0fbe1b",
+            "task_contract.json": "be56e369a2bb887a066d584fedb53db2b3d08ded84a9a99d7af9d743cc76c1a4",
+            "trace.jsonl": "6b9ce09a637747f0f1596464afe2c0e4c80d93dfebeecf83c7f9a09b861916ef"
+          },
+          "task_dir": "workspace/evaluations/stage12-mechanisms-final/cases/01-m_page",
+          "mapping_audit": {
+            "status": "mapped",
+            "claims": 6,
+            "mapping_sha256": "1b710a71e288e538e292cc6b96eb3a4ccba4c83cdaa23b620cdacbd6979ef4e8",
+            "claim_kinds": [
+              "direct",
+              "observed",
+              "unknown"
+            ],
+            "source_kinds": [
+              "execution",
+              "web"
+            ],
+            "records": 3,
+            "omitted_records": 0,
+            "structural_links_valid": true,
+            "semantic_support": "not_certified"
+          },
+          "failed_checks": []
+        },
+        {
+          "id": "m_network",
+          "round": 1,
+          "status": "pass",
+          "group": "fault",
+          "review_status": "reviewed",
+          "metrics": {
+            "steps": 9,
+            "seconds": 22.12,
+            "equivalent_tokens": 24590,
+            "input_tokens": 85133,
+            "cached_tokens": 74368,
+            "output_tokens": 3194,
+            "llm_calls": 12,
+            "review_calls": 2,
+            "tool_errors": 3,
+            "stop_reason": "final_answer"
+          },
+          "artifact_sha256": {
+            "evidence.json": "3099a75b2fa8786063bc98a981cc4af55dae30193dec2fc250379e02794223d9",
+            "messages.json": "b02ef0170e6e4092249dc845cc5320c29d8aad3bfc955adda2590fcc886824bb",
+            "plan.json": "476d9aeb3c5e6aaa2dd0d3fbbc1a903ffd962c8652680c1f4b61a9fd2d3bcfdb",
+            "report.contract.json": "7a43d76b63e2ac296e34661eb514d5927df20e26a07d023c53955d76119df1e3",
+            "report.evidence.json": "ffef695f62e4bb0b9b3c15cdb6cf3020e908c982f42dd77d4c08d1ceee894112",
+            "report.md": "6a4158907d55b41208fc8f6edfe59aa5939df192e19d72c168dec0c34486d7c4",
+            "report.quality.json": "be1afa7d4e330522ef52ed1d4440e16726b90acb371b5f414bc56f43c7c5dc8a",
+            "report.review.json": "fdc4cb0c1010eea0c2b8e28073ab3e00ef7ad150698af9d706d0bb31105228de",
+            "report.reviews.jsonl": "c3fab13ba5cc07d66ca243d7d5bd81a56cbaa9230556d7a81a1cc26770712128",
+            "task_contract.json": "48c7ed2bfcd4594220941ad3eaffea15830bf999b96991f631c54c7417c32c0f",
+            "trace.jsonl": "f0b3de335d151f04dee1d918949d4714abe22dd70b038551e8e5a283c4d499f1"
+          },
+          "task_dir": "workspace/evaluations/stage12-mechanisms-final/cases/01-m_network",
+          "mapping_audit": {
+            "status": "mapped",
+            "claims": 3,
+            "mapping_sha256": "bf140dade870164cef6636bb908dcc6f28a4d677609ff893356b0917c1d3b755",
+            "claim_kinds": [
+              "observed",
+              "unknown"
+            ],
+            "source_kinds": [
+              "execution"
+            ],
+            "records": 2,
+            "omitted_records": 0,
+            "structural_links_valid": true,
+            "semantic_support": "not_certified"
+          },
+          "failed_checks": []
+        },
+        {
+          "id": "m_compute",
+          "round": 1,
+          "status": "pass",
+          "group": "fault",
+          "review_status": "reviewed",
+          "metrics": {
+            "steps": 5,
+            "seconds": 8.83,
+            "equivalent_tokens": 12116,
+            "input_tokens": 41895,
+            "cached_tokens": 35328,
+            "output_tokens": 1008,
+            "llm_calls": 7,
+            "review_calls": 1,
+            "tool_errors": 1,
+            "stop_reason": "final_answer"
+          },
+          "artifact_sha256": {
+            "evidence.json": "e12c46908adf6a1148eecab626d564fad453326c49ee5fc9d69666e7ed6940c5",
+            "messages.json": "8cf4916f95bb5d443adc9a321faa1418c99e4cf993c37a32dd997dbf1cbdcc50",
+            "plan.json": "3863881daa300b62f7bb908a09ab913fa8fd537eda2c9e053dce88e4c0c3d74a",
+            "report.contract.json": "41313f5137dd0adf831e0e630b19925305f4df61136302417ca469ae8daeb85a",
+            "report.evidence.json": "064f0129c7cee14f5347658893f4e637e0f9ceb28372f3737008ab7aa2057de9",
+            "report.md": "ed5508c51668eb467db4db42ee7e09f42bc311d65ecf10be203593843aa078ab",
+            "report.quality.json": "f7afee6c63d78022d2a211da38d6da0901c69da0de4d3f6eade3cb8f07336854",
+            "report.review.json": "8c30e4a5b46d0f1cf512973e8021ec2060889f84d69b801f7a42cac1d991fcaa",
+            "report.reviews.jsonl": "171a5708bded7ef082ec195db10443f36ae2f5bd95b21d57951b69a670d157c5",
+            "task_contract.json": "858cdba76f0d381102db8aa8a6adfe0828c7d36ea7317237285d1e65cdaae64e",
+            "trace.jsonl": "28628fbccd98dee7dda22cad73afd5adab1d99d671f000ebf01c7550fe88f9f1"
+          },
+          "task_dir": "workspace/evaluations/stage12-mechanisms-final/cases/01-m_compute",
+          "mapping_audit": {
+            "status": "mapped",
+            "claims": 2,
+            "mapping_sha256": "979a428c44ef6fcdf19433b9b55fd9c6b7388e73cbfd72771a42a59be8a69e94",
+            "claim_kinds": [
+              "observed",
+              "unknown"
+            ],
+            "source_kinds": [
+              "execution"
+            ],
+            "records": 2,
+            "omitted_records": 0,
+            "structural_links_valid": true,
+            "semantic_support": "not_certified"
+          },
+          "failed_checks": []
+        },
+        {
+          "id": "m_budget",
+          "round": 1,
+          "status": "pass",
+          "group": "fault",
+          "review_status": "not_reviewed",
+          "metrics": {
+            "steps": 1,
+            "seconds": 12.08,
+            "equivalent_tokens": 12554,
+            "input_tokens": 26933,
+            "cached_tokens": 20608,
+            "output_tokens": 2084,
+            "llm_calls": 5,
+            "review_calls": 0,
+            "tool_errors": 3,
+            "stop_reason": "budget"
+          },
+          "artifact_sha256": {
+            "evidence.json": "e28c34af14ec78bff41aa34653a8217b81a4ebcd1901420756dcb6c11d144352",
+            "messages.json": "2ca4cadb4468077b9f1698df0d7d14382b09129ae72900b174fb1f6bfc534276",
+            "plan.json": "5be32bbb4960765735c8ebd0647aad0299730d9b2df748a092b2c6a2e17555b3",
+            "report.contract.json": "24149f78f9fb229956fe79b77a73cf5883cd66f37df8a60dacdf2ccc04f7d236",
+            "report.evidence.json": "480b8561a1e942ca5d9d67492969556af045829cef844de82d7eaad9497d3d39",
+            "report.md": "a693ddd0a7cdffdf6e9ddd8ff442cdf0a88726b6bb23884e25a405aca8929250",
+            "report.quality.json": "bb570b3132c6bd7ada438a5e45ccb19b5b645ff18bc181108aba9570d939a9a8",
+            "report.review.json": "cc9b4679de62e8861f67e2e0aeb67f74c8b0338d85f3ec012be1f817a2325009",
+            "report.reviews.jsonl": "9bda6358ee08425ebe0f94c93067bd7e6c5aaea16a59324cded44c185b066f27",
+            "task_contract.json": "02378f8c1c2e3fc650676d5da031258228409a275cced890f7994d077c00cc4e",
+            "trace.jsonl": "ed1168ec3f59bfb412889bc4a301691ddf22eacb6f7b9c24f0bf30ea2862a4a4"
+          },
+          "task_dir": "workspace/evaluations/stage12-mechanisms-final/cases/01-m_budget",
+          "mapping_audit": {
+            "status": "draft",
+            "claims": 0,
+            "mapping_sha256": "afce3aaf106da29eefb68916d20412d1bba9eb2993212232be20e5981fba3241",
+            "claim_kinds": [],
+            "source_kinds": [],
+            "records": 2,
+            "omitted_records": 0,
+            "structural_links_valid": true,
+            "semantic_support": "not_certified"
+          },
+          "failed_checks": []
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "First run retained at 5/6; second development run 6/6 is a different code revision, not independent holdout.",
+    "Snapshot claims require explicit historical limits; current claims require current byte hash. Semantic misuse still needs review.",
+    "Python parser type names are not native JSON type names.",
+    "Web or execution excerpts cannot alone prove all operation counts or absence of other calls.",
+    "Budget-case pass means expected incomplete status, not content acceptance.",
+    "First run report boilerplate incorrectly implied three rounds and a real-network case; immutable original retained; generic renderer corrected later."
+  ]
+}
