@@ -14,6 +14,7 @@ from agent.quality import inspect_report
 from agent.numeric_evidence import arithmetic_errors, csv_facts
 from agent.context import estimate_tokens
 from agent.evidence import mapping_sha
+from agent.artifacts import read_json_artifact, INTERNAL_JSON
 from agent.task_contract import TaskContract, brief_extension_reason, check_contract, extract_contract
 
 REVIEW_SYSTEM = """你是独立报告审稿人，只审查给定报告、笔记与本地计算证据。
@@ -44,7 +45,7 @@ source_readings 是本轮实际 fetch_url 返回的原文片段，notes 是模�
 唯一审查对象是 report 字段；notes、historical_context、recent_code、calculation_results 均仅为核对证据，不能摘录它们作为 quote。
 证据中的错误只有被报告实际采用、影响报告结论时才形成报告问题；必须定位报告中采用该错误的原句。仅存在于笔记的措辞不列入 issues。
 calculation_results 是本轮成功执行工具的输入与输出；有计算器记录时不能声称未计算。失败调用不会出现在这里；可能截断的结果须按标记处理。
-json_samples是报告实际引用的本轮JSON文件内容和类型；若用户要求JSON数字而实际字段为str，不能因文字金额正确就放过类型不符，也不能将字符串宣称为数值字段。采样截断时不推断未展示内容。
+json_samples是报告实际引用的本轮JSON文件内容、字节哈希和类型；若用户要求JSON数字而实际字段为str，不能因文字金额正确就放过类型不符，也不能将字符串宣称为数值字段。采样截断或unavailable时不推断未展示内容。artifact证据仅证明对应文件版本的样本与类型，不证明业务值或计算正确；execution成功不证明文件内容正确。scope是作者声明的网页结论范围，不是语义认证，仍需核对正文是否扩大已读范围。
 材料有歧义时保留各解释及限制，不要求强选一种读法；不能用某种读法改摘要、另一种读法改正文。修订只纠正有证据的错误。
 区分对象是否支持某协议与协议是否执行某项清理：不自动关闭资源，并不意味着不支持上下文管理器协议。
 逐项核对动作主体：只负责资源关闭的包装器不自动继承被包装对象的事务提交/回滚行为，不能据“关闭型上下文管理器”写成“事务加关闭”。
@@ -120,26 +121,18 @@ def build_review_messages(report: str, task_dir: Path, session, *, question: str
         artifacts.append({"path": path.name, "content": content, "possibly_truncated": len(sampled) > limit})
         remaining -= len(content)
     # 只取报告实际提到的本轮JSON产物，内部证据/追踪文件不当研究输出采样。
-    internal = {'messages.json','evidence.json','task_contract.json','memory_context.json','plan.json'}
+    internal = INTERNAL_JSON
     for filename in sorted(set(re.findall(r'(?<![\w./\\-])([\w-]+\.json)\b',report))):
         if filename in internal or remaining <= 0:
             continue
-        path = task_dir/filename
-        if not path.is_file() or path.is_symlink() or not path.resolve().is_relative_to(task_dir.resolve()):
+        if not (task_dir/filename).is_file():
             continue
         limit = min(remaining,4000)
-        with path.open(encoding='utf-8-sig',errors='replace') as stream:
-            sampled = stream.read(limit+1)
-        item = {'path':filename,'content':sampled[:limit],'possibly_truncated':len(sampled)>limit}
-        if not item['possibly_truncated']:
-            try:
-                value = json.loads(sampled)
-                item['json_type'] = type(value).__name__
-                if isinstance(value,dict):
-                    item['field_types'] = {k:type(v).__name__ for k,v in list(value.items())[:32]}
-                    item['omitted_field_types'] = max(0,len(value)-32)
-            except ValueError:
-                item['parse_error'] = 'invalid_json'
+        try:
+            item = read_json_artifact(task_dir,filename,limit)
+        except (OSError,ValueError) as exc:
+            json_artifacts.append({'path':filename,'unavailable':True,'reason':str(exc)[:200]})
+            continue
         json_artifacts.append(item)
         remaining -= len(item['content'])
     scripts = []

@@ -1,4 +1,4 @@
-"""只读取本次已经送达并保留的证据，不能从网页缓存扩大已读范围。"""
+"""重读已保留证据或显式读取本次JSON产物；不从网页缓存扩大已读范围。"""
 from typing import Annotated
 from pydantic import Field
 from tools.registry import tool, Tool
@@ -10,11 +10,16 @@ def make_read_evidence(session: ResearchSession) -> Tool:
     def read_evidence(
         source_id: Annotated[str,Field(max_length=60,description='本次ID，如web-1、calculation-1、execution-1、history-1；空值列出最近10项索引')] = '',
         query: Annotated[str,Field(max_length=120,description='可选字面关键词；只定位本次已送达的证据内容，不检索外部网页')] = '',
+        artifact_filename: Annotated[str,Field(max_length=120,description='可选：读取本任务目录内JSON产物并登记版本、样本及类型证据；仅文件名，与source_id互斥')] = '',
     ) -> dict:
-        """查看本次已经收到的证据ID与精确原文；摘录校验失败时先读取，不反复猜空格或重新计算。"""
+        """查看已保留证据原文，或用artifact_filename实际读取本次JSON产物并登记版本；不重新计算。"""
         ledger=session.evidence
         if ledger is None:
             raise ValueError('本次尚无证据账本')
+        if artifact_filename:
+            if source_id:
+                raise ValueError('artifact_filename与source_id不能同时填写')
+            source_id=ledger.artifact(artifact_filename)
         if not source_id:
             rows=list(ledger.records.values())[-10:]
             return {'records':[{'id':r['id'],'kind':r['kind'],'start':r.get('start'),'end':r.get('end'),
@@ -23,6 +28,9 @@ def make_read_evidence(session: ResearchSession) -> Tool:
         if source_id not in ledger.records:
             raise ValueError('未保留该ID；请先空参数列出索引')
         row=ledger.records[source_id]
+        if row['kind']=='artifact':
+            from agent.artifacts import check_artifact_version
+            check_artifact_version(ledger.path.parent,row)
         pos=row['text'].lower().find(query.lower()) if query else 0
         if pos<0:
             return {'id':source_id,'match':False,'meaning':'仅本次已送达片段内字面未命中，不证明网页全文不存在。'}

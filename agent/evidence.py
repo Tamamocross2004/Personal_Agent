@@ -35,6 +35,20 @@ def locate_excerpt(text: str, excerpt: str) -> str | None:
     return match[0] if match else None  # 只容许空白差异，保存的是实际原文，不替换词语/标点。
 
 
+def reading_coverage(records, source: dict) -> dict:
+    intervals = sorted((r['start'], r['end']) for r in records
+                       if r['kind']=='web' and r.get('url')==source.get('url')
+                       and r.get('page_text_sha256')==source.get('page_text_sha256'))
+    end = total = 0
+    for left, right in intervals:
+        total += max(0, right-max(left,end))
+        end = max(end,right)
+    size = source.get('page_characters')
+    return {'delivered_characters':total, 'page_characters':size,
+            'full_page_delivered':bool(source.get('page_text_sha256') and size is not None and total==size),
+            'meaning':'仅计本次保留的实际送达字符，缓存全文及未命中检索不算已读'}
+
+
 def write_json(path: Path, value: dict) -> None:
     temp = path.with_name(path.name + '.tmp')
     if path.is_symlink() or temp.is_symlink():
@@ -57,6 +71,8 @@ class Claim(BaseModel):
     supports: list[EvidenceRef] = Field(default_factory=list, max_length=4)
     assumptions: str = Field(default='', max_length=600)
     limits: str = Field(default='', max_length=600)
+    scope: Literal['excerpt', 'whole_document'] | None = Field(
+        default=None, description='网页结论的覆盖范围；whole_document要求关联网页版本已完整送达。未填不代表全文已读。')
 
 
 class EvidenceLedger:
@@ -125,17 +141,22 @@ class EvidenceLedger:
                         description='本次工具派发的真实返回；不证明网页事实、外部副作用或所有调用次数')
 
     def web_coverage(self, source: dict) -> dict:
-        intervals = sorted((r['start'], r['end']) for r in self.records.values()
-                           if r['kind']=='web' and r.get('url')==source.get('url')
-                           and r.get('page_text_sha256')==source.get('page_text_sha256'))
-        end = total = 0
-        for left, right in intervals:
-            total += max(0, right-max(left,end))
-            end = max(end,right)
-        size = source.get('page_characters')
-        return {'delivered_characters':total, 'page_characters':size,
-                'full_page_delivered':bool(size is not None and total==size),
-                'meaning':'仅计本次保留的实际送达字符，缓存全文及未命中检索不算已读'}
+        return reading_coverage(self.records.values(), source)
+
+    def artifact(self, filename: str) -> str:
+        from agent.artifacts import read_json_artifact
+        item = read_json_artifact(self.path.parent, filename)
+        text = json.dumps(item, ensure_ascii=False, indent=2)
+        if len(text)>12000:
+            raise ValueError('产物快照超过证据单项上限，未登记；请提供较小的结构化产物')
+        for record in self.records.values():
+            if record['kind']=='artifact' and record['text']==text:
+                return record['id']
+        source = self.add('artifact', text, artifact_path=filename, artifact_sha256=item['sha256'],
+                          description='本次读取的文件字节版本、JSON样本和类型；不认证业务值正确或文件作者')
+        if source is None:
+            raise ValueError('证据账本已满，未保留本次产物证据')
+        return source
 
     def validate(self, report: str, claims: list[Claim]) -> list[dict]:
         missing_limits = [f'claims[{i}].limits（原句：{c.quote[:60]}）'
@@ -164,13 +185,22 @@ class EvidenceLedger:
                         +'；用read_evidence(source_id="'+ref.source_id+'", query="关键词")读取真实原文，不要反复猜ID或重算。')
                 if claim.kind == 'direct' and source['kind'] not in ('web','user'):
                     raise ValueError('direct仅用于用户材料/已读原文；历史摘要和计算不能冒充当前直接事实')
-                if claim.kind == 'observed' and source['kind'] != 'execution':
-                    raise ValueError('observed仅关联本次execution工具返回记录；用户要求不能证明实际执行')
+                if source['kind'] == 'artifact':
+                    from agent.artifacts import check_artifact_version
+                    check_artifact_version(self.path.parent, source)
+                if claim.kind == 'observed' and source['kind'] not in ('execution','artifact'):
+                    raise ValueError('observed仅关联本次execution工具返回记录或artifact文件记录；用户要求不能证明实际执行')
                 refs.append({**ref.model_dump(),'excerpt':resolved,'requested_excerpt':ref.excerpt,
                     'locator':'exact' if resolved==ref.excerpt else 'whitespace',
                     'source_kind':source['kind'],'source_sha256':source['text_sha256']})
             if claim.kind == 'calculated' and not any(r['source_kind']=='calculation' for r in refs):
                 raise ValueError('calculated结论必须关联本次成功计算，不能只给原始数字')
+            if claim.scope is not None:
+                web = [self.records[r['source_id']] for r in refs if r['source_kind']=='web']
+                if not web:
+                    raise ValueError('scope仅用于关联网页证据的结论')
+                if claim.scope=='whole_document' and any(not self.web_coverage(r)['full_page_delivered'] for r in web):
+                    raise ValueError('结论声明覆盖全文，但关联网页版本未完整送达；请补读或限定结论范围')
             if claim.kind == 'direct':
                 def numbers(text):
                     from decimal import Decimal
@@ -223,7 +253,7 @@ class EvidenceLedger:
                     for ref in c['supports']:
                         if self.records[ref['source_id']]['text_sha256']!=ref['source_sha256']:
                             raise ValueError('旧证据关联版本失效')
-                    restored.append(Claim.model_validate({**{k:c[k] for k in Claim.model_fields},
+                    restored.append(Claim.model_validate({**{k:c[k] for k in Claim.model_fields if k in c},
                         'supports':[{k:r[k] for k in EvidenceRef.model_fields} for r in c['supports']]}))
                 mapped = self.validate(report,restored)
                 for old,current in zip(previous.get('claims',[]),mapped):
@@ -287,10 +317,18 @@ def audit_mapping(root: Path, report_name: str = 'report.md') -> dict:
     report=path.read_text(encoding='utf-8')
     for claim in mapping['claims']:
         if claim['quote'] not in report: raise ValueError('结论原句失效')
+        if claim.get('scope') is not None:
+            web = [records[r['source_id']] for r in claim['supports'] if records[r['source_id']]['kind']=='web']
+            if not web or (claim['scope']=='whole_document' and any(
+                    not reading_coverage(records.values(),r)['full_page_delivered'] for r in web)):
+                raise ValueError('网页结论范围与实际送达记录不匹配')
         for ref in claim['supports']:
             r=records[ref['source_id']]
             if ref['source_sha256']!=r['text_sha256'] or ref['excerpt'] not in r['text']:
                 raise ValueError('证据关联失效')
+            if r['kind']=='artifact':
+                from agent.artifacts import check_artifact_version
+                check_artifact_version(root,r)
     return {'status':mapping['status'],'claims':len(mapping['claims']),
             'mapping_sha256':mapping_sha(mapping),
             'claim_kinds':sorted({c['kind'] for c in mapping['claims']}),
