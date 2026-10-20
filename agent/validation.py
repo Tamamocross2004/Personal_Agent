@@ -218,9 +218,9 @@ def aggregate(data, suite):
 
 
 def report(out, data):
-    lines = ['# 阶段12独立评估', '', f"执行方式：{data['execution']}；状态：{data['state']}",
+    lines = ['# 阶段12评估', '', f"执行方式：{data['execution']}；状态：{data['state']}",
              f"冻结代码：{data['lock']['code_sha256']}；题集：{data['lock']['suite_sha256']}", '',
-             '## 三轮自动检查', '', '| 轮次 | 正常任务 | 故障状态正确性 |', '|---|---|---|']
+             '## 自动检查（实际轮次数见表）', '', '| 轮次 | 正常任务 | 故障状态正确性 |', '|---|---|---|']
     for r in data['summary']['rounds']:
         lines.append(f"| {r['round']} | {r['normal']['passed']}/{r['normal']['selected']} | {r['fault']['passed']}/{r['fault']['selected']} |")
     lines += ['', '自动门槛：' + str(data['summary']['automatic_gate']),
@@ -233,7 +233,7 @@ def report(out, data):
         if c['status'] != 'pass':
             lines.append(f"- 第{c['round']}轮 {c['id']}：" + '；'.join(x['name'] + ' ' + x.get('detail', '') for x in c.get('checks', []) if not x['passed']) + c.get('error_type', ''))
     lines += ['', '总计量：`' + json.dumps(data['summary']['metrics'], ensure_ascii=False) + '`', '',
-              '等效token是预算权重，不是人民币账单。故障注入使用真实模型和合成工具环境，另有一题真实联网；没有据此认证全部外网稳定性。']
+              '等效token是预算权重，不是人民币账单。题目来源与工具环境以冻结题集为准；开发集、合成网页与单轮结果不能自动认定为独立验收或真实外网稳定性证明。']
     (out / 'report.md').write_text('\n'.join(lines) + '\n', encoding='utf-8')
 
 

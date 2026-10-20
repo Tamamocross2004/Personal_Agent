@@ -28,16 +28,21 @@ def make_read_evidence(session: ResearchSession) -> Tool:
         if source_id not in ledger.records:
             raise ValueError('未保留该ID；请先空参数列出索引')
         row=ledger.records[source_id]
+        version = {}
         if row['kind']=='artifact':
-            from agent.artifacts import check_artifact_version
-            check_artifact_version(ledger.path.parent,row)
+            from agent.artifacts import artifact_version_status
+            version = {'artifact_path':row['artifact_path'],'artifact_sha256':row['artifact_sha256'],
+                       'recorded_at':row['recorded_at'],
+                       'current_version_status':artifact_version_status(ledger.path.parent,row),
+                       'artifact_limits':'这是记录时的文件快照；changed/unavailable不能证明当前内容，历史说明须显式使用snapshot并注明limits。'}
         pos=row['text'].lower().find(query.lower()) if query else 0
         if pos<0:
-            return {'id':source_id,'match':False,'meaning':'仅本次已送达片段内字面未命中，不证明网页全文不存在。'}
+            return {'id':source_id,'match':False,**version,'meaning':'仅本次已送达片段内字面未命中，不证明网页全文不存在。'}
         left=max(0,pos-250)
         end=min(len(row['text']),left+1600)
         return {'id':source_id,'kind':row['kind'],'excerpt':row['text'][left:end],
                 'record_text_range':[left,end],'source_sha256':row['text_sha256'],
                 **({'read_coverage':ledger.web_coverage(row)} if row['kind']=='web' else {}),
+                **version,
                 'partial':left>0 or end<len(row['text']),'semantic_support':'not_certified'}
     return read_evidence

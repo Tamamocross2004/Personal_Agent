@@ -45,10 +45,19 @@ def read_json_artifact(root: Path, filename: str, limit: int = 4000) -> dict:
     return item
 
 
-def check_artifact_version(root: Path, record: dict) -> None:
+def artifact_version_status(root: Path, record: dict) -> str:
     try:
         current = read_json_artifact(root, record['artifact_path'], limit=0)
-    except (OSError, ValueError) as exc:
-        raise ValueError('产物证据已失效：文件缺失、不可读或超过上限，请重新读取产物') from exc
-    if current['sha256'] != record['artifact_sha256']:
-        raise ValueError('产物版本已变化，请重新读取产物并更新结论关联')
+    except (OSError, ValueError):
+        return 'unavailable'
+    return 'current' if current['sha256'] == record['artifact_sha256'] else 'changed'
+
+
+def check_artifact_version(root: Path, record: dict) -> None:
+    status = artifact_version_status(root,record)
+    label = f"{record.get('id','')}（{record['artifact_path']}）"
+    if status == 'unavailable':
+        raise ValueError(f'产物证据{label}已失效：文件缺失、不可读或超过上限，请重新读取产物')
+    if status == 'changed':
+        raise ValueError(f'产物{label}版本已变化，不能证明当前文件；请重读并更新关联。'
+                         '若仅描述当时读取的历史快照，使用artifact_version=snapshot并填写limits，不能据此声明当前内容。')

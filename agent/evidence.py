@@ -73,6 +73,8 @@ class Claim(BaseModel):
     limits: str = Field(default='', max_length=600)
     scope: Literal['excerpt', 'whole_document'] | None = Field(
         default=None, description='网页结论的覆盖范围；whole_document要求关联网页版本已完整送达。未填不代表全文已读。')
+    artifact_version: Literal['current','snapshot'] = Field(
+        default='current', description='文件证据默认证明当前版本并检查哈希；snapshot仅描述记录时快照，必须填limits注明历史范围，不证明当前内容。')
 
 
 class EvidenceLedger:
@@ -185,7 +187,7 @@ class EvidenceLedger:
                         +'；用read_evidence(source_id="'+ref.source_id+'", query="关键词")读取真实原文，不要反复猜ID或重算。')
                 if claim.kind == 'direct' and source['kind'] not in ('web','user'):
                     raise ValueError('direct仅用于用户材料/已读原文；历史摘要和计算不能冒充当前直接事实')
-                if source['kind'] == 'artifact':
+                if source['kind'] == 'artifact' and claim.artifact_version=='current':
                     from agent.artifacts import check_artifact_version
                     check_artifact_version(self.path.parent, source)
                 if claim.kind == 'observed' and source['kind'] not in ('execution','artifact'):
@@ -195,6 +197,9 @@ class EvidenceLedger:
                     'source_kind':source['kind'],'source_sha256':source['text_sha256']})
             if claim.kind == 'calculated' and not any(r['source_kind']=='calculation' for r in refs):
                 raise ValueError('calculated结论必须关联本次成功计算，不能只给原始数字')
+            if claim.artifact_version=='snapshot' and (claim.kind!='observed' or not claim.limits.strip()
+                    or not refs or any(r['source_kind']!='artifact' for r in refs)):
+                raise ValueError('snapshot仅用于observed历史文件快照，须全部关联artifact并填写limits说明记录时范围，不证明当前内容')
             if claim.scope is not None:
                 web = [self.records[r['source_id']] for r in refs if r['source_kind']=='web']
                 if not web:
@@ -326,9 +331,12 @@ def audit_mapping(root: Path, report_name: str = 'report.md') -> dict:
             r=records[ref['source_id']]
             if ref['source_sha256']!=r['text_sha256'] or ref['excerpt'] not in r['text']:
                 raise ValueError('证据关联失效')
-            if r['kind']=='artifact':
+            if r['kind']=='artifact' and claim.get('artifact_version','current')=='current':
                 from agent.artifacts import check_artifact_version
                 check_artifact_version(root,r)
+        if claim.get('artifact_version')=='snapshot' and (claim['kind']!='observed' or not claim.get('limits','').strip()
+                or not claim['supports'] or any(records[r['source_id']]['kind']!='artifact' for r in claim['supports'])):
+            raise ValueError('历史快照关联缺少类型、来源或适用范围')
     return {'status':mapping['status'],'claims':len(mapping['claims']),
             'mapping_sha256':mapping_sha(mapping),
             'claim_kinds':sorted({c['kind'] for c in mapping['claims']}),

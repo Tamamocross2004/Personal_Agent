@@ -52,13 +52,40 @@ def test_modified_or_deleted_file_invalidates_mapping_and_read_only_audit(tmp_pa
     with pytest.raises(ValueError,match='版本已变化'):
         audit_mapping(tmp_path)
     assert session.evidence.prepare(report,claim.quote,None,complete=True)['status']=='stale'
-    assert reg.execute('read_evidence',{'source_id':source}).is_error
+    old_read=json.loads(reg.execute('read_evidence',{'source_id':source}).content)
+    assert old_read['current_version_status']=='changed'
     new_source=session.evidence.artifact(path.name)
     assert new_source!=source
     path.unlink()
     with pytest.raises(ValueError,match='已失效'):
         session.evidence.validate(claim.quote,[Claim.model_validate({**claim.model_dump(),
             'supports':[{'source_id':new_source,'excerpt':'"count": "str"'}]})])
+
+
+def test_historical_snapshot_remains_a_reading_record_but_not_current_file_proof(tmp_path):
+    path=tmp_path/'catalog.json'
+    path.write_text('{"edition":"alpha"}',encoding='utf-8')
+    session,reg=setup(tmp_path)
+    source=session.evidence.artifact(path.name)
+    claim=Claim(quote='初次记录的edition为alpha',kind='observed',artifact_version='snapshot',
+                limits='仅描述该记录时刻的文件，不代表当前内容或真实版本发布。',
+                supports=[{'source_id':source,'excerpt':'alpha'}])
+    path.write_text('{"edition":"beta"}',encoding='utf-8')
+    report=tmp_path/'report.md'
+    report.write_text(claim.quote,encoding='utf-8')
+    mapping=session.evidence.prepare(report,claim.quote,[claim],complete=True)
+    write_json(report.with_suffix('.evidence.json'),mapping)
+    assert audit_mapping(tmp_path)['structural_links_valid']
+    assert session.evidence.prepare(report,claim.quote,None,complete=True)['status']=='mapped'
+    with pytest.raises(ValueError,match='版本已变化'):
+        session.evidence.validate(claim.quote,[claim.model_copy(update={'artifact_version':'current'})])
+    with pytest.raises(ValueError,match='snapshot仅用于'):
+        session.evidence.validate(claim.quote,[claim.model_copy(update={'limits':''})])
+    path.unlink()
+    assert audit_mapping(tmp_path)['structural_links_valid']
+    read=json.loads(reg.execute('read_evidence',{'source_id':source}).content)
+    assert read['current_version_status']=='unavailable'
+    assert read['recorded_at'] and 'alpha' in read['excerpt']
 
 
 @pytest.mark.parametrize('filename',['../outside.json','sub/data.json','..\\outside.json',

@@ -9,6 +9,17 @@ from agent import validation as v
 from tools import default_registry
 
 
+def test_single_round_development_report_does_not_claim_three_rounds_or_real_network(tmp_path):
+    data={'execution':'live','state':'complete','lock':{'code_sha256':'x','suite_sha256':'y'},
+          'summary':{'rounds':[{'round':1,'normal':{'passed':1,'selected':1},
+                               'fault':{'passed':1,'selected':1}}],
+                     'automatic_gate':False,'metrics':{}},'cases':[]}
+    v.report(tmp_path,data)
+    text=(tmp_path/'report.md').read_text(encoding='utf-8')
+    assert '三轮自动检查' not in text and '另有一题真实联网' not in text
+    assert '开发集' in text and '实际轮次数见表' in text
+
+
 def test_suite_rejects_duplicate_dependency_and_missing_rubric(tmp_path):
     suite = v.load_suite()
     for mutate in ('duplicate', 'dependency', 'rubric'):
