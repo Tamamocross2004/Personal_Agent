@@ -44,8 +44,9 @@ from agent.trace import MESSAGES_FILE, TRACE_FILE, TraceWriter, fanout, save_mes
 from agent.workspace import new_task_dir
 from tools import ResearchSession, default_registry
 from tools.notes import NOTES_FILE
+from agent.checkpoint import CheckpointStore, CheckpointError
 
-FAILED_STOPS = ("context_overflow", "content_filter", "error")
+FAILED_STOPS = ("context_overflow", "content_filter", "error", "needs_verification")
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -86,18 +87,60 @@ def research(
     historical_context: str | None = None,
     should_stop: Callable[[], bool] | None = None,
 ) -> AgentResult:
+    task_dir=Path(task_dir or new_task_dir(question))
+    checkpoint=CheckpointStore(task_dir)
+    _check_new_task(task_dir,checkpoint)
+    with checkpoint.lease():
+        _check_new_task(task_dir,checkpoint)
+        return _research(llm,settings,question,max_steps,budget,task_dir=task_dir,
+                         historical_context=historical_context,
+                         should_stop=lambda:bool(should_stop and should_stop()) or (task_dir/'.desktop-stop').exists(),
+                         checkpoint=checkpoint)
+
+
+def _check_new_task(task_dir,checkpoint):
+    if checkpoint.path.exists():
+        raise CheckpointError('任务已有检查点；使用恢复入口，不能覆盖旧任务或重置预算')
+    if any((task_dir/name).exists() for name in ('trace.jsonl','messages.json','evidence.json')):
+        raise CheckpointError('任务已有执行产物且无检查点，不能覆盖旧任务；请新建任务目录')
+
+
+def resume_research(task_dir:Path, *, should_stop=None, llm=None, clear_stop_marker=True) -> AgentResult:
+    checkpoint=CheckpointStore(task_dir)
+    checkpoint.read()  # 无检查点的旧任务不创建锁文件或目录，不改变原始产物。
+    with checkpoint.lease():
+        data=checkpoint.read()
+        checkpoint.validate(data)
+        if clear_stop_marker:
+            with checkpoint.lease(control=True):
+                (checkpoint.root/'.desktop-stop').unlink(missing_ok=True)
+        settings=Settings(**data['research_settings'])
+        if llm is None:
+            identity=data['identity']['model']
+            llm=LLMClient(load_llm_config(provider=identity['provider'],model=identity['model'],settings=settings))
+        options=data['identity']['options']
+        return _research(llm,settings,data['question'],options['max_steps'],options['token_budget'],
+                         task_dir=Path(task_dir),
+                         should_stop=lambda:bool(should_stop and should_stop()) or (checkpoint.root/'.desktop-stop').exists(),
+                         checkpoint=checkpoint,resume_state=data)
+
+
+def _research(
+    llm,settings,question,max_steps,budget,*,task_dir,historical_context=None,should_stop=None,
+    checkpoint=None,resume_state=None,
+) -> AgentResult:
     """运行一次研究任务：独立的工作目录、工具实例和运行日志。"""
     task_dir = task_dir or new_task_dir(question)
     tracer = TraceWriter(task_dir / TRACE_FILE)
     contract = extract_contract(question)
     session = ResearchSession(task_contract=contract)  # 本次请求是唯一约定来源
     memory_store = MemoryStore(settings.memory_db_path) if settings.memory_enabled else None
-    memory_context = historical_context or ""
-    if historical_context:
+    memory_context = resume_state['memory_context'] if resume_state else historical_context or ""
+    if historical_context and not resume_state:
         task_dir.mkdir(parents=True, exist_ok=True)
         (task_dir / "memory_context.json").write_text(json.dumps({"query":question,
             "record_ids":[],"source":"desktop_session","context":historical_context}, ensure_ascii=False,indent=2),encoding="utf-8")
-    if memory_store and historical_context is None:
+    if memory_store and historical_context is None and not resume_state:
         try:
             records = memory_store.search(question, limit=settings.memory_recall_limit, followup=True)
             memory_context = format_context(records, settings.memory_context_max_chars)
@@ -143,16 +186,23 @@ def research(
         memory_context=memory_context,
         task_contract=contract,
         should_stop=should_stop,
+        checkpoint=checkpoint,
     )
+    agent.research_settings={k:v for k,v in settings.model_dump(mode='json').items() if not k.endswith('_api_key')}
     try:
-        result = agent.run(question)
+        result = agent.run(question,resume_state=resume_state) if resume_state else agent.run(question)
     finally:
         tracer.close()
     save_messages(task_dir / MESSAGES_FILE, result.messages)
+    if result.stop_reason in ('interrupted','needs_verification'):
+        console.print(f'[yellow]任务已停止；恢复条件：python -m agent.resume status "{task_dir}"[/]')
+        return result
 
     reports = sorted(p for p in task_dir.glob("*.md") if p.name != NOTES_FILE)
     # 被强制收尾且没写过报告时，收尾回答本身就是（不完整的）报告，替用户存下来
     if not reports and result.stop_reason in FINALIZE_REASONS and result.answer.strip():
+        agent._save_checkpoint('postprocess',pending={'kind':'fallback','reason':'兜底报告多文件保存中，需核对未提交写入'},
+                               result=checkpoint.read()['result'] if checkpoint and checkpoint.path.exists() else None)
         fallback = task_dir / "report.md"
         fallback.write_text(result.answer, encoding="utf-8")
         save_check(fallback, inspect_report(result.answer, task_dir, session))
@@ -162,6 +212,7 @@ def research(
             from agent.evidence import write_json
             write_json(fallback.with_suffix('.evidence.json'),session.evidence.prepare(fallback,result.answer,None,complete=False))
         reports = [fallback]
+        agent._save_checkpoint('postprocess',result={k:v for k,v in vars(result).items() if k!='messages'})
 
     for r in reports:
         console.print(f"[bold green]报告：[/]{r}")
@@ -181,6 +232,11 @@ def research(
         console.print("[red]鉴权失败：请检查 API Key 是否正确、是否与所选厂商匹配。[/]")
     if result.stop_reason == "context_overflow":
         console.print("[yellow]提示：对话历史超出了模型上下文上限。可以减少 --max-steps，阶段 4 会从根本上解决。[/]")
+    if checkpoint and checkpoint.path.exists():
+        data=checkpoint.read()
+        # 有未确认的模型请求时不将检查点伪装为完成。
+        if not data.get('pending'):
+            agent._save_checkpoint('postprocess',status='complete',result={k:v for k,v in vars(result).items() if k!='messages'})
     return result
 
 

@@ -14,9 +14,10 @@ from agent.memory import format_context
 from agent.workspace import new_task_dir
 from desktop_app.store import Store
 from desktop_app.usage import PricingBook, TraceUsageReader, summarize
+from agent.checkpoint import CheckpointStore
 
-ACTIVE={'queued','running','cancelling'}
-FINAL={'completed','partial','failed','cancelled','interrupted','imported'}
+ACTIVE={'queued','resuming','running','cancelling'}
+FINAL={'completed','partial','failed','cancelled','interrupted','imported','needs_verification'}
 
 
 def read_json(path,default=None):
@@ -53,7 +54,7 @@ class Manager:
         self.log=None
         self.closed=threading.Event()
         for row in self.store.runs():
-            if row['state'] in ACTIVE:self.store.set_run(row['id'],'interrupted',{'error':'本地服务重启；未恢复执行。重新运行会创建新任务。'})
+            if row['state'] in ACTIVE:self.store.set_run(row['id'],'interrupted',{'error':'本地服务重启；未自动恢复。可查看检查点恢复条件。'})
         self.thread=None
         if start:
             self.thread=threading.Thread(target=self._watch,daemon=True)
@@ -112,6 +113,19 @@ class Manager:
                 'summary':text,'sources':[]}],6000)
         return None  # 第一轮沿用CLI的历史召回规则。
 
+    def resume(self,rid):
+        with self.lock:
+            row=self.store.run(rid)
+            if row['state'] in ACTIVE:raise ValueError('任务已在运行或排队，不能重复恢复')
+            if self.store.session(row['session_id'])['archived']:raise ValueError('请先取消归档再恢复')
+            root=self.safe_task(row)
+            status=CheckpointStore(root).status()
+            if not status['resumable']:raise ValueError(status['reason'])
+            with CheckpointStore(root).lease(control=True):
+                for name in ('.desktop-stop','.desktop-result.json'):
+                    (root/name).unlink(missing_ok=True)
+            return self.store.set_run(rid,'resuming',{'error':'已请求从检查点恢复，继承原步数、预算和审稿次数。'})
+
     def tick(self):
         with self.lock:
             if self.process is not None:
@@ -121,6 +135,7 @@ class Manager:
                 if result:
                     stop=result.get('stop_reason')
                     state=('cancelled' if stop=='interrupted' else 'completed' if stop=='final_answer' else
+                           'needs_verification' if stop=='needs_verification' else
                            'partial' if stop in {'max_steps','budget','loop_detected'} else 'failed')
                 else:
                     state='interrupted' if row['state']=='cancelling' else 'failed'
@@ -129,12 +144,14 @@ class Manager:
                 if self.log:self.log.close()
                 self.log=None; self.process=None; self.active=None
             if self.closed.is_set():return
-            pending=next((r for r in self.store.runs() if r['state']=='queued'),None)
+            pending=next((r for r in self.store.runs() if r['state'] in {'queued','resuming'}),None)
             if pending is None:return
             path=self.safe_task(pending)
-            request={'question':pending['question'],'options':pending['options'],'historical_context':self.context(pending)}
+            resuming=pending['state']=='resuming'
+            request={'question':pending['question'],'options':pending['options'],'resume':resuming,
+                     'historical_context':None if resuming else self.context(pending)}
             (path/'.desktop-request.json').write_text(json.dumps(request,ensure_ascii=False),encoding='utf-8')
-            self.log=(path/'.desktop-console.log').open('wb')
+            self.log=(path/'.desktop-console.log').open('ab' if resuming else 'wb')
             env=os.environ.copy(); env['PYTHONIOENCODING']='utf-8'
             try:
                 self.process=subprocess.Popen([sys.executable,'-m','desktop_app.worker',str(path),'--parent',str(os.getpid())],
@@ -162,7 +179,9 @@ class Manager:
     def stop(self,rid,force=False):
         with self.lock:
             row=self.store.run(rid)
-            if row['state']=='queued':return self.store.set_run(rid,'cancelled',{'error':'排队任务已取消，未调用模型。','usage_not_started':True})
+            if row['state'] in {'queued','resuming'}:
+                return self.store.set_run(rid,'cancelled',{'error':'排队请求已取消，未发出新调用。',
+                    'usage_not_started':row['state']=='queued'})
             if row['state'] not in {'running','cancelling'}:return row
             (self.safe_task(row)/'.desktop-stop').touch()
             if force and self.active==rid and self.process:
@@ -183,7 +202,7 @@ class Manager:
                 if self.log:self.log.close()
                 self.process=None;self.active=None;self.log=None
             for row in self.store.runs():
-                if row['state']=='queued':self.store.set_run(row['id'],'interrupted',{'error':'应用关闭，排队任务未执行。'})
+                if row['state'] in {'queued','resuming'}:self.store.set_run(row['id'],'interrupted',{'error':'应用关闭，排队请求未执行。'})
         if self.thread and self.thread is not threading.current_thread():self.thread.join(timeout=2)
 
     def detail(self,rid):
@@ -207,6 +226,7 @@ class Manager:
         if review.get('evidence_mapping_sha256') and review['evidence_mapping_sha256']!=evidence.get('mapping_sha256'):
             review={**review,'status':'stale'}
         return {**row,'files':files,'review':review,'evidence':evidence,
+                'checkpoint':CheckpointStore(root).status(),
                 'usage':self.usage(row),
                 'quality':read_json(root/'report.quality.json',{}),'plan':read_json(root/'plan.json',{}),
                 'contract':read_json(root/'task_contract.json',{}),

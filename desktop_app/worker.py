@@ -9,7 +9,7 @@ from pathlib import Path
 
 from agent.config import Settings,load_llm_config
 from agent.llm import LLMClient
-from main import research
+from main import research,resume_research
 
 
 def watch_parent(pid):
@@ -41,11 +41,14 @@ def main():
     options=request['options']
     settings=Settings().model_copy(update={'memory_enabled':options['memory']})
     try:
-        config=load_llm_config(provider=options['provider'],model=options['model'],settings=settings)
-        client=LLMClient(config)
-        result=research(client,settings,request['question'],options['max_steps'],options['budget'],
-            task_dir=args.task_dir,historical_context=request.get('historical_context'),
-            should_stop=(args.task_dir/'.desktop-stop').exists)
+        if request.get('resume'):
+            result=resume_research(args.task_dir,should_stop=(args.task_dir/'.desktop-stop').exists,clear_stop_marker=False)
+        else:
+            config=load_llm_config(provider=options['provider'],model=options['model'],settings=settings)
+            client=LLMClient(config)
+            result=research(client,settings,request['question'],options['max_steps'],options['budget'],
+                task_dir=args.task_dir,historical_context=request.get('historical_context'),
+                should_stop=(args.task_dir/'.desktop-stop').exists)
         value=asdict(result);value.pop('messages',None)
     except KeyboardInterrupt:value={'stop_reason':'interrupted','error':'用户请求停止。'}
     except Exception as exc:value={'stop_reason':'error','error':f'{type(exc).__name__}: {exc}'}

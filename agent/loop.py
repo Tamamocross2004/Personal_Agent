@@ -67,6 +67,7 @@ from agent.prompts import (
     wrapup_refused_result,
 )
 from tools.registry import ToolRegistry, ToolResult
+from agent.checkpoint import CheckpointMixin, NeedsVerification, agent_identity, restore, runtime_identity
 
 StopReason = Literal[
     "final_answer",  # 正常完成
@@ -77,6 +78,7 @@ StopReason = Literal[
     "context_overflow",  # 上下文超出模型上限
     "content_filter",  # 被内容审核拦截且无法恢复
     "error",  # 其它无法恢复的错误（Key 错误、模型名错误……）
+    "needs_verification",  # 操作结果不确定，不能自动重做
 ]
 
 # 这几种情况会做"强制收尾"调用，因此 answer 里通常仍有内容
@@ -153,7 +155,7 @@ class AgentResult:
         return out
 
 
-class Agent:
+class Agent(CheckpointMixin):
     def __init__(
         self,
         llm: ChatModel,
@@ -178,6 +180,7 @@ class Agent:
         memory_context: str = "",
         task_contract: TaskContract | None = None,
         should_stop: Callable[[], bool] | None = None,
+        checkpoint=None,
     ):
         self.llm = llm
         self.registry = registry
@@ -203,12 +206,21 @@ class Agent:
         self.memory_context = memory_context
         self.task_contract = task_contract
         self.should_stop = should_stop
+        self.checkpoint = checkpoint
+        self._runtime_identity=runtime_identity() if checkpoint else None
 
     # ------------------------------------------------------------------
     # 对外接口
     # ------------------------------------------------------------------
 
-    def run(self, question: str) -> AgentResult:
+    def run(self, question: str, *, resume_state: dict | None = None) -> AgentResult:
+        self._segment_started=time.perf_counter()
+        self._elapsed_before=0
+        self._checkpoint_phase='before_plan'
+        self._checkpoint_pending=None
+        self._checkpoint_data={}
+        if resume_state is not None:
+            return self._resume(resume_state)
         # 每次 run 的状态都重新初始化
         self._tokens = 0
         self._equiv = 0.0  # 等效 token，预算按它计算
@@ -230,6 +242,10 @@ class Agent:
         self._last_reviews: dict[str, dict] = {}
         self._call_stats: dict[tuple[str, str], list[int]] = {}  # 调用签名 → [调用次数, 成功次数]
         self._write_errors: dict[tuple[str,str],str] = {}
+        self._pending_text=[]
+        self._empty_replies=0
+        self._pending_reviews={}
+        self._finalizing_reason=None
         if self.compactor:
             self.compactor.reset()
 
@@ -265,6 +281,8 @@ class Agent:
                 '用户禁止补日期时保留资料相对时间，不把系统当天日期补入资料陈述。')
         if self.memory_context:
             messages.insert(1, {"role": "user", "content": self.memory_context})
+        self._checkpoint_messages=messages
+        self._save_checkpoint('before_plan')
         self._emit(
             "run_start",
             question=question,
@@ -278,48 +296,104 @@ class Agent:
             self._emit("notice", text=f"已加载历史研究背景（{len(self.memory_context)} 字符），历史结论仍需核实。")
         try:
             self._plan(messages, question)
+            self._save_checkpoint('loop')
             stop, answer, error = self._loop(messages)
         except KeyboardInterrupt:
             self._emit("notice", text="用户中断，任务停止。")
             stop, answer, error = "interrupted", "", "用户中断"
+        except NeedsVerification as exc:
+            stop,answer,error='needs_verification','',str(exc)
 
-        self._refresh_report_checks()
+        return self._finish_run(messages,stop,answer,error,started)
+
+    def _resume(self,data):
+        self.checkpoint.validate(data,agent_identity(self))
+        restore(self,data)
+        messages=self._checkpoint_messages=data['messages']
+        self._checkpoint_phase=data['phase']; self._checkpoint_pending=data.get('pending')
+        self._checkpoint_data=data
+        self._tools=self.registry.schemas()
+        self._emit('run_resume',steps=self._steps,equivalent_tokens=round(self._equiv),review_calls=self._review_count)
+        if data['phase']=='postprocess':
+            return AgentResult(messages=messages,**data['result'])
+        started=time.perf_counter()
+        try:
+            if data['phase']=='before_plan':
+                self._plan(messages,self._question)
+                self._save_checkpoint('loop')
+            if data['phase']=='review_pending':
+                self._finish_pending_reviews(messages)
+                self._maybe_warn_budget(messages)
+                self._maybe_warn_steps(messages,self._steps)
+            if data['phase']=='review_pending' and self._blocked>=self.max_blocked_repeats:
+                stop,answer,error=self._finalize(messages,'loop_detected')
+            else:
+                stop,answer,error=self._loop(messages,queued_response=data.get('response'))
+        except KeyboardInterrupt:
+            stop,answer,error='interrupted','','用户中断'
+        except NeedsVerification as exc:
+            stop,answer,error='needs_verification','',str(exc)
+        return self._finish_run(messages,stop,answer,error,started)
+
+    def _finish_run(self,messages,stop,answer,error,started):
+        if stop in FINALIZE_REASONS and error is None:
+            self._finalizing_reason=None
+            self._checkpoint_pending=None
+        if self._checkpoint_pending is None:
+            self._refresh_report_checks()
+        result=AgentResult(answer,self._steps,stop,messages,self._tokens,error,round(self._equiv))
+        if stop in ('interrupted','needs_verification') or self._checkpoint_pending is not None:
+            self._save_checkpoint(pending=self._checkpoint_pending,
+                status='needs_verification' if self._checkpoint_pending else 'interrupted',
+                response=self._checkpoint_data.get('response'))
+        else:
+            value=asdict(result); value.pop('messages')
+            self._save_checkpoint('postprocess',result=value)
+
         self._emit(
             "run_end",
             stop_reason=stop,
             steps=self._steps,
             total_tokens=self._tokens,
             equivalent_tokens=round(self._equiv),
-            seconds=round(time.perf_counter() - started, 2),
+            seconds=round(self._elapsed_before+time.perf_counter()-self._segment_started, 2),
             error=error,
         )
-        return AgentResult(answer, self._steps, stop, messages, self._tokens, error, round(self._equiv))
+        return result
 
     # ------------------------------------------------------------------
     # 主循环
     # ------------------------------------------------------------------
 
-    def _loop(self, messages: list[dict[str, Any]]) -> tuple[StopReason, str, str | None]:
+    def _loop(self, messages: list[dict[str, Any]], queued_response=None) -> tuple[StopReason, str, str | None]:
         tools = self._tools = self.registry.schemas()
-        pending_text: list[str] = []  # 被截断、正在续写的回答
-        empty_replies = 0
+        pending_text = self._pending_text
+        empty_replies = self._empty_replies
 
-        for step in range(1, self.max_steps + 1):
+        first=self._steps if queued_response is not None else self._steps+1
+        for step in range(first, self.max_steps + 1):
+            if queued_response is not None:
+                resp=ChatCompletion.model_validate(queued_response)
+                queued_response=None
+            else:
+                self._save_checkpoint('loop')
+                resp=None
             self._steps = step
             self._emit("step", step=step)
 
             # 估算这次请求的上下文大小；超过阈值就先压缩
             context_tokens = self._estimate_context(messages, tools)
-            if self.compactor:
+            if self.compactor and resp is None:
                 context_tokens = self._compact(messages, context_tokens)
 
             # 不是等超了才停，而是预估"再调用一次就会超"时就收尾（收尾调用本身仍会花掉约一次的量）
-            if self._equiv + self._project_next_call(context_tokens) >= self.token_budget:
+            if resp is None and self._equiv + self._project_next_call(context_tokens) >= self.token_budget:
                 return self._finalize(messages, "budget")
 
             # ---- 1. 调用模型 ----
             try:
-                resp = self._call_llm(messages, tools, step)
+                if resp is None:
+                    resp = self._call_llm(messages, tools, step)
             except openai.APIError as e:
                 kind = classify_api_error(e)
                 if kind == "content_filter" and self._redact_last_tool_results(messages):
@@ -347,6 +421,7 @@ class Agent:
                     continue
                 if not text.strip() and not pending_text:
                     empty_replies += 1
+                    self._empty_replies=empty_replies
                     if empty_replies >= 2:
                         return "error", "", "模型连续返回空回复"
                     # 空的 assistant 消息有的厂商不接受，所以不放进历史，只追加提醒
@@ -357,6 +432,7 @@ class Agent:
                 if step < self.max_steps and self._request_structure_repair(messages):
                     pending_text.clear()
                     empty_replies = 0
+                    self._empty_replies=0
                     continue
                 answer = "".join(pending_text) + text
                 self._emit("final", text=answer, stop_reason="final_answer")
@@ -364,6 +440,7 @@ class Agent:
 
             # ---- 3. 有工具调用：逐个执行，结果写回历史 ----
             empty_replies = 0
+            self._empty_replies=0
             self._execute_calls(messages, msg, truncated)
 
             # ---- 4. 本轮结束后的检查 ----
@@ -391,6 +468,7 @@ class Agent:
         注意即使拒绝也必须回一条 tool 消息：每个 tool_call 都要有对应的结果，否则下次请求报 400。
         """
         messages.append(_assistant_message_to_dict(msg))
+        self._save_checkpoint('tool_batch',pending={'kind':'tool_batch','reason':'批次尚未完整提交，不能重放已有副作用'})
         reports_written = {}
         length_rejected = False
         rejected_length_calls = set()
@@ -402,6 +480,8 @@ class Agent:
             self._check_stop()
             name, arguments = call.function.name, call.function.arguments
             self._emit("tool_call", id=call.id, name=name, arguments=arguments)
+            self._save_checkpoint('tool_batch',pending={'kind':'tool','id':call.id,'name':name,
+                                                       'reason':'调用派发或副作用结果待提交，未自动重做'})
             if truncated:
                 # 参数大概率是半截 JSON；即使碰巧能解析，内容也不完整（例如半篇报告）
                 result, seconds = ToolResult(TRUNCATED_TOOL_CALL_RESULT, True), 0.0
@@ -409,6 +489,11 @@ class Agent:
                 result, seconds = ToolResult(wrapup_refused_result(name), True), 0.0
             else:
                 result, seconds = self._run_tool(name, arguments)
+            if self.checkpoint and getattr(self,'_tool_outcome_uncertain',False):
+                self._emit('tool_result',id=call.id,name=name,content=result.content,is_error=True,seconds=seconds)
+                self._save_checkpoint('tool_batch',pending={'kind':'tool','id':call.id,'name':name,
+                                                           'reason':'工具线程超时，后台副作用可能仍在进行'})
+                raise NeedsVerification('工具超时且结果不确定，已停止派发后续操作；需核对，未自动重做')
             content = _truncate(result.content, self.max_tool_result_chars)
             if name == 'fetch_url' and result.is_error and result.content.startswith('ERROR: FetchError:') and self.research_session is not None:
                 from tools.session import normalize_url
@@ -471,6 +556,7 @@ class Agent:
                 complete = args.get("complete", True)
                 reports_written[filename] = complete
                 self._report_completeness[filename] = complete
+            self._save_checkpoint('tool_batch',pending={'kind':'tool_batch','reason':'结果已返回，批次后处理尚未提交'})
 
         if rejected_length_calls and not reports_written:
             # 失败参数仍在 trace；只移除其对模型的反复锚定，保留同批其他工具的配对消息。
@@ -506,11 +592,18 @@ class Agent:
             messages.append({'role':'system','content':reminder})
             self._emit('notice',text=reminder)
 
-        for filename, complete in reports_written.items():
-            self._review_saved_report(messages, filename, complete=complete)
+        self._pending_reviews=reports_written
+        self._save_checkpoint('review_pending')
+        self._finish_pending_reviews(messages)
 
         if truncated:
             self._emit("notice", text="回复因输出长度上限被截断，工具调用未执行，已告知模型分段处理。")
+
+    def _finish_pending_reviews(self,messages):
+        for filename,complete in list(self._pending_reviews.items()):
+            self._review_saved_report(messages,filename,complete=complete)
+            self._pending_reviews.pop(filename)
+            self._save_checkpoint('review_pending')
 
     def _request_structure_repair(self, messages: list[dict[str, Any]]) -> bool:
         """正常结束前只提醒一次；不增加步数、预算或强制收尾轮数。"""
@@ -585,6 +678,7 @@ class Agent:
                 if self._equiv + projected >= self.token_budget:
                     record = save_review(path, report, "skipped_budget", [])
                     break
+                self._check_stop()
                 self._review_count += 1
                 self._reviewed_hashes.add(digest)
                 self._emit("notice", text=f"开始报告审稿：{path.name}（{self._review_count}/{self.review_max_calls}），用量计入预算。")
@@ -681,10 +775,14 @@ class Agent:
             after = getattr(self.llm, 'request_attempts', None)
             return after-attempts_before if isinstance(after,int) and isinstance(attempts_before,int) else None
         try:
+            self._save_checkpoint(pending={'kind':'model','purpose':purpose,'step':step,
+                                          'reason':'模型请求已派发，结果或用量尚未确认'})
             resp = self.llm.chat(messages, tools=tools, **kwargs)
         except Exception as exc:
             self._emit('llm_error',purpose=purpose,step=step,**identity,request_attempts=attempts(),
                        error_type=type(exc).__name__,seconds=round(time.perf_counter()-started,2))
+            if self.checkpoint:
+                raise NeedsVerification('模型请求结果或用量未确认，已保留请求边界；未自动恢复或重置预算') from exc
             raise
         u = resp.usage
         p = u.prompt_tokens if u else 0
@@ -711,6 +809,11 @@ class Agent:
             seconds=round(time.perf_counter() - started, 2),
             finish_reason=resp.choices[0].finish_reason if resp.choices else None,
         )
+        if purpose=='agent' and step is not None:
+            self._save_checkpoint('response',response=resp.model_dump(mode='json'))
+        elif self.checkpoint:
+            self._save_checkpoint(pending={'kind':'model','purpose':purpose,'returned':True,
+                                          'reason':'已记录返回用量，规划/审稿/收尾结果尚未提交'})
         # 已返回的调用先记录实际用量，再响应停止，避免丢失已消耗 token。
         self._check_stop()
         return resp
@@ -814,6 +917,7 @@ class Agent:
         Python 无法强制杀死线程，超时的线程会在后台继续跑完（daemon 线程，不会阻止程序退出）。
         这里用"分段等待"而不是一次 wait(timeout)，这样 Windows 上 Ctrl+C 也能及时响应。
         """
+        self._tool_outcome_uncertain=False
         box: dict[str, ToolResult] = {}
         done = threading.Event()
 
@@ -829,6 +933,7 @@ class Agent:
         deadline = time.monotonic() + self.tool_timeout
         while not done.wait(0.1):
             if time.monotonic() >= deadline:
+                self._tool_outcome_uncertain=True
                 return ToolResult(
                     f"ERROR: 工具执行超时（超过 {self.tool_timeout:g} 秒），已放弃本次调用。请换个参数或来源。",
                     True,
@@ -893,6 +998,8 @@ class Agent:
         收尾轮数用完仍没有文字回答时，才退回到老办法（tool_choice=none，再不行就不发工具）。
         预算不在收尾阶段检查：收尾最多几次调用，超出量有限。
         """
+        self._finalizing_reason=reason
+        self._save_checkpoint('finalizing',pending={'kind':'finalize','reason':reason})
         self._emit("notice", text=f"触发强制收尾（{reason}），进入收尾阶段：只能读笔记、写报告、更新计划。")
         messages.append({"role": "user", "content": finalize_prompt(reason)})
         tools = getattr(self, "_tools", None) or None

@@ -100,6 +100,8 @@ def create_app(manager:Manager,token:str,ui_dir:Path|None=None):
     def run(rid:str):return redact(manager.detail(rid))
     @app.post('/api/runs/{rid}/stop')
     def stop(rid:str,force:bool=False):return redact(manager.stop(rid,force))
+    @app.post('/api/runs/{rid}/resume')
+    def resume(rid:str):return redact(manager.resume(rid))
     @app.post('/api/import')
     def import_history():return {'imported':manager.import_history()}
     @app.get('/api/runs/{rid}/files/{name:path}')

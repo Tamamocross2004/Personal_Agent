@@ -21,6 +21,7 @@ STOP_REASON_LABELS = {
     "max_steps": "达到最大步数，已强制收尾",
     "budget": "token 预算用完，已强制收尾",
     "loop_detected": "检测到重复调用循环，已强制收尾",
+    "needs_verification": "操作结果不确定，需核对后决定后续任务",
     "interrupted": "用户中断",
     "context_overflow": "上下文超出模型上限",
     "content_filter": "被内容审核拦截",

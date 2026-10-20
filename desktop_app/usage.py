@@ -102,6 +102,7 @@ class TraceUsageReader:
                     kind=event.get('kind')
                     if not isinstance(kind,str):previous['invalid_lines']+=1;continue
                     if kind in {'llm_call','llm_error'}:previous['events'].append(event)
+                    elif kind in {'run_start','run_resume'}:previous['finished']=False
                     elif kind=='run_end':previous['finished']=True
             previous.update(size=stat.st_size,mtime=stat.st_mtime_ns)
             self.cache[key]=previous
@@ -179,7 +180,7 @@ def summarize(trace,row,book:PricingBook):
     if trace:
         if trace['invalid_lines']:warnings.add('日志包含损坏或超长事件，统计可能不完整。')
         if trace['partial_line']:warnings.add('日志末行尚不完整，暂未计入。')
-        if not trace['finished'] and row.get('state') not in {'queued','running','cancelling'}:
+        if not trace['finished'] and row.get('state') not in {'queued','resuming','running','cancelling'}:
             warnings.add('未取得完整结束记录，可能存在未返回或未落盘的请求。')
     elif not available:warnings.add('运行日志缺失；不把未知调用和费用记为零。')
     if not attempts_complete:warnings.add('部分旧调用未记录请求尝试数；重试次数只能给出下限。')

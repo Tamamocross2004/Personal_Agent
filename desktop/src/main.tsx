@@ -56,6 +56,7 @@ type Run = {
   result: any;
 };
 type Detail = Run & {
+  checkpoint: any;
   usage: any;
   files: { name: string; size: number; modified: number; type: string }[];
   review: any;
@@ -104,6 +105,7 @@ async function fileResponse(run: string, name: string) {
 }
 const labels: Record<string, string> = {
   queued: "排队中",
+  resuming: "等待恢复",
   running: "研究中",
   cancelling: "正在停止",
   completed: "研究结束",
@@ -111,10 +113,11 @@ const labels: Record<string, string> = {
   failed: "执行失败",
   cancelled: "已取消",
   interrupted: "已中断",
+  needs_verification: "需核对",
   imported: "历史记录",
 };
 const active = (r: Run) =>
-  ["queued", "running", "cancelling"].includes(r.state);
+  ["queued", "resuming", "running", "cancelling"].includes(r.state);
 const time = (value: string) =>
   new Date(value).toLocaleString("zh-CN", {
     month: "numeric",
@@ -133,6 +136,7 @@ const kindLabel: Record<string, string> = {
 };
 
 function App() {
+  const [resumeVersion, setResumeVersion] = useState(0);
   const [ready, setReady] = useState(false),
     [error, setError] = useState(""),
     [config, setConfig] = useState<any>(null);
@@ -320,7 +324,7 @@ function App() {
       }
     })();
     return () => controller.abort();
-  }, [rid, ready]);
+  }, [rid, ready, resumeVersion]);
   useEffect(() => {
     if (feed.current) feed.current.scrollTop = feed.current.scrollHeight;
   }, [runs.length, events[rid]?.length]);
@@ -400,6 +404,20 @@ function App() {
       setDetail(await api(`/runs/${rid}`));
     } catch (e) {
       setError(String(e));
+    }
+  }
+  async function resume() {
+    if (!rid || busy) return;
+    setBusy(true);
+    try {
+      const row = await api(`/runs/${rid}/resume`, { method: "POST" });
+      setRuns((old) => old.map((r) => r.id === rid ? row : r));
+      setDetail(await api(`/runs/${rid}`));
+      setResumeVersion((v) => v + 1);
+    } catch (e) {
+      setError(String(e));
+    } finally {
+      setBusy(false);
     }
   }
   async function saveTitle() {
@@ -877,6 +895,14 @@ function App() {
                 <span>{time(detail.created_at)}</span>
               </div>
               <div className="inspector-body">
+                {detail.checkpoint && (detail.checkpoint.available || ["interrupted", "failed", "cancelled", "needs_verification"].includes(detail.state)) && (
+                  <div className="panel-intro">
+                    <strong>检查点恢复</strong>
+                    <p>{detail.checkpoint.reason}</p>
+                    {detail.checkpoint.available && <p>累计 {detail.checkpoint.steps} 步 · {number(detail.checkpoint.equivalent_tokens)} 等效 token · {detail.checkpoint.review_calls} 次审稿</p>}
+                    <button className="primary" disabled={busy || active(detail) || !detail.checkpoint.resumable} onClick={resume}>从检查点恢复</button>
+                  </div>
+                )}
                 {tab === "usage" && (
                   <UsagePanel
                     value={detail.usage}
@@ -1242,7 +1268,7 @@ function App() {
               expanded={pricingExpanded}
             />
             <p className="muted small">
-              追问可沿用本会话上一轮报告作为历史数据。停止后重新提交会创建新任务，首版尚无检查点恢复。
+              追问可沿用本会话上一轮报告。停止后可在右侧查看检查点恢复条件；重新提交会创建新任务，恢复则继承原任务预算。
             </p>
             <button className="primary" onClick={() => setSettings(false)}>
               完成
