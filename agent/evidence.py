@@ -174,7 +174,9 @@ class EvidenceLedger:
             if claim.kind == 'direct':
                 def numbers(text):
                     from decimal import Decimal
-                    text = re.sub(r'\[\d+\]', '', text)  # 报告引用编号不作事实数字
+                    # 标准编号及本次真实证据ID是引用标记，不是原句中的事实数值。
+                    text = re.sub(r'\[([^\[\]\n]+)\]',
+                                  lambda m: '' if m[1].isdigit() or m[1] in self.records else m[0], text)
                     return {Decimal(n.replace(',','')) for n in re.findall(
                         r'(?<![\d.])(?:\d[\d,]*(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?',text)}
                 supplied = set().union(*(numbers(r['excerpt']) for r in refs))

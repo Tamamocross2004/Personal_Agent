@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "cohort": "holdout2-revealed-development",
+  "policy": {
+    "normal_min_rate": 0.9,
+    "fault_min_rate": 1.0,
+    "rounds": 3,
+    "max_steps": 15,
+    "per_case_budget": 80000,
+    "total_budget_per_round": 500000,
+    "review_max_calls": 2,
+    "acceptance": "冻结三轮每轮正常任务至少90%，故障100%；全部产物按独立rubric人工核对，无实质错误或未决分歧；编码助手核对单列，不冒充外部人工。"
+  },
+  "cases": [
+    {
+      "id": "r_calibration",
+      "split": "development",
+      "title": "启机条件与证书未知",
+      "prompt": "不联网。给定设备规范：只有校准证书有效且温度处于10至35摄氏度才允许启动。目前温度22摄氏度，证书状态资料缺失。说明能否据此确认允许启动，以及能否断定证书过期。不操作设备，不补具体日期。 保存report.md，包含摘要、方法与范围、正文、结论、局限性、参考资料，全文最多500字。用claims关联关键结论及真实依据。",
+      "rubric": [
+        "温度满足已知条件，证书有效性仍未知，不能据此确认可启机",
+        "证书未知不等于确定无效/过期；必要条件不当充分授权证明",
+        "报告不补日期；direct保持规范/温度事实，不把推断夹入"
+      ],
+      "network_forbidden": true,
+      "no_calendar_date": true,
+      "require_evidence": true
+    },
+    {
+      "id": "r_fractional_fee",
+      "split": "development",
+      "title": "千与十万计价及三位小数",
+      "prompt": "不联网。虚构服务接收端0.28元/千token、生成端9元/十万token，本次接收15000、生成2500token，无折扣。用run_python算两项费用及总额，保存fee.json，严格包含receive_cost、generate_cost、total_cost数值键，单位元，保留实际小数。报告说明计价单位换算。 保存report.md，包含摘要、方法与范围、正文、结论、局限性、参考资料，全文最多500字。用claims关联关键结论及真实依据。",
+      "rubric": [
+        "接收费4.2元、生成费0.225元、合计4.425元，不按分擅自截断",
+        "千和十万的分母正确；报告与JSON一致",
+        "资料原始数值与计算金额分开，字段和单位可追溯"
+      ],
+      "network_forbidden": true,
+      "require_evidence": true,
+      "required_tools": [
+        "run_python"
+      ],
+      "expected_json": {
+        "fee.json": {
+          "receive_cost": 4.2,
+          "generate_cost": 0.225,
+          "total_cost": 4.425
+        }
+      }
+    },
+    {
+      "id": "r_bill",
+      "split": "development",
+      "title": "有涨有降的分项账单",
+      "prompt": "不联网。固定用量下账单两项费用分别为存储6元、计算24元；新方案相同用量下这两项费用分别成为原来的4倍和0.75倍。用run_python计算新总费用、新旧总费用倍率、绝对差；若新旧方案用量都同比乘3，再计算绝对差。保存bill.json，严格四个数值键new_total、ratio、difference、scaled_difference，解释倍率与差额的关系。 保存report.md，包含摘要、方法与范围、正文、结论、局限性、参考资料，全文最多500字。用claims关联关键结论及真实依据。",
+      "rubric": [
+        "新总额42，倍率1.4，差额12，扩量差额36",
+        "给定金额是费用，不能改作单价或补造两个分项用量相同",
+        "按旧费用权重0.2/0.8加权；同比扩量保留单价和分项构成的适用条件，不取倍率乘积"
+      ],
+      "network_forbidden": true,
+      "require_evidence": true,
+      "required_tools": [
+        "run_python"
+      ],
+      "expected_json": {
+        "bill.json": {
+          "new_total": 42,
+          "ratio": 1.4,
+          "difference": 12,
+          "scaled_difference": 36
+        }
+      }
+    }
+  ]
+}

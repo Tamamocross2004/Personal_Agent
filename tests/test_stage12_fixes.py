@@ -86,6 +86,11 @@ def test_direct_composite_numeric_result_rejects_before_mapping(tmp_path):
         ledger.validate(c['quote'],[Claim(**c)])
     c.update(quote='输入单价13元[2]')
     assert ledger.validate(c['quote'],[Claim(**c)])
+    c.update(quote='输入单价13元[user-1]')
+    assert ledger.validate(c['quote'],[Claim(**c)])
+    c.update(quote='输入单价13元[unknown-99]')
+    with pytest.raises(ValueError,match='摘录未提供的数值'):
+        ledger.validate(c['quote'],[Claim(**c)])
 
 
 def test_numeric_presence_allows_decimal_notation_and_grouping(tmp_path):
@@ -121,3 +126,18 @@ def test_delivered_coverage_merges_overlap_and_keeps_page_versions_separate(tmp_
     assert not ledger.web_coverage(ledger.records[first])['full_page_delivered']
     add(80,100)
     assert ledger.web_coverage(ledger.records[first])['full_page_delivered']
+
+
+def test_reviewer_sees_referenced_json_types_but_not_internal_or_unrelated_files(tmp_path):
+    from agent.review import build_review_messages
+    (tmp_path/'fee.json').write_text('{"total_cost":"4.425"}',encoding='utf-8')
+    (tmp_path/'unrelated.json').write_text('{"private":"not requested"}',encoding='utf-8')
+    (tmp_path/'messages.json').write_text('{"internal":"not research output"}',encoding='utf-8')
+    messages,_ = build_review_messages('fee.json 含数值字段。另见messages.json。',tmp_path,ResearchSession(),
+                                       question='total_cost必须是JSON数字')
+    payload = json.loads(messages[1]['content'])
+    assert len(payload['json_samples'])==1
+    assert payload['json_samples'][0]['field_types']=={'total_cost':'str'}
+    assert '4.425' in payload['json_samples'][0]['content']
+    assert 'not requested' not in messages[1]['content']
+    assert 'not research output' not in messages[1]['content']

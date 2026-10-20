@@ -1,5 +1,20 @@
 # 阶段12继续修复与第二批保留评估约定
 
+## 候选修正及最终冻结范围
+
+第二批候选`be3e022`运行到首轮8项已评分（5 pass、3 fail）时停止，未完成三轮。新增数字检查误把真实引用`[user-1]`的编号1当作事实数字，属于实现误拦截；另有JSON把Decimal存成字符串。保留原始running检查点、已完成任务与第9题中断轨迹，停止原因另存`workspace/stage12-holdout2-abort.json`，不覆盖为完整结果，也不把未运行题算通过；中断请求可能已计费但没有完整事件。
+
+修正：忽略标准引用号及本次真实证据ID的方括号标记；不忽略任意未知编号。审稿增加对报告引用的本轮JSON产物的有界读取、字段类型，排除内部messages/evidence等文件。JSON数值不得用default=str写成字符串。缺陷三题另作开发复测，3/3；全量733 passed。第二批已揭盲，后续只作回归。
+
+最终使用另一批`agent/validation_holdout3_cases.json`，cohort=`stage12-fix-fresh-holdout-3`，不是在第二批失败回答上改题后重评：10道正常题重新设计为放行证据、日志引述、区间/观测值歧义、万次/千行三位小数费用、不同账单加权、另一长文备份资格、不同环境不强造冲突、新Indigo记忆建档/追问、另一官方API词法/文件系统边界；三道故障换为并发上限地址、减法及另一预算输入。各题rubric/独立答案在首次运行前写定。
+
+最终门槛、模型、预算、轮数、原始分数保留和人工核对要求均沿用下文。第三批如被用于继续修复，同样转入开发资料，不能复用为新的独立验收。
+
+```powershell
+.\.venv\Scripts\python.exe -m agent.validation --suite agent/validation_holdout3_cases.json freeze --split holdout --out workspace/stage12-fix-holdout3-lock.json
+.\.venv\Scripts\python.exe -m agent.validation --suite agent/validation_holdout3_cases.json run --lock workspace/stage12-fix-holdout3-lock.json --rounds 3 --out workspace/evaluations/stage12-fix-holdout3
+```
+
 用户在首批评估后要求继续修复。本轮保留原始35/39、原始产物和助手核对，不覆盖旧结果。
 
 ## 修复及开发范围
