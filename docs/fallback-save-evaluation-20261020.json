@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-20",
+  "review_revision": "29f9042",
+  "implementation_base_revision": "29f904243c98fb08c01f67bdaccec90d8c3a097f",
+  "scope": "automatic fallback provenance and consistent desktop state; no semantic acceptance",
+  "assistant_review": {
+    "reviewer_kind": "coding_assistant",
+    "blind_review": false,
+    "counts": {
+      "pending": 0,
+      "pass": 24,
+      "fail": 2,
+      "uncertain": 13
+    },
+    "human_review_complete": false,
+    "acceptance": "not_accepted",
+    "external_human_review": "user declined; no longer a development waiting item"
+  },
+  "stage12_original_result": "37/39 unchanged",
+  "original_files_checked": 456,
+  "original_files_changed": 0,
+  "tests": {
+    "passed": 813,
+    "seconds": 54.05,
+    "new_cases": 13
+  },
+  "ui": {
+    "checks": [
+      "native startup, preload and authenticated loopback API",
+      "submit -> subprocess tools -> report/chart/CSV/evidence/review/usage; SSE EOF reconnect",
+      "search, rename, archive/unarchive preserve research and never call model",
+      "reload is read-only; synchronous repeated send creates one run",
+      "review limit remains skipped_limit, not passed",
+      "automatic fallback shows current save, original model text and unreviewed state; edit makes provenance stale",
+      "budget exhaustion remains partial with original limit; Escape closes settings",
+      "unknown API outcome shows needs_verification and failed/unknown usage; resume blocked",
+      "cooperative stop and UI resume reuse committed response, same task and cumulative usage",
+      "subprocess recovery after a committed tool batch does not repeat that tool",
+      "corrupt checkpoint has visible refusal and disabled resume",
+      "missing CSV visible; malformed image URL does not crash; changed report makes review stale",
+      "long history stays at reader position; 1050x700 has no document overflow",
+      "force stop preserves uncertain checkpoint; normal desktop exit cleans backend",
+      "restart preserves index; unexpected Electron death cleans backend and worker; restart never auto-runs"
+    ],
+    "page_errors": [],
+    "screenshot_visually_checked": true
+  },
+  "build": "TypeScript and Vite passed",
+  "paid_model_requests": 0,
+  "offline_demo": {
+    "path": "workspace/evaluations/fallback-save-demo-20261020",
+    "synthetic_llm_events": 2,
+    "provenance": {
+      "kind": "automatic_fallback",
+      "saved_by": "runtime",
+      "saved_at": "2026-10-20T13:49:38.677537+00:00",
+      "stop_reason": "budget",
+      "complete_at_save": false,
+      "review_status_at_save": "not_reviewed",
+      "source_answer_sha256": "238babe2c335971b5c96845ee93148c612fbc551706a86e33ebd4426f571ed90",
+      "report_bytes_sha256": "3189142bed8fc292fcc52671e349f835a7c277ce0e93996c315cec61a2c4f98b",
+      "status": "current"
+    }
+  },
+  "grading_functions_unchanged": [
+    "assess",
+    "aggregate",
+    "number_tree"
+  ],
+  "runtime_sha256": "7e92dc94aae1baf5c35c1bc0b015cfc8dc2d6d90618d096b469741a91356f724",
+  "legacy_checkpoint_migration": false,
+  "source_hash_basis": "working tree bytes before commit",
+  "source_sha256": {
+    "main.py": "3da98853b293d66474eaa5786a431ffef487ee5473959e6194445318b97e061d",
+    "agent/report_state.py": "449bd82551adc51eec434a985920fdb4d8853361dd20914df4bd977fb46bd4fe",
+    "agent/artifacts.py": "39a583ba092e0d449235f8533c88efd36819e3f6079c76b6f65ba50e0ca2d012",
+    "desktop_app/manager.py": "73e5c51a91fd5c459c1fcb5ccc6eb45a8bf3113179cf700e604fbd751dbe8e00",
+    "desktop/src/main.tsx": "f4ccfc56b88a896a772d15ae2265c9441271ba8cb05da429d23a1bab168f0671",
+    "desktop/src/style.css": "17ef8c3f95d3154805a15c890b42443793409aff456e806a7921efb68be69042",
+    "desktop/scripts/acceptance-smoke.cjs": "e999ff4f265daf648cfd1f5b04c80728e6b4d94a45090bc4b586954fef67f95f",
+    "tests/test_fallback_save.py": "b0f6dd440c00a2a41710acaa20ef6655fe06856e598a09ee920972d38ac8ec50",
+    "tests/desktop_acceptance_fixture.py": "1ff7ff0ec17917575d18aa70820a91c50cc5c692ae20262b9dd5d8753c2cc666"
+  },
+  "artifact_sha256": {
+    "workspace/fallback-save-tests-1.log": "9fba852f6c22201c7cfd1f51ba3438cc1f2e583a3fd5ff5f0c83455506108250",
+    "workspace/fallback-save-full-tests-20261020.log": "113344b74ecb05765435d283842423c290df6a0f3ee9b69fb988d80f7714a0ab",
+    "workspace/fallback-save-build-release-20261020.log": "ef6c4c009d5526d96be410d3b4d847e1371bd8d9761c419c099d77c978eadfbc",
+    "workspace/fallback-save-ui-release-20261020.log": "3eaf18c247f5dd46c63dc06c747d60c31a4f8859efddcfa375e3ab5234440a6e",
+    "workspace/fallback-save-release-20261020-ui-results.json": "3716ab86ee95f75ea3f6213cb2a754404838a9da28042ece88f3f1e1c197ae57",
+    "workspace/fallback-save-release-20261020-fallback-current.png": "c6095aa913915c8b5041cf542539bf3c638d8b291bf1c760d1d54e30db9f39ef",
+    "workspace/fallback-save-demo-20261020.log": "2a19565eeff309724d5d8c9bcd78113d48fe3e7fdc43f466b83508454c6430b3",
+    "workspace/fallback-save-replay-20261020.log": "1752a743a3df9166dadc8a6dbf11163d86b043f5b8273d9396849ef830794eb9",
+    "workspace/assistant-followup-review-20261020.log": "c6d709f8e0e9f412b80ad391dcd8aa42830c8d35bf90cda0757251f01c188d34",
+    "workspace/evaluations/stage12-independent4-assistant-followup-20261020/review-decisions.json": "14d5c3742f2fdb57c59083ad8a31ec8bdd00d79790b2dbc5213aeb92a2f9bf21",
+    "workspace/evaluations/stage12-independent4-assistant-followup-20261020/review-evidence.json": "ae8f06b61eceaa7ab3a89d38ce6659547684027b554b0fe26523028d906fdbb7",
+    "workspace/evaluations/stage12-independent4-assistant-followup-20261020/checked/review.json": "eb0f867808282e091832a90b529dbad39e8bd88f1726c5d579e111027d29410c",
+    "workspace/evaluations/fallback-save-demo-20261020/.agent-checkpoint.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/evaluations/fallback-save-demo-20261020/.agent-checkpoint.sqlite3": "4db669e998106e6b9063aa364d989d6994d9a05246cdc1b5cc4880027981a163",
+    "workspace/evaluations/fallback-save-demo-20261020/evidence.json": "0d253aec952941c8665041ddd4723e64c6410841200af003cf52df97ed1e2b77",
+    "workspace/evaluations/fallback-save-demo-20261020/messages.json": "15826dc019b6161f8960d2b4f009967121d84684dbd4e7e1deee8c253e6ebd10",
+    "workspace/evaluations/fallback-save-demo-20261020/plan.json": "c0ecfde38fe4e09058d6ca0cc4819277e7e8495ce8e61bff9f8cb2932bca1dff",
+    "workspace/evaluations/fallback-save-demo-20261020/report.contract.json": "2b15a20143d70d75bb16a3728b704489379ebb801f816ed92559dd76ec9b4ecf",
+    "workspace/evaluations/fallback-save-demo-20261020/report.evidence.json": "6ec6b6efdf4929455962effcbf70f5fc2ceecad9d72f80d9cf864eda761dae0f",
+    "workspace/evaluations/fallback-save-demo-20261020/report.md": "3189142bed8fc292fcc52671e349f835a7c277ce0e93996c315cec61a2c4f98b",
+    "workspace/evaluations/fallback-save-demo-20261020/report.provenance.json": "6f76ba1de81cd40b8571361dd819e95e8801e32e71051ff93ade011c79551964",
+    "workspace/evaluations/fallback-save-demo-20261020/report.quality.json": "05906b87a8cac1f41120e7e22f6e4a72d40bf5102a28634213f4344494799c71",
+    "workspace/evaluations/fallback-save-demo-20261020/report.review.json": "9d01ff47b0bfea31e44ba77122c86425c095b9bfd3a0034a0dc1da7584b871b3",
+    "workspace/evaluations/fallback-save-demo-20261020/report.reviews.jsonl": "3ed0cd2cff758e1a7b5d7d832915319cee6b947f15a10c0e40edd3a6b4866a5e",
+    "workspace/evaluations/fallback-save-demo-20261020/task_contract.json": "2ce3e00c91b44d761323e1b99afd1e95332913c470524eca865fc27282aa842e",
+    "workspace/evaluations/fallback-save-demo-20261020/trace.jsonl": "b0bf6e0633ebe5797518ca216b895bbb951f22f5c03597e7e94c5fb57f47b772",
+    "desktop/dist/assets/index-BfDkLw-k.js": "61e7fc94a654d910990052f5d401af8f8cfa7e9471022ed80ecbcc29c8c3f0b8",
+    "desktop/dist/assets/index-ixRPFUVF.css": "03e5d18af393da2f8ac9a27ed0696f86da286ffc0b9c1bff1875a40866b45eb2",
+    "desktop/dist/index.html": "9a98ae90785c77827ca8d5fe3633e2f3fa8a7186d238be6c12236e134d9bacd4"
+  },
+  "limits": [
+    "Original model text preserved; other semantic errors remain",
+    "No new live model/holdout evaluation or rescore",
+    "Provenance certifies file version only, not content truth or reviewer identity",
+    "Old checkpoints retain source version refusal; old reports not backfilled"
+  ]
+}

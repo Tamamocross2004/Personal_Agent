@@ -9,6 +9,9 @@ const os = require("node:os");
 const project = path.resolve(__dirname, "../..");
 const fixture = fs.mkdtempSync(path.join(os.tmpdir(), "agent-stage14-"));
 const evidence = path.join(project, "workspace");
+const prefixAt = process.argv.indexOf("--evidence-prefix");
+const evidencePrefix = prefixAt < 0 ? "stage14" : process.argv[prefixAt + 1];
+assert.match(evidencePrefix || "", /^[a-z0-9-]+$/);
 const env = { ...process.env };
 delete env.ELECTRON_RUN_AS_NODE;
 let app, page, connection, backendPid;
@@ -303,7 +306,7 @@ async function verifyCrashCleanup() {
     await page.locator(".usage-panel").waitFor();
     assert.equal(detail.usage.calls, 5); // planning, code, report, review, final
     await page.screenshot({
-      path: path.join(evidence, "stage14-completed.png"),
+      path: path.join(evidence, `${evidencePrefix}-completed.png`),
     });
     checks.push(
       "submit -> subprocess tools -> report/chart/CSV/evidence/review/usage; SSE EOF reconnect",
@@ -402,12 +405,49 @@ async function verifyCrashCleanup() {
       .click();
     await page.getByLabel("等效 token 预算", { exact: true }).fill("1000");
     await page.getByRole("button", { name: "完成", exact: true }).click();
-    const budget = await newTask("不联网，虚构资料：预算不足场景。");
+    const budget = await newTask("不联网，虚构资料：预算不足，自动保存演示。");
     const partial = await finished(budget.id);
     assert.equal(partial.state, "partial");
     assert.equal(partial.options.budget, 1000);
     assert.equal(partial.result.stop_reason, "budget");
     await quality("budget");
+    await quality("not_reviewed");
+    const saved = await api(`/runs/${partial.id}`);
+    assert.equal(saved.provenance.status, "current");
+    assert.equal(
+      partial.result.answer,
+      "离线样例：模型生成此段文字时，程序尚未开始文件保存。",
+    );
+    await page
+      .locator(".runtime-save-note")
+      .getByText(/已自动保存未完成结果/)
+      .waitFor();
+    assert.equal(
+      await page.locator(".run-block.focused .state").innerText(),
+      "提前收尾",
+    );
+    await page
+      .locator(".tabs")
+      .getByRole("button", { name: "报告", exact: true })
+      .click();
+    await page
+      .locator(".document")
+      .getByRole("heading", { name: "自动保存的未完成结果", exact: true })
+      .waitFor();
+    await page.screenshot({
+      path: path.join(evidence, `${evidencePrefix}-fallback-current.png`),
+    });
+    fs.appendFileSync(
+      path.join(partial.task_dir, "report.md"),
+      "\n\n后续手工修改示例。\n",
+    );
+    await page
+      .locator(".runtime-save-note")
+      .getByText("自动保存记录已过期，当前文件版本已变化。", { exact: true })
+      .waitFor();
+    checks.push(
+      "automatic fallback shows current save, original model text and unreviewed state; edit makes provenance stale",
+    );
     await page
       .getByRole("button", { name: "deepseek-flash", exact: true })
       .first()
@@ -579,7 +619,7 @@ async function verifyCrashCleanup() {
       false,
     );
     await page.screenshot({
-      path: path.join(evidence, "stage14-small-window.png"),
+      path: path.join(evidence, `${evidencePrefix}-small-window.png`),
     });
     checks.push(
       "long history stays at reader position; 1050x700 has no document overflow",
@@ -628,7 +668,7 @@ async function verifyCrashCleanup() {
       fixture,
     };
     fs.writeFileSync(
-      path.join(evidence, "stage14-ui-results.json"),
+      path.join(evidence, `${evidencePrefix}-ui-results.json`),
       JSON.stringify(result, null, 2),
     );
     console.log(JSON.stringify(result, null, 2));
@@ -637,7 +677,7 @@ async function verifyCrashCleanup() {
       console.error((await page.locator("body").innerText()).slice(-12000));
       await page
         .screenshot({
-          path: path.join(evidence, "stage14-ui-error.png"),
+          path: path.join(evidence, `${evidencePrefix}-ui-error.png`),
           timeout: 5000,
         })
         .catch(() => {});

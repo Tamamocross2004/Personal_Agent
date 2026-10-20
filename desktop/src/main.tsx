@@ -56,6 +56,7 @@ type Run = {
   result: any;
 };
 type Detail = Run & {
+  provenance?: any;
   checkpoint: any;
   usage: any;
   files: { name: string; size: number; modified: number; type: string }[];
@@ -515,8 +516,10 @@ function App() {
       setError(String(e));
     }
   }
-  const current = sessions.find((s) => s.id === sid),
-    selected = runs.find((r) => r.id === rid);
+  const current = sessions.find((s) => s.id === sid);
+  // 当前轮次与成果面板使用同一份详情，避免两个轮询周期显示相反状态。
+  const visibleRuns = runs.map((r) => (r.id === detail?.id ? detail : r));
+  const selected = visibleRuns.find((r) => r.id === rid);
   const timeline = events[rid] || [],
     usage = statistics[rid]?.tokens || 0;
   return (
@@ -698,7 +701,7 @@ function App() {
             </div>
           ) : (
             <div className="messages">
-              {runs.map((run, index) => (
+              {visibleRuns.map((run, index) => (
                 <section
                   key={run.id}
                   className={"run-block " + (run.id === rid ? "focused" : "")}
@@ -781,6 +784,18 @@ function App() {
                           )}
                         </div>
                       </details>
+                    </div>
+                  )}
+                  {run.id === rid &&
+                    detail?.provenance?.status === "current" && (
+                      <div className="runtime-save-note" role="note">
+                        已自动保存未完成结果到
+                        report.md。下方保留停止前的模型原文；保存时未经过报告审稿。
+                      </div>
+                    )}
+                  {run.id === rid && detail?.provenance?.status === "stale" && (
+                    <div className="runtime-save-note" role="note">
+                      自动保存记录已过期，当前文件版本已变化。
                     </div>
                   )}
                   {run.result.answer ? (
@@ -1200,6 +1215,18 @@ function App() {
                     <div className="quality-row">
                       <span>结束原因</span>
                       <b>{detail.result.stop_reason || detail.state}</b>
+                    </div>
+                    <div className="quality-row">
+                      <span>保存来源</span>
+                      <b>
+                        {detail.provenance?.status === "current"
+                          ? "程序自动保存未完成结果"
+                          : detail.provenance?.status === "stale"
+                            ? "自动保存记录已过期"
+                            : detail.provenance?.status === "unavailable"
+                              ? "来源记录不可用"
+                              : "未记录自动保存来源"}
+                      </b>
                     </div>
                     <div className="quality-row">
                       <span>语义审稿</span>

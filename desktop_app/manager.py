@@ -15,6 +15,7 @@ from agent.workspace import new_task_dir
 from desktop_app.store import Store
 from desktop_app.usage import PricingBook, TraceUsageReader, summarize
 from agent.checkpoint import CheckpointStore
+from agent.report_state import fallback_status
 
 ACTIVE={'queued','resuming','running','cancelling'}
 FINAL={'completed','partial','failed','cancelled','interrupted','imported','needs_verification'}
@@ -231,6 +232,7 @@ class Manager:
         if review.get('evidence_mapping_sha256') and review['evidence_mapping_sha256']!=evidence.get('mapping_sha256'):
             review={**review,'status':'stale'}
         return {**row,'files':files,'review':review,'evidence':evidence,
+                'provenance':fallback_status(root),
                 'checkpoint':CheckpointStore(root).status(),
                 'usage':self.usage(row),
                 'quality':read_json(root/'report.quality.json',{}),'plan':read_json(root/'plan.json',{}),

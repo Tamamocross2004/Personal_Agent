@@ -34,11 +34,12 @@ from agent.config import PROVIDERS, Settings, load_llm_config
 from agent.context import ContextCompactor
 from agent.display import console, show_event, usage_table
 from agent.llm import LLMClient
-from agent.loop import FINALIZE_REASONS, Agent, AgentResult, TokenWeights
+from agent.loop import FINALIZE_REASONS, Agent, AgentEvent, AgentResult, TokenWeights
 from agent.memory import MemoryStore, format_context, save_research
 from agent.prompts import CHAT_SYSTEM_PROMPT, research_system_prompt
 from agent.quality import inspect_report, save_check
 from agent.review import save_review
+from agent.report_state import PROVENANCE, fallback_document
 from agent.task_contract import extract_contract, save_contract_check
 from agent.trace import MESSAGES_FILE, TRACE_FILE, TraceWriter, fanout, save_messages
 from agent.workspace import new_task_dir
@@ -204,13 +205,25 @@ def _research(
         agent._save_checkpoint('postprocess',pending={'kind':'fallback','reason':'兜底报告多文件保存中，需核对未提交写入'},
                                result=checkpoint.read()['result'] if checkpoint and checkpoint.path.exists() else None)
         fallback = task_dir / "report.md"
-        fallback.write_text(result.answer, encoding="utf-8")
-        save_check(fallback, inspect_report(result.answer, task_dir, session))
-        save_contract_check(fallback, result.answer, contract)
-        save_review(fallback, result.answer, "not_reviewed", [], reason="最终文字兜底保存，未经过报告审稿")
+        document, provenance = fallback_document(result.answer, result.stop_reason)
+        # 原文原样保存；字节来源摘要与报告检查使用的换行规范化文本分别记录。
+        with fallback.open('w', encoding='utf-8', newline='') as stream:
+            stream.write(document)
+        checked_text = fallback.read_text(encoding='utf-8')
+        save_check(fallback, inspect_report(checked_text, task_dir, session))
+        save_contract_check(fallback, checked_text, contract)
+        save_review(fallback, checked_text, "not_reviewed", [], reason="程序自动保存停止前的模型原文，保存时未经过报告审稿")
+        from agent.evidence import write_json
         if session.evidence:
-            from agent.evidence import write_json
-            write_json(fallback.with_suffix('.evidence.json'),session.evidence.prepare(fallback,result.answer,None,complete=False))
+            write_json(fallback.with_suffix('.evidence.json'),session.evidence.prepare(fallback,checked_text,None,complete=False))
+        write_json(task_dir / PROVENANCE, provenance)
+        notice = AgentEvent('notice', {'text': '程序已自动保存未完成回答为report.md；正文保留停止前的模型原文，保存时未经过报告审稿。',
+                            'action': 'automatic_fallback_saved', 'filename': 'report.md', 'provenance': provenance})
+        try:
+            tracer(notice)
+        finally:
+            tracer.close()
+        show_event(notice)
         reports = [fallback]
         agent._save_checkpoint('postprocess',result={k:v for k,v in vars(result).items() if k!='messages'})
 

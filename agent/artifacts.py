@@ -13,7 +13,7 @@ MAX_BYTES = 65536
 def artifact_path(root: Path, filename: str) -> Path:
     if (not filename or '/' in filename or '\\' in filename or ':' in filename
             or Path(filename).name != filename or not filename.endswith('.json')
-            or filename in INTERNAL_JSON or filename.endswith(('.evidence.json', '.review.json', '.quality.json'))):
+            or filename in INTERNAL_JSON or filename.endswith(('.evidence.json', '.review.json', '.quality.json', '.provenance.json'))):
         raise ValueError('只能读取任务目录内的 JSON 产物文件名，不能读取内部记录或路径')
     path = root / filename
     if path.is_symlink() or not path.resolve().is_relative_to(root.resolve()) or not path.is_file():

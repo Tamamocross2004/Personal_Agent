@@ -1417,3 +1417,13 @@ small {
 .tabs {
   gap: 14px;
 }
+.runtime-save-note {
+  margin: 12px 0 16px 25px;
+  padding: 10px 12px;
+  border: 1px solid #665437;
+  border-radius: 6px;
+  color: #d9c49d;
+  background: #302a21;
+  font-size: 11px;
+  line-height: 1.8;
+}

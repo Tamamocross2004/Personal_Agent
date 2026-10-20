@@ -63,6 +63,8 @@ class OfflineModel:
             if '独立报告审稿人' in messages[0]['content']:
                 return completion('{"issues":[]}')
             return completion('{}', prompt_tokens=1500 if '预算不足' in self.question else 10)
+        if '自动保存演示' in self.question:
+            return completion('离线样例：模型生成此段文字时，程序尚未开始文件保存。')
         if '等待停止' in self.question:
             # 停在模型响应提交之前；收到停止后仍返回真实响应供原运行机制记账。
             if self.root: (self.root/'.desktop-test-waiting').touch()
