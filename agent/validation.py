@@ -19,6 +19,7 @@ from agent.eval_checks import assess_run, check
 from agent.evaluate import metadata, new_output
 
 SUITE = Path(__file__).with_name('validation_cases.json')
+NO_TASK_STATUSES = {'pending', 'skipped_dependency', 'skipped_budget'}
 
 
 def read(path):
@@ -260,6 +261,7 @@ def run(suite, lock, out, rounds):
                 entry['status'] = 'skipped_dependency'
             else:
                 task = out / 'cases' / f'{r:02d}-{c["id"]}'
+                entry.update(status='running', task_dir=str(task.resolve()), artifact_sha256={})
                 task_settings = settings.model_copy(update={'memory_enabled': c.get('memory', False),
                     'memory_db_path': out / f'memory-{r:02d}.sqlite3', 'report_review_enabled': True,
                     'report_review_max_calls': 2})
@@ -275,6 +277,8 @@ def run(suite, lock, out, rounds):
                     if result.stop_reason == 'interrupted':
                         raise KeyboardInterrupt
                 except KeyboardInterrupt:
+                    if entry['status'] == 'running':
+                        entry['status'] = 'interrupted'
                     raise
                 except Exception as exc:
                     # 仅保存异常类型，避免SDK异常意外回显凭据。
@@ -287,6 +291,8 @@ def run(suite, lock, out, rounds):
                             known = end.get('equivalent_tokens', sum(e.get('equivalent_tokens', 0) for e in events if e['kind'] == 'llm_call'))
                             used_by_round[r] += known
                             entry['metrics'] = {'equivalent_tokens': known, 'accounting': 'trace_only_incomplete'}
+                finally:
+                    entry['artifact_sha256'] = artifacts(task) if task.exists() else {}
             data['summary'] = aggregate(data, suite)
             save(out / 'results.json', data)
         verify_lock(lock, suite)
@@ -300,9 +306,7 @@ def run(suite, lock, out, rounds):
         data['summary'] = aggregate(data, suite)
         save(out / 'results.json', data)
         report(out, data)
-        worksheet = [{'id': c['id'], 'round': c['round'], 'artifact_sha256': c.get('artifact_sha256', {}),
-                      'verdict': 'pending', 'findings': [], 'reviewer': '', 'reviewer_kind': '',
-                      'rubric': next(x['rubric'] for x in cases if x['id'] == c['id'])} for c in data['cases']]
+        worksheet = review_template(data, cases)
         save(out / 'review-template.json', worksheet)
     return data
 
@@ -327,22 +331,106 @@ def rescore(source, suite, out):
     return data
 
 
+def review_key(record):
+    if (not isinstance(record, dict) or not isinstance(record.get('id'), str)
+            or not record['id'].strip() or type(record.get('round')) is not int or record['round'] < 1):
+        raise ValueError('核对条目必须包含非空题目id和正整数round')
+    return record['id'], record['round']
+
+
+def review_cases(source):
+    if not isinstance(source, dict) or not isinstance(source.get('cases'), list) or not source['cases']:
+        raise ValueError('原始结果必须包含非空cases列表')
+    indexed = {}
+    for record in source['cases']:
+        key = review_key(record)
+        if key in indexed:
+            raise ValueError(f'原始结果重复条目：第{key[1]}轮 {key[0]}')
+        if not isinstance(record.get('status'), str) or not record['status']:
+            raise ValueError(f'第{key[1]}轮 {key[0]}：原始自动状态缺失或无效')
+        indexed[key] = record
+    return indexed
+
+
+def artifact_version(record):
+    """仅未执行/待执行且未记录目录时，兼容缺失/null/旧模板{}；不认证执行事实。"""
+    key = review_key(record)
+    label = f'第{key[1]}轮 {key[0]}'
+    value = record.get('artifact_sha256')
+    directory = record.get('task_dir')
+    if directory is not None and (not isinstance(directory, str) or not directory.strip()):
+        raise ValueError(label + '：任务目录无效')
+    if not record.get('task_dir'):
+        if (not isinstance(record.get('status'), str) or record['status'] not in NO_TASK_STATUSES
+                or value not in (None, {})):
+            raise ValueError(label + '：无任务目录且不是待执行/跳过记录，不能按无产物处理')
+        return None
+    if not isinstance(value, dict):
+        raise ValueError(label + '：已执行项缺少产物哈希映射，不能按无产物处理')
+    for name, checksum in value.items():
+        if (not isinstance(name, str) or not name or not isinstance(checksum, str)
+                or len(checksum) != 64 or any(c not in '0123456789abcdef' for c in checksum)):
+            raise ValueError(label + '：产物哈希映射无效')
+    return dict(value)
+
+
+def review_template(source, cases):
+    definitions = {c['id']: c for c in cases}
+    bound = digest(source)
+    worksheet = []
+    for record in review_cases(source).values():
+        definition = definitions.get(record['id'])
+        if not definition or not definition.get('rubric'):
+            raise ValueError('题集缺少对应核对依据：' + record['id'])
+        worksheet.append({'id': record['id'], 'round': record['round'],
+            'source_results_sha256': bound, 'automatic_status': record['status'],
+            'task_dir': record.get('task_dir'), 'artifact_sha256': artifact_version(record),
+            'verdict': 'pending', 'findings': [], 'reviewer': '', 'reviewer_kind': '',
+            'rubric': definition['rubric']})
+    return worksheet
+
+
 def review(source, decisions):
-    expected = {(c['id'], c['round']): c for c in source['cases']}
-    if len(decisions) != len(expected) or len({(d['id'], d['round']) for d in decisions}) != len(expected):
+    expected = review_cases(source)
+    if (not isinstance(decisions, list) or len(decisions) != len(expected)
+            or len({review_key(d) for d in decisions}) != len(expected)):
         raise ValueError('必须逐题逐轮核对，不能缺项或重复')
+    source_hash = digest(source)
+    counts = {key: 0 for key in ('pending', 'pass', 'fail', 'uncertain')}
     for d in decisions:
-        original = expected.get((d['id'], d['round']))
-        if original is None or original.get('artifact_sha256') != d['artifact_sha256']:
-            raise ValueError('核对的产物版本不同')
-        if original.get('task_dir') and artifacts(Path(original['task_dir'])) != d['artifact_sha256']:
-            raise ValueError('原始产物已变化')
-        if d['verdict'] not in ('pass', 'fail', 'uncertain') or not d['reviewer'] or d['reviewer_kind'] not in ('human', 'coding_assistant'):
-            raise ValueError('核对人身份、类型或结论无效')
-    human = all(d['reviewer_kind'] == 'human' for d in decisions)
+        key = review_key(d)
+        label = f'第{key[1]}轮 {key[0]}：'
+        original = expected.get(key)
+        if original is None:
+            raise ValueError(label + '不是原始结果中的条目')
+        if 'source_results_sha256' in d and d['source_results_sha256'] != source_hash:
+            raise ValueError(label + '核对表绑定的原始结果不同')
+        version = artifact_version(original)
+        selected = d.get('artifact_sha256')
+        if version is None:
+            if selected not in (None, {}):
+                raise ValueError(label + '未执行项不能附加产物哈希')
+        elif selected != version:
+            raise ValueError(label + '核对的产物版本不同')
+        if original.get('task_dir') and artifacts(Path(original['task_dir'])) != version:
+            raise ValueError(label + '原始产物已变化')
+        verdict = d.get('verdict')
+        reviewer, kind = d.get('reviewer', ''), d.get('reviewer_kind', '')
+        if (not isinstance(verdict, str) or verdict not in counts or not isinstance(reviewer, str)
+                or kind not in ('', 'human', 'coding_assistant')
+                or (verdict != 'pending' and (not reviewer.strip() or not kind))):
+            raise ValueError(label + '核对人身份、类型或结论无效')
+        if not isinstance(d.get('findings', []), list) or any(not isinstance(x, str) for x in d.get('findings', [])):
+            raise ValueError(label + 'findings必须是文字列表')
+        counts[verdict] += 1
+    complete = counts['pending'] == 0
+    human = complete and all(d['reviewer_kind'] == 'human' for d in decisions)
     clean = all(d['verdict'] == 'pass' for d in decisions)
-    accepted = source['summary']['automatic_gate'] and human and clean and source['execution'] == 'live'
-    return {'source_results_sha256': digest(source), 'decisions': decisions, 'acceptance': 'accepted' if accepted else 'not_accepted',
+    if not isinstance(source.get('summary'), dict) or type(source['summary'].get('automatic_gate')) is not bool:
+        raise ValueError('原始结果缺少布尔型automatic_gate')
+    accepted = source['summary']['automatic_gate'] and human and clean and source.get('execution') == 'live'
+    return {'source_results_sha256': source_hash, 'decisions': decisions, 'acceptance': 'accepted' if accepted else 'not_accepted',
+            'review_status': 'complete' if complete else 'pending', 'counts': counts,
             'human_review_complete': human, 'semantic_clean': clean,
             'note': '编码助手核对不能冒充外部人工盲审；只读重评分不能替换原始分数。'}
 
@@ -360,7 +448,32 @@ def main(argv=None):
     p = sub.add_parser('run'); p.add_argument('--lock', type=Path, required=True); p.add_argument('--out', type=Path, required=True); p.add_argument('--rounds', type=int, choices=[1, 3], default=3)
     p = sub.add_parser('rescore'); p.add_argument('source', type=Path); p.add_argument('--out', type=Path, required=True)
     p = sub.add_parser('review'); p.add_argument('source', type=Path); p.add_argument('decisions', type=Path); p.add_argument('--out', type=Path, required=True)
+    p = sub.add_parser('template', help='从旧结果只读导出绑定版本的待核对表，不运行或重评分')
+    p.add_argument('source', type=Path); p.add_argument('--out', type=Path, required=True)
     args = parser.parse_args(argv)
+    if args.command in ('review', 'template'):
+        # 先验证，再创建输出目录；输入错误不留下阻碍重试的空目录。
+        try:
+            source = read(args.source)
+            if args.command == 'template':
+                suite = load_suite(args.suite)
+                lock = source.get('lock') if isinstance(source, dict) else None
+                if not isinstance(lock, dict) or lock.get('suite_sha256') != digest(suite):
+                    raise ValueError('题集与原始结果的冻结版本不符，请用--suite指定对应题集')
+                decisions = review_template(source, suite['cases'])
+            else:
+                decisions = read(args.decisions)
+            result = review(source, decisions)
+            out = new_output(args.out)
+            if args.command == 'template':
+                save(out / 'review-template.json', decisions)
+                save(out / 'review-status.json', {k: v for k, v in result.items() if k != 'decisions'})
+            else:
+                save(out / 'review.json', result)
+        except (OSError, ValueError) as exc:
+            parser.exit(2, f'复核输入或输出错误：{exc}\n')
+        print(json.dumps({k: v for k, v in result.items() if k != 'decisions'}, ensure_ascii=False))
+        return 0 if args.command == 'template' or result['acceptance'] == 'accepted' else 1
     suite = load_suite(args.suite)
     if args.command == 'freeze':
         freeze(suite, args.split, args.out); print(args.out); return 0
@@ -369,8 +482,6 @@ def main(argv=None):
         result = run(suite, read(args.lock), out, args.rounds)
     elif args.command == 'rescore':
         result = rescore(read(args.source), suite, out)
-    else:
-        result = review(read(args.source), read(args.decisions)); save(out / 'review.json', result)
     print(json.dumps(result.get('summary', {k: v for k, v in result.items() if k != 'decisions'}), ensure_ascii=False))
     return 0 if result.get('summary', {}).get('automatic_gate') or result.get('acceptance') == 'accepted' else 1
 

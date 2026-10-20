@@ -5,7 +5,7 @@
 原始题集及门槛：[冻结约定](/D:/code/personal_agent/docs/stage12-independent4-plan-20261020.md)。
 可编辑的独立副本：[人工核对JSON](/D:/code/personal_agent/workspace/stage12-independent4-human-review.json)。所有结论仍为pending，核对人及类型未填写，未代替用户作结论。
 
-请使用上面的已准备副本。原始模板对未执行依赖项将缺少的artifact_sha256写成了空对象，而核对入口期待null；本副本只将该无产物项规范为null，原始结果与模板均未改。该项仍pending，未认证为通过；无需重新复制原始模板覆盖本副本。
+上面的已准备副本可以继续使用。最初原始模板对未执行依赖项将缺少的artifact_sha256写成空对象，旧入口期待null；本副本当时仅规范该无产物项，原始结果与模板未改。2026-10-20已修复入口兼容，并支持pending进度与绑定原始结果的新表，见[工具说明](review-tool-compatibility-20261020.md)。新表位于[独立导出目录](/D:/code/personal_agent/workspace/evaluations/stage12-independent4-review-tools-export-20261020/review-template.json)，仍全部pending、身份空白；使用任一副本即可，不要互相覆盖已填写意见。
 
 逐项阅读报告、有关原文、实际JSON和执行记录；对照下列rubric填写verdict为pass/fail/uncertain、findings、reviewer及reviewer_kind为human。不要改id、round或artifact_sha256。题目口径有歧义也应写入findings，不能用猜测凑pass；未执行项保留uncertain。
 

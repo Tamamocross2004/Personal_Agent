@@ -32,6 +32,8 @@
 
 阅读输出report.md/results.json和逐题目录，用`agent.replay`及`agent.evidence`离线核对。复制review-template.json到新文件，逐题填写verdict(pass/fail/uncertain)、findings、reviewer和reviewer_kind(human/coding_assistant)，保留原始哈希。
 
+2026-10-20工具更新：旧无产物空值已兼容；可用 `template 原results.json --out 新目录` 从旧结果重新导出带原始结果摘要的新表，须在命令前用 `--suite` 指定对应冻结题集。未填写项可保留pending，复核输出进度且保持not_accepted；输入错误退出2，不创建空输出目录。导出成功退出0不代表质量通过。原始分数和已有人工表均不改写，详见[工具优化与命令](review-tool-compatibility-20261020.md)。
+
 ```powershell
 .\.venv\Scripts\python.exe -m agent.validation review workspace/evaluations/stage12-holdout-v1/results.json workspace/stage12-review.json --out workspace/evaluations/stage12-reviewed-v1
 ```

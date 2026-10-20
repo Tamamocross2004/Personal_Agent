@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-20",
+  "baseline_revision": "31a5642bf9fd73dc99ac38a26c1906bdb0f68797",
+  "scope": "offline review tooling and evaluation metadata only",
+  "stage12_acceptance": "not_accepted",
+  "original_automatic_result": "37/39 unchanged",
+  "tests": {
+    "passed": 800,
+    "seconds": 49.08,
+    "added_parameterized_cases": 23,
+    "focused_passed": 34
+  },
+  "original_files_checked": 456,
+  "original_files_changed": 0,
+  "grading_functions_ast_unchanged": [
+    "assess",
+    "aggregate",
+    "number_tree",
+    "fixture_tools",
+    "identity",
+    "verify_lock",
+    "rescore"
+  ],
+  "paid_model_requests": 0,
+  "rescore_performed": false,
+  "source_results_sha256": "9c290809ad910ec82ea30446460e1e851b0ac76c7cfe25ad2812d5adbaccf1ff",
+  "offline_outputs": {
+    "legacy-pending-check": {
+      "path": "workspace/evaluations/stage12-independent4-legacy-pending-check-20261020/review.json",
+      "sha256": "4f0a36d7d2a7cd6c7961c7e42765c2866b6b99026ab88525df5f7d408faa9b25",
+      "counts": {
+        "pending": 39,
+        "pass": 0,
+        "fail": 0,
+        "uncertain": 0
+      },
+      "review_status": "pending",
+      "acceptance": "not_accepted",
+      "source_results_sha256": "9c290809ad910ec82ea30446460e1e851b0ac76c7cfe25ad2812d5adbaccf1ff"
+    },
+    "bound-pending-check": {
+      "path": "workspace/evaluations/stage12-independent4-bound-pending-check-20261020/review.json",
+      "sha256": "44f4a88e1559a40cdafd67ffbcbc2272996f29ee1338c5c17bc64d589cd537a4",
+      "counts": {
+        "pending": 39,
+        "pass": 0,
+        "fail": 0,
+        "uncertain": 0
+      },
+      "review_status": "pending",
+      "acceptance": "not_accepted",
+      "source_results_sha256": "9c290809ad910ec82ea30446460e1e851b0ac76c7cfe25ad2812d5adbaccf1ff"
+    },
+    "human-pending-check": {
+      "path": "workspace/evaluations/stage12-independent4-human-pending-check-20261020/review.json",
+      "sha256": "cfd241d6a3024eec5f84ac563b294f768eedd2b38d192b2f68f8033194f729c3",
+      "counts": {
+        "pending": 39,
+        "pass": 0,
+        "fail": 0,
+        "uncertain": 0
+      },
+      "review_status": "pending",
+      "acceptance": "not_accepted",
+      "source_results_sha256": "9c290809ad910ec82ea30446460e1e851b0ac76c7cfe25ad2812d5adbaccf1ff"
+    },
+    "assistant-rechecked": {
+      "path": "workspace/evaluations/stage12-independent4-assistant-rechecked-20261020/review.json",
+      "sha256": "38402cc74f4210cedc28d59e1b28df52660db247ff6617e5ab60d38e5c4e836c",
+      "counts": {
+        "pending": 0,
+        "pass": 25,
+        "fail": 2,
+        "uncertain": 12
+      },
+      "review_status": "complete",
+      "acceptance": "not_accepted",
+      "source_results_sha256": "9c290809ad910ec82ea30446460e1e851b0ac76c7cfe25ad2812d5adbaccf1ff"
+    }
+  },
+  "editable_export": {
+    "path": "workspace/evaluations/stage12-independent4-review-tools-export-20261020/review-template.json",
+    "sha256": "c475056430e8d752b618a3a73dd05f7dfe77cf30e9bbb1e11b86b5c155943089",
+    "pending": 39,
+    "reviewers_blank": true
+  },
+  "runtime_fingerprint": {
+    "before": "e391a9f6bfefc1570dd49b4bd46f92cf39a332b07b99abca4b8902ad8eb5abc3",
+    "after": "5fc8d74e567e0438d0860ff3e2b8a6906a671e47ffdaca9c5edb1b9d284736fb",
+    "legacy_checkpoint_migration": false,
+    "note": "Existing runtime fingerprint includes validation.py; old checkpoints retain source mismatch refusal"
+  },
+  "source_sha256": {
+    "agent/validation.py": "d6e7961c5630a13910cbf5850eeea4d55149f9a222917190d752c8a9d4626442",
+    "tests/test_validation.py": "5b90ae0190683ce0917a7c037034a6db490161e6072dfd73eb77c460924aa78e"
+  },
+  "artifact_sha256": {
+    "workspace/review-tool-tests-1.log": "9dc28c0257972fa4dc5f333e5821890bc1b9d88091c63da9eea73a32f5df1104",
+    "workspace/review-tool-full-tests-20261020.log": "b67ea9edf51eb3e04d919b64e85eb35cbd993dcc888d7773f92029bd62617f54",
+    "workspace/review-tool-export-20261020.log": "4685744c9671ee52919392556e3b8f4530bb4ed0c2d0519a7c21a1e1744e2a14",
+    "workspace/review-tool-legacy-pending-20261020.log": "4685744c9671ee52919392556e3b8f4530bb4ed0c2d0519a7c21a1e1744e2a14",
+    "workspace/review-tool-bound-pending-20261020.log": "4685744c9671ee52919392556e3b8f4530bb4ed0c2d0519a7c21a1e1744e2a14",
+    "workspace/review-tool-human-pending-20261020.log": "4685744c9671ee52919392556e3b8f4530bb4ed0c2d0519a7c21a1e1744e2a14",
+    "workspace/review-tool-assistant-20261020.log": "b62de018ce4b4c278768a32ff25c85969a3eee316eab313a020e5ca79b2f64f4",
+    "workspace/review-tool-baseline-20261020.json": "14c56948443966567bc1a8e034da88110b4b2cc762c298d2ff67d6d7b0cbd560"
+  },
+  "acceptance_policy": "Original automatic gate plus completed clean human review on live results; pending/assistant review never accepted"
+}
