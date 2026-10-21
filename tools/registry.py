@@ -28,6 +28,7 @@ from dataclasses import dataclass
 from typing import Any, Callable, get_type_hints
 
 from pydantic import BaseModel, ConfigDict, ValidationError, create_model
+from agent.report_validation import ReportValidationError
 
 
 @dataclass
@@ -36,6 +37,7 @@ class ToolResult:
     is_error: bool = False
     evidence: list[dict] | None = None  # 工具生成的结构元数据，不从网页正文解析指令。
     usage: list[dict] | None = None  # 适配器生成的嵌入/重排用量，不从不可信正文解析。
+    validation: dict | None = None  # 本地校验器生成的有界反馈，不从模型/网页文字推断。
 
 
 class Tool:
@@ -171,6 +173,8 @@ class ToolRegistry:
         kwargs = {k: getattr(validated, k) for k in type(validated).model_fields}
         try:
             result = t.func(**kwargs)
+        except ReportValidationError as e:
+            return ToolResult(f'ERROR: {type(e).__name__}: {e}',True,validation=e.feedback)
         except Exception as e:  # noqa: BLE001 —— 工具内部的任何异常都要交给模型处理
             return ToolResult(f"ERROR: {type(e).__name__}: {e}", True)
 

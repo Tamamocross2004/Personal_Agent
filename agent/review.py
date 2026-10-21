@@ -166,6 +166,7 @@ def build_review_messages(report: str, task_dir: Path, session, *, question: str
     from datetime import date
     contract = task_contract or extract_contract(question)
     payload = {"review_date": date.today().isoformat(), "task_request": question[:12000],
+               "run_activity":session.activity_summary() if session and hasattr(session,'activity_summary') else None,
                "historical_context": memory_context[:6000], "previous_review": previous_review,
                "report": report[:40000], "notes": notes[:20000],
                "mechanical_check": inspect_report(report, task_dir, session, contract=contract).to_dict(),

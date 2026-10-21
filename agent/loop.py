@@ -251,6 +251,8 @@ class Agent(CheckpointMixin):
         self._pending_reviews={}
         self._finalizing_reason=None
         self._delivery_reserved_tokens=0
+        if self.research_session is not None:
+            self.research_session.tool_activity={}
         if self.compactor:
             self.compactor.reset()
 
@@ -486,6 +488,7 @@ class Agent(CheckpointMixin):
         length_rejected = False
         rejected_length_calls = set()
         length_measurements = []
+        rejected_feedback = []
         if msg.content:
             self._emit("thought", text=msg.content)
 
@@ -493,8 +496,15 @@ class Agent(CheckpointMixin):
             self._check_stop()
             name, arguments = call.function.name, call.function.arguments
             self._emit("tool_call", id=call.id, name=name, arguments=arguments)
+            activity=None
+            if self.research_session is not None:
+                key=name if name in self.registry.names else '__unregistered__'
+                activity=self.research_session.tool_activity.setdefault(key,
+                    {'requested':0,'returned_ok':0,'returned_error':0,'uncertain':0})
+                activity['requested']+=1
             self._save_checkpoint('tool_batch',pending={'kind':'tool','id':call.id,'name':name,
                                                        'reason':'调用派发或副作用结果待提交，未自动重做'})
+            self._tool_outcome_uncertain=False
             if truncated:
                 # 参数大概率是半截 JSON；即使碰巧能解析，内容也不完整（例如半篇报告）
                 result, seconds = ToolResult(TRUNCATED_TOOL_CALL_RESULT, True), 0.0
@@ -502,12 +512,19 @@ class Agent(CheckpointMixin):
                 result, seconds = ToolResult(wrapup_refused_result(name), True), 0.0
             else:
                 result, seconds = self._run_tool(name, arguments)
+            uncertain=getattr(self,'_tool_outcome_uncertain',False)
+            if activity is not None:
+                activity['uncertain' if uncertain else 'returned_error' if result.is_error else 'returned_ok']+=1
             if (self.checkpoint or name=='search_knowledge') and getattr(self,'_tool_outcome_uncertain',False):
                 self._emit('tool_result',id=call.id,name=name,content=result.content,is_error=True,seconds=seconds)
                 self._save_checkpoint('tool_batch',pending={'kind':'tool','id':call.id,'name':name,
                                                            'reason':'工具线程超时，后台副作用可能仍在进行'})
                 raise NeedsVerification('工具超时且结果不确定，已停止派发后续操作；需核对，未自动重做')
-            content = _truncate(result.content, self.max_tool_result_chars)
+            activity_text=''
+            if name=='read_notes' and not result.is_error and self.research_session is not None:
+                activity_text=json.dumps(self.research_session.activity_summary(),ensure_ascii=False)
+            content = _truncate(('【本次运行记录快照】'+activity_text+'\n' if activity_text else '')+result.content,
+                                self.max_tool_result_chars)
             for usage in result.usage or []:
                 reranked=usage.get('operation')=='rerank'
                 self._emit('rerank_call' if reranked else 'embedding_call',**usage)
@@ -534,11 +551,22 @@ class Agent(CheckpointMixin):
                 ):
                     length_measurements.append({'scope':scope,'unit':unit,'actual':int(actual),
                                                 'maximum':int(maximum),'suggested_target':int(int(maximum)*.6)})
+            if name=='write_report' and result.validation:
+                rejected_feedback.append(result.validation)
+                if any(i['code']=='brief_length' for i in result.validation['issues']):
+                    rejected_length_calls.add(call.id)
+                    length_measurements.extend(result.validation.get('measurements',[]))
             if self._evidence:
                 ids = (self._evidence.capture(name,arguments,content,call.id,result.evidence,
                                               min(len(result.content),self.max_tool_result_chars)) if not result.is_error else [])
                 if name in ('fetch_url','calculator','run_python','days_between'):
                     observed = self._evidence.execution(name,arguments,content,call.id,result.is_error)
+                    if observed:
+                        ids.append(observed)
+                if activity_text:
+                    shown=min(len(activity_text),max(0,self.max_tool_result_chars-len('【本次运行记录快照】')))
+                    observed=self._evidence.execution(name,arguments,activity_text[:shown],call.id,False,
+                                                     delivery_truncated=shown<len(activity_text)) if shown else None
                     if observed:
                         ids.append(observed)
                 if ids:
@@ -570,6 +598,7 @@ class Agent(CheckpointMixin):
                 content=content,
                 is_error=result.is_error,
                 seconds=round(seconds, 2),
+                **({'validation':result.validation} if result.validation else {}),
             )
             messages.append({"role": "tool", "tool_call_id": call.id, "content": content})
             if name == "write_report" and not result.is_error:
@@ -600,9 +629,11 @@ class Agent(CheckpointMixin):
             self._last_prompt = 0
             self._len_at_last_call = 0
             messages.append({'role':'assistant','content':
-                '【上下文整理】本批超限write_report未保存。被拒写稿参数与反馈已移出模型上下文，完整记录仍在trace。'
+                '【上下文整理】本批超限write_report未保存。被拒写稿参数已移出模型上下文，完整记录仍在trace。'
                 '原任务、其他工具结果和证据索引保留；请重新生成显著更短的完整稿，不能复用被拒稿。'
-                '程序计量（不是放宽上限）：'+json.dumps(length_measurements[:4],ensure_ascii=False)})
+                '程序计量（不是放宽上限）：'+json.dumps(length_measurements[:4],ensure_ascii=False)
+                +'\n仍须逐项纠正的校验反馈（未自动修正；若截断须重查）：'
+                +json.dumps(rejected_feedback,ensure_ascii=False)[:6200]})
             self._emit('notice',text='已从模型上下文移除本批超限写稿调用；原始参数/反馈仍保留在trace，证据索引不变。')
 
         if length_rejected and not reports_written and not self._length_repair_requested:

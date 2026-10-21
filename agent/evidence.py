@@ -173,12 +173,12 @@ class EvidenceLedger:
             if source: ids.append(source)
         return ids
 
-    def execution(self, tool: str, arguments: str, content: str, call_id: str, is_error: bool) -> str | None:
+    def execution(self, tool: str, arguments: str, content: str, call_id: str, is_error: bool, *, delivery_truncated=False) -> str | None:
         """派发结果仅证明本次工具返回，不把失败变成成功计算/网页证据。"""
         text = ('tool: '+tool+'\noutcome: '+('error' if is_error else 'success')
                 +'\narguments:\n'+arguments[:1000]+'\nreturned:\n'+content[:2000])
         return self.add('execution', text, tool=tool, tool_call_id=call_id,
-                        is_error=is_error, delivery_truncated=len(arguments)>1000 or len(content)>2000,
+                        is_error=is_error, delivery_truncated=delivery_truncated or len(arguments)>1000 or len(content)>2000,
                         description='本次工具派发的真实返回；不证明网页事实、外部副作用或所有调用次数')
 
     def web_coverage(self, source: dict) -> dict:
@@ -200,8 +200,47 @@ class EvidenceLedger:
         return source
 
     def validate(self, report: str, claims: list[Claim]) -> list[dict]:
+        from agent.report_validation import ReportValidationError
+        issues=[]
+        result=[]
+        for index,claim in enumerate(claims):
+            start=len(issues)
+            base=f'claims[{index}]'
+            def error(path,code,message):
+                issues.append({'path':base+path,'code':code,'message':message})
+            if claim.quote not in report:
+                error('.quote','quote_missing','结论原句不在当前报告中：'+claim.quote[:80])
+            if claim.kind=='inference' and not (claim.reasoning.strip() or claim.assumptions.strip()):
+                error('.reasoning','inference_basis','推断必须说明reasoning推导或assumptions适用条件；不能编造假设')
+            refs=[(f'.supports[{i}]',r) for i,r in enumerate(claim.supports)]
+            for i,premise in enumerate(claim.premises):
+                if not premise.text.strip() or (premise.basis=='evidence')!=bool(premise.supports):
+                    error(f'.premises[{i}]','premise_basis','premises的evidence须关联真实摘录；assumption/unknown不附来源，text不得为空白')
+                refs.extend((f'.premises[{i}].supports[{j}]',r) for j,r in enumerate(premise.supports))
+            if claim.kind!='unknown' and not refs:
+                error('.supports','missing_support','非unknown结论必须关联实际证据')
+            for path,ref in refs:
+                source=self.records.get(ref.source_id)
+                if not source or sha(source['text'])!=source['text_sha256']:
+                    error(path+'.source_id','source_missing','证据ID不存在或哈希无效：'+ref.source_id+'；用read_evidence查看本次保留的ID。')
+                    continue
+                if locate_excerpt(source['text'],ref.excerpt) is None:
+                    error(path+'.excerpt','excerpt_missing','摘录不在证据'+ref.source_id+'中：'+ref.excerpt[:100]
+                          +'；用read_evidence(source_id="'+ref.source_id+'", query="关键词")读取真实原文，不要猜ID或补写摘录。')
+                if source['kind']=='history' and not claim.limits.strip():
+                    error('.limits','history_limits','历史证据须说明记录日期与当前适用性的限制；逐项填写limits，不用当前日期补造。')
+            if len(issues)==start:
+                try:
+                    result.extend(self._validate_claims(report,[claim],base_index=index))
+                except ValueError as exc:
+                    error('','evidence_constraint',str(exc))
+        if issues:
+            raise ReportValidationError(issues,report_sha256=sha(report))
+        return result
+
+    def _validate_claims(self, report: str, claims: list[Claim], *, base_index=0) -> list[dict]:
         missing_limits = [f'claims[{i}].limits（原句：{c.quote[:60]}）'
-                          for i,c in enumerate(claims) if not c.limits.strip()
+                          for i,c in enumerate(claims,start=base_index) if not c.limits.strip()
                           and any(self.records.get(r['source_id'],{}).get('kind')=='history'
                                   for r in claim_refs(c.model_dump()))]
         if missing_limits:
@@ -209,7 +248,7 @@ class EvidenceLedger:
                              +'。limits是每条claim的字段，不是只在报告正文写日期；unknown引用历史也要填。'
                              '用read_evidence读取真实历史日期，不用当前系统日期补造。')
         result = []
-        for index, claim in enumerate(claims):
+        for index, claim in enumerate(claims,start=base_index):
             if claim.quote not in report:
                 raise ValueError('结论原句不在当前报告中：'+claim.quote[:80])
             all_refs = claim_refs(claim.model_dump())

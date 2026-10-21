@@ -17,6 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from agent.quality import inspect_report, save_check, structure_repair_feedback
 from agent.evidence import Claim, write_json
+from agent.report_validation import ReportValidationError
 from agent.markdown_tables import markdown_tables
 from agent.task_contract import TaskContract, check_contract, explicit_headers, extract_contract, length_repair_hint, needs_brief_reason, save_contract_check
 from agent.numeric_evidence import arithmetic_errors, price_ratio_errors, report_cost_errors, scaling_explanation_errors
@@ -94,7 +95,7 @@ def make_write_report(task_dir: Path, session: ResearchSession | None = None, *,
 
     @tool(name="write_report")
     def write_report(
-        content: Annotated[str, Field(description="完整的 Markdown 报告内容；patch 模式留空")] = "",
+        content: Annotated[str, Field(description="overwrite/append须提供非空正文，不能只交claims；patch留空。简述稿先写核心答案、必要依据和局限，少用重复引文；claims.quote须逐字摘自这份正文。")] = "",
         filename: Annotated[str, Field(description="文件名，例如 report.md")] = "report.md",
         mode: Annotated[
             Literal["overwrite", "append", "patch"],
@@ -110,8 +111,9 @@ def make_write_report(task_dir: Path, session: ResearchSession | None = None, *,
         返回值附有对报告的自动检查结果。"""
         if mode != "patch" and not content.strip():
             raise ValueError("报告内容为空")
-        task_dir.mkdir(parents=True, exist_ok=True)
         path = task_dir / safe_filename(filename)
+        if path.is_symlink():
+            raise ValueError('报告不得为符号链接')
         if mode == "patch":
             if content or not replacements or not complete or not path.is_file() or path.is_symlink():
                 raise ValueError("patch 要求已有报告、非空 replacements、complete=true，且 content 留空。")
@@ -125,15 +127,18 @@ def make_write_report(task_dir: Path, session: ResearchSession | None = None, *,
                     if mode == "append" and path.exists() else content)
         active_contract = session.task_contract if session and session.task_contract else initial_contract
         contract_check = check_contract(full, active_contract)
+        issues=[]
+        def reject(path,code,message):
+            issues.append({'path':path,'code':code,'message':message})
         if complete and contract_check['hard_errors']:
-            raise ValueError("尚未保存：任务约定检查失败：" + "；".join(contract_check['hard_errors'])
+            reject('content','task_contract',"任务约定检查失败：" + "；".join(contract_check['hard_errors'])
                              + length_repair_hint(contract_check, full) + "草稿不等于完整交付。")
         if complete and needs_brief_reason(contract_check, active_contract) and len(brief_extension_reason.strip()) < 20:
-            raise ValueError("尚未保存：用户要求简述，正文明显超过默认软目标。请先删除重复引文、无关背景或额外分析，保留必答结论、依据和局限。"
+            reject('content','brief_length',"用户要求简述，正文明显超过默认软目标。请先删除重复引文、无关背景或额外分析，保留必答结论、依据和局限。"
                              "默认目标不是用户硬上限；如确实需要较长内容，可在 brief_extension_reason 中说明具体必答项与必要性（至少20字符），由审稿核对，不能只称更全面。")
         missing = missing_table_headers(full, list(active_contract.required_headers)) if complete else []
         if missing:
-            raise ValueError("尚未保存：完整报告缺少用户指定表头（原文及列顺序必须一致）："
+            reject('content','required_headers',"完整报告缺少用户指定表头（原文及列顺序必须一致）："
                              + "；".join(" | ".join(header) for header in missing)
                              + "。请修正后重试；分段写作中间段请设 complete=false，最后一段设 true。")
         errors = arithmetic_errors(full) + scaling_explanation_errors(full) if complete else []
@@ -145,11 +150,21 @@ def make_write_report(task_dir: Path, session: ResearchSession | None = None, *,
                 errors.extend(report_cost_errors(full, sample))
                 errors.extend(price_ratio_errors(full, sample))
         if errors:
-            raise ValueError("尚未保存：数值检查失败，请核对计算结果：" + "；".join(errors))
+            for message in errors:
+                reject('content','arithmetic',"数值检查失败，请核对计算结果："+message)
         ledger = session.evidence if session else None
+        mapping=None
         if claims and ledger is None:
-            raise ValueError('本次没有可用证据账本，不能提交自造证据ID')
-        mapping = ledger.prepare(path, full, claims, complete=complete) if ledger else None
+            reject('claims','missing_ledger','本次没有可用证据账本，不能提交自造证据ID')
+        if ledger:
+            try:
+                mapping=ledger.prepare(path,full,claims,complete=complete)
+            except ReportValidationError as exc:
+                issues.extend(exc.issues)
+        if issues:
+            from agent.evidence import sha
+            raise ReportValidationError(issues,report_sha256=sha(full),measurements=contract_check['measurements'])
+        task_dir.mkdir(parents=True, exist_ok=True)
         if mode == "append" and path.exists():
             with path.open("a", encoding="utf-8") as f:
                 f.write("\n\n" + content)

@@ -49,6 +49,8 @@ def test_saved_response_reused_without_repaying_or_repeating_tool(tmp_path):
     assert result.total_tokens==45 and result.equivalent_tokens==60
     assert len(replacement.requests)==1
     assert sum(m.get('role')=='tool' for m in result.messages)==1
+    assert CheckpointStore(tmp_path).read()['session']['tool_activity']['record']=={
+        'requested':1,'returned_ok':1,'returned_error':0,'uncertain':0}
 
 
 REPORT='# 核对\n\n## 摘要\n业务状态未知。\n\n## 方法与范围\n仅依据材料。\n\n## 正文\n资料不足。\n\n## 结论\n业务状态未知。\n\n## 局限性\n未核实。\n\n## 参考资料\n用户材料。'
@@ -70,6 +72,7 @@ def test_report_saved_before_review_and_review_committed_do_not_repeat(tmp_path,
     result=new.run('业务状态未知',resume_state=store.read())
     assert result.stop_reason=='final_answer' and result.steps==2 and result.total_tokens==60
     assert new._review_count==1 and (tmp_path/'report.md').read_bytes()==before
+    assert new_s.tool_activity['write_report']['requested']==1
     assert len((tmp_path/'report.reviews.jsonl').read_text(encoding='utf-8').splitlines())==1
     assert len(new_llm.requests)==(1 if after_review else 2)
 

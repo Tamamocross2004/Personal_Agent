@@ -8,15 +8,16 @@ import pytest
 from knowledge import report_probe as probe
 
 
-def test_freeze_does_not_rewrite_existing_run_and_checks_source_and_suite(tmp_path,monkeypatch):
+@pytest.mark.parametrize('explicit',[False,True])
+def test_freeze_does_not_rewrite_existing_run_and_checks_source_and_suite(tmp_path,monkeypatch,explicit):
     source=tmp_path/'source'; kb=source/'knowledge'; kb.mkdir(parents=True)
     for path in (source/'documents',kb/'documents',kb/'vectors'): path.mkdir()
     (source/'documents'/'a.txt').write_text('原文',encoding='utf-8')
     with sqlite3.connect(kb/'knowledge.sqlite3') as db: db.execute('create table sample(value text)')
     suite=tmp_path/'suite.json'; suite.write_text(json.dumps({'cases':[], 'max_steps':12,'token_budget':80000}),encoding='utf-8')
-    monkeypatch.setattr(probe,'SUITE',suite)
+    monkeypatch.setattr(probe,'SUITE',tmp_path/'unused-default.json' if explicit else suite)
     monkeypatch.setattr(probe,'KnowledgeStore',lambda s: SimpleNamespace(generation=lambda:{'id':'frozen'}))
-    root=tmp_path/'new'; plan=probe.freeze(root,source)
+    root=tmp_path/'new'; plan=probe.freeze(root,source,suite if explicit else None)
     probe.validate(root,plan)
     with pytest.raises(ValueError,match='预算变化'):
         probe.validate(root,{**plan,'token_budget':plan['token_budget']+1})

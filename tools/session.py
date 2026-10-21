@@ -44,6 +44,19 @@ class ResearchSession:
     task_contract: TaskContract | None = None
     evidence: object | None = None  # Agent创建的本次证据账本，不从历史文件恢复。
     failed_fetches: dict[str, str] = field(default_factory=dict)  # 已实际返回FetchError的操作目标，非引用来源
+    tool_activity: dict[str, dict[str, int]] = field(default_factory=dict)
+
+    def activity_summary(self) -> dict:
+        records=list(self.evidence.records.values()) if self.evidence else []
+        docs=[r for r in records if r['kind']=='document']
+        return {'tool_requests':{name:dict(counts) for name,counts in list(self.tool_activity.items())[:24]},
+                'omitted_tools':max(0,len(self.tool_activity)-24),
+                'retained_evidence':{'records':len(records),'document_records':len(docs),
+                    'document_versions':len({(r.get('document_id'),r.get('file_sha256'),r.get('generation')) for r in docs}),
+                    'ledger_omitted_records':self.evidence.omitted if self.evidence else 0},
+                'limits':'截至此快照的本任务工具请求与返回；returned_error也可能是参数校验或重复拦截，并非工具函数实际执行失败。'
+                         'requested未被returned_ok/returned_error/uncertain覆盖的部分尚未返回；不统计服务商内部重试。'
+                         '文档仅计已保留送达片段，不是全库清单、完整阅读或无遗漏证明；不证明生产业务状态。'}
 
     def find_page(self, url: str) -> Page | None:
         """按规范化 URL 查找读过的页面（同时匹配请求地址和重定向后的最终地址）。"""

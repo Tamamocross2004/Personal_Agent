@@ -193,7 +193,8 @@ def snapshot(agent):
             'session':{'pages':{k:asdict(v) for k,v in session.pages.items()},
                        'notes':[asdict(n) for n in session.notes],'failed_fetches':session.failed_fetches,
                        'evidence_records':agent._evidence.records if agent._evidence else {},
-                       'evidence_omitted':agent._evidence.omitted if agent._evidence else 0} if session else None,
+                       'evidence_omitted':agent._evidence.omitted if agent._evidence else 0,
+                       'tool_activity':session.tool_activity} if session else None,
             'research_settings':getattr(agent,'research_settings',{}),
             'elapsed':getattr(agent,'_elapsed_before',0)+time.perf_counter()-agent._segment_started}
 
@@ -214,6 +215,7 @@ def restore(agent,data):
     session=agent.research_session
     if session and data['session']:
         s=data['session']; session.pages.clear(); session.pages.update({k:Page(**v) for k,v in s['pages'].items()})
+        session.tool_activity={k:dict(v) for k,v in s.get('tool_activity',{}).items()}
         session.notes[:]=[Note(**n) for n in s['notes']]; session.failed_fetches=s['failed_fetches']; session.task_contract=agent._contract
         ledger=EvidenceLedger.__new__(EvidenceLedger)
         ledger.path=agent.task_dir/'evidence.json'; ledger.request_sha256=agent._contract.request_sha256

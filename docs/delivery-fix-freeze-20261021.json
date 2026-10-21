@@ -1,0 +1,114 @@
+{
+  "suite": {
+    "version": 1,
+    "purpose": "new development diagnostics for report submission, not independent stage12 acceptance; coding assistant authored and reviewed",
+    "max_steps": 12,
+    "token_budget": 80000,
+    "cases": [
+      {
+        "id": "bounded-material-report",
+        "question": "不联网，仅依据虚构材料写一份全文不超过300字的简短报告：设备UX72配置19GB内存，设备PY36配置25GB内存，未提供故障率。列出两者内存，并说明能否判断哪台更可靠。保留型号、单位，给出依据及限制，不增加计算或性能测试。",
+        "checks": [
+          "型号、19GB与25GB归属正确；未给故障率不能推出可靠性排序",
+          "按原有全文可见非空白字符口径不超过300；不得靠删除必要依据与限制凑长度",
+          "正文与claims同步提交；原句、来源、摘录仍严格核对"
+        ]
+      },
+      {
+        "id": "make-phony-clean",
+        "question": "不联网，查本地GNU Make手册，简短解释为何清理规则常把clean声明为.PHONY。如果当前目录恰有名为clean的文件，这项声明会有什么作用？说明手册给出的理由和适用边界，并关联实际读到的片段。不要运行命令或把解释说成本机测试。",
+        "checks": [
+          "区分伪目标名称和真实文件，声明.PHONY避免同名文件导致清理规则被视为已更新",
+          "不把伪目标规则描述为没有任何适用边界；不能称已本机执行",
+          "引用来自实际送达片段，简述不重复扩写无关目标类型"
+        ],
+        "anchors": [
+          {
+            "name": "gnu-make.pdf",
+            "page": 43,
+            "contains": "to avoid a conflict with a file of the same name"
+          }
+        ]
+      },
+      {
+        "id": "logging-adapter-context",
+        "question": "不联网，仅查本地Python logging cookbook，简短说明LoggerAdapter如何将上下文加入日志记录：构造时的信息通过什么参数提供，process方法做什么，日志调用自己传入extra时默认行为需要注意什么？给出已读依据，不运行脚本，不扩展到其他版本或额外日志框架。",
+        "checks": [
+          "构造时logger与dict-like extra；默认process把适配器extra放入调用关键字参数",
+          "依据本地手册区分覆盖日志调用extra与自动合并，不补其他版本行为",
+          "仅描述示例和机制，不捏造本机执行、性能测量或成功验证"
+        ],
+        "anchors": [
+          {
+            "name": "python-logging.txt",
+            "page": 1,
+            "contains": "it will be silently overwritten."
+          }
+        ]
+      },
+      {
+        "id": "retrieval-activity-snapshot",
+        "question": "不联网，查本地SQLite FTS5资料，简短说明unicode61 tokenizer的tokenchars和separators选项分别有什么作用。报告同时注明截至写稿前本任务已返回结果的检索请求次数，以及实际送达并保留片段涉及的文档版本数，给出记录依据并说明这些数量能否代表全库覆盖。不要运行代码或声称完成生产测试。",
+        "checks": [
+          "tokenchars加入额外token字符，separators指定额外分隔字符，依据已读版本而非记忆",
+          "请求与返回计数对照真实轨迹及其快照边界，不预设固定次数；错误返回不冒充成功执行",
+          "文档版本数按本任务保留的document_id/file_sha256/generation去重，不作为全库数量或完整阅读证明"
+        ],
+        "anchors": [
+          {
+            "name": "sqlite-fts5.txt",
+            "page": 1,
+            "contains": "should be considered token characters, even if they are white-space or"
+          }
+        ]
+      }
+    ]
+  },
+  "suite_file": "D:/code/personal_agent/knowledge/delivery_cases.json",
+  "suite_sha256": "db3e2e3059e87b0128ca728f933765f8db449a22532bc31923b1533c02a5bb04",
+  "sources": {
+    "gnu-make.pdf": "a4bc06026984382815e392159e60a4bc356cac6c5b81e5ae84fa4f58f621f4d3",
+    "python-logging.txt": "3dfd06bf81a417d8c09cb21d6448dff73ae3729f15f3ba9d0ed91c662acd26ee",
+    "sqlite-fts5.txt": "11e8b8839d8db49e97000761760f077a98ccc975209d3030887d4f18b7b3b6d2"
+  },
+  "source_sha256": "d699f1f2a4939bd03403f6c481e2425b20d1df3ef0a5756396a6c9d1bdca1231",
+  "configuration": {
+    "model": {
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "base_url": "https://api.deepseek.com",
+      "temperature": 0.3,
+      "max_tokens": null,
+      "thinking": "disabled",
+      "max_retries": 3
+    },
+    "embedding_model": "Pro/BAAI/bge-m3",
+    "embedding_dimensions": 1024,
+    "embedding_base_url": "https://api.siliconflow.cn/v1",
+    "embedding_timeout": 30.0,
+    "rerank_model": "BAAI/bge-reranker-v2-m3",
+    "rerank_enabled": true,
+    "rerank_base_url": "https://api.siliconflow.cn/v1",
+    "rerank_timeout": 30.0,
+    "lexical": 40,
+    "vector": 40,
+    "pool": 20,
+    "search_budget": 30000,
+    "weights": [
+      0.1,
+      2.0
+    ],
+    "generation_max_tokens": 4096,
+    "review_enabled": true,
+    "review_max_calls": 2,
+    "review_max_tokens": 2048,
+    "memory_enabled": false
+  },
+  "generation": "28c1bd2146c546e9ba5283420a0c0336",
+  "max_steps": 12,
+  "token_budget": 80000,
+  "no_web": true,
+  "no_memory": true,
+  "reviewer": "coding_assistant",
+  "purpose": "development only; questions differ from previous five, no paired gain claim"
+}
