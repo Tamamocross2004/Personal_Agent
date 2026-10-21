@@ -219,15 +219,13 @@ async function verifyCrashCleanup() {
     await page
       .getByRole("button", { name: "原始资料知识库", exact: true })
       .click();
-    await page
-      .getByLabel("选择知识文档")
-      .setInputFiles({
-        name: "界面原文.md",
-        mimeType: "text/markdown",
-        buffer: Buffer.from(
-          '档案保留期限为七个工作日。<script>throw Error("untrusted")</script>',
-        ),
-      });
+    await page.getByLabel("选择知识文档").setInputFiles({
+      name: "界面原文.md",
+      mimeType: "text/markdown",
+      buffer: Buffer.from(
+        '档案保留期限为七个工作日。<script>throw Error("untrusted")</script>',
+      ),
+    });
     await page.getByRole("button", { name: "导入并构建", exact: true }).click();
     await until(
       async () => {
@@ -251,7 +249,67 @@ async function verifyCrashCleanup() {
       path: path.join(evidence, evidencePrefix + "-knowledge.png"),
       fullPage: true,
     });
-    const oldGeneration = (await api("/knowledge")).active.id;
+    await page.getByLabel("检索方式").selectOption("hybrid");
+    assert.equal(await page.getByLabel("本次检索重排").isChecked(), false);
+    await page.getByLabel("本次检索重排").check();
+    await page.getByRole("button", { name: "检索", exact: true }).click();
+    await page
+      .locator(".knowledge-hit")
+      .getByText(/重排分/)
+      .waitFor();
+    assert.equal((await api("/knowledge")).rerank.usage.calls, 1);
+    const [cachedResponse] = await Promise.all([
+      page.waitForResponse(
+        (r) =>
+          r.url().endsWith("/api/knowledge/search") &&
+          r.request().method() === "POST",
+      ),
+      page.getByRole("button", { name: "检索", exact: true }).click(),
+    ]);
+    assert.equal((await cachedResponse.json()).reranking.cache_hit, true);
+    await until(
+      () => page.getByRole("button", { name: "检索", exact: true }).isEnabled(),
+      "cached search UI settled",
+    );
+    assert.equal((await api("/knowledge")).rerank.usage.calls, 1);
+    await page.locator(".knowledge-modal").evaluate((box) => {
+      box.scrollTop = box.scrollHeight;
+    });
+    await page.screenshot({
+      path: path.join(evidence, evidencePrefix + "-reranking.png"),
+      fullPage: true,
+    });
+    await page
+      .locator(".knowledge-modal")
+      .getByRole("button", { name: "关闭", exact: true })
+      .click();
+    await page.getByLabel("知识库", { exact: true }).check();
+    assert.equal(
+      await page.getByLabel("重排", { exact: true }).isChecked(),
+      false,
+    );
+    await page.getByLabel("重排", { exact: true }).check();
+    const knowledgeSession = await newTask(
+      "不联网，虚构资料：知识库重排界面验收。",
+    );
+    const knowledgeRun = await finished(knowledgeSession.id);
+    assert.equal(knowledgeRun.state, "completed");
+    const knowledgeDetail = await api("/runs/" + knowledgeRun.id);
+    assert.equal(knowledgeDetail.usage.rerank.calls, 1);
+    assert.equal(knowledgeDetail.usage.rerank.input_tokens, 23);
+    assert.equal(
+      knowledgeDetail.claims.claims[0].supports[0].source_kind,
+      "document",
+    );
+    await page.getByLabel("知识库", { exact: true }).uncheck();
+    checks.push(
+      "cross-encoder preview/cache, per-run switch, worker evidence and separate rerank usage",
+    );
+    await page
+      .getByRole("button", { name: "原始资料知识库", exact: true })
+      .click();
+    const statusBeforeRebuild = await api("/knowledge");
+    const oldGeneration = statusBeforeRebuild.active.id;
     await page.getByRole("button", { name: "重建索引", exact: true }).click();
     await until(
       async () => {
@@ -261,7 +319,10 @@ async function verifyCrashCleanup() {
       "cached rebuild",
       45000,
     );
-    assert.equal((await api("/knowledge")).usage.calls, 1);
+    assert.equal(
+      (await api("/knowledge")).usage.calls,
+      statusBeforeRebuild.usage.calls,
+    );
     await page
       .getByRole("button", { name: "从当前库移除", exact: true })
       .click();

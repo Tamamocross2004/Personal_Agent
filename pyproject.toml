@@ -38,6 +38,7 @@ include = ["agent*", "tools*", "desktop_app*", "knowledge*"]
 
 [tool.setuptools.package-data]
 agent = ["*.json"]
+knowledge = ["*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -9,6 +9,8 @@ from fakes import completion
 
 def settings(root):
     return Settings(_env_file=None, deepseek_api_key='offline-stage14-test-key',
+                    siliconflow_api_key='offline-rag-test-key',
+                    knowledge_rerank_enabled=False,
                     memory_enabled=False, memory_db_path=Path(root)/'memory.sqlite3',
                     report_review_enabled=True, report_review_max_calls=1,
                     agent_max_steps=12, agent_token_budget=80000)
@@ -82,6 +84,17 @@ class OfflineModel:
         # 工具返回的协议消息可能不带name，按其原始tool_call_id匹配。
         calls = {c['id']:c['function']['name'] for m in messages for c in m.get('tool_calls',[])}
         names.update(calls.get(m.get('tool_call_id')) for m in results)
+        if '知识库重排' in self.question:
+            if not results:
+                return completion(tool_calls=[('fixture-knowledge','search_knowledge',{'query':'档案需要保存多久','mode':'hybrid'})])
+            if 'write_report' not in names:
+                import re
+                source=re.search(r'document-\d+',next(m['content'] for m in results if calls.get(m.get('tool_call_id'))=='search_knowledge')).group()
+                text=REPORT.replace('业务状态未知。','档案保留期限为七个工作日。').replace('工具记录的退出码为零。','资料来自本次送达原文。')
+                return completion(tool_calls=[('fixture-report','write_report',{'content':text,'claims':[
+                    {'quote':'档案保留期限为七个工作日。','kind':'direct','scope':'excerpt',
+                     'supports':[{'source_id':source,'excerpt':'档案保留期限为七个工作日。'}]}]})])
+            return completion('离线知识库重排演示结束。查看 [报告](report.md)。')
         if not results:
             return completion(tool_calls=[('fixture-code','run_python',{'code':CODE})])
         if 'write_report' not in names:

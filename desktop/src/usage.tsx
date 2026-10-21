@@ -45,6 +45,15 @@ export function UsagePanel({
             次用量未知。费用未计价，不含在下方对话模型估算中。建库用量见知识库。
           </p>
         )}
+        {!!value.rerank?.calls && (
+          <p>
+            检索重排：{value.rerank.calls} 次，输入{" "}
+            {count(value.rerank.input_tokens)} / 输出{" "}
+            {count(value.rerank.output_tokens)} token，
+            {value.rerank.unknown_usage_calls}{" "}
+            次用量未知。费用未计价，单独于下方对话模型估算。
+          </p>
+        )}
       </div>
       <div className="usage-cards">
         <div>

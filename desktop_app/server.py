@@ -37,12 +37,14 @@ class RunInput(BaseModel):
     budget:int=Field(default=300000,ge=1000,le=2000000)
     memory:bool=True
     knowledge:bool=False
+    rerank:bool|None=None
 
 
 class KnowledgeQuery(BaseModel):
     query:str=Field(min_length=1,max_length=1000)
     mode:Literal['keyword','vector','hybrid']='keyword'
     k:int=Field(default=4,ge=1,le=8)
+    rerank:bool|None=None
 
 
 def create_app(manager:Manager,token:str,ui_dir:Path|None=None):

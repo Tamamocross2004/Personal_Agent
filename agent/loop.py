@@ -496,11 +496,15 @@ class Agent(CheckpointMixin):
                 raise NeedsVerification('工具超时且结果不确定，已停止派发后续操作；需核对，未自动重做')
             content = _truncate(result.content, self.max_tool_result_chars)
             for usage in result.usage or []:
-                self._emit('embedding_call',**usage)
-                if usage.get('input_tokens') is None:
-                    raise NeedsVerification('嵌入请求用量未知，已停止；需核对实际服务消耗，不能自动重做')
-                self._equiv+=usage['input_tokens']
-                self._tokens+=usage['input_tokens']
+                reranked=usage.get('operation')=='rerank'
+                self._emit('rerank_call' if reranked else 'embedding_call',**usage)
+                input_tokens=usage.get('input_tokens');output_tokens=usage.get('output_tokens',0)
+                if input_tokens is not None:
+                    self._equiv+=input_tokens;self._tokens+=input_tokens
+                if output_tokens is not None:
+                    self._equiv+=output_tokens*self.token_weights.output;self._tokens+=output_tokens
+                if input_tokens is None or (reranked and output_tokens is None):
+                    raise NeedsVerification('检索模型请求用量未知，已停止；需核对实际服务消耗，不能自动重做')
             if name == 'fetch_url' and result.is_error and result.content.startswith('ERROR: FetchError:') and self.research_session is not None:
                 from tools.session import normalize_url
                 try:

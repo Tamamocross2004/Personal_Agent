@@ -157,6 +157,7 @@ function App() {
     budget: 300000,
     memory: true,
     knowledge: false,
+    rerank: false,
   });
   const [settings, setSettings] = useState(false),
     [inspector, setInspector] = useState(true),
@@ -213,6 +214,7 @@ function App() {
           budget: c.budget,
           memory: c.memory,
           knowledge: c.knowledge,
+          rerank: c.rerank,
         });
         setReady(true);
       } catch (e) {
@@ -928,6 +930,21 @@ function App() {
                 />
                 知识库
               </label>
+              {options.knowledge && (
+                <label
+                  className="memory-toggle"
+                  title="使用云端cross-encoder重排候选，会产生独立调用用量"
+                >
+                  <input
+                    type="checkbox"
+                    checked={options.rerank}
+                    onChange={(e) =>
+                      setOptions({ ...options, rerank: e.target.checked })
+                    }
+                  />
+                  重排
+                </label>
+              )}
               <span className="spacer" />
               {selected && active(selected) && (
                 <button

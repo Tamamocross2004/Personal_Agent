@@ -19,6 +19,7 @@ def main():
     search=commands.add_parser('search'); search.add_argument('query')
     search.add_argument('--mode',choices=['keyword','vector','hybrid'],default='hybrid')
     search.add_argument('-k',type=int,default=4)
+    search.add_argument('--rerank',action=argparse.BooleanOptionalAction,default=None,help='开启/关闭cross-encoder重排，默认按项目设置；keyword始终不执行')
     args=parser.parse_args(); store=KnowledgeStore(Settings())
     try:
         if args.command=='status': result=store.status()
@@ -30,7 +31,7 @@ def main():
             result=store.build(uploads,mode='replace' if args.replace else 'append')
         elif args.command=='rebuild': result=store.build(mode='rebuild')
         elif args.command=='remove': result=store.build(remove=[args.document_id])
-        else: result=store.search(args.query,mode=args.mode,k=args.k)
+        else: result=store.search(args.query,mode=args.mode,k=args.k,rerank=args.rerank)
         print(json.dumps(result,ensure_ascii=False,indent=2))
     except ValueError as exc: parser.exit(1,str(exc)+'\n')
 

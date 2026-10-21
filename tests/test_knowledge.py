@@ -46,7 +46,7 @@ class FakeVectors:
 
 @pytest.fixture
 def kb(tmp_path):
-    settings=Settings(_env_file=None,siliconflow_api_key='test-only-key',knowledge_path=tmp_path/'kb',embedding_dimensions=2)
+    settings=Settings(_env_file=None,siliconflow_api_key='test-only-key',knowledge_path=tmp_path/'kb',embedding_dimensions=2,knowledge_rerank_enabled=False)
     client=FakeEmbedding(); vectors=FakeVectors()
     return KnowledgeStore(settings,vectors=vectors,embedding_client=client),client,vectors
 

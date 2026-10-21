@@ -89,6 +89,7 @@ class Manager:
         return {'provider':s.llm_provider,'model':model,'key_configured':configured,
                 'max_steps':s.agent_max_steps,'budget':s.agent_token_budget,'memory':s.memory_enabled,
                 'knowledge':s.knowledge_enabled,
+                'rerank':s.knowledge_rerank_enabled,
                 'review_enabled':s.report_review_enabled,'review_max_calls':s.report_review_max_calls,
                 'project_root':str(PROJECT_ROOT),'workspace_root':str(self.root)}
 
@@ -277,19 +278,21 @@ class Manager:
         try:trace=self.usage_reader.read(self.safe_task(row)/'trace.jsonl')
         except OSError:trace=None
         value=summarize(trace,row,self.pricing)
-        recorded={e['id']:e for e in trace.get('embedding_events',[]) if e.get('id')} if trace else {}
-        journal=self.safe_task(row)/'embedding_usage.jsonl'
-        if journal.is_file() and not journal.is_symlink() and journal.stat().st_size<=2_000_000:
-            with journal.open(encoding='utf-8') as stream:
-                for line in stream:
-                    try:
-                        event=json.loads(line)
-                        if isinstance(event,dict) and event.get('id'): recorded[event['id']]=event
-                    except ValueError: pass
-        events=list(recorded.values())
-        value['embedding']={'calls':len(events),'input_tokens':sum(e.get('input_tokens') or 0 for e in events),
-            'unknown_usage_calls':sum(e.get('input_tokens') is None for e in events),
-            'estimated_cost':None,'note':'本轮检索嵌入单独统计；未配置费率，费用未计价。建库用量见知识库。'}
+        for operation in ('embedding','rerank'):
+            recorded={e['id']:e for e in trace.get(operation+'_events',[]) if e.get('id')} if trace else {}
+            journal=self.safe_task(row)/(operation+'_usage.jsonl')
+            if journal.is_file() and not journal.is_symlink() and journal.stat().st_size<=2_000_000:
+                with journal.open(encoding='utf-8') as stream:
+                    for line in stream:
+                        try:
+                            event=json.loads(line)
+                            if isinstance(event,dict) and event.get('id'): recorded[event['id']]=event
+                        except ValueError: pass
+            events=list(recorded.values())
+            value[operation]={'calls':len(events),'input_tokens':sum(e.get('input_tokens') or 0 for e in events),
+                'output_tokens':sum(e.get('output_tokens') or 0 for e in events),
+                'unknown_usage_calls':sum(e.get('input_tokens') is None or (operation=='rerank' and e.get('output_tokens') is None) for e in events),
+                'estimated_cost':None,'note':'检索模型独立统计；未配置费率，费用未计价。建库用量见知识库。'}
         return value
 
     def import_history(self):

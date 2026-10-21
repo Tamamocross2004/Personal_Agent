@@ -1,0 +1,307 @@
+{
+  "version": 1,
+  "date": "2026-10-21",
+  "base_revision": "17409d66570af8188af651ae1b6b96b9bcc09b52",
+  "scope": "development diagnostic; not independent acceptance; stage12 remains not accepted",
+  "frozen_runtime_sha256": "65dd29cc31cfa46fa4b0d412f8efb4c95e5263ca070594992d6630f76a47e46f",
+  "suite_sha256": "a40926632d7fe29b6b4aa6bbaf20c33240204b4b2bf68f9c053b2c3b546d534a",
+  "source_unchanged_during_measurement": true,
+  "suite_unchanged_during_measurement": true,
+  "closeout_runtime_sha256": "8707a817564fde8ee8a12f26af07b1c99111ea4b48b5351038954bd4c8ae945e",
+  "closeout_default_rerank": false,
+  "closeout_change": "default disabled after unchanged relevance metrics and added latency; explanatory text only; no retuning or paid resampling",
+  "tests": {
+    "full": {
+      "passed": 897,
+      "seconds": 386.39,
+      "log": "workspace/rerank-pytest-20261021.log"
+    },
+    "closeout": {
+      "passed": 91,
+      "seconds": 42.4,
+      "log": "workspace/rerank-closeout-tests-20261021.log"
+    }
+  },
+  "desktop": {
+    "status": "passed",
+    "scope": "isolated offline engineering acceptance; no paid model request",
+    "checks": [
+      "native startup, preload and authenticated loopback API",
+      "cross-encoder preview/cache, per-run switch, worker evidence and separate rerank usage",
+      "knowledge import, escaped preview, independent keyword retrieval, cached rebuild and remove",
+      "submit -> subprocess tools -> report/chart/CSV/evidence/review/usage; SSE EOF reconnect",
+      "search, rename, archive/unarchive preserve research and never call model",
+      "reload is read-only; synchronous repeated send creates one run",
+      "review limit remains skipped_limit, not passed",
+      "automatic fallback shows current save, original model text and unreviewed state; edit makes provenance stale",
+      "budget exhaustion remains partial with original limit; Escape closes settings",
+      "unknown API outcome shows needs_verification and failed/unknown usage; resume blocked",
+      "cooperative stop and UI resume reuse committed response, same task and cumulative usage",
+      "subprocess recovery after a committed tool batch does not repeat that tool",
+      "corrupt checkpoint has visible refusal and disabled resume",
+      "missing CSV visible; malformed image URL does not crash; changed report makes review stale",
+      "long history stays at reader position; 1050x700 has no document overflow",
+      "force stop preserves uncertain checkpoint; normal desktop exit cleans backend",
+      "restart preserves index; unexpected Electron death cleans backend and worker; restart never auto-runs"
+    ],
+    "page_errors": [],
+    "fixture": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\agent-stage14-cXQt4s"
+  },
+  "build": {
+    "exit_code": 0,
+    "log": "workspace/rerank-ui-final-build-20261021.log"
+  },
+  "summary": {
+    "baseline": {
+      "precision_at_4": 0.425,
+      "recall_at_4": 1.0,
+      "mrr_at_4": 1.0,
+      "mean_wall_seconds": 0.159225
+    },
+    "rerank": {
+      "precision_at_4": 0.425,
+      "recall_at_4": 1.0,
+      "mrr_at_4": 1.0,
+      "mean_wall_seconds": 4.6511249999999995
+    }
+  },
+  "cache_check": {
+    "new_requests": 0,
+    "hit": true
+  },
+  "research": [
+    {
+      "arm": "baseline",
+      "result": {
+        "answer": "报告已保存并通过自动检查与语义审稿。\n\n**结论摘要：**\n- **忘带门卡**：员工须到服务台核验员工编号，领取仅当天有效的临时卡；该卡只能通行办公区，不能替代机房授权。\n- **外来人员周末来访**：接待人至少提前一天登记姓名和到访日期；访客携身份证在入口核验后取得当日二维码；周末仍需登记，由值班接待人确认后放行；二维码不用于机房通行。\n- **进入机房**：员工须同时具备有效门卡和单独的机房授权；忘带卡时由机房管理员核验并现场陪同，不能刷办公区临时卡进入；外来人员还须管理员预先批准并全程陪同。\n- **补卡费用**：知识库明确写明“本文件没有列出补卡费用”，值班联系表也未给收费标准，因此费用**未知**；未提供记录不等于免费，报告未补造任何金额或承诺。\n\n报告文件：`松岚园区通行手续简述.md`，参考资料按文件、页码、片段和知识库代际 `1c59712ee2c64c61b31bff2ff6dd840a` 列出。",
+        "steps": 4,
+        "stop_reason": "final_answer",
+        "total_tokens": 62658,
+        "error": null,
+        "equivalent_tokens": 31148
+      },
+      "wall_seconds": 23.81,
+      "llm_calls": 6,
+      "embedding_calls": 4,
+      "rerank_calls": 0,
+      "claims": 7,
+      "review_status": "reviewed",
+      "issues": [],
+      "tool_errors": [
+        {
+          "name": "save_note",
+          "content": "ERROR: ValueError: knowledge-base://员工门卡.txt 不是本次任务中用 fetch_url 成功读过的网页。笔记只能记录读过的原文内容；如果信息来自搜索摘要，请先用 fetch_url 阅读原文。"
+        }
+      ]
+    },
+    {
+      "arm": "rerank",
+      "result": {
+        "answer": "报告已保存并通过自动检查与语义审稿。\n\n**结论简述：**\n- **员工忘带门卡**：在服务台核验员工编号，领取仅当天有效的临时卡；该卡只能通行办公区，不能替代机房授权。\n- **外来人员周末来访**：接待人至少提前一天登记姓名和到访日期，访客携身份证在入口核验后取得当日二维码；周末仍需登记，由值班接待人确认后放行，访客二维码不用于机房通行。\n- **进入机房**：员工须同时具备有效门卡和单独的机房授权，忘带卡时由机房管理员核验并现场陪同，不能自行刷办公区临时卡；外来人员还需管理员预先批准并全程陪同。\n- **补卡费用**：知识库明确\"没有列出补卡费用\"，已读片段中无任何金额，故为未知，不能推定为零或免费。\n\n报告文件：`松岚园区通行手续简述.md`（参考资料按文件、页码与知识库代际 1c59712e… 列出）。",
+        "steps": 5,
+        "stop_reason": "final_answer",
+        "total_tokens": 73643,
+        "error": null,
+        "equivalent_tokens": 29650
+      },
+      "wall_seconds": 38.19,
+      "llm_calls": 7,
+      "embedding_calls": 3,
+      "rerank_calls": 4,
+      "claims": 6,
+      "review_status": "reviewed",
+      "issues": [],
+      "tool_errors": []
+    }
+  ],
+  "embedding_usage": {
+    "calls": 21,
+    "returned": 21,
+    "unknown_usage_calls": 0,
+    "input_tokens": 1721
+  },
+  "rerank_usage": {
+    "calls": 16,
+    "input_tokens": 24579,
+    "output_tokens": 0,
+    "unknown_usage_calls": 0
+  },
+  "preflight": {
+    "model": "BAAI/bge-reranker-v2-m3",
+    "status": "returned",
+    "started_at": "2026-10-21T02:50:31.768157+00:00",
+    "http_status": 200,
+    "response": {
+      "id": "01a15c5e119478e3989dd868f1f7254a",
+      "results": [
+        {
+          "index": 0,
+          "document": null,
+          "relevance_score": 0.11891760677099228
+        },
+        {
+          "index": 1,
+          "document": null,
+          "relevance_score": 7.625270518474281e-05
+        }
+      ],
+      "meta": {
+        "tokens": {
+          "input_tokens": 32,
+          "output_tokens": 0,
+          "image_tokens": 0
+        },
+        "billed_units": {
+          "input_tokens": 32,
+          "output_tokens": 0,
+          "image_tokens": 0,
+          "search_units": 0,
+          "classifications": 0
+        }
+      }
+    }
+  },
+  "original_artifact_integrity": {
+    "checked": 700,
+    "mismatches": []
+  },
+  "secret_scan": {
+    "changed_files_with_project_keys": [],
+    "dotenv_ignored": true
+  },
+  "source_files_sha256": {
+    "agent/config.py": "993482c9a6b5f1cf9d8991134b45138309d7d5f10476bbb811db390bdd6ac71e",
+    "agent/display.py": "e86f6599c6c86d1e8faefe2ef62112a2702a05b91d745f6b7f532ca9b1fea47f",
+    "agent/evidence.py": "ec1ba46608b100d907ae5c82b2f0eacfb470889076708e4a91915a040c685452",
+    "agent/loop.py": "994be77a5cf66a512f80addf085f5754433fa205596205e4c96a59a1cd4b08ba",
+    "agent/prompts.py": "740556f84e4c95bdf15bb4eef6bbf5c7433e69718bb30d3d2b7665761794c602",
+    "desktop/scripts/acceptance-smoke.cjs": "1236fb7d9fff2bb77935888d4fe43d7333909f83a0f37cd357f09a890d69c2d1",
+    "desktop/src/knowledge.tsx": "145de43cad0ae21315e4b79f6f9c1b0f933176faa36a14f81c42acae88cd55e3",
+    "desktop/src/main.tsx": "1ff554b5f04cdd4936809eb74d803e74060e077325b788ea2ecb289d257ccf06",
+    "desktop/src/style.css": "7b4545d8386ddae23e944d8a681b227add0f1eb842274f7d06ea7866f1efbbc6",
+    "desktop/src/usage.tsx": "d3cc76ad2609f873ad822dfdb008be8963426ae3fd2a843ca69a6bcc3ef39f6a",
+    "desktop_app/manager.py": "d98bb1c0c72bc8fe559ed0bc09488c6c99bebc228cb2f883879da0d6d49a002c",
+    "desktop_app/server.py": "80e649c8f0d9b2052e316852a3acf5a9e1cb113f218fcdbfddfb2d420902244b",
+    "desktop_app/usage.py": "7b0aac191f6185b6bc9d2b3668486ecc0db936812ac59dcefab471e1ad342fe6",
+    "desktop_app/worker.py": "c31e04bedb4c4f5b275eb5107045c4914e3934d76b8e7fc6dde1d02e8c613cc0",
+    "knowledge/__main__.py": "fc231000c92128f2dacd50c8e4a2131c197130af52b5c13500673af31e4dec43",
+    "knowledge/rerank_cases.json": "a40926632d7fe29b6b4aa6bbaf20c33240204b4b2bf68f9c053b2c3b546d534a",
+    "knowledge/rerank_probe.py": "4c49f1e3a7f0e8dcd50edb647ba9beb521398ea05c01da538b25f1c99b9b75bc",
+    "knowledge/reranking.py": "8118a7613b87909571050ad1b6d6d3bee2a9beb8aa68b0dbc4ab60570cf384ec",
+    "knowledge/store.py": "1b6b8299ac7e28108cdb9db6b3dce916b776376c0cc8b782c3bbc2093c9938e4",
+    "main.py": "5cf18e55b7602db95360fb482a420fe8c62d22a6a4a0a64201f31122e82141ec",
+    "pyproject.toml": "43bd4d82c437d424635ef759db3396a190bd8fb9978f820604e2e9fbdd223e42",
+    "tests/desktop_acceptance_fixture.py": "81856a16065a60c4d363a6d16b4470bf1ba96e28f6b338b6ba75e451e5bfeb5c",
+    "tests/desktop_acceptance_server.py": "b5356613b6e79e0bd49eb0a04760a9b7dfbbbbf6aaa63cbd6c822d68c09b98ef",
+    "tests/desktop_acceptance_worker.py": "63539ab71e3cfb73d0e6f66cb367bc4ef2552fa6c440a1f7917b5af48bac98fd",
+    "tests/desktop_rag_fixture.py": "e6540fccbd8341cefaa70c58dbddc442d81bfd8a6d83de1b6b8b89204c3f2fb6",
+    "tests/test_knowledge.py": "b3208f82200a43fe365c79c90338e15a77d9f4f182c5aa48715cf7e2823b33ae",
+    "tests/test_reranking.py": "f5d505afb4bb5ed7b51da4ed1768d6c15a89a781eef13c11651630d465ed014a",
+    "tools/knowledge.py": "11191ecca1a72c435a3cdecfe3ae33f7bbff54c9b68d0ce0845ec5e1172f46fc",
+    "tools/registry.py": "d42f2caa8037230631396858699c55387a976e5a3551f4a4f426b1e9754f700c"
+  },
+  "artifact_sha256": {
+    "workspace/rerank-live-20261021/artifacts.json": "e3afb1b635758988e5e491498a4b5276c10c66074d32f8964dd467dff4175659",
+    "workspace/rerank-live-20261021/plan.json": "34fd248813a35b01508a8e0f8cf7a96479a229b6949575e4060d4f8c7951a59b",
+    "workspace/rerank-live-20261021/results.json": "77878b20ae52cded92a1f0cc7ef234cb437dfe3aea2f93c063cf13a996e0d814",
+    "workspace/rerank-live-20261021/knowledge/.build.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/rerank-live-20261021/knowledge/.vectors.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/rerank-live-20261021/knowledge/knowledge.sqlite3": "f63b69726a70900e356b06e30c422a7355b3d07e3bcac977296541b15c876bcf",
+    "workspace/rerank-live-20261021/knowledge/documents/0f331b753dd671529ded8128d521bc436917e586bec0ee1cfc83593bd79727a4": "0f331b753dd671529ded8128d521bc436917e586bec0ee1cfc83593bd79727a4",
+    "workspace/rerank-live-20261021/knowledge/documents/286762b43aaf8317272d08297a8a02a952d306a59821e6a21cff0ffb8b2395aa": "286762b43aaf8317272d08297a8a02a952d306a59821e6a21cff0ffb8b2395aa",
+    "workspace/rerank-live-20261021/knowledge/documents/29934721c39ffecaf1a64a7b3bace6bf5579f96cf21a5bc000fa583f65b48bef": "29934721c39ffecaf1a64a7b3bace6bf5579f96cf21a5bc000fa583f65b48bef",
+    "workspace/rerank-live-20261021/knowledge/documents/2e4ac7a0079a9ebc47d9ea753c62efa08b38043e037d1559c4df825f00465010": "2e4ac7a0079a9ebc47d9ea753c62efa08b38043e037d1559c4df825f00465010",
+    "workspace/rerank-live-20261021/knowledge/documents/3b4174f05d5bf8f1aba25a8ef80f623d613c3f2965f3b0aaa1f7b874ba8c0df0": "3b4174f05d5bf8f1aba25a8ef80f623d613c3f2965f3b0aaa1f7b874ba8c0df0",
+    "workspace/rerank-live-20261021/knowledge/documents/3d5c94bba9c33fa278ea34fc2063ae88fdfe4b3bdf4c3b3e1a4ae9de66587230": "3d5c94bba9c33fa278ea34fc2063ae88fdfe4b3bdf4c3b3e1a4ae9de66587230",
+    "workspace/rerank-live-20261021/knowledge/documents/6586fdf2ad35780d19b7614477c88fcbc4880dc764acf67f44f566c5acb24d96": "6586fdf2ad35780d19b7614477c88fcbc4880dc764acf67f44f566c5acb24d96",
+    "workspace/rerank-live-20261021/knowledge/documents/87b10c6c3bddd314246401b969674f8c2d3eb88dc9819365b3ce1173802e0c16": "87b10c6c3bddd314246401b969674f8c2d3eb88dc9819365b3ce1173802e0c16",
+    "workspace/rerank-live-20261021/knowledge/documents/87dd75f1e777fb9338b4313dea40b354973f1b5d0948f5226a43f0f22fd33d29": "87dd75f1e777fb9338b4313dea40b354973f1b5d0948f5226a43f0f22fd33d29",
+    "workspace/rerank-live-20261021/knowledge/documents/8e9f13791f7270bc4ec38863492769cfa872114b5bbf34e0b08694bcb6ec3cc3": "8e9f13791f7270bc4ec38863492769cfa872114b5bbf34e0b08694bcb6ec3cc3",
+    "workspace/rerank-live-20261021/knowledge/documents/948229ffcaba49157f74f4c3d530dd0c6afb1937769b5409ba69482e87075779": "948229ffcaba49157f74f4c3d530dd0c6afb1937769b5409ba69482e87075779",
+    "workspace/rerank-live-20261021/knowledge/documents/a0427b87767625382cda160f70487bd0190910729a467f71f5eeaef4540bff40": "a0427b87767625382cda160f70487bd0190910729a467f71f5eeaef4540bff40",
+    "workspace/rerank-live-20261021/knowledge/documents/a55b5ffa17eb6aae03bf63cea9e861c997886f35776fee9560d73efdef1618eb": "a55b5ffa17eb6aae03bf63cea9e861c997886f35776fee9560d73efdef1618eb",
+    "workspace/rerank-live-20261021/knowledge/documents/ac516bc7b4f38888d0b6f194d0644866446a0b54ae7042b1986d18ae69a975d4": "ac516bc7b4f38888d0b6f194d0644866446a0b54ae7042b1986d18ae69a975d4",
+    "workspace/rerank-live-20261021/knowledge/documents/b8527b443bd16659b92f0b58f8dfe36710f8eef6ede19fb62d39ce692230ce48": "b8527b443bd16659b92f0b58f8dfe36710f8eef6ede19fb62d39ce692230ce48",
+    "workspace/rerank-live-20261021/knowledge/documents/da12a312dde1586fc2cf452d1167c1a75b5335d358cc56757022f8ba853c846e": "da12a312dde1586fc2cf452d1167c1a75b5335d358cc56757022f8ba853c846e",
+    "workspace/rerank-live-20261021/knowledge/documents/df7fa1e0c7cdb18061b1e2b02312a1bf7241131c46974bdceda980adcd6a7b14": "df7fa1e0c7cdb18061b1e2b02312a1bf7241131c46974bdceda980adcd6a7b14",
+    "workspace/rerank-live-20261021/knowledge/documents/e0947b97982afe0a7780652e16690e33feb519bbe429a7d345f374ced093ed49": "e0947b97982afe0a7780652e16690e33feb519bbe429a7d345f374ced093ed49",
+    "workspace/rerank-live-20261021/knowledge/documents/e936fa263854e3649300807afd62ed9884de45b54956c52f8a2b780e1c961745": "e936fa263854e3649300807afd62ed9884de45b54956c52f8a2b780e1c961745",
+    "workspace/rerank-live-20261021/knowledge/documents/eeb82c8c0f570f35ecbb41618941fe5fae199e9d7e39ae1525901b3de48e0008": "eeb82c8c0f570f35ecbb41618941fe5fae199e9d7e39ae1525901b3de48e0008",
+    "workspace/rerank-live-20261021/knowledge/documents/f3194ccb1253ac0c07970763a491e923eaf07b9e4b3c54b835cdb720c427773e": "f3194ccb1253ac0c07970763a491e923eaf07b9e4b3c54b835cdb720c427773e",
+    "workspace/rerank-live-20261021/knowledge/documents/f32cfc091bb65c71fc507dcbf73cd0cf072421bfb397a733548fa2177e2dc473": "f32cfc091bb65c71fc507dcbf73cd0cf072421bfb397a733548fa2177e2dc473",
+    "workspace/rerank-live-20261021/knowledge/documents/f77ca966e4cc81940a5ea1c014a7480355e89af65aa2c36955d8aa696664192c": "f77ca966e4cc81940a5ea1c014a7480355e89af65aa2c36955d8aa696664192c",
+    "workspace/rerank-live-20261021/knowledge/documents/fe2e7b462c4d210f37d53ac8536109188cb79ed9679f04ba770426b59fc4982a": "fe2e7b462c4d210f37d53ac8536109188cb79ed9679f04ba770426b59fc4982a",
+    "workspace/rerank-live-20261021/knowledge/vectors/1c59712ee2c64c61b31bff2ff6dd840a.db/LOCK": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workspace/rerank-live-20261021/knowledge/vectors/1c59712ee2c64c61b31bff2ff6dd840a.db/collections/chunks/manifest.json": "439bced4db104c9bc364e111da83cd0486ba478d9e84a87f4a8b6156ece9130c",
+    "workspace/rerank-live-20261021/knowledge/vectors/1c59712ee2c64c61b31bff2ff6dd840a.db/collections/chunks/manifest.json.prev": "439bced4db104c9bc364e111da83cd0486ba478d9e84a87f4a8b6156ece9130c",
+    "workspace/rerank-live-20261021/knowledge/vectors/1c59712ee2c64c61b31bff2ff6dd840a.db/collections/chunks/schema.json": "091a94653bffaee066311202f1db0c0e9850fe8749840a67e6189920344759ce",
+    "workspace/rerank-live-20261021/knowledge/vectors/1c59712ee2c64c61b31bff2ff6dd840a.db/collections/chunks/partitions/_default/data/data_000001_000024.parquet": "c1e6f3633331c8a54108c47ca332ae0d27dd64d1b5f5cf09945f98d65bd07396",
+    "workspace/rerank-live-20261021/knowledge/vectors/1c59712ee2c64c61b31bff2ff6dd840a.db/collections/chunks/wal/wal_data_000001.arrow": "25537a38a1b3aec8ddcbb362b1da7d9543579ce958c0f3df0cf2da9a978b442f",
+    "workspace/rerank-live-20261021/research-baseline/.agent-checkpoint.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/rerank-live-20261021/research-baseline/.agent-checkpoint.sqlite3": "7afcf361bc19a73428acd60cf0390623ea20e8d45da07c57e8b2b64ddf34c7e8",
+    "workspace/rerank-live-20261021/research-baseline/embedding_usage.jsonl": "cf9bbcfad84aecff906d000d260abe7acc1c2d4ec9c2cfdb697dda71bb2ca9bc",
+    "workspace/rerank-live-20261021/research-baseline/evidence.json": "d09ea9139e19bce52e5b6f2b7888a813e64d6f30afbd4e73ddbd85d45e17f7b4",
+    "workspace/rerank-live-20261021/research-baseline/knowledge_snapshot.json": "3c9e53468ae89ddaee187ed106d307dcd0d59703094aa3aceec7c17b4fd75d46",
+    "workspace/rerank-live-20261021/research-baseline/messages.json": "1b7b01f27d36eaa4ff3283b7a185136aa3a43d4a0899650674b1208a8e2aabec",
+    "workspace/rerank-live-20261021/research-baseline/plan.json": "7a4d11a1f6591619962dfc7b91b414e3e87206a68602c3cf4d16b5e69d1de53b",
+    "workspace/rerank-live-20261021/research-baseline/task_contract.json": "593d8883e83decd049afb225fcfa878d38dbf82eaeb56862f3ecdc49a5a87586",
+    "workspace/rerank-live-20261021/research-baseline/trace.jsonl": "ff2b2ab0060a80e995794ae2afd76b61ce14282ba7a366f351e18f164bc70a92",
+    "workspace/rerank-live-20261021/research-baseline/松岚园区通行手续简述.contract.json": "a57e74faca2c8bb633e168357b80adea13ed2424ab145ea16af57c54d181fc0c",
+    "workspace/rerank-live-20261021/research-baseline/松岚园区通行手续简述.evidence.json": "b6df0209993193e538ac4336e8e1f4078976f3ded18bfe5b42d83747d417ba99",
+    "workspace/rerank-live-20261021/research-baseline/松岚园区通行手续简述.md": "dd09f87642d848855b6419d01b0f0725ea7e5ba208d3ab3c2fad857b0bfc1342",
+    "workspace/rerank-live-20261021/research-baseline/松岚园区通行手续简述.quality.json": "88ba105e68ea9bbc9af5add8f00d148bd726e1edeaa31ae1cfc6be0b12ba4302",
+    "workspace/rerank-live-20261021/research-baseline/松岚园区通行手续简述.review.json": "eac5b2da327e22f60bf1029aef47654db7067eb8dc0ecc1c597eec4472294424",
+    "workspace/rerank-live-20261021/research-baseline/松岚园区通行手续简述.reviews.jsonl": "6e2472f298bdccf265dbce754b5bcc099545b44784fe60378556b8e1c8686f0e",
+    "workspace/rerank-live-20261021/research-rerank/.agent-checkpoint.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/rerank-live-20261021/research-rerank/.agent-checkpoint.sqlite3": "541ac858955e05553d392117d33a347da4a62a59c9392e5b4de7bf5d83dc6850",
+    "workspace/rerank-live-20261021/research-rerank/embedding_usage.jsonl": "b430943480e285e7193d907daa7bab04f8e485e8064dfed9fbeb28a9dd27a650",
+    "workspace/rerank-live-20261021/research-rerank/evidence.json": "8a63530de710bad3ec01cde5c395eef93e310ed5910b4e6f3a5a4560b8b1b316",
+    "workspace/rerank-live-20261021/research-rerank/knowledge_snapshot.json": "3c9e53468ae89ddaee187ed106d307dcd0d59703094aa3aceec7c17b4fd75d46",
+    "workspace/rerank-live-20261021/research-rerank/messages.json": "5851a649a529aff116cd5842505f8af124f80393831f310f3a5bcc6b46ad9378",
+    "workspace/rerank-live-20261021/research-rerank/plan.json": "da168b9d32f511065d3cea5923088591ef5aea2fe9521bb5daffc2a4292940ab",
+    "workspace/rerank-live-20261021/research-rerank/rerank_usage.jsonl": "b7fe28459b60f07a6e9099b0ac53d866068969a010711e03d9d1b841013e0f12",
+    "workspace/rerank-live-20261021/research-rerank/task_contract.json": "593d8883e83decd049afb225fcfa878d38dbf82eaeb56862f3ecdc49a5a87586",
+    "workspace/rerank-live-20261021/research-rerank/trace.jsonl": "2b6e21b71057bf7b9895303d4d04ff76197176c70a9582b1f9d5302949949d0b",
+    "workspace/rerank-live-20261021/research-rerank/松岚园区通行手续简述.contract.json": "51f151d7173613a8b6340bfa5aafc1476b8bbc1653aed332a1cea94ab9b8d239",
+    "workspace/rerank-live-20261021/research-rerank/松岚园区通行手续简述.evidence.json": "4cc0aac9d8ed866cf66544efed13177a29e16a2e66f80a524d0da104aea63a28",
+    "workspace/rerank-live-20261021/research-rerank/松岚园区通行手续简述.md": "7ce9de6c007c547d7c9d3f5aa5c4ac5b2d2244abc1dc31af8328755ab829a298",
+    "workspace/rerank-live-20261021/research-rerank/松岚园区通行手续简述.quality.json": "cd1010b8ef7d518d39ba7c2013dd961ab39250f57f177ae2dc67c40fea0ada32",
+    "workspace/rerank-live-20261021/research-rerank/松岚园区通行手续简述.review.json": "ea66752dd26b5df4697e65c45915540e4e4438d5d0d61c77a0ff8564da0c26cd",
+    "workspace/rerank-live-20261021/research-rerank/松岚园区通行手续简述.reviews.jsonl": "cb03896683a7381b8d57b2ff1569fcef195304f0756180477d1aee147fc71f3c",
+    "workspace/rerank-build-20261021.log": "45606e0ce6106882df84460f4938001e4f60721d0d6f27cd2d70280670f40b47",
+    "workspace/rerank-closeout-build-20261021.log": "bdc349deec6822d4e347f864a8e8f915628b5feff3dc9c50675d41de5fad4d4e",
+    "workspace/rerank-closeout-desktop-20261021.log": "43b8366e9e1ea5e43d7b2c4f65bbc4e542607942bbe9b4a0b39eb21cb8d93186",
+    "workspace/rerank-closeout-tests-20261021.log": "76fe9d9a82a6f226ff2b2786f543baf4e233fce91a1de3f9a36940139c2d81ab",
+    "workspace/rerank-dependencies-20261021.log": "672aec65a45bed50e70229c70934a7eebf0462595c459b83023027645d57cccf",
+    "workspace/rerank-desktop-20261021.log": "c68536892a471238a9e41e0014fb63ec64a9bdb82a413ef361c9f04022405a73",
+    "workspace/rerank-initial-tests-20261021.log": "09e83bd3130821a3218e6571e2e7e41808677c97dce120e40406d0cc60ac1a4c",
+    "workspace/rerank-live-20261021.log": "167328f76efdcdcfb1c1cba2d0a05bee91469ee4a28e52e51ab85a0c12e66113",
+    "workspace/rerank-pytest-20261021.log": "38d0d3ebd73d813e2b222987ad72019e934bed50e86652dbc41bb52b17eb76fc",
+    "workspace/rerank-unit-20261021.log": "6e937af00f9f2ddf37963b9e5087c7e31712e23fd8ae7c03cdb0290c178e4de5",
+    "workspace/rerank-20261021-claim-support.png": "07a31d7f5a8e0f2b329c875d7e74f47a03d5bf4172e2af65600110c4d29a45a9",
+    "workspace/rerank-20261021-completed.png": "c3d4ee99e956c86c20aa765fbd2a89500e75a476af6aefb8f82114349395c634",
+    "workspace/rerank-20261021-fallback-current.png": "1c9ce192a07a578918b1faa131e4b92ba9f7ff4576f51e165ae563ca76468897",
+    "workspace/rerank-20261021-knowledge.png": "f4336f8f291c219d8d84098a884368174ca6fdc785a6a986932dca57664e8890",
+    "workspace/rerank-20261021-reranking.png": "ad869dbb47b4eb451db4dab9a6bdd40a331fb2253019440dd89e990a50975299",
+    "workspace/rerank-20261021-small-window.png": "7d52f1cc6218a39fbaff9e42be2a89971786ebd8d3b7128dbb0ecdc13f159f90",
+    "workspace/rerank-closeout-20261021-claim-support.png": "bb96993b2a4c0def9b7704b20a65a4030c6a16b05f6774cbd204f51a68818357",
+    "workspace/rerank-closeout-20261021-completed.png": "6e686247610bdebd43f3a702e900828ca517d001a648a3d021653408fa7ac4a2",
+    "workspace/rerank-closeout-20261021-fallback-current.png": "31493edd4c8ef44d6d42f5bc9964206471287ffe3c1614571486bce4507a3da9",
+    "workspace/rerank-closeout-20261021-knowledge.png": "215abd0cba1dfb3b6de3c08ae34087535366c595b3673cc9b0f468032a266c1c",
+    "workspace/rerank-closeout-20261021-reranking.png": "a0dab5880392d22dd41cb0f173e6394ac6a836b4fdc0ab2e2a507dfa0107f14a",
+    "workspace/rerank-closeout-20261021-small-window.png": "416121d19bdbc2c0a8f066bfd33a5f1a212147d8bd86f59103ff93d973db3e4f",
+    "workspace/rerank-20261021-ui-results.json": "01465594ae9d916f145892f162fa2970e2b9dd2a0da5956de20059930baf485d",
+    "workspace/rerank-closeout-20261021-ui-results.json": "107071aac0807a529e7b0d07e9721c289f74a7e3859f15e9bbd3308fa7ee379f",
+    "workspace/rerank-capability-20261021.json": "16ed3c7b0a7c795815840896a4f6a03eb0ef34dcb252fca1e6d935e7fdb55d79",
+    "workspace/rerank-original-integrity-20261021.json": "7670771de515928acce18020f070a95e65bdc97b48e0b3e2356b1c82933fe80d",
+    "workspace/rerank-ui-final-20261021-claim-support.png": "523656fc56b6e6885727cbef94c5bf17c12eba72b80b6122b69eeb93db19ac02",
+    "workspace/rerank-ui-final-20261021-completed.png": "c48fde81e80e2cad46320d1a10be8e38aada0f179499ca7717a650f89891cf1a",
+    "workspace/rerank-ui-final-20261021-fallback-current.png": "aa4dce870601c5d163fd4fae7f68a88fd5990c67c3cb63f475d57d10b96bfd66",
+    "workspace/rerank-ui-final-20261021-knowledge.png": "4664aaa99ea3388fae7855c45cc17e1740b5ebd8127da753177fd1efd83f3146",
+    "workspace/rerank-ui-final-20261021-reranking.png": "3d4fed7777eb1ce42144d896a2ad38b52ea681d7da7a82378084e653c040702c",
+    "workspace/rerank-ui-final-20261021-small-window.png": "aa1bd05e2ef0450a310d98298f0c617cb358648b07ab963f50fb1301fced1c28",
+    "workspace/rerank-ui-final-20261021-ui-results.json": "7d969768ed5867a7a0ed31bb793a697c00d6bc6596586120f3b553f7fff1278f",
+    "workspace/rerank-ui-final-build-20261021.log": "a89b75f28f2f1cfc52edb2683b1a03d8918fafc1bbff651543353b7c8d832bfd",
+    "workspace/rerank-ui-final-desktop-20261021.log": "93530cebf6d9808fbf451741bacac09e029085fbe42d1588b0c357d6d24bad3c"
+  }
+}

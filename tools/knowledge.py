@@ -15,17 +15,21 @@ def make_search_knowledge(settings,task_dir:Path,session,store_factory=Knowledge
         query:Annotated[str,Field(min_length=1,max_length=1000,description='检索本地原始文档的问题，不检索历史研究摘要')],
         mode:Literal['hybrid','keyword','vector']='hybrid',
         k:Annotated[int,Field(ge=1,le=8)]=4,
+        rerank:Annotated[bool|None,Field(description='留空沿用本任务重排设置；false关闭。本任务已关闭时不能自行开启。关键词模式不执行云端重排')]=None,
     )->ToolResult:
         """检索已导入知识库。hybrid独立召回关键词和向量后融合；keyword不调用嵌入API。
-        返回原文、文件/页码/代际，rank_score仅相对排序，不代表正确概率。无命中不等于全文无该事实。"""
+        可按本轮设置对候选进行cross-encoder重排。返回原文、文件/页码/代际；rank_score和rerank_score
+        仅用于排序，不代表答案正确概率。无命中不等于全文无该事实。"""
         events={}
         def collect(event):
             events[event['id']]=event
-            journal=task_dir/'embedding_usage.jsonl'
+            journal=task_dir/('rerank_usage.jsonl' if event.get('operation')=='rerank' else 'embedding_usage.jsonl')
             if journal.is_symlink(): raise ValueError('嵌入用量日志不得为链接')
             with journal.open('a',encoding='utf-8') as stream:
                 stream.write(json.dumps(event,ensure_ascii=False)+'\n')
         try:
+            if rerank is True and not settings.knowledge_rerank_enabled:
+                raise ValueError('当前任务已关闭重排，不能通过工具自行开启')
             store=store_factory(settings,event_callback=collect)
             snapshot=task_dir/'knowledge_snapshot.json'
             if snapshot.is_symlink(): raise ValueError('知识库任务快照不得为链接')
@@ -42,8 +46,8 @@ def make_search_knowledge(settings,task_dir:Path,session,store_factory=Knowledge
             if not generation:
                 return ToolResult('知识库尚无已完成索引；请先在知识库管理中导入资料。')
             result=store.search(query,generation=generation,mode=mode,k=k,
-                                budget=getattr(session,'embedding_budget_remaining',0))
-            content=json.dumps({key:value for key,value in result.items() if key not in ('hits','usage')},ensure_ascii=False)+'\n'
+                                budget=getattr(session,'embedding_budget_remaining',0),rerank=rerank)
+            content=json.dumps({key:value for key,value in result.items() if key not in ('hits','usage','candidates')},ensure_ascii=False)+'\n'
             metadata=[]
             for hit in result['hits']:
                 content+=f"\n【{hit['name']} 第{hit['page']}页 片段{hit['chunk_id']} {hit['role']}】\n<document_content>\n"

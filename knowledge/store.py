@@ -12,13 +12,14 @@ from .documents import parse, split, sha
 from .embedding import Embedder
 from .locking import lease
 from .vectors import MilvusVectors
+from .reranking import Reranker,validate_rows
 
 
 def now(): return datetime.now(timezone.utc).isoformat()
 
 
 class KnowledgeStore:
-    def __init__(self,settings,*,vectors=None,embedding_client=None,event_callback=None):
+    def __init__(self,settings,*,vectors=None,embedding_client=None,rerank_client=None,event_callback=None):
         self.settings=settings
         self.event_callback=event_callback
         self.root=Path(settings.knowledge_path)
@@ -29,6 +30,7 @@ class KnowledgeStore:
         if self.path.is_symlink(): raise ValueError('知识库数据库不得为链接')
         self.vectors=vectors or MilvusVectors()
         self.embedder=Embedder(settings,self.record_event,embedding_client)
+        self.reranker=Reranker(settings,self.record_event,rerank_client)
         self.signature=sha(json.dumps(self.embedder.identity,sort_keys=True))
         with self.connect() as db:
             db.executescript('''
@@ -39,6 +41,7 @@ class KnowledgeStore:
                 CREATE VIRTUAL TABLE IF NOT EXISTS chunks_fts USING fts5(generation UNINDEXED,idx UNINDEXED,terms);
                 CREATE TABLE IF NOT EXISTS vectors(signature TEXT,text_hash TEXT,data TEXT,PRIMARY KEY(signature,text_hash));
                 CREATE TABLE IF NOT EXISTS events(id TEXT PRIMARY KEY,data TEXT);
+                CREATE TABLE IF NOT EXISTS rerank_cache(key TEXT PRIMARY KEY,data TEXT);
             ''')
 
     @contextmanager
@@ -80,9 +83,16 @@ class KnowledgeStore:
             if not g: return None
             return {k:v for k,v in g.items() if k!='files'} | {'files':[
                 {k:v for k,v in d.items() if k!='pages'} | {'pages':len(d['pages'])} for d in g.get('files',[])]}
-        events=self.events()
+        all_events=self.events()
+        events=[e for e in all_events if e.get('operation')!='rerank']
+        rerank_events=[e for e in all_events if e.get('operation')=='rerank']
         return {'active':public(current),'latest':public(latest),
                 'embedding':{**self.embedder.identity,'key_configured':bool(self.settings.siliconflow_api_key)},
+                'rerank':{**self.reranker.identity,'enabled':self.settings.knowledge_rerank_enabled,
+                    'candidates':self.settings.knowledge_rerank_candidates,
+                    'usage':{'calls':len(rerank_events),'input_tokens':sum(e.get('input_tokens') or 0 for e in rerank_events),
+                        'output_tokens':sum(e.get('output_tokens') or 0 for e in rerank_events),
+                        'unknown_usage_calls':sum(e.get('input_tokens') is None or e.get('output_tokens') is None for e in rerank_events)}},
                 'usage':{'calls':len(events),'returned':sum(e['status']=='returned' for e in events),
                     'unknown_usage_calls':sum(e.get('input_tokens') is None for e in events),
                     'input_tokens':sum(e.get('input_tokens') or 0 for e in events)},
@@ -178,9 +188,23 @@ class KnowledgeStore:
         return {'id':doc_id,'name':document['name'],'page':page,'text':document['pages'][page-1]['text'][:20000],
                 'partial':len(document['pages'][page-1]['text'])>20000,'file_sha256':document['file_sha256']}
 
-    def search(self,query,*,generation=None,mode='hybrid',k=4,budget=10000):
+    def _rerank(self,query,texts,purpose,budget):
+        key=sha(json.dumps({'identity':self.reranker.identity,'query':sha(query),
+                            'texts':[sha(text) for text in texts]},sort_keys=True))
+        with self.connect() as db:
+            row=db.execute('SELECT data FROM rerank_cache WHERE key=?',(key,)).fetchone()
+        if row: return validate_rows(json.loads(row[0]),len(texts)),[],True
+        rows,events=self.reranker.rank(query,texts,purpose,budget)
+        with self.connect() as db:
+            db.execute('INSERT OR REPLACE INTO rerank_cache VALUES (?,?)',(key,json.dumps(rows,allow_nan=False)))
+        return rows,events,False
+
+    def search(self,query,*,generation=None,mode='hybrid',k=4,budget=None,rerank=None):
         if mode not in ('keyword','vector','hybrid') or not query.strip() or len(query)>1000 or not 1<=k<=8:
             raise ValueError('检索参数无效；问题最多1000字符，k为1至8')
+        if rerank is True and mode=='keyword': raise ValueError('关键词模式不执行云端重排；请选择hybrid或vector')
+        use_rerank=mode!='keyword' and (self.settings.knowledge_rerank_enabled if rerank is None else rerank)
+        budget=self.settings.knowledge_search_token_budget if budget is None else budget
         current=self.generation(generation)
         if not current or not current['chunks']: return {'generation':current['id'] if current else None,'hits':[],'usage':[],'mode':mode}
         if current['status']!='ready': raise ValueError('知识库版本未完成')
@@ -197,11 +221,22 @@ class KnowledgeStore:
         dense=[]; events=[]
         if mode!='keyword':
             vectors,events,_=self._cached_vectors([query],'query:'+current['id'],budget)
+            budget-=sum(e['input_tokens'] for e in events)
             dense=self.vectors.search(self.root,current['id'],vectors[0],min(40,len(chunks)))
         scores={}
         for ranks in (lexical,dense):
             for rank,index in enumerate(ranks,1): scores[index]=scores.get(index,0)+1/(60+rank)
-        direct=sorted(scores,key=lambda i:(-scores[i],i))[:k]
+        pool=sorted(scores,key=lambda i:(-scores[i],i))[:self.settings.knowledge_rerank_candidates]
+        ranking=list(pool);rerank_scores={}
+        reranking={'enabled':use_rerank,'status':'disabled' if not use_rerank else 'empty',
+                   'model':self.settings.rerank_model if use_rerank else None,'candidate_count':len(pool),'cache_hit':False}
+        if use_rerank and pool:
+            rows,usage,cache_hit=self._rerank(query,[chunks[i]['text'] for i in pool],'query:'+current['id'],budget)
+            events+=usage
+            rerank_scores={pool[row['index']]:row['relevance_score'] for row in rows}
+            ranking=sorted(pool,key=lambda i:(-rerank_scores[i],pool.index(i)))
+            reranking.update(status='applied',cache_hit=cache_hit)
+        direct=ranking[:k]
         selected=[(i,'direct') for i in direct]
         for index in direct:
             for neighbor in (index-1,index+1):
@@ -213,8 +248,11 @@ class KnowledgeStore:
             chunk=chunks[index]; text=chunk['text'][:remaining]
             hits.append({**chunk,'text':text,'end':chunk['start']+len(text),'generation':current['id'],
                          'chunk_id':index,'role':role,'rank_score':scores.get(index),
+                         'rerank_score':rerank_scores.get(index),
                          'partial':len(text)<len(chunk['text'])})
             remaining-=len(text)
         return {'generation':current['id'],'hits':hits,'usage':events,'mode':mode,
+                'reranking':reranking,'candidates':[{'chunk_id':i,'rrf_score':scores[i],
+                    'rerank_score':rerank_scores.get(i)} for i in pool],
                 'lexical_candidates':len(lexical),'vector_candidates':len(dense),
-                'meaning':'RRF为相对排序；无命中或有限片段不证明原资料不存在信息，检索不认证答案。'}
+                'meaning':'RRF与重排分仅用于排序，不是答案正确概率；无命中或有限片段不证明原资料不存在信息，检索不认证答案。'}

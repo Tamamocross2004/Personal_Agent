@@ -56,6 +56,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("--chat", action="store_true", help="纯对话模式（不使用工具，阶段 0 行为）")
     p.add_argument("--no-memory", action="store_true", help="本次不读取或写入长期记忆")
     p.add_argument("--knowledge", action="store_true", help="启用本地原始文档知识库检索")
+    p.add_argument("--rerank", action=argparse.BooleanOptionalAction,default=None,help="开启/关闭知识库cross-encoder重排")
     p.add_argument("--provider", choices=list(PROVIDERS), help="覆盖 .env 中的 LLM_PROVIDER")
     p.add_argument("--model", help="覆盖模型名")
     p.add_argument("--max-steps", type=int, help="最大循环步数（默认取 .env 的 AGENT_MAX_STEPS，30）")
@@ -314,6 +315,8 @@ def main(argv: list[str] | None = None) -> int:
         settings = Settings()
         if args.knowledge:
             settings = settings.model_copy(update={'knowledge_enabled':True})
+        if args.rerank is not None:
+            settings = settings.model_copy(update={'knowledge_rerank_enabled':args.rerank})
         if args.no_memory:
             settings = settings.model_copy(update={"memory_enabled": False})
         cfg = load_llm_config(provider=args.provider, model=args.model, settings=settings)

@@ -17,6 +17,7 @@ export function KnowledgeLibrary({
     [mode, setMode] = useState("keyword");
   const [result, setResult] = useState<any>(null),
     [preview, setPreview] = useState<any>(null);
+  const [rerank, setRerank] = useState<boolean | undefined>(undefined);
   const load = async () => setStatus(await api("/knowledge"));
   useEffect(() => {
     let live = true;
@@ -65,7 +66,16 @@ export function KnowledgeLibrary({
         </div>
         <p className="muted">
           TXT、Markdown、文本
-          PDF。云端嵌入会把文档片段和检索问题发送给硅基流动；聊天模型保持当前设置。扫描件暂不支持。
+          PDF。云端嵌入和重排会把文档片段、检索问题发送给硅基流动；聊天模型保持当前设置。扫描件暂不支持。
+        </p>
+        <p className="muted">
+          重排模型：{status?.rerank?.model || "加载中"} · 默认
+          {status?.rerank?.enabled ? "开启" : "关闭"} · 候选上限{" "}
+          {status?.rerank?.candidates || "—"}。累计{" "}
+          {status?.rerank?.usage?.calls || 0} 次 · 输入{" "}
+          {status?.rerank?.usage?.input_tokens || 0} token · 输出{" "}
+          {status?.rerank?.usage?.output_tokens || 0} token · 用量未知{" "}
+          {status?.rerank?.usage?.unknown_usage_calls || 0} 次 · 费用未计价。
         </p>
         <p>
           嵌入模型：{status?.embedding?.model || "加载中"} · Key{" "}
@@ -232,7 +242,7 @@ export function KnowledgeLibrary({
         )}
         <h3>检索预览</h3>
         <p className="muted">
-          关键词模式不调用嵌入服务；混合和向量模式可能产生 API
+          关键词模式不调用嵌入或重排服务；混合和向量模式可能产生 API
           用量。排序分仅用于排列片段，不表示答案正确概率。
         </p>
         <div className="knowledge-actions">
@@ -252,6 +262,16 @@ export function KnowledgeLibrary({
             <option value="hybrid">混合（云端嵌入）</option>
             <option value="vector">向量（云端嵌入）</option>
           </select>
+          <label>
+            <input
+              aria-label="本次检索重排"
+              type="checkbox"
+              checked={rerank ?? status?.rerank?.enabled ?? false}
+              disabled={mode === "keyword"}
+              onChange={(e) => setRerank(e.target.checked)}
+            />
+            本次检索启用重排
+          </label>
           <button
             disabled={pending || !query.trim()}
             onClick={() =>
@@ -259,7 +279,15 @@ export function KnowledgeLibrary({
                 setResult(
                   await api("/knowledge/search", {
                     method: "POST",
-                    body: JSON.stringify({ query, mode, k: 4 }),
+                    body: JSON.stringify({
+                      query,
+                      mode,
+                      k: 4,
+                      rerank:
+                        mode === "keyword"
+                          ? false
+                          : (rerank ?? status?.rerank?.enabled ?? false),
+                    }),
                   }),
                 ),
               )
@@ -273,6 +301,14 @@ export function KnowledgeLibrary({
             <p>
               版本：{result.generation || "暂无"} · {result.hits.length}{" "}
               个片段。无命中不证明资料不存在相关事实。
+              {result.reranking && (
+                <>
+                  {" "}
+                  重排：{result.reranking.status} ·{" "}
+                  {result.reranking.model || "关闭"}
+                  {result.reranking.cache_hit ? "（缓存命中）" : ""}
+                </>
+              )}
             </p>
             {result.hits.map((h: any) => (
               <article key={h.chunk_id} className="knowledge-hit">
@@ -283,6 +319,9 @@ export function KnowledgeLibrary({
                 <p className="muted">
                   提取文本区间 {h.start}–{h.end} · RRF{" "}
                   {h.rank_score?.toFixed(5) || "—"}
+                  {h.rerank_score != null && (
+                    <> · 重排分 {h.rerank_score.toFixed(5)}</>
+                  )}
                 </p>
                 <pre>{h.text}</pre>
               </article>

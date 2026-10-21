@@ -147,6 +147,7 @@ class EvidenceLedger:
                     page_sha256=item['page_sha256'],generation=item['generation'],page=item['page'],
                     chunk_id=item['chunk_id'],start=item['start'],end=item['start']+shown,
                     context_role=item['role'],delivery_truncated=shown<len(item['text']),
+                    retrieval_rank_score=item.get('rank_score'),rerank_score=item.get('rerank_score'),
                     description='本任务固定知识库代际中实际送达的提取原文；不证明原文件事实真实或当前库状态')
                 if source: ids.append(source)
         elif tool == 'fetch_url':

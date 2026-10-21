@@ -21,6 +21,8 @@ def main():
     settings=Settings().model_copy(update={'memory_enabled':options['memory'],
         'knowledge_enabled':options.get('knowledge',False),
         'knowledge_path':Path(request.get('knowledge_path',Settings().knowledge_path))})
+    if options.get('rerank') is not None:
+        settings=settings.model_copy(update={'knowledge_rerank_enabled':options['rerank']})
     try:
         if request.get('resume'):
             result=resume_research(args.task_dir,should_stop=(args.task_dir/'.desktop-stop').exists,clear_stop_marker=False)

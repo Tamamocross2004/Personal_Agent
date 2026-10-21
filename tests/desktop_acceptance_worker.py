@@ -7,6 +7,8 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from desktop_acceptance_fixture import OfflineModel,settings
 import desktop_app.worker as worker
 import main
+from desktop_rag_fixture import inject_clients
+inject_clients()
 
 root=Path(sys.argv[1])
 (root/'.desktop-test-worker.json').write_text(json.dumps({'pid':__import__('os').getpid()}),encoding='utf-8')
