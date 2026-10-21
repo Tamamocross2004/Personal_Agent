@@ -1,0 +1,737 @@
+{
+  "source_unchanged": true,
+  "tasks": [
+    {
+      "id": "bounded-material-report",
+      "stop_reason": "final_answer",
+      "steps": 4,
+      "equivalent_tokens": 16312,
+      "chat": {
+        "calls": 6,
+        "purposes": {
+          "planning": 1,
+          "agent": 4,
+          "report_review": 1
+        },
+        "prompt_tokens": 38506,
+        "cached_tokens": 28160,
+        "completion_tokens": 1575,
+        "unknown_usage_calls": 0
+      },
+      "embedding": {
+        "calls": 0,
+        "input_tokens": 0,
+        "unknown_usage_calls": 0
+      },
+      "rerank": {
+        "calls": 0,
+        "input_tokens": 0,
+        "unknown_usage_calls": 0
+      },
+      "tools": {
+        "update_plan": 2,
+        "write_report": 2
+      },
+      "tool_errors": [
+        {
+          "name": "write_report",
+          "content": "ERROR: ReportValidationError: 尚未保存：{\"status\": \"rejected\", \"report_sha256\": \"559bbff62dd4e9716c58d132d592ed4c910a12f0861cedc8c94461b710ec515c\", \"issues\": [{\"path\": \"content\", \"code\": \"task_contract\", \"message\": \"任务约定检查失败：full/characters 实际 308，超过明确上限 300（不超过300字）。本次计量是可见非空白字符（删空白不会降低数量；英文、数字和标点也计入），至少需减少8；建议整体删减约128，下一稿写到约180以留余量，仍按原上限300检查。不要反复只删一两个字。；长句定位（压缩重复解释，保留核心事实，不是自动删除）：[{\\\"count\\\": 50, \\\"text\\\": \\\"限制：内存容量与故障率是不同维度，容量大小不能推出可靠性高低；故障率缺失不等于为零，仅表示未提供记录\\\"}, {\\\"count\\\": 44, \\\"text\\\": \\\"UX72 配置 19GB 内存，PY36 配置 25GB 内存；材料未提供故障率，无法判断哪台更可靠\\\"}]全文范围含标题和参考资料，正文范围也含章节名；合并重复解释，保留必答结论、依据及局限。草稿不等于完整交付。\"}], \"omitted_issues\": 0, \"measurements\": [{\"maximum\": 300, \"unit\": \"characters\", \"scope\": \"full\", \"explicit_text\": \"不超过300字\", \"actual\": 308}], \"limits\": \"汇总可独立检查的问题；依赖无效来源的进一步检查待修复后重做。未写入，不自动修正；通过定位也不认证语义。\"}"
+        }
+      ],
+      "budget_denied_calls": [],
+      "document_records_checked": 0,
+      "invalid_document_records": [],
+      "reports": [
+        {
+          "filename": "report.md",
+          "mapping": {
+            "status": "mapped",
+            "claims": 4,
+            "mapping_sha256": "b2a80d31254a938a0281983c342cfb4519d645c04036deef3a969f0f82fc08d8",
+            "claim_kinds": [
+              "direct",
+              "inference",
+              "unknown"
+            ],
+            "source_kinds": [
+              "user"
+            ],
+            "records": 1,
+            "omitted_records": 0,
+            "structural_links_valid": true,
+            "semantic_support": "not_certified"
+          },
+          "review_status": "reviewed",
+          "issues": [],
+          "support_review": {
+            "status": "complete",
+            "checks": [
+              {
+                "claim_index": 0,
+                "target": "quote",
+                "status": "supported",
+                "reason": "用户输入逐字给出UX72为19GB、PY36为25GB，报告保留型号与单位，表述一致。",
+                "missing_evidence": "",
+                "suggestion": "",
+                "quote": "UX72 配置 19GB 内存，PY36 配置 25GB 内存"
+              },
+              {
+                "claim_index": 1,
+                "target": "quote",
+                "status": "supported",
+                "reason": "用户输入明确写明“未提供故障率”，报告转述准确。",
+                "missing_evidence": "",
+                "suggestion": "",
+                "quote": "材料未提供故障率"
+              },
+              {
+                "claim_index": 2,
+                "target": "quote",
+                "status": "supported",
+                "reason": "材料仅提供内存容量，未提供故障率等可靠性数据；由容量无法推出可靠性排序，结论限定在“无法判断”范围内，未越界。",
+                "missing_evidence": "",
+                "suggestion": "",
+                "quote": "无法判断哪台更可靠"
+              },
+              {
+                "claim_index": 3,
+                "target": "quote",
+                "status": "supported",
+                "reason": "“未提供故障率”只说明资料缺失，报告明确区分缺失与为零，未把未知写成事实。",
+                "missing_evidence": "",
+                "suggestion": "",
+                "quote": "故障率缺失不等于为零，只表示未提供记录"
+              }
+            ],
+            "missing_claim_indices": [],
+            "omitted_items": 0,
+            "counts": {
+              "supported": 4,
+              "contradicted": 0,
+              "insufficient": 0,
+              "uncertain": 0
+            },
+            "meaning": "模型对选定结论的逐项意见；不认证事实或未关联文本。"
+          },
+          "review_hash_matches": true,
+          "hard_errors": []
+        }
+      ],
+      "activity_snapshots_checked": [],
+      "validation_rejections": [
+        {
+          "tool_call_id": "call_00_v5No17MnRPh9emmbcxvX5869",
+          "feedback": {
+            "status": "rejected",
+            "report_sha256": "559bbff62dd4e9716c58d132d592ed4c910a12f0861cedc8c94461b710ec515c",
+            "issues": [
+              {
+                "path": "content",
+                "code": "task_contract",
+                "message": "任务约定检查失败：full/characters 实际 308，超过明确上限 300（不超过300字）。本次计量是可见非空白字符（删空白不会降低数量；英文、数字和标点也计入），至少需减少8；建议整体删减约128，下一稿写到约180以留余量，仍按原上限300检查。不要反复只删一两个字。；长句定位（压缩重复解释，保留核心事实，不是自动删除）：[{\"count\": 50, \"text\": \"限制：内存容量与故障率是不同维度，容量大小不能推出可靠性高低；故障率缺失不等于为零，仅表示未提供记录\"}, {\"count\": 44, \"text\": \"UX72 配置 19GB 内存，PY36 配置 25GB 内存；材料未提供故障率，无法判断哪台更可靠\"}]全文范围含标题和参考资料，正文范围也含章节名；合并重复解释，保留必答结论、依据及局限。草稿不等于完整交付。"
+              }
+            ],
+            "omitted_issues": 0,
+            "measurements": [
+              {
+                "maximum": 300,
+                "unit": "characters",
+                "scope": "full",
+                "explicit_text": "不超过300字",
+                "actual": 308
+              }
+            ],
+            "limits": "汇总可独立检查的问题；依赖无效来源的进一步检查待修复后重做。未写入，不自动修正；通过定位也不认证语义。"
+          }
+        }
+      ],
+      "coding_assistant_review": {
+        "kind": "coding_assistant",
+        "independent": false,
+        "findings": [],
+        "assessment": "Final report preserves model/memory assignments and reliability uncertainty; 300-character hard limit passed after correction; selected claims fully model-reviewed."
+      }
+    },
+    {
+      "id": "make-phony-clean",
+      "stop_reason": "budget",
+      "steps": 7,
+      "equivalent_tokens": 45664,
+      "chat": {
+        "calls": 11,
+        "purposes": {
+          "planning": 1,
+          "agent": 9,
+          "report_review": 1
+        },
+        "prompt_tokens": 127684,
+        "cached_tokens": 108672,
+        "completion_tokens": 6147,
+        "unknown_usage_calls": 0
+      },
+      "embedding": {
+        "calls": 1,
+        "input_tokens": 11,
+        "unknown_usage_calls": 0
+      },
+      "rerank": {
+        "calls": 1,
+        "input_tokens": 3480,
+        "unknown_usage_calls": 0
+      },
+      "tools": {
+        "search_knowledge": 1,
+        "update_plan": 4,
+        "read_evidence": 5,
+        "read_notes": 1,
+        "write_report": 3
+      },
+      "tool_errors": [
+        {
+          "name": "write_report",
+          "content": "ERROR: ReportValidationError: 尚未保存：{\"status\": \"rejected\", \"report_sha256\": \"120242ad4af4a330777be84b787aaa2fb140c6e32c0bcdcb780e56a8cf90369e\", \"issues\": [{\"path\": \"content\", \"code\": \"brief_length\", \"message\": \"用户要求简述，正文明显超过默认软目标。请先删除重复引文、无关背景或额外分析，保留必答结论、依据和局限。默认目标不是用户硬上限；如确实需要较长内容，可在 brief_extension_reason 中说明具体必答项与必要性（至少20字符），由审稿核对，不能只称更全面。\"}, {\"path\": \"claims[6]\", \"code\": \"evidence_constraint\", \"message\": \"引用章节没有绑定已读标题依据：第 2 章；不能从文件名或未读目录补充定位。\"}], \"omitted_issues\": 0, \"measurements\": [{\"scope\": \"body\", \"unit\": \"characters\", \"actual\": 1148, \"soft_target\": 500}], \"limits\": \"汇总可独立检查的问题；依赖无效来源的进一步检查待修复后重做。未写入，不自动修正；通过定位也不认证语义。\"}"
+        },
+        {
+          "name": "write_report",
+          "content": "ERROR: ReportValidationError: 尚未保存：{\"status\": \"rejected\", \"report_sha256\": \"85bf619ea61b08491a132fa6db990f68ec3402488507b118a0dac20940801560\", \"issues\": [{\"path\": \"content\", \"code\": \"brief_length\", \"message\": \"用户要求简述，正文明显超过默认软目标。请先删除重复引文、无关背景或额外分析，保留必答结论、依据和局限。默认目标不是用户硬上限；如确实需要较长内容，可在 brief_extension_reason 中说明具体必答项与必要性（至少20字符），由审稿核对，不能只称更全面。\"}, {\"path\": \"claims[4]\", \"code\": \"evidence_constraint\", \"message\": \"引用章节没有绑定已读标题依据：第 2 章；不能从文件名或未读目录补充定位。\"}], \"omitted_issues\": 0, \"measurements\": [{\"scope\": \"body\", \"unit\": \"characters\", \"actual\": 1307, \"soft_target\": 500}], \"limits\": \"汇总可独立检查的问题；依赖无效来源的进一步检查待修复后重做。未写入，不自动修正；通过定位也不认证语义。\"}"
+        }
+      ],
+      "budget_denied_calls": [],
+      "document_records_checked": 10,
+      "invalid_document_records": [],
+      "reports": [
+        {
+          "filename": "report.md",
+          "mapping": {
+            "status": "mapped",
+            "claims": 6,
+            "mapping_sha256": "54ca53432d1dfd4aa7b75de5d3398e1c7fb557875e70a28fb96c8385f01a793a",
+            "claim_kinds": [
+              "direct"
+            ],
+            "source_kinds": [
+              "document"
+            ],
+            "records": 12,
+            "omitted_records": 0,
+            "structural_links_valid": true,
+            "semantic_support": "not_certified"
+          },
+          "review_status": "reviewed",
+          "issues": [],
+          "support_review": {
+            "status": "complete",
+            "checks": [
+              {
+                "claim_index": 0,
+                "target": "quote",
+                "status": "supported",
+                "reason": "document-4 原文与引句一致：phony 目标不是文件名，只是显式请求时执行配方的名字，并给出避免同名文件冲突与提高性能两个理由。",
+                "missing_evidence": "",
+                "suggestion": "",
+                "quote": "手册把 phony 目标定义为“不是真正的文件名，只是显式请求时执行配方的名字”，并给出两个用途：避免与同名文件冲突、提高性能 [1]"
+              },
+              {
+                "claim_index": 1,
+                "target": "quote",
+                "status": "supported",
+                "reason": "document-2 原文说明若目录中创建了名为 clean 的文件，因 clean 无先决条件会被视为最新、配方不执行，与报告一致。",
+                "missing_evidence": "",
+                "suggestion": "",
+                "quote": "clean 无先决条件，若目录中曾创建名为 clean 的文件，它会被视为最新，配方不执行 [2]"
+              },
+              {
+                "claim_index": 2,
+                "target": "quote",
+                "status": "supported",
+                "reason": "document-1 原文明确：声明后 make clean 无论是否存在名为 clean 的文件都会运行配方。",
+                "missing_evidence": "",
+                "suggestion": "",
+                "quote": "`.PHONY: clean` 使 `make clean` 无视是否存在名为 clean 的文件而运行配方 [3]"
+              },
+              {
+                "claim_index": 3,
+                "target": "quote",
+                "status": "supported",
+                "reason": "document-1 原文说明 .PHONY 先决条件按字面目标名解释、绝不当模式，并建议用 force target 实现模式规则总是重建。",
+                "missing_evidence": "",
+                "suggestion": "",
+                "quote": "`.PHONY` 的先决条件始终按字面目标名解释，绝不当模式（即使含 `%`）；要总是重建模式规则应改用 force target [3]"
+              },
+              {
+                "claim_index": 4,
+                "target": "quote",
+                "status": "supported",
+                "reason": "document-3 原文说明 .PHONY : clean 防止 make 被真实 clean 文件搞混，并使 rm 出错时继续；报告表述与原文一致。",
+                "missing_evidence": "",
+                "suggestion": "",
+                "quote": "`.PHONY : clean` 可防止 make 被真实的 clean 文件搞混，并配合 `-` 前缀让 rm 出错时继续 [4]"
+              },
+              {
+                "claim_index": 5,
+                "target": "quote",
+                "status": "supported",
+                "reason": "document-6 原文称 clean 为典型 phony 目标，仅在显式 make clean 时执行，与报告一致。",
+                "missing_evidence": "",
+                "suggestion": "",
+                "quote": "clean 属典型 phony 目标，仅在显式 `make clean` 时执行 [5]"
+              }
+            ],
+            "missing_claim_indices": [],
+            "omitted_items": 0,
+            "counts": {
+              "supported": 6,
+              "contradicted": 0,
+              "insufficient": 0,
+              "uncertain": 0
+            },
+            "meaning": "模型对选定结论的逐项意见；不认证事实或未关联文本。"
+          },
+          "review_hash_matches": true,
+          "hard_errors": []
+        }
+      ],
+      "activity_snapshots_checked": [
+        {
+          "tool_call_id": "call_00_4nCG4WkNkMZoHeaSTYDB3113",
+          "tool_mismatches": [],
+          "document_records_match": true,
+          "document_versions_match": true,
+          "summary": {
+            "tool_requests": {
+              "search_knowledge": {
+                "requested": 1,
+                "returned_ok": 1,
+                "returned_error": 0,
+                "uncertain": 0
+              },
+              "update_plan": {
+                "requested": 4,
+                "returned_ok": 4,
+                "returned_error": 0,
+                "uncertain": 0
+              },
+              "read_evidence": {
+                "requested": 5,
+                "returned_ok": 5,
+                "returned_error": 0,
+                "uncertain": 0
+              },
+              "read_notes": {
+                "requested": 1,
+                "returned_ok": 1,
+                "returned_error": 0,
+                "uncertain": 0
+              }
+            },
+            "omitted_tools": 0,
+            "retained_evidence": {
+              "records": 11,
+              "document_records": 10,
+              "document_versions": 1,
+              "ledger_omitted_records": 0
+            },
+            "limits": "截至此快照的本任务工具请求与返回；returned_error也可能是参数校验或重复拦截，并非工具函数实际执行失败。requested未被returned_ok/returned_error/uncertain覆盖的部分尚未返回；不统计服务商内部重试。文档仅计已保留送达片段，不是全库清单、完整阅读或无遗漏证明；不证明生产业务状态。"
+          }
+        }
+      ],
+      "validation_rejections": [
+        {
+          "tool_call_id": "call_00_vtkVgMFAe038uGaGCE5C7385",
+          "feedback": {
+            "status": "rejected",
+            "report_sha256": "120242ad4af4a330777be84b787aaa2fb140c6e32c0bcdcb780e56a8cf90369e",
+            "issues": [
+              {
+                "path": "content",
+                "code": "brief_length",
+                "message": "用户要求简述，正文明显超过默认软目标。请先删除重复引文、无关背景或额外分析，保留必答结论、依据和局限。默认目标不是用户硬上限；如确实需要较长内容，可在 brief_extension_reason 中说明具体必答项与必要性（至少20字符），由审稿核对，不能只称更全面。"
+              },
+              {
+                "path": "claims[6]",
+                "code": "evidence_constraint",
+                "message": "引用章节没有绑定已读标题依据：第 2 章；不能从文件名或未读目录补充定位。"
+              }
+            ],
+            "omitted_issues": 0,
+            "measurements": [
+              {
+                "scope": "body",
+                "unit": "characters",
+                "actual": 1148,
+                "soft_target": 500
+              }
+            ],
+            "limits": "汇总可独立检查的问题；依赖无效来源的进一步检查待修复后重做。未写入，不自动修正；通过定位也不认证语义。"
+          }
+        },
+        {
+          "tool_call_id": "call_00_aD1yp4VKr4r8bl6m0a7V7200",
+          "feedback": {
+            "status": "rejected",
+            "report_sha256": "85bf619ea61b08491a132fa6db990f68ec3402488507b118a0dac20940801560",
+            "issues": [
+              {
+                "path": "content",
+                "code": "brief_length",
+                "message": "用户要求简述，正文明显超过默认软目标。请先删除重复引文、无关背景或额外分析，保留必答结论、依据和局限。默认目标不是用户硬上限；如确实需要较长内容，可在 brief_extension_reason 中说明具体必答项与必要性（至少20字符），由审稿核对，不能只称更全面。"
+              },
+              {
+                "path": "claims[4]",
+                "code": "evidence_constraint",
+                "message": "引用章节没有绑定已读标题依据：第 2 章；不能从文件名或未读目录补充定位。"
+              }
+            ],
+            "omitted_issues": 0,
+            "measurements": [
+              {
+                "scope": "body",
+                "unit": "characters",
+                "actual": 1307,
+                "soft_target": 500
+              }
+            ],
+            "limits": "汇总可独立检查的问题；依赖无效来源的进一步检查待修复后重做。未写入，不自动修正；通过定位也不认证语义。"
+          }
+        }
+      ],
+      "coding_assistant_review": {
+        "kind": "coding_assistant",
+        "independent": false,
+        "findings": [
+          {
+            "quote": "手册未讨论其他情形，此处不扩展。",
+            "reason": "Limited delivered excerpts do not establish absence across the entire manual; qualify as not covered in the read excerpts."
+          }
+        ],
+        "assessment": "Saved and fully model-reviewed during budget wrapup; not a normal final_answer."
+      }
+    },
+    {
+      "id": "logging-adapter-context",
+      "stop_reason": "budget",
+      "steps": 5,
+      "equivalent_tokens": 45679,
+      "chat": {
+        "calls": 10,
+        "purposes": {
+          "planning": 1,
+          "agent": 7,
+          "report_review": 1,
+          "wrapup_uncached": 1
+        },
+        "prompt_tokens": 100268,
+        "cached_tokens": 76928,
+        "completion_tokens": 5385,
+        "unknown_usage_calls": 0
+      },
+      "embedding": {
+        "calls": 1,
+        "input_tokens": 13,
+        "unknown_usage_calls": 0
+      },
+      "rerank": {
+        "calls": 1,
+        "input_tokens": 3863,
+        "unknown_usage_calls": 0
+      },
+      "tools": {
+        "search_knowledge": 1,
+        "update_plan": 4,
+        "read_notes": 1,
+        "write_report": 4
+      },
+      "tool_errors": [
+        {
+          "name": "write_report",
+          "content": "ERROR: ReportValidationError: 尚未保存：{\"status\": \"rejected\", \"report_sha256\": \"ca77948faa4b2f9ded113de1a50105544381629b72db5c0b229f296d7f942936\", \"issues\": [{\"path\": \"content\", \"code\": \"brief_length\", \"message\": \"用户要求简述，正文明显超过默认软目标。请先删除重复引文、无关背景或额外分析，保留必答结论、依据和局限。默认目标不是用户硬上限；如确实需要较长内容，可在 brief_extension_reason 中说明具体必答项与必要性（至少20字符），由审稿核对，不能只称更全面。\"}], \"omitted_issues\": 0, \"measurements\": [{\"scope\": \"body\", \"unit\": \"characters\", \"actual\": 1083, \"soft_target\": 500}], \"limits\": \"汇总可独立检查的问题；依赖无效来源的进一步检查待修复后重做。未写入，不自动修正；通过定位也不认证语义。\"}"
+        },
+        {
+          "name": "write_report",
+          "content": "ERROR: ValueError: 报告版本已变化：base_sha256 必须是当前报告的 SHA-256，请核对最新审稿反馈。"
+        }
+      ],
+      "budget_denied_calls": [],
+      "document_records_checked": 8,
+      "invalid_document_records": [],
+      "reports": [
+        {
+          "filename": "report.md",
+          "mapping": {
+            "status": "stale",
+            "claims": 0,
+            "mapping_sha256": "3fceb63e696bc262f44e27b14503b338ee47fd43c55f136b52812c0350160246",
+            "claim_kinds": [],
+            "source_kinds": [],
+            "records": 10,
+            "omitted_records": 0,
+            "structural_links_valid": true,
+            "semantic_support": "not_certified"
+          },
+          "review_status": "not_reviewed",
+          "issues": [],
+          "support_review": null,
+          "review_hash_matches": true,
+          "hard_errors": []
+        }
+      ],
+      "activity_snapshots_checked": [
+        {
+          "tool_call_id": "call_00_384mUQu9lOkKiQLyNHLE1034",
+          "tool_mismatches": [],
+          "document_records_match": true,
+          "document_versions_match": true,
+          "summary": {
+            "tool_requests": {
+              "search_knowledge": {
+                "requested": 1,
+                "returned_ok": 1,
+                "returned_error": 0,
+                "uncertain": 0
+              },
+              "update_plan": {
+                "requested": 4,
+                "returned_ok": 4,
+                "returned_error": 0,
+                "uncertain": 0
+              },
+              "read_notes": {
+                "requested": 1,
+                "returned_ok": 1,
+                "returned_error": 0,
+                "uncertain": 0
+              }
+            },
+            "omitted_tools": 0,
+            "retained_evidence": {
+              "records": 9,
+              "document_records": 8,
+              "document_versions": 1,
+              "ledger_omitted_records": 0
+            },
+            "limits": "截至此快照的本任务工具请求与返回；returned_error也可能是参数校验或重复拦截，并非工具函数实际执行失败。requested未被returned_ok/returned_error/uncertain覆盖的部分尚未返回；不统计服务商内部重试。文档仅计已保留送达片段，不是全库清单、完整阅读或无遗漏证明；不证明生产业务状态。"
+          }
+        }
+      ],
+      "validation_rejections": [
+        {
+          "tool_call_id": "call_00_ODGkm4DfNTAL7lGhpLo42041",
+          "feedback": {
+            "status": "rejected",
+            "report_sha256": "ca77948faa4b2f9ded113de1a50105544381629b72db5c0b229f296d7f942936",
+            "issues": [
+              {
+                "path": "content",
+                "code": "brief_length",
+                "message": "用户要求简述，正文明显超过默认软目标。请先删除重复引文、无关背景或额外分析，保留必答结论、依据和局限。默认目标不是用户硬上限；如确实需要较长内容，可在 brief_extension_reason 中说明具体必答项与必要性（至少20字符），由审稿核对，不能只称更全面。"
+              }
+            ],
+            "omitted_issues": 0,
+            "measurements": [
+              {
+                "scope": "body",
+                "unit": "characters",
+                "actual": 1083,
+                "soft_target": 500
+              }
+            ],
+            "limits": "汇总可独立检查的问题；依赖无效来源的进一步检查待修复后重做。未写入，不自动修正；通过定位也不认证语义。"
+          }
+        }
+      ],
+      "coding_assistant_review": {
+        "kind": "coding_assistant",
+        "independent": false,
+        "findings": [
+          {
+            "quote": "需自行重写 `process()` 才能保留",
+            "reason": "Read manual describes overriding process as a customization option; necessity/uniqueness is stronger than the supplied evidence. Keep explanation within default behavior."
+          }
+        ],
+        "assessment": "Main contextual-extra explanation matches frozen cookbook; final mapping stale with zero claims, no completed review."
+      }
+    },
+    {
+      "id": "retrieval-activity-snapshot",
+      "stop_reason": "budget",
+      "steps": 8,
+      "equivalent_tokens": 47395,
+      "chat": {
+        "calls": 12,
+        "purposes": {
+          "planning": 1,
+          "agent": 10,
+          "wrapup_uncached": 1
+        },
+        "prompt_tokens": 141266,
+        "cached_tokens": 119680,
+        "completion_tokens": 4759,
+        "unknown_usage_calls": 0
+      },
+      "embedding": {
+        "calls": 1,
+        "input_tokens": 16,
+        "unknown_usage_calls": 0
+      },
+      "rerank": {
+        "calls": 1,
+        "input_tokens": 4307,
+        "unknown_usage_calls": 0
+      },
+      "tools": {
+        "search_knowledge": 1,
+        "update_plan": 5,
+        "read_evidence": 5,
+        "read_notes": 1,
+        "write_report": 2
+      },
+      "tool_errors": [
+        {
+          "name": "write_report",
+          "content": "ERROR: ReportValidationError: 尚未保存：{\"status\": \"rejected\", \"report_sha256\": \"3c89777d21173e4c69b9a197c2eb9165adf9b04fcfeef6aa70c4146971ebe115\", \"issues\": [{\"path\": \"content\", \"code\": \"brief_length\", \"message\": \"用户要求简述，正文明显超过默认软目标。请先删除重复引文、无关背景或额外分析，保留必答结论、依据和局限。默认目标不是用户硬上限；如确实需要较长内容，可在 brief_extension_reason 中说明具体必答项与必要性（至少20字符），由审稿核对，不能只称更全面。\"}], \"omitted_issues\": 0, \"measurements\": [{\"scope\": \"body\", \"unit\": \"characters\", \"actual\": 1181, \"soft_target\": 500}], \"limits\": \"汇总可独立检查的问题；依赖无效来源的进一步检查待修复后重做。未写入，不自动修正；通过定位也不认证语义。\"}"
+        },
+        {
+          "name": "write_report",
+          "content": "ERROR: ReportValidationError: 尚未保存：{\"status\": \"rejected\", \"report_sha256\": \"bcff5663e4c8ae28f98fda8da4e60552a0ef65ab53852f441e44b2f48502ee93\", \"issues\": [{\"path\": \"claims[3].supports[0].excerpt\", \"code\": \"excerpt_missing\", \"message\": \"摘录不在证据document-2中：By default all space and punctuation\\r\\ncharacters, as defined by Unicode 6.1, are considered separato；用read_evidence(source_id=\\\"document-2\\\", query=\\\"关键词\\\")读取真实原文，不要猜ID或补写摘录。\"}, {\"path\": \"claims[5]\", \"code\": \"evidence_constraint\", \"message\": \"direct仅用于用户材料/已读原文；历史摘要和计算不能冒充当前直接事实\"}], \"omitted_issues\": 0, \"measurements\": [{\"scope\": \"body\", \"unit\": \"characters\", \"actual\": 864, \"soft_target\": 500}], \"limits\": \"汇总可独立检查的问题；依赖无效来源的进一步检查待修复后重做。未写入，不自动修正；通过定位也不认证语义。\"}"
+        }
+      ],
+      "budget_denied_calls": [],
+      "document_records_checked": 9,
+      "invalid_document_records": [],
+      "reports": [
+        {
+          "filename": "report.md",
+          "mapping": {
+            "status": "draft",
+            "claims": 0,
+            "mapping_sha256": "ff44a0469be8820a26a50c9c7383ca56edc681ff079656f10d4b45c5376a32bf",
+            "claim_kinds": [],
+            "source_kinds": [],
+            "records": 11,
+            "omitted_records": 0,
+            "structural_links_valid": true,
+            "semantic_support": "not_certified"
+          },
+          "review_status": "not_reviewed",
+          "issues": [],
+          "support_review": null,
+          "review_hash_matches": true,
+          "hard_errors": []
+        }
+      ],
+      "activity_snapshots_checked": [
+        {
+          "tool_call_id": "call_00_UKl1svp2PddhmVI6RiO51129",
+          "tool_mismatches": [],
+          "document_records_match": true,
+          "document_versions_match": true,
+          "summary": {
+            "tool_requests": {
+              "search_knowledge": {
+                "requested": 1,
+                "returned_ok": 1,
+                "returned_error": 0,
+                "uncertain": 0
+              },
+              "update_plan": {
+                "requested": 4,
+                "returned_ok": 4,
+                "returned_error": 0,
+                "uncertain": 0
+              },
+              "read_evidence": {
+                "requested": 2,
+                "returned_ok": 2,
+                "returned_error": 0,
+                "uncertain": 0
+              },
+              "read_notes": {
+                "requested": 1,
+                "returned_ok": 1,
+                "returned_error": 0,
+                "uncertain": 0
+              }
+            },
+            "omitted_tools": 0,
+            "retained_evidence": {
+              "records": 10,
+              "document_records": 9,
+              "document_versions": 1,
+              "ledger_omitted_records": 0
+            },
+            "limits": "截至此快照的本任务工具请求与返回；returned_error也可能是参数校验或重复拦截，并非工具函数实际执行失败。requested未被returned_ok/returned_error/uncertain覆盖的部分尚未返回；不统计服务商内部重试。文档仅计已保留送达片段，不是全库清单、完整阅读或无遗漏证明；不证明生产业务状态。"
+          }
+        }
+      ],
+      "validation_rejections": [
+        {
+          "tool_call_id": "call_00_1iTE2NxU2hEdtCZdZKP98322",
+          "feedback": {
+            "status": "rejected",
+            "report_sha256": "3c89777d21173e4c69b9a197c2eb9165adf9b04fcfeef6aa70c4146971ebe115",
+            "issues": [
+              {
+                "path": "content",
+                "code": "brief_length",
+                "message": "用户要求简述，正文明显超过默认软目标。请先删除重复引文、无关背景或额外分析，保留必答结论、依据和局限。默认目标不是用户硬上限；如确实需要较长内容，可在 brief_extension_reason 中说明具体必答项与必要性（至少20字符），由审稿核对，不能只称更全面。"
+              }
+            ],
+            "omitted_issues": 0,
+            "measurements": [
+              {
+                "scope": "body",
+                "unit": "characters",
+                "actual": 1181,
+                "soft_target": 500
+              }
+            ],
+            "limits": "汇总可独立检查的问题；依赖无效来源的进一步检查待修复后重做。未写入，不自动修正；通过定位也不认证语义。"
+          }
+        },
+        {
+          "tool_call_id": "call_00_Y5DNXVIwwEDFnR88tinJ8467",
+          "feedback": {
+            "status": "rejected",
+            "report_sha256": "bcff5663e4c8ae28f98fda8da4e60552a0ef65ab53852f441e44b2f48502ee93",
+            "issues": [
+              {
+                "path": "claims[3].supports[0].excerpt",
+                "code": "excerpt_missing",
+                "message": "摘录不在证据document-2中：By default all space and punctuation\r\ncharacters, as defined by Unicode 6.1, are considered separato；用read_evidence(source_id=\"document-2\", query=\"关键词\")读取真实原文，不要猜ID或补写摘录。"
+              },
+              {
+                "path": "claims[5]",
+                "code": "evidence_constraint",
+                "message": "direct仅用于用户材料/已读原文；历史摘要和计算不能冒充当前直接事实"
+              }
+            ],
+            "omitted_issues": 0,
+            "measurements": [
+              {
+                "scope": "body",
+                "unit": "characters",
+                "actual": 864,
+                "soft_target": 500
+              }
+            ],
+            "limits": "汇总可独立检查的问题；依赖无效来源的进一步检查待修复后重做。未写入，不自动修正；通过定位也不认证语义。"
+          }
+        }
+      ],
+      "coding_assistant_review": {
+        "kind": "coding_assistant",
+        "independent": false,
+        "findings": [
+          {
+            "quote": "未验证 ascii tokenizer 对 separators 的处理细节",
+            "reason": "Unrequested adjacent tokenizer topic adds scope; selected question concerned unicode61. No completed review."
+          }
+        ],
+        "assessment": "Reported one returned search, nine delivered document records and one document version match the runtime snapshot; excerpt/kind errors prevented linked report saving."
+      }
+    }
+  ],
+  "stage12_accepted": false,
+  "author_and_reviewer": "coding_assistant",
+  "purpose": "mechanism diagnostics; no comparison score against old different questions"
+}
