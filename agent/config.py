@@ -87,6 +87,8 @@ class Settings(BaseSettings):
     rerank_model: str = 'BAAI/bge-reranker-v2-m3'
     rerank_timeout: float = Field(default=30, gt=0, le=120)
     knowledge_rerank_candidates: int = Field(default=20, ge=8, le=80)
+    knowledge_lexical_candidates: int = Field(default=40, ge=8, le=200)
+    knowledge_vector_candidates: int = Field(default=40, ge=8, le=200)
     knowledge_search_token_budget: int = Field(default=30000, ge=1000, le=200000)
 
     llm_temperature: float = 0.3

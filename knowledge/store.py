@@ -223,13 +223,13 @@ class KnowledgeStore:
             lexical=[]
             if terms and mode!='vector':
                 expression=' OR '.join('"'+t.replace('"','""')+'"' for t in terms)
-                lexical=[int(r[0]) for r in db.execute('SELECT idx FROM chunks_fts WHERE chunks_fts MATCH ? AND generation=? ORDER BY bm25(chunks_fts),idx LIMIT 40',
-                                                     (expression,current['id']))]
+                lexical=[int(r[0]) for r in db.execute('SELECT idx FROM chunks_fts WHERE chunks_fts MATCH ? AND generation=? ORDER BY bm25(chunks_fts),idx LIMIT ?',
+                                                     (expression,current['id'],self.settings.knowledge_lexical_candidates))]
         dense=[]; events=[]
         if mode!='keyword':
             vectors,events,_=self._cached_vectors([query],'query:'+current['id'],budget)
             budget-=sum(e['input_tokens'] for e in events)
-            dense=self.vectors.search(self.root,current['id'],vectors[0],min(40,current['chunks']))
+            dense=self.vectors.search(self.root,current['id'],vectors[0],min(self.settings.knowledge_vector_candidates,current['chunks']))
         scores={}
         for ranks in (lexical,dense):
             for rank,index in enumerate(ranks,1): scores[index]=scores.get(index,0)+1/(60+rank)
