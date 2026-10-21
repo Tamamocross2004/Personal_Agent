@@ -173,11 +173,26 @@ class EvidenceLedger:
             if source: ids.append(source)
         return ids
 
-    def execution(self, tool: str, arguments: str, content: str, call_id: str, is_error: bool, *, delivery_truncated=False) -> str | None:
+    def execution(self, tool: str, arguments: str, content: str, call_id: str, is_error: bool, *, delivery_truncated=False,
+                  activity_snapshot: dict | None = None) -> str | None:
         """派发结果仅证明本次工具返回，不把失败变成成功计算/网页证据。"""
         text = ('tool: '+tool+'\noutcome: '+('error' if is_error else 'success')
                 +'\narguments:\n'+arguments[:1000]+'\nreturned:\n'+content[:2000])
-        return self.add('execution', text, tool=tool, tool_call_id=call_id,
+        metadata={}
+        if activity_snapshot is not None:
+            # 仅保留已实际送达且完整入账的程序快照，不能借元数据送入未读字段。
+            try:
+                delivered_snapshot=json.loads(content)
+            except ValueError:
+                delivered_snapshot=None
+            complete=(not delivery_truncated and len(content)<=2000 and not is_error
+                      and tool=='read_notes' and delivered_snapshot==activity_snapshot
+                      and activity_snapshot.get('snapshot',{}).get('tool_call_id')==call_id)
+            metadata['activity_snapshot_complete']=complete
+            if complete:
+                metadata['activity_snapshot']=json.loads(content)
+                metadata['activity_snapshot_sha256']=sha(content)
+        return self.add('execution', text, tool=tool, tool_call_id=call_id, **metadata,
                         is_error=is_error, delivery_truncated=delivery_truncated or len(arguments)>1000 or len(content)>2000,
                         description='本次工具派发的真实返回；不证明网页事实、外部副作用或所有调用次数')
 
@@ -372,6 +387,7 @@ class EvidenceLedger:
                 context = record['text'][max(0,pos-250):pos+len(ref['excerpt'])+250]
                 entry=candidate.setdefault(record['id'],{k:v for k,v in record.items() if k!='text'} |
                     {'contexts':[],'context_is_excerpt':len(context)<len(record['text']),
+                     'context_selection':'selected_excerpt_with_nearby_text; distinct from original delivery truncation',
                      **({'read_coverage':self.web_coverage(record)} if record['kind']=='web' else {}),
                      **({'history_header':record['text'].split('历史摘要：',1)[0][:800]} if record['kind']=='history' else {})})
                 if not any(context in old for old in entry['contexts']):

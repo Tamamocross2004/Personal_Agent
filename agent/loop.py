@@ -521,8 +521,10 @@ class Agent(CheckpointMixin):
                                                            'reason':'工具线程超时，后台副作用可能仍在进行'})
                 raise NeedsVerification('工具超时且结果不确定，已停止派发后续操作；需核对，未自动重做')
             activity_text=''
+            activity_snapshot=None
             if name=='read_notes' and not result.is_error and self.research_session is not None:
-                activity_text=json.dumps(self.research_session.activity_summary(),ensure_ascii=False)
+                activity_snapshot=self.research_session.activity_summary(snapshot_call_id=call.id)
+                activity_text=json.dumps(activity_snapshot,ensure_ascii=False)
             content = _truncate(('【本次运行记录快照】'+activity_text+'\n' if activity_text else '')+result.content,
                                 self.max_tool_result_chars)
             for usage in result.usage or []:
@@ -566,7 +568,8 @@ class Agent(CheckpointMixin):
                 if activity_text:
                     shown=min(len(activity_text),max(0,self.max_tool_result_chars-len('【本次运行记录快照】')))
                     observed=self._evidence.execution(name,arguments,activity_text[:shown],call.id,False,
-                                                     delivery_truncated=shown<len(activity_text)) if shown else None
+                                                     delivery_truncated=shown<len(activity_text),
+                                                     activity_snapshot=activity_snapshot) if shown else None
                     if observed:
                         ids.append(observed)
                 if ids:

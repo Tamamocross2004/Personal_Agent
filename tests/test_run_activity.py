@@ -73,6 +73,37 @@ def test_truncated_activity_is_not_stored_as_fully_delivered_evidence(tmp_path):
           research_session=session,max_tool_result_chars=50).run('回顾')
     row=next(r for r in session.evidence.records.values() if r['kind']=='execution')
     assert row['delivery_truncated'] and 'retained_evidence' not in row['text']
+    assert not row['activity_snapshot_complete'] and 'activity_snapshot' not in row
+
+
+def test_historical_snapshot_retains_its_own_cutoff_in_bounded_review_context(tmp_path):
+    from agent.evidence import sha
+    session=ResearchSession()
+    llm=ScriptedLLM([completion('{}'),completion(tool_calls=[('snapshot-47','read_notes',{})]),completion('完成')])
+    Agent(llm,ToolRegistry(make_notes_tools(tmp_path,session)),task_dir=tmp_path,research_session=session).run('核对')
+    ledger=session.evidence
+    row=next(r for r in ledger.records.values() if r['kind']=='execution')
+    before=row['activity_snapshot']; current=session.activity_summary()
+    assert before['snapshot']['tool_call_id']=='snapshot-47'
+    assert before['snapshot']['cutoff']=='after_tool_return_before_own_execution_record'
+    assert current['retained_evidence']['records']==before['retained_evidence']['records']+1
+    assert row['activity_snapshot_sha256']==sha(row['text'].split('returned:\n',1)[1])
+    claim={'quote':'读取成功','kind':'observed','supports':[{'source_id':row['id'],'excerpt':'tool: read_notes'}]}
+    packet=ledger.packet({'status':'mapped','claims':[claim]})
+    source=packet['sources'][row['id']]
+    assert source['context_is_excerpt'] and not source['delivery_truncated']
+    assert source['activity_snapshot']==before  # 即使附近文本不含尾部计数字段，完整快照仍有界提供。
+    assert ledger.packet({'status':'mapped','claims':[claim]},budget=1)['omitted_items']==1
+
+
+@pytest.mark.parametrize('content,wrong_call',[('{"partial":true}',False),('{',False),('{}',True)])
+def test_structured_snapshot_cannot_inject_undelivered_or_mismatched_fields(tmp_path,content,wrong_call):
+    from agent.evidence import EvidenceLedger
+    ledger=EvidenceLedger(tmp_path,'问题')
+    snapshot={'snapshot':{'tool_call_id':'other' if wrong_call else 'c'},'hidden':'not delivered'}
+    key=ledger.execution('read_notes','{}',content,'c',False,activity_snapshot=snapshot)
+    assert not ledger.records[key]['activity_snapshot_complete']
+    assert 'activity_snapshot' not in ledger.records[key]
 
 
 def test_uncertain_timeout_is_not_counted_as_known_error_or_success():

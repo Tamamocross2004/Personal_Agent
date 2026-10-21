@@ -46,10 +46,14 @@ class ResearchSession:
     failed_fetches: dict[str, str] = field(default_factory=dict)  # 已实际返回FetchError的操作目标，非引用来源
     tool_activity: dict[str, dict[str, int]] = field(default_factory=dict)
 
-    def activity_summary(self) -> dict:
+    def activity_summary(self, *, snapshot_call_id: str | None = None) -> dict:
         records=list(self.evidence.records.values()) if self.evidence else []
         docs=[r for r in records if r['kind']=='document']
-        return {'tool_requests':{name:dict(counts) for name,counts in list(self.tool_activity.items())[:24]},
+        return {'snapshot':{'kind':'tool_return' if snapshot_call_id else 'current_review_state',
+                    'tool_call_id':snapshot_call_id,
+                    'cutoff':'after_tool_return_before_own_execution_record' if snapshot_call_id else 'at_summary_creation',
+                    'last_retained_evidence_id':records[-1]['id'] if records else None},
+                'tool_requests':{name:dict(counts) for name,counts in list(self.tool_activity.items())[:24]},
                 'omitted_tools':max(0,len(self.tool_activity)-24),
                 'retained_evidence':{'records':len(records),'document_records':len(docs),
                     'document_versions':len({(r.get('document_id'),r.get('file_sha256'),r.get('generation')) for r in docs}),
