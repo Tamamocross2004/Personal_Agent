@@ -85,6 +85,7 @@ def test_non_length_rejection_compacts_draft_without_repairing_claims(tmp_path):
           research_session=session,on_event=events.append).run(question)
     shown=json.dumps(llm.requests[-1]['messages'],ensure_ascii=False)
     assert bad not in shown and 'quote_missing' in shown and 'omitted_rejections' in shown
+    assert not any(c['id']=='bad' for m in llm.requests[-1]['messages'] for c in m.get('tool_calls') or [])
     assert any(e.kind=='tool_call' and json.loads(e.data['arguments']).get('content')==bad for e in events)
     assert not (tmp_path/'report.md').exists()
 
