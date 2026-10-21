@@ -162,7 +162,10 @@ class ToolRegistry:
         try:
             validated = t.args_model.model_validate(args)
         except ValidationError as e:
-            return ToolResult(f"ERROR: 参数校验失败：{_format_validation_error(e)}", True)
+            feedback = f"ERROR: 参数校验失败：{_format_validation_error(e)}"
+            if name == 'write_report':
+                feedback += '\n引用层级：claims:[{quote:当前稿原句,kind:结论类型,supports:[{source_id:真实ID,excerpt:实际原文}]}]。不自动纠正ID或补写摘录；可用read_evidence读取support。'
+            return ToolResult(feedback, True)
 
         # 3. 执行
         kwargs = {k: getattr(validated, k) for k in type(validated).model_fields}

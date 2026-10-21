@@ -165,10 +165,11 @@ def test_review_limit_marks_new_version_unreviewed(tmp_path):
 
 def test_budget_skip_does_not_call_reviewer(tmp_path):
     agent, llm, _ = agent_for(tmp_path, [
-        completion(tool_calls=[("w1", "write_report", {"content": BAD})]), completion("完成")
-    ], token_budget=1500, review_max_tokens=2048)
+        # 接口实际输入高于预估，预留不是硬账单保证；仍须记账并跳过无额度审稿。
+        completion(tool_calls=[("w1", "write_report", {"content": BAD})],prompt_tokens=295000)
+    ], token_budget=300000, review_max_tokens=2048)
     agent.run("检查")
-    assert len(llm.requests) == 3
+    assert len(llm.requests) == 2
     assert json.loads((tmp_path / "report.review.json").read_text(encoding="utf-8"))["status"] == "skipped_budget"
 
 

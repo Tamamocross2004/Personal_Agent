@@ -18,10 +18,19 @@ RAW = '存储阶段尚未进行。\r\n这里保留模型停止前的文字。'
 
 
 def stopped_task(root, *, settings=None):
-    model = ScriptedLLM([completion('{}'), completion(RAW)])
+    # 预算内派发后，实际用量超估；保留这次已收到的截断原文，不额外调用收尾。
+    model = ScriptedLLM([completion('{}'), completion(RAW,finish_reason='length',prompt_tokens=80000)])
     result = research(model, settings or Settings(_env_file=None, memory_enabled=False),
-                      '不联网，列出本次尚未完成的事项。', 5, 1, task_dir=root)
+                      '不联网，列出本次尚未完成的事项。', 5, 80000, task_dir=root)
     return result, model
+
+
+def test_no_budget_does_not_save_program_notice_as_model_report(tmp_path):
+    model=ScriptedLLM([])
+    result=research(model,Settings(_env_file=None,memory_enabled=False),
+                    '不联网，说明材料。',5,1,task_dir=tmp_path)
+    assert result.stop_reason=='budget' and result.answer=='' and not model.requests
+    assert not (tmp_path/'report.md').exists() and not (tmp_path/PROVENANCE).exists()
 
 
 def test_real_budget_fallback_keeps_raw_answer_and_records_actual_save(tmp_path, capsys):

@@ -60,8 +60,8 @@ def write_json(path: Path, value: dict) -> None:
 
 class EvidenceRef(BaseModel):
     model_config = ConfigDict(extra='forbid')
-    source_id: str = Field(min_length=1, max_length=60)
-    excerpt: str = Field(min_length=1, max_length=600)
+    source_id: str = Field(min_length=1, max_length=60, description='本任务真实证据ID；与excerpt一起放在claim.supports数组内，不是claim顶层字段。')
+    excerpt: str = Field(min_length=1, max_length=600, description='从该ID实际保留原文逐字选取，最多600字符；read_evidence返回support可直接使用，不可补齐未送达文字。')
 
 
 class Premise(BaseModel):
@@ -90,7 +90,8 @@ class Claim(BaseModel):
     model_config = ConfigDict(extra='forbid')
     quote: str = Field(min_length=2, max_length=600)
     kind: Literal['direct', 'calculated', 'inference', 'unknown', 'observed']
-    supports: list[EvidenceRef] = Field(default_factory=list, max_length=4)
+    supports: list[EvidenceRef] = Field(default_factory=list, max_length=4,
+        description='引用结构为supports:[{source_id:真实ID,excerpt:实际原文}]；quote须逐字在本稿，source_id/excerpt不得直接放claim顶层。')
     assumptions: str = Field(default='', max_length=600)
     reasoning: str = Field(default='', max_length=600, description='从所列前提到结论的推导；不是新增事实或假设。')
     premises: list[Premise] = Field(default_factory=list, max_length=4,
@@ -255,24 +256,8 @@ class EvidenceLedger:
                 if claim.scope=='whole_document' and any(not self.web_coverage(r)['full_page_delivered'] for r in web):
                     raise ValueError('结论声明覆盖全文，但关联网页版本未完整送达；请补读或限定结论范围')
             if claim.kind == 'direct':
-                def numbers(text):
-                    from decimal import Decimal
-                    # 标准编号及本次真实证据ID是引用标记，不是原句中的事实数值。
-                    def bracket(match):
-                        if match[1].isdigit() or match[1] in self.records:
-                            return ''
-                        try:
-                            values = json.loads(match[0],parse_float=Decimal,parse_int=Decimal)
-                            if isinstance(values,list) and all(isinstance(v,Decimal) for v in values):
-                                return ' '.join(map(str,values))
-                        except ValueError:
-                            pass
-                        return match[0]
-                    text = re.sub(r'\[([^\[\]\n]+)\]',bracket,text)
-                    return {Decimal(n.replace(',','')) for n in re.findall(
-                        r'(?<![\d.])(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?',text)}
-                supplied = set().union(*(numbers(r['excerpt']) for r in refs))
-                novel = numbers(claim.quote)-supplied
+                from agent.claim_numbers import check_direct
+                novel = check_direct(claim.quote,refs,self.records)
                 if novel:
                     calculations = [r['id'] for r in self.records.values() if r['kind']=='calculation'][-8:]
                     raise ValueError(f'claims[{index}].kind=direct原句含摘录未提供的数值{sorted(map(str,novel))}；'

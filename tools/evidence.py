@@ -40,7 +40,12 @@ def make_read_evidence(session: ResearchSession) -> Tool:
             return {'id':source_id,'match':False,**version,'meaning':'仅本次已送达片段内字面未命中，不证明网页全文不存在。'}
         left=max(0,pos-250)
         end=min(len(row['text']),left+1600)
+        support_left=max(0,pos-80)
+        support_end=min(len(row['text']),support_left+600)
         return {'id':source_id,'kind':row['kind'],'excerpt':row['text'][left:end],
+                'support':{'source_id':source_id,'excerpt':row['text'][support_left:support_end]},
+                'support_text_range':[support_left,support_end],
+                'claim_usage':'将support放入claims[i].supports数组；quote须从当前报告逐字选取。support只证明原文定位，不认证蕴含。',
                 **({k:row[k] for k in ('document_name','page','generation','file_sha256','start','end')}
                    if row['kind']=='document' else {}),
                 'record_text_range':[left,end],'source_sha256':row['text_sha256'],

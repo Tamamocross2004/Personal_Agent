@@ -94,13 +94,14 @@ class Settings(BaseSettings):
     llm_temperature: float = 0.3
     llm_timeout: float = 60.0
     llm_max_retries: int = 3
-    # 单次回复的最大输出 token。不设置则用厂商默认值（各家上限不同，设太大会报 400）
+    # 客户端输出上限；研究模式另受agent_call_max_tokens和剩余估算预算约束。
     llm_max_tokens: int | None = None
 
     # ---- Agent 运行保护（阶段 3）----
     agent_max_steps: int = 30  # 记笔记会占用步数，阶段 4 实测 20 步不够
     # 单个任务的"等效 token"上限：未命中缓存的输入 × 1 + 命中缓存的输入 × 0.1 + 输出 × 2（权重见下）
     agent_token_budget: int = 300_000
+    agent_call_max_tokens: int = Field(default=4096, ge=64, le=32768)
     token_weight_cached: float = 0.1
     token_weight_output: float = 2.0
     tool_timeout: float = 60.0  # 单次工具执行的最长秒数

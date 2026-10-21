@@ -165,9 +165,25 @@ def test_memory_commit_before_crash_is_idempotent_without_new_model_calls(tmp_pa
 
 def test_finalization_interruption_cannot_gain_more_wrapup_calls(tmp_path):
     store=CrashStore(tmp_path,lambda d:d['phase']=='finalizing' and d.get('pending',{}).get('returned'))
-    llm=ScriptedLLM([completion('{}'),completion('预算耗尽')])
-    with pytest.raises(Crash): create(tmp_path,llm,ToolRegistry([]),ResearchSession(),store,token_budget=1).run('测试')
+    llm=ScriptedLLM([completion('{}'),completion('',finish_reason='length'),completion('收尾')])
+    with pytest.raises(Crash): create(tmp_path,llm,ToolRegistry([]),ResearchSession(),store,max_steps=1).run('测试')
     assert not store.status()['resumable']
+
+
+def test_resume_inherits_actual_budget_overrun_and_does_not_dispatch(tmp_path):
+    seen=[]
+    @tool
+    def record()->str:
+        """记录一次。"""
+        seen.append('done'); return '完成'
+    reg=ToolRegistry([record]); session=ResearchSession()
+    store=CrashStore(tmp_path,lambda d:d['phase']=='response')
+    llm=ScriptedLLM([completion('{}'),completion(tool_calls=[('r','record',{})],prompt_tokens=11000)])
+    with pytest.raises(Crash): create(tmp_path,llm,reg,session,store,token_budget=10000).run('执行')
+    saved=store.read(); replacement=ScriptedLLM([])
+    result=create(tmp_path,replacement,reg,ResearchSession(),token_budget=10000).run('执行',resume_state=saved)
+    assert seen==['done'] and result.stop_reason=='budget' and not replacement.requests
+    assert result.equivalent_tokens==saved['state']['_equiv']>10000
 
 
 def test_status_for_legacy_trace_never_invents_a_checkpoint(tmp_path):

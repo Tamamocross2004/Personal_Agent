@@ -127,7 +127,7 @@ def test_budget_exhaustion_keeps_existing_forced_wrapup_boundary(tmp_path):
         write(), completion('暂不修复。', prompt_tokens=80000), completion('预算已用尽，仍有结构警告。'),
     ], review_reports=True, token_budget=80000)
     assert result.stop_reason == 'budget' and agent._structure_repair_requested
-    assert agent._review_count == 0 and len(llm.requests) == 4
+    assert agent._review_count == 0 and len(llm.requests) == 3
     assert json.loads((tmp_path / 'report.review.json').read_text(encoding='utf-8'))['status'] == 'not_reviewed'
 
 

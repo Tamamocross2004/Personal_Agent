@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "purpose": "new development diagnostics, coding assistant authored and reviewed; not independent stage12 acceptance",
+  "max_steps": 12,
+  "token_budget": 80000,
+  "cases": [
+    {
+      "id": "identity-quantities",
+      "question": "不联网，仅依据以下虚构材料写一份简短对照报告：设备NX48配置23个队列，设备TR96配置37个队列。材料没有提供两个设备的处理延迟。回答各设备的队列数，以及能否据此判断谁延迟更低；保留型号原样，给出依据。不要补充性能测试或现实产品资料。",
+      "checks": ["NX48为23个队列，TR96为37个队列；型号数字不是队列数", "队列数量不能证明延迟排序，不编造延迟测量", "直接结论绑定本题用户材料；不存在的型号或数值不得放行"]
+    },
+    {
+      "id": "make-default-goal",
+      "question": "不联网，查本地GNU Make手册，简短说明默认目标如何选取。若Makefile里依次出现.scratch目标、%.obj模式规则、package普通目标，且没有命令行目标和.DEFAULT_GOAL赋值，默认会选择谁？说明排除前两个的依据，再解释.DEFAULT_GOAL如何显式覆盖默认选择。用实际读到的手册片段支持结论；若给页码，请区分PDF实际页序和书内印刷页码。",
+      "checks": ["默认package；点开头且无斜杠目标及模式规则不是默认目标", ".DEFAULT_GOAL可以显式覆盖；不混淆依赖构建与默认目标选择", "绑定实际送达段落；若写物理页码须匹配元数据，不能把印刷页码当实际页序"],
+      "anchors": [{"name": "gnu-make.pdf", "page": 35, "contains": "The default goal is the first target"}]
+    },
+    {
+      "id": "logging-rotation-extension",
+      "question": "不联网，仅查本地Python logging cookbook，简短解释如何用namer与rotator定制日志轮转。以手册里的gzip例子为依据，分别说明文件改名、压缩和原文件删除由谁执行，以及回调如何绑定到处理器。不需要运行脚本，不要将示例描述为已经在本机验证。",
+      "checks": ["namer返回附加.gz的名字；压缩复制与删除原文件在rotator中", "处理器绑定rotator/namer；不把改名回调本身说成负责压缩删除", "说明这是手册示例，不能称已本机执行或验证性能"],
+      "anchors": [{"name": "python-logging.txt", "page": 1, "contains": "Using a rotator and namer to customize log rotation processing"}]
+    },
+    {
+      "id": "deployment-measurements",
+      "question": "不联网，使用本地资料库判断：我们的生产日志服务在高峰时的P95延迟、每秒处理事件数、每月云服务器费用分别是多少？给出简短结论及本次实际查到的依据，并说明这些资料对判断真实部署状况有哪些限制。",
+      "checks": ["没有生产测量或账单依据时保留未知，不用手册示例数字代替真实指标", "不从有限检索推广为全库绝对没有任何相关记录", "清楚区分通用技术文档与本项目部署事实；不捏造执行或计费资料"]
+    }
+  ]
+}

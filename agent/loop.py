@@ -181,6 +181,7 @@ class Agent(CheckpointMixin):
         task_contract: TaskContract | None = None,
         should_stop: Callable[[], bool] | None = None,
         checkpoint=None,
+        generation_max_tokens: int = 4096,
     ):
         self.llm = llm
         self.registry = registry
@@ -188,6 +189,9 @@ class Agent(CheckpointMixin):
         self.max_steps = max_steps
         self.max_tool_result_chars = max_tool_result_chars
         self.token_budget = token_budget
+        if generation_max_tokens < 1:
+            raise ValueError('generation_max_tokens须为正数')
+        self.generation_max_tokens = generation_max_tokens
         self.budget_warn_ratio = budget_warn_ratio
         self.token_weights = token_weights or TokenWeights()
         self.tool_timeout = tool_timeout
@@ -246,6 +250,7 @@ class Agent(CheckpointMixin):
         self._empty_replies=0
         self._pending_reviews={}
         self._finalizing_reason=None
+        self._delivery_reserved_tokens=0
         if self.compactor:
             self.compactor.reset()
 
@@ -303,6 +308,8 @@ class Agent(CheckpointMixin):
             stop, answer, error = "interrupted", "", "用户中断"
         except NeedsVerification as exc:
             stop,answer,error='needs_verification','',str(exc)
+        except _BudgetExhausted:
+            stop,answer,error=self._budget_stop()
 
         return self._finish_run(messages,stop,answer,error,started)
 
@@ -333,6 +340,8 @@ class Agent(CheckpointMixin):
             stop,answer,error='interrupted','','用户中断'
         except NeedsVerification as exc:
             stop,answer,error='needs_verification','',str(exc)
+        except _BudgetExhausted:
+            stop,answer,error=self._budget_stop()
         return self._finish_run(messages,stop,answer,error,started)
 
     def _finish_run(self,messages,stop,answer,error,started):
@@ -386,9 +395,13 @@ class Agent(CheckpointMixin):
             if self.compactor and resp is None:
                 context_tokens = self._compact(messages, context_tokens)
 
-            # 不是等超了才停，而是预估"再调用一次就会超"时就收尾（收尾调用本身仍会花掉约一次的量）
-            if resp is None and self._equiv + self._project_next_call(context_tokens) >= self.token_budget:
-                return self._finalize(messages, "budget")
+            if resp is None:
+                self._delivery_reserved_tokens=self._delivery_reserve(messages,context_tokens)
+                projected=self._project_next_call(context_tokens)
+                output=self._output_limit()*self.token_weights.output if self._delivery_reserved_tokens else 64*self.token_weights.output
+                if self._equiv+projected+output+self._delivery_reserved_tokens >= self.token_budget:
+                    self._emit('notice',text=f'下一研究调用与交付预留估算无法同时容纳，转入收尾；交付预留约{round(self._delivery_reserved_tokens)}等效token。')
+                    return self._finalize(messages, "budget")
 
             # ---- 1. 调用模型 ----
             try:
@@ -684,7 +697,8 @@ class Agent(CheckpointMixin):
                                                                previous_report=self._last_report_texts.get(path.name),
                                                                task_contract=self._contract, report_filename=path.name)
             while True:
-                projected = estimate_messages(review_messages) + self.review_max_tokens * self.token_weights.output
+                projected = (estimate_messages(review_messages)*self.token_weights.uncached
+                             + self._output_limit(self.review_max_tokens)*self.token_weights.output)
                 if self._equiv + projected >= self.token_budget:
                     record = save_review(path, report, "skipped_budget", [])
                     break
@@ -778,6 +792,21 @@ class Agent(CheckpointMixin):
         **kwargs: Any,
     ) -> ChatCompletion:
         self._check_stop()
+        independent=purpose in ('planning','report_review','wrapup_uncached')
+        context=(estimate_messages(messages)+estimate_tools(tools) if independent
+                 else self._estimate_context(messages,tools))
+        projected=context*self.token_weights.uncached if independent else self._project_next_call(context)
+        remaining=self.token_budget-self._equiv
+        output_weight=self.token_weights.output
+        affordable=int((remaining-projected)/output_weight) if output_weight>0 else self._output_limit()
+        limit=min(self._output_limit(kwargs.get('max_tokens')),affordable)
+        if remaining<=projected or limit<min(64,self._output_limit(kwargs.get('max_tokens'))):
+            self._emit('budget_guard',purpose=purpose,remaining_equivalent=round(remaining),
+                       estimated_input_equivalent=round(projected),dispatched=False)
+            raise _BudgetExhausted
+        kwargs['max_tokens']=limit
+        self._emit('budget_guard',purpose=purpose,remaining_equivalent=round(remaining),
+                   estimated_input_equivalent=round(projected),max_tokens=limit,dispatched=True)
         started = time.perf_counter()
         self._len_at_last_call = len(messages)
         config = getattr(self.llm, 'config', None)
@@ -899,7 +928,7 @@ class Agent(CheckpointMixin):
     def _run_tool(self, name: str, arguments: str) -> tuple[ToolResult, float]:
         """执行一次工具调用：先做重复检测，再带超时执行。"""
         if self.research_session is not None:
-            self.research_session.embedding_budget_remaining=max(0,int(self.token_budget-self._equiv))
+            self.research_session.embedding_budget_remaining=max(0,int(self.token_budget-self._equiv-self._delivery_reserved_tokens))
         sig = (name, _normalize_args(arguments))
         stats = self._call_stats.setdefault(sig, [0, 0])
         calls, successes = stats
@@ -963,6 +992,43 @@ class Agent(CheckpointMixin):
         reused = min(self._last_prompt, context_tokens)
         return reused * w.cached + (context_tokens - reused) * w.uncached
 
+    def _output_limit(self, requested=None):
+        configured=getattr(getattr(self.llm,'config',None),'max_tokens',None)
+        return min(int(v) for v in (self.generation_max_tokens,configured,requested) if v is not None)
+
+    def _delivery_reserve(self,messages,context_tokens):
+        """预留一次写作和一次审稿的估算，不保证未知工具长度、分词和缓存行为。
+
+        审稿基础包取当前真实状态；未来报告按一次输出上限、关联包按既有14000字符
+        上限估算。此规划额度不修改审稿次数、证据门槛或实际用量。
+        """
+        if ('write_report' not in self.registry.names or not self.task_dir
+                or any(self._report_completeness.values())):
+            return 0
+        output=self._output_limit()
+        notice=estimate_messages([{'role':'user','content':finalize_prompt('budget')}])
+        reserve=self._project_next_call(context_tokens+notice)+output*self.token_weights.output
+        if self.review_reports and self._review_count<self.review_max_calls:
+            review,_=build_review_messages('',self.task_dir,self.research_session,question=self._question,
+                memory_context=self.memory_context,task_contract=self._contract,
+                calculation_results=self._calculation_results,source_readings=self._source_readings)
+            # 包本身有14000字符上限，按中文密度保守估算未来关联，而非按已有题目调比例。
+            packet=14000/1.3 if self._evidence and self._evidence.records else 0
+            reserve+=(estimate_messages(review)+output+packet)*self.token_weights.uncached
+            reserve+=self._output_limit(self.review_max_tokens)*self.token_weights.output
+        return reserve
+
+    def _budget_stop(self):
+        text='剩余预算无法容纳下一次模型调用的估算输入与最小输出，已停止；任务或审稿可能未完成，请查看已保存产物及状态。'
+        self._checkpoint_pending=None  # 本次未派发，不制造结果不确定的请求边界。
+        self._finalizing_reason=None
+        self._emit('notice',text=text)
+        # 程序提示不是模型原文，不能被上层自动保存为模型兜底报告。
+        answer=''.join(self._pending_text)
+        if answer:
+            self._emit('final',text=answer,stop_reason='budget')
+        return 'budget',answer,None
+
     def _maybe_warn_budget(self, messages: list[dict[str, Any]]) -> None:
         if self._budget_warned or self._equiv < self.token_budget * self.budget_warn_ratio:
             return
@@ -1010,9 +1076,10 @@ class Agent(CheckpointMixin):
           实测"不发工具"（4.2 万输入命中 384）和"tools + tool_choice=none"（3.5 万输入命中 640）都几乎不命中，
           推测厂商按 tool_choice 渲染出的提示开头不同。所以收尾阶段照常请求，由代码拒绝不允许的工具。
         收尾轮数用完仍没有文字回答时，才退回到老办法（tool_choice=none，再不行就不发工具）。
-        预算不在收尾阶段检查：收尾最多几次调用，超出量有限。
+        所有收尾调用仍在统一入口检查剩余额度，预估不足时直接停止。
         """
         self._finalizing_reason=reason
+        self._delivery_reserved_tokens=0
         self._save_checkpoint('finalizing',pending={'kind':'finalize','reason':reason})
         self._emit("notice", text=f"触发强制收尾（{reason}），进入收尾阶段：只能读笔记、写报告、更新计划。")
         messages.append({"role": "user", "content": finalize_prompt(reason)})
@@ -1042,12 +1109,12 @@ class Agent(CheckpointMixin):
         self._emit("notice", text="收尾轮数已用完，禁止调用工具，要求模型直接作答。")
         messages.append({"role": "user", "content": WRAPUP_LAST_CALL_PROMPT})
         try:
-            resp = self._call_llm(messages, getattr(self, "_tools", None) or None, None, tool_choice="none")
+            resp = self._call_llm(messages, getattr(self, "_tools", None) or None, None, purpose='wrapup_uncached',tool_choice="none")
             if resp.choices[0].message.tool_calls and not resp.choices[0].message.content:
                 raise _ToolChoiceIgnored
         except (openai.BadRequestError, _ToolChoiceIgnored):
             try:
-                resp = self._call_llm(messages, None, None)
+                resp = self._call_llm(messages, None, None, purpose='wrapup_uncached')
             except openai.APIError as e:
                 return reason, "", f"收尾调用失败：{type(e).__name__}: {e}"
         except openai.APIError as e:
@@ -1070,6 +1137,10 @@ class Agent(CheckpointMixin):
 
 class _ToolChoiceIgnored(Exception):
     """收尾时模型无视 tool_choice=none，仍然只返回了工具调用。"""
+
+
+class _BudgetExhausted(Exception):
+    """预检未派发；与结果不确定的服务错误区分。"""
 
 
 def _stop_for(kind: str) -> StopReason:

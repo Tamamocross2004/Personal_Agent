@@ -127,8 +127,7 @@ def test_persistent_repeats_trigger_loop_detected_and_finalize(registry):
 
 
 def test_budget_warning_then_projected_overrun_finalizes(registry):
-    """（无缓存时等效 token = 输入 + 2×输出）调用 1 后累计 300；调用 2 后累计 900（≥80%）→ 提醒；
-    第 3 步预估：上次输入 600 按缓存价 60 + 新增部分全价 → 900 + 60 + 新增 > 1000 → 不再开始新一轮，直接收尾。"""
+    """累计900时提醒；余100连收尾输入加最小输出也不足，不再派发。"""
     res, llm, events = run(
         [
             completion(tool_calls=[("c1", "echo", {"text": "1"})], prompt_tokens=300, completion_tokens=0),
@@ -139,11 +138,11 @@ def test_budget_warning_then_projected_overrun_finalizes(registry):
         token_budget=1000,
     )
     assert res.stop_reason == "budget"
-    assert res.answer == "收尾"
-    final_msgs = llm.requests[-1]["messages"]
+    assert res.answer=='' and len(llm.requests)==2
+    final_msgs = res.messages
     warnings = [m for m in final_msgs if "已使用 900 / 1000" in str(m.get("content"))]
     assert len(warnings) == 1 and warnings[0]["role"] == "user"  # 只提醒一次
-    assert final_msgs[-1]["content"] == finalize_prompt("budget")
+    assert any(e.kind=='budget_guard' and not e.data['dispatched'] for e in events)
     assert "tool_choice" not in llm.requests[-1]
 
 
@@ -192,7 +191,7 @@ def test_budget_allows_normal_finish(registry):
     assert res.stop_reason == "final_answer" and res.total_tokens == 250
 
 
-def test_budget_exhausted_forces_finalize(registry):
+def test_budget_exhausted_does_not_dispatch_an_extra_finalize(registry):
     res, llm, _ = run(
         [
             completion(tool_calls=[("c1", "echo", {"text": "1"})], prompt_tokens=1200),
@@ -202,10 +201,9 @@ def test_budget_exhausted_forces_finalize(registry):
         token_budget=1000,
     )
     assert res.stop_reason == "budget"
-    assert res.answer == "预算内的收尾"
-    assert len(llm.requests) == 2
+    assert res.answer=='' and res.equivalent_tokens==1210
+    assert len(llm.requests) == 1
     assert "tool_choice" not in llm.requests[-1]
-    assert llm.requests[-1]["messages"][-1]["content"] == finalize_prompt("budget")
 
 
 # ---------------------------------------------------------------------------

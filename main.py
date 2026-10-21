@@ -178,6 +178,7 @@ def _research(
         system_prompt=research_system_prompt(date.today().isoformat(), max_steps),
         max_steps=max_steps,
         token_budget=budget,
+        generation_max_tokens=settings.agent_call_max_tokens,
         token_weights=TokenWeights(cached=settings.token_weight_cached, output=settings.token_weight_output),
         tool_timeout=settings.tool_timeout,
         compactor=compactor,

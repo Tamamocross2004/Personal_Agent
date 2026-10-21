@@ -26,7 +26,7 @@ def registry():
 
 
 # 这些事件每次运行都有，断言事件顺序时忽略它们，聚焦在控制流上
-_BOOKKEEPING = {"run_start", "run_end", "llm_call"}
+_BOOKKEEPING = {"run_start", "run_end", "llm_call", "budget_guard"}
 
 
 class Events(list):
