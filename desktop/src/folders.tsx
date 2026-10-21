@@ -13,6 +13,10 @@ export function FolderLibrary({
     [scan, setScan] = useState<any>(null);
   const [busy, setBusy] = useState(false),
     [error, setError] = useState("");
+  const [preview, setPreview] = useState<any>(null),
+    [parseStates, setParseStates] = useState<Record<string, string>>({});
+  const busyGuard = useRef(false),
+    previewTurn = useRef(0);
   const alive = useRef(true),
     selection = useRef(0);
   useEffect(() => {
@@ -34,11 +38,13 @@ export function FolderLibrary({
     return () => {
       alive.current = false;
       selection.current++;
+      previewTurn.current++;
       window.removeEventListener("keydown", escape);
     };
   }, []);
   const action = async (work: () => Promise<any>) => {
-    if (busy) return;
+    if (busyGuard.current) return;
+    busyGuard.current = true;
     setBusy(true);
     setError("");
     try {
@@ -46,6 +52,7 @@ export function FolderLibrary({
     } catch (e) {
       if (alive.current) setError(String(e));
     } finally {
+      busyGuard.current = false;
       if (alive.current) setBusy(false);
     }
   };
@@ -53,12 +60,36 @@ export function FolderLibrary({
     const turn = ++selection.current;
     setSelected(id);
     setScan(null);
+    setPreview(null);
+    setParseStates({});
+    previewTurn.current++;
     setError("");
     try {
       const result = await api("/folders/" + id + "/scan");
       if (alive.current && turn === selection.current) setScan(result);
     } catch (e) {
       if (alive.current && turn === selection.current) setError(String(e));
+    }
+  };
+  const openPreview = async (file: any, offset = 0) => {
+    const turn = ++previewTurn.current;
+    setPreview(null);
+    const result = await api(
+      `/folders/${selected}/files/${file.id}?scan_id=${scan.id}&offset=${offset}`,
+    );
+    if (alive.current && turn === previewTurn.current) {
+      setPreview({
+        ...result,
+        relative_path: file.relative_path,
+        file_id: file.id,
+      });
+      setParseStates((s) => ({
+        ...s,
+        [file.id]:
+          result.status === "ready"
+            ? "解析完成"
+            : result.message || result.status,
+      }));
     }
   };
   return (
@@ -101,7 +132,10 @@ export function FolderLibrary({
                   setFolders((await api("/folders")).folders);
                   setSelected(row.id);
                   setScan(null);
-                  setError("已授权目录，请点击扫描。");
+                  setPreview(null);
+                  setParseStates({});
+                  previewTurn.current++;
+                  setError("");
                 }
               })
             }
@@ -131,6 +165,9 @@ export function FolderLibrary({
               action(async () => {
                 const id = selected;
                 const turn = ++selection.current;
+                setPreview(null);
+                setParseStates({});
+                previewTurn.current++;
                 const result = await api("/folders/" + id + "/scan", {
                   method: "POST",
                 });
@@ -150,6 +187,9 @@ export function FolderLibrary({
                   selection.current++;
                   setSelected("");
                   setScan(null);
+                  setPreview(null);
+                  setParseStates({});
+                  previewTurn.current++;
                   setFolders((await api("/folders")).folders);
                 }
               })
@@ -185,6 +225,7 @@ export function FolderLibrary({
                     <th>大小</th>
                     <th>修改时间</th>
                     <th>状态 / 原因</th>
+                    <th>本地预览</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -225,6 +266,18 @@ export function FolderLibrary({
                           )[f.status]
                         }{" "}
                         {f.reason}
+                        {parseStates[f.id] && <div>{parseStates[f.id]}</div>}
+                      </td>
+                      <td>
+                        {f.kind === "file" && f.status === "ready" && (
+                          <button
+                            disabled={busy}
+                            aria-label={"预览 " + f.relative_path}
+                            onClick={() => action(() => openPreview(f))}
+                          >
+                            解析预览
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -233,10 +286,140 @@ export function FolderLibrary({
             </div>
           </>
         )}
+        {preview && (
+          <section className="folder-preview">
+            <h3>
+              {preview.relative_path} ·{" "}
+              {preview.status === "ready" ? "本地解析预览" : "解析未完成"}
+            </h3>
+            {preview.status !== "ready" ? (
+              <p role="alert">{preview.message || preview.status}</p>
+            ) : (
+              <>
+                <p className="muted">
+                  文件 SHA256：{preview.file_sha256} ·{" "}
+                  {preview.cache_hit ? "复用本地解析缓存" : "本次本地解析"} ·{" "}
+                  {preview.total_blocks}块
+                </p>
+                {preview.warnings.map((x: string, i: number) => (
+                  <p className="muted" key={i}>
+                    {x}
+                  </p>
+                ))}
+                <div className="knowledge-actions">
+                  <button
+                    disabled={busy || preview.offset === 0}
+                    onClick={() =>
+                      action(() =>
+                        openPreview(
+                          {
+                            id: preview.file_id,
+                            relative_path: preview.relative_path,
+                          },
+                          Math.max(0, preview.offset - preview.limit),
+                        ),
+                      )
+                    }
+                  >
+                    上一组
+                  </button>
+                  <span>
+                    第{preview.offset + 1}—
+                    {Math.min(
+                      preview.offset + preview.limit,
+                      preview.total_blocks,
+                    )}
+                    块
+                  </span>
+                  <button
+                    disabled={
+                      busy ||
+                      preview.offset + preview.limit >= preview.total_blocks
+                    }
+                    onClick={() =>
+                      action(() =>
+                        openPreview(
+                          {
+                            id: preview.file_id,
+                            relative_path: preview.relative_path,
+                          },
+                          preview.offset + preview.limit,
+                        ),
+                      )
+                    }
+                  >
+                    下一组
+                  </button>
+                </div>
+                <div className="folder-preview-blocks">
+                  {preview.blocks.map((b: any) => (
+                    <article key={b.id}>
+                      <strong>
+                        块{b.id} · {locationLabel(b.location)}
+                      </strong>
+                      {b.location.kind === "spreadsheet_cell" ? (
+                        <>
+                          <p>
+                            值：
+                            {b.value === null ? "空白 / 未知" : String(b.value)}{" "}
+                            · 类型：{b.type} · 格式：{b.number_format}
+                          </p>
+                          {b.formula !== null && (
+                            <p>
+                              公式：{b.formula} · 缓存：
+                              {b.type === "formula_cached_missing"
+                                ? "未提供（未知）"
+                                : String(b.value)}
+                              ，未重新计算
+                            </p>
+                          )}
+                          {b.merged_range && <p>合并范围：{b.merged_range}</p>}
+                          {(b.sheet_state !== "visible" ||
+                            b.hidden_row ||
+                            b.hidden_column) && <p>包含隐藏工作表 / 行列</p>}
+                        </>
+                      ) : (
+                        <pre>{b.text || "（空白内容）"}</pre>
+                      )}
+                      {b.merged_origin && (
+                        <p>
+                          合并单元格原点：行{b.merged_origin.row} 列
+                          {b.merged_origin.column}
+                        </p>
+                      )}
+                      <details>
+                        <summary>定位与文本哈希</summary>
+                        <pre>
+                          {JSON.stringify(
+                            {
+                              location: b.location,
+                              text_sha256: b.text_sha256,
+                            },
+                            null,
+                            2,
+                          )}
+                        </pre>
+                      </details>
+                    </article>
+                  ))}
+                </div>
+              </>
+            )}
+          </section>
+        )}
         <p className="muted">
           取消授权会禁止后续读取，但保留已有扫描清单；重新授权不会自动扫描。
         </p>
       </section>
     </div>
   );
+}
+
+function locationLabel(l: any): string {
+  if (l.kind === "paragraph") return `正文段落${l.paragraph}`;
+  if (l.kind === "table_cell") return `表格${l.table} 行${l.row} 列${l.column}`;
+  if (l.kind === "spreadsheet_cell") return `${l.sheet}!${l.cell}`;
+  if (l.kind === "csv_record")
+    return `记录${l.record} · 物理行${l.physical_line_start}—${l.physical_line_end}`;
+  return `${l.page ? "第" + l.page + "页 · " : ""}第${l.line}行 · 字符${l.start}—${l.end}`;
 }

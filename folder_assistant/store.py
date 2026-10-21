@@ -153,6 +153,46 @@ class FolderStore:
         if not row:raise KeyError('尚无扫描清单，请先扫描')
         return json.loads(row['payload'])
 
+    def preview(self,key,scan_id,file_id,*,offset=0,limit=50):
+        import subprocess,sys,tempfile
+        from .parsing import VERSION
+        if offset<0 or not 1<=limit<=100:raise ValueError('预览分页无效')
+        with self.lock:
+            row,data=self.read(key,scan_id,file_id)
+            digest=hashlib.sha256(data).hexdigest()
+            cache=self.root/'parsed';cache.mkdir(exist_ok=True)
+            path=cache/(digest+'-'+str(VERSION)+row['suffix']+'.json')
+            hit=False;result=None
+            if path.is_file() and not path.is_symlink() and path.stat().st_size<=20_000_000:
+                try:
+                    candidate=json.loads(path.read_text('utf-8'))
+                    if candidate.get('file_sha256')==digest and candidate.get('parser_version')==VERSION:
+                        result=candidate;hit=True
+                except (ValueError,UnicodeError):pass
+            if result is None:
+                with tempfile.TemporaryDirectory(prefix='parse-',dir=self.root) as temporary:
+                    snapshot=Path(temporary)/'source.bin';snapshot.write_bytes(data)
+                    env={k:v for k,v in os.environ.items() if k.lower() in {'systemroot','windir','path','temp','tmp','lang'}}
+                    try:
+                        process=subprocess.run([sys.executable,'-X','utf8','-m','folder_assistant.parse_worker',str(snapshot),row['suffix']],
+                            cwd=Path(__file__).resolve().parents[1],env=env,capture_output=True,timeout=20)
+                    except subprocess.TimeoutExpired:return {'status':'parse_timeout','message':'解析超过20秒，已停止本次解析，源文件未修改'}
+                    try:payload=json.loads(process.stdout)
+                    except (ValueError,UnicodeError):return {'status':'parse_failed','message':'解析子进程未正常返回，未使用不完整结果'}
+                    if not payload.get('ok'):return {k:v for k,v in payload.items() if k!='ok'}
+                    result=payload['result']
+                    if result['file_sha256']!=digest:raise ValueError('解析输入版本不一致')
+                    text=json.dumps(result,ensure_ascii=False)
+                    if len(text.encode())>20_000_000:raise ValueError('解析记录超过20MB上限')
+                    temp=cache/(uuid.uuid4().hex+'.tmp');temp.write_text(text,encoding='utf-8');temp.replace(path)
+            # Do not serve a stale cached version after revocation, source replacement or mid-parse edits.
+            _,current=self.read(key,scan_id,file_id)
+            if hashlib.sha256(current).hexdigest()!=digest:raise ValueError('解析期间源文件变化，请重新扫描')
+            return {'status':'ready','folder_id':key,'scan_id':scan_id,'file_id':file_id,'relative_path':row['relative_path'],
+                    'file_sha256':digest,'parser_version':VERSION,'cache_hit':hit,'offset':offset,'limit':limit,
+                    'total_blocks':len(result['blocks']),'blocks':result['blocks'][offset:offset+limit],
+                    'warnings':result['warnings'],'cloud_calls':False}
+
     def read(self,key,scan_id,file_id):
         """Read by manifest identity only; never accept an arbitrary model path."""
         with self.lock:

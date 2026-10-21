@@ -9,6 +9,21 @@ const docs = path.join(fixture, "资料 空间");
 fs.mkdirSync(docs);
 fs.writeFileSync(path.join(docs, "readme.txt"), "本地资料原文。");
 fs.writeFileSync(path.join(docs, ".env"), "SENSITIVE=must-not-read");
+const parseMode = process.argv.includes("--parse");
+if (parseMode)
+  require("node:child_process").execFileSync(
+    path.join(project, ".venv", "Scripts", "python.exe"),
+    ["-X", "utf8", path.join(project, "tests", "folder_ui_fixture.py"), docs],
+  );
+const before = Object.fromEntries(
+  fs.readdirSync(docs).map((n) => [
+    n,
+    require("node:crypto")
+      .createHash("sha256")
+      .update(fs.readFileSync(path.join(docs, n)))
+      .digest("hex"),
+  ]),
+);
 const wrapper = path.join(fixture, "harness.cjs");
 fs.writeFileSync(
   wrapper,
@@ -54,8 +69,76 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
       body: JSON.stringify({ path: docs }),
     });
     assert.equal(denied.status, 403);
+    if (parseMode) {
+      await page
+        .getByRole("button", { name: "预览 说明.docx", exact: true })
+        .click();
+      await page
+        .locator(".folder-preview")
+        .getByText("合同样例：交付前须核对清单。", { exact: true })
+        .waitFor();
+      assert.match(
+        await page.locator(".folder-preview").innerText(),
+        /表格1 行2 列2/,
+      );
+      await page
+        .getByRole("button", { name: "预览 数据.csv", exact: true })
+        .click();
+      await page
+        .locator(".folder-preview")
+        .getByText(/记录2 · 物理行2/)
+        .waitFor();
+      await page
+        .getByRole("button", { name: "预览 分页.txt", exact: true })
+        .click();
+      await page.getByRole("button", { name: "下一组", exact: true }).click();
+      await page
+        .locator(".folder-preview")
+        .getByText("第51行资料", { exact: true })
+        .waitFor();
+      await page
+        .getByRole("button", { name: "预览 损坏.docx", exact: true })
+        .click();
+      await page.locator(".folder-preview").getByRole("alert").waitFor();
+      await page
+        .getByRole("button", { name: "预览 说明.pdf", exact: true })
+        .click();
+      await page
+        .locator(".folder-preview")
+        .getByText(/Local PDF source/)
+        .waitFor();
+      assert.match(await page.locator(".folder-preview").innerText(), /第1页/);
+      await page
+        .getByRole("button", { name: "预览 台账.xlsx", exact: true })
+        .click();
+      await page
+        .locator(".folder-preview")
+        .getByText(/公式：=1\+2/)
+        .waitFor();
+      assert.match(
+        await page.locator(".folder-preview").innerText(),
+        /未提供（未知）/,
+      );
+      await page
+        .getByRole("button", { name: "预览 台账.xlsx", exact: true })
+        .click();
+      await page
+        .locator(".folder-preview")
+        .getByText(/复用本地解析缓存/)
+        .waitFor();
+      await page
+        .locator(".folder-preview")
+        .getByText(/公式：=1\+2/)
+        .scrollIntoViewIfNeeded();
+    }
     await page.screenshot({
-      path: path.join(project, "workspace", "stage15-folder-ui-20261021.png"),
+      path: path.join(
+        project,
+        "workspace",
+        parseMode
+          ? "stage16-folder-ui-20261021.png"
+          : "stage15-folder-ui-20261021.png",
+      ),
     });
     await page
       .getByRole("button", { name: "取消目录授权", exact: true })
@@ -69,9 +152,22 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
       "本地资料原文。",
     );
     assert.deepEqual(errors, []);
+    assert.deepEqual(
+      Object.fromEntries(
+        fs.readdirSync(docs).map((n) => [
+          n,
+          require("node:crypto")
+            .createHash("sha256")
+            .update(fs.readFileSync(path.join(docs, n)))
+            .digest("hex"),
+        ]),
+      ),
+      before,
+    );
     console.log(
       JSON.stringify({
         passed: true,
+        multi_format_preview: parseMode,
         fixture,
         checks: [
           "native-picker-capability",

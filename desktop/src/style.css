@@ -1479,3 +1479,7 @@ small {
 .folder-file-list { max-height: 48vh; overflow: auto; }
 .folder-file-list table { width: 100%; font-size: 12px; border-collapse: collapse; }
 .folder-file-list th, .folder-file-list td { text-align: left; padding: 8px; border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
+.folder-preview { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px; }
+.folder-preview-blocks { max-height: 42vh; overflow: auto; }
+.folder-preview-blocks article { padding: 12px; margin: 8px 0; background: #ffffff06; border-radius: 8px; }
+.folder-preview pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; }

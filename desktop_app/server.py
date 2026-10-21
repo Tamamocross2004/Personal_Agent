@@ -106,6 +106,9 @@ def create_app(manager:Manager,token:str,ui_dir:Path|None=None,*,folder_grant_to
     def folder_scan(fid:str):return folders.scan(fid)
     @app.get('/api/folders/{fid}/scan')
     def folder_manifest(fid:str):return folders.manifest(fid)
+    @app.get('/api/folders/{fid}/files/{file_id}')
+    def folder_preview(fid:str,file_id:str,scan_id:str,offset:int=0,limit:int=50):
+        return redact(folders.preview(fid,scan_id,file_id,offset=offset,limit=limit))
     @app.get('/api/knowledge')
     def knowledge():return redact(manager.knowledge_status())
     @app.post('/api/knowledge/import')
