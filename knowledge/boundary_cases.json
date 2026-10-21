@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "purpose": "development diagnostics on new official source documents; authored and reviewed by coding_assistant, not independent acceptance",
+  "max_steps": 12,
+  "token_budget": 80000,
+  "cases": [
+    {
+      "id": "handover-known-unknown",
+      "question": "不联网，仅依据以下虚构交接记录，写一份全文不超过220字的简短报告：归档原定每周2次，有人建议改为每周3次，尚未批准；没有提供执行记录，也没有提供负责人身份。区分原值、建议、批准状态、执行情况与负责人信息。没有记录不等于证明未执行或无人负责；不补日期，不计算，不检索其他材料。",
+      "checks": ["每周2次为原定值，3次为未批准建议，不声称已生效", "执行情况未知，不把没有执行记录改写为已证明未执行；负责人身份未知不等于无人负责", "全文按现有可见非空白字符口径不超过220，不补实际日期和额外分析"]
+    },
+    {
+      "id": "csv-json-conversion",
+      "question": "不联网，依据本地csv和json文档写简短说明：csv.reader默认会不会把未加引号的数字字段转成float，QUOTE_NONNUMERIC如何改变这一行为？json.loads默认怎样解码JSON实数，若希望用Decimal解析该如何配置？区分默认行为与显式选项，关联两份文档的已读依据；只解释，不运行代码或宣称做过实测。",
+      "checks": ["CSV默认返回字符串，QUOTE_NONNUMERIC例外针对未加引号字段转float，不声称所有字段无条件转换", "JSON实数默认float，parse_float可传decimal.Decimal；一种配置方式不等于唯一可能实现", "不把文档示例说成本机运行结果，不扩展未要求的数据处理测试"],
+      "anchors": [
+        {"name": "csv.txt", "page": 1, "contains": "unquoted fields are transformed into floats"},
+        {"name": "json.txt", "page": 1, "contains": "parse_float=decimal.Decimal"}
+      ]
+    },
+    {
+      "id": "temporary-file-conditions",
+      "question": "不联网，仅依据本地tempfile文档写简短说明：NamedTemporaryFile放进with是否就一定会删除？delete=False时delete_on_close=True是否仍会删除？Windows上文件尚未关闭时再次按名称打开，文档给出哪些可选条件与清理限制？这些文档能否证明本项目生产程序采用了哪组参数、已经验证删除成功？只解释，不创建文件或运行代码。",
+      "checks": ["明确delete=False时delete_on_close被忽略，不能把with当作无条件删除保证", "Windows重开条件是至少满足其中之一，不把delete=False、共享删除权限、delete=True且delete_on_close=False叠加成必须同时满足；保留相关关闭与权限限制", "文档描述不能证明本项目实际配置和测试结果；未返回记录不推出全库不存在配置；不宣称实测"],
+      "anchors": [
+        {"name": "tempfile.txt", "page": 1, "contains": "false, the value of *delete_on_close* is ignored"},
+        {"name": "tempfile.txt", "page": 1, "contains": "at least one of the following conditions"}
+      ]
+    },
+    {
+      "id": "json-roundtrip-activity",
+      "question": "不联网，依据本地json文档，简短说明非字符串字典键序列化时如何处理，能否保证loads(dumps(x))总等于x。另注明截至写稿前本任务已返回结果的search_knowledge次数，以及实际送达并保留片段的文档版本数，引用实际记录并说明快照截止位置；这些数量不是全库覆盖率或服务商API调用次数。只解释，不运行代码，不把示例说成本机验证。",
+      "checks": ["字典键转换为字符串，存在非字符串键时往返不保证等于原对象，不反向夸大所有对象一定不同", "检索返回次数与文档版本数按真实trace及所引快照核对，明确时点；若另报证据总数，区分快照记录入账前后", "不将局部审稿上下文缺失说成完整原始工具返回截断，不声称完整阅读全库或执行代码"],
+      "anchors": [
+        {"name": "json.txt", "page": 1, "contains": "coerced to strings"}
+      ]
+    }
+  ]
+}

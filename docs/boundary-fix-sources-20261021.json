@@ -1,0 +1,43 @@
+{
+  "sources": [
+    {
+      "name": "csv.txt",
+      "requested_url": "https://raw.githubusercontent.com/python/cpython/v3.13.0/Doc/library/csv.rst",
+      "final_url": "https://raw.githubusercontent.com/python/cpython/v3.13.0/Doc/library/csv.rst",
+      "retrieved_at_utc": "2026-10-21T13:02:59.370038+00:00",
+      "raw_filename": "csv.txt.raw.txt",
+      "raw_sha256": "855994acbf3d91832e7e9206ef1d37f5dbaa8e7a2a30237e737e58071098dd8b",
+      "document_sha256": "855994acbf3d91832e7e9206ef1d37f5dbaa8e7a2a30237e737e58071098dd8b",
+      "characters": 22671,
+      "chunks": 41,
+      "embedding_estimated_input_tokens": 8347
+    },
+    {
+      "name": "json.txt",
+      "requested_url": "https://raw.githubusercontent.com/python/cpython/v3.13.0/Doc/library/json.rst",
+      "final_url": "https://raw.githubusercontent.com/python/cpython/v3.13.0/Doc/library/json.rst",
+      "retrieved_at_utc": "2026-10-21T13:03:00.922781+00:00",
+      "raw_filename": "json.txt.raw.txt",
+      "raw_sha256": "6533f6d5be67f903194ba4b92335d079552edb69c4c8fd45d6215de60358dd8e",
+      "document_sha256": "6533f6d5be67f903194ba4b92335d079552edb69c4c8fd45d6215de60358dd8e",
+      "characters": 29219,
+      "chunks": 53,
+      "embedding_estimated_input_tokens": 10774
+    },
+    {
+      "name": "tempfile.txt",
+      "requested_url": "https://raw.githubusercontent.com/python/cpython/v3.13.0/Doc/library/tempfile.rst",
+      "final_url": "https://raw.githubusercontent.com/python/cpython/v3.13.0/Doc/library/tempfile.rst",
+      "retrieved_at_utc": "2026-10-21T13:03:01.569126+00:00",
+      "raw_filename": "tempfile.txt.raw.txt",
+      "raw_sha256": "487aeabf01be281fd1e2534b326c33cca4d9fab4db1c04d32e58439c9f6346bc",
+      "document_sha256": "487aeabf01be281fd1e2534b326c33cca4d9fab4db1c04d32e58439c9f6346bc",
+      "characters": 19891,
+      "chunks": 36,
+      "embedding_estimated_input_tokens": 7323
+    }
+  ],
+  "runtime_sha256": "f9fcc0f956fdd7f7cba0cae495b79c43c22e51fa9f4099510f9b5092e2637538",
+  "error_type": null,
+  "transformation": "Official CPython v3.13.0 RST source saved as unchanged UTF8 bytes; TXT extension only, no content transformation"
+}
