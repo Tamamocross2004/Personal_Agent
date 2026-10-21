@@ -574,7 +574,7 @@ class Agent(CheckpointMixin):
                     for source_id in ids:
                         source=self._evidence.records[source_id]
                         preview=source['text'][:100] if source['kind']=='web' else source['text'].split('成功输出：',1)[-1][:120]
-                        content += '\n'+json.dumps({'source_id':source_id,'range':[source.get('start'),source.get('end')],
+                        content += '\n'+json.dumps({'source_id':source_id,'kind':source['kind'],'range':[source.get('start'),source.get('end')],
                                                     'preview':preview},ensure_ascii=False)
             if name == "fetch_url" and not result.is_error:
                 self._source_readings.append({"tool_call_id": call.id, "arguments": arguments[:2000],

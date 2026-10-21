@@ -61,8 +61,8 @@ def check_direct(quote, refs, records):
         locations.append(match.span())
     for match in _SECTION.finditer(quote):
         label = next(v for v in match.groups() if v)
-        heading = (r'(?:^|\n)\s*(?:第\s*' + re.escape(label) + r'\s*[章节]|'
-                   r'(?:(?:Chapter|Section)\s+)?' + re.escape(label) + r'(?![\d.])(?:\s|$))')
+        heading = (r'(?:^|\n)\s*(?:#{1,6}\s+)?(?:第\s*' + re.escape(label) + r'\s*[章节]|'
+                   r'(?:(?:Chapter|Section)\s+)?' + re.escape(label) + r'(?!\d|\.\d)(?:\s|[:：]|\.(?=\s)|$))')
         if not any(re.search(heading, s['text'], re.I) for s in sources):
             raise ValueError('引用章节没有绑定已读标题依据：' + match[0] + '；不能从文件名或未读目录补充定位。')
         locations.append(match.span())

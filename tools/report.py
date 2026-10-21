@@ -163,7 +163,9 @@ def make_write_report(task_dir: Path, session: ResearchSession | None = None, *,
                 issues.extend(exc.issues)
         if issues:
             from agent.evidence import sha
-            raise ReportValidationError(issues,report_sha256=sha(full),measurements=contract_check['measurements'])
+            raise ReportValidationError(issues,candidate_sha256=sha(full),
+                saved_report_sha256=sha(path.read_text(encoding='utf-8')) if path.is_file() else None,
+                measurements=contract_check['measurements'])
         task_dir.mkdir(parents=True, exist_ok=True)
         if mode == "append" and path.exists():
             with path.open("a", encoding="utf-8") as f:

@@ -59,3 +59,15 @@ def test_numeric_formats_units_and_citation_markers():
     assert numbers('30-40')=={Decimal(30),Decimal(40)}
     records={'evidence42':{'kind':'user','text':'数量27'}}
     assert not check_direct('数量27[evidence42]',[{'source_id':'evidence42','excerpt':'数量27'}],records)
+
+
+@pytest.mark.parametrize('label',['7','12.8','3.4.9'])
+@pytest.mark.parametrize('style',['Chapter {}: Heading','Section {}：Heading','## {} Heading','### {}. Heading','## 第{}节 标题'])
+def test_heading_delimiters_and_markdown_are_general_not_question_exceptions(label,style):
+    assert not check('第'+label+'节说明数量27',style.format(label)+'\n数量27',excerpt='数量27')
+
+
+@pytest.mark.parametrize('text',['正文提到 Chapter 7: 但不是标题','70: Other heading','7.1 Other section'])
+def test_heading_prefix_and_inline_mentions_cannot_substitute_for_exact_heading(text):
+    with pytest.raises(ValueError,match='章节'):
+        check('第7节说明数量27',text+'\n数量27',excerpt='数量27')

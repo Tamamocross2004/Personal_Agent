@@ -31,6 +31,7 @@ def test_counts_come_from_all_batches_not_model_text_or_latest_batch(tmp_path,re
     assert summary['retained_evidence']['document_records']==0  # 工具名称和返回声称不是送达原文证据。
     received='\n'.join(m['content'] for m in llm.requests[-1]['messages'] if m['role']=='tool')
     assert '【本次运行记录快照】' in received
+    assert '"kind": "execution"' in received
     observed=[r for r in session.evidence.records.values() if r['kind']=='execution' and r['tool']=='read_notes']
     assert observed and 'tool_requests' in observed[0]['text']
     review,_=build_review_messages('仅依据实际记录。',tmp_path,session)

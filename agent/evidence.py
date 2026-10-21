@@ -235,7 +235,7 @@ class EvidenceLedger:
                 except ValueError as exc:
                     error('','evidence_constraint',str(exc))
         if issues:
-            raise ReportValidationError(issues,report_sha256=sha(report))
+            raise ReportValidationError(issues,candidate_sha256=sha(report))
         return result
 
     def _validate_claims(self, report: str, claims: list[Claim], *, base_index=0) -> list[dict]:

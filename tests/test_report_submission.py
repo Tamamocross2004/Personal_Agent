@@ -28,7 +28,8 @@ def test_all_independent_errors_are_returned_without_overwriting_report_or_sidec
     bad='需要缩短的背景说明。'*40+'价格7元，1+2=8。'
     result=registry.execute('write_report',{'content':bad,'claims':[
         claim(quote='不在当前正文的原句',source='missing'),claim(excerpt='未读取的价格9元')]})
-    assert result.is_error and result.validation['report_sha256']==sha(bad)
+    assert result.is_error and result.validation['candidate_sha256']==sha(bad)
+    assert result.validation['saved_report_sha256']==sha(good)
     codes={i['code'] for i in result.validation['issues']}
     assert {'task_contract','required_headers','arithmetic','quote_missing','source_missing','excerpt_missing'}<=codes
     paths={i['path'] for i in result.validation['issues']}
@@ -43,6 +44,7 @@ def test_soft_target_and_wrong_reference_both_return_and_target_does_not_change(
     assert {'brief_length','quote_missing'}<={i['code'] for i in result.validation['issues']}
     assert any(m.get('soft_target')==500 for m in result.validation['measurements'])
     assert not (tmp_path/'report.md').exists()
+    assert result.validation['saved_report_sha256'] is None
 
 
 def test_feedback_is_bounded_and_explicit_about_omitted_errors(tmp_path):
@@ -88,3 +90,16 @@ def test_corrected_submission_is_saved_and_only_then_reviewed(tmp_path):
     assert (tmp_path/'report.md').read_text('utf-8')==text
     assert json.loads((tmp_path/'report.review.json').read_text('utf-8'))['status']=='reviewed'
     assert json.loads((tmp_path/'report.evidence.json').read_text('utf-8'))['claims'][0]['quote']=='价格7元'
+
+
+def test_rejected_candidate_hash_cannot_replace_saved_patch_base(tmp_path):
+    _,registry=setup(tmp_path,'材料：价格7元。全文不超过80字。')
+    good='# 原稿\n价格7元'
+    registry.execute('write_report',{'content':good,'claims':[claim()]})
+    result=registry.execute('write_report',{'content':'重复背景。'*100,'claims':[claim()]})
+    args={'mode':'patch','replacements':[{'old':'原稿','new':'修订'}],'claims':[claim()]}
+    rejected=registry.execute('write_report',{**args,'base_sha256':result.validation['candidate_sha256']})
+    assert rejected.is_error and (tmp_path/'report.md').read_text('utf-8')==good
+    accepted=registry.execute('write_report',{**args,'base_sha256':result.validation['saved_report_sha256']})
+    assert not accepted.is_error
+    assert (tmp_path/'report.md').read_text('utf-8')==good.replace('原稿','修订')
