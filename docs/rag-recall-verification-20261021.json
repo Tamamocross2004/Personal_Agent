@@ -1,0 +1,111 @@
+{
+  "complete": true,
+  "source_unchanged": true,
+  "source_sha256": "cb58a441b3ec0a5da27546af7a015a72440826b514433629351ec37efc8d12bf",
+  "questions": 100,
+  "same_corpus_rows": 100902,
+  "old_query_overlap": 0,
+  "summary": {
+    "40-20/rrf": {
+      "precision_at_4": 0.165,
+      "recall_at_4": 0.66,
+      "hit_at_4": 0.66,
+      "mrr_at_4": 0.48083333333333345,
+      "ndcg_at_4": 0.5261732909393884,
+      "candidate_recall": 0.83,
+      "mean_seconds": 0.05159756000004563,
+      "cases": 100
+    },
+    "40-20/rerank": {
+      "precision_at_4": 0.1675,
+      "recall_at_4": 0.67,
+      "hit_at_4": 0.67,
+      "mrr_at_4": 0.575,
+      "ndcg_at_4": 0.599010740144367,
+      "candidate_recall": 0.83,
+      "mean_seconds": 0.8835037179998835,
+      "cases": 100
+    },
+    "80-40/rrf": {
+      "precision_at_4": 0.1625,
+      "recall_at_4": 0.65,
+      "hit_at_4": 0.65,
+      "mrr_at_4": 0.47333333333333344,
+      "ndcg_at_4": 0.5178614614486932,
+      "candidate_recall": 0.85,
+      "mean_seconds": 0.05328652999985934,
+      "cases": 100
+    },
+    "80-40/rerank": {
+      "precision_at_4": 0.165,
+      "recall_at_4": 0.66,
+      "hit_at_4": 0.66,
+      "mrr_at_4": 0.57,
+      "ndcg_at_4": 0.5927014426086523,
+      "candidate_recall": 0.85,
+      "mean_seconds": 1.0980640170000333,
+      "cases": 100
+    },
+    "120-80/rrf": {
+      "precision_at_4": 0.165,
+      "recall_at_4": 0.66,
+      "hit_at_4": 0.66,
+      "mrr_at_4": 0.48333333333333345,
+      "ndcg_at_4": 0.5278614614486932,
+      "candidate_recall": 0.9,
+      "mean_seconds": 0.06788553300015338,
+      "cases": 100
+    },
+    "120-80/rerank": {
+      "precision_at_4": 0.1675,
+      "recall_at_4": 0.67,
+      "hit_at_4": 0.67,
+      "mrr_at_4": 0.5725,
+      "ndcg_at_4": 0.5970082081893863,
+      "candidate_recall": 0.9,
+      "mean_seconds": 1.4769191969997337,
+      "cases": 100
+    }
+  },
+  "per_profile_usage": {
+    "40-20": {
+      "calls": 100,
+      "input_tokens": 72377,
+      "output_tokens": 0,
+      "unknown": 0
+    },
+    "80-40": {
+      "calls": 100,
+      "input_tokens": 145936,
+      "output_tokens": 0,
+      "unknown": 0
+    },
+    "120-80": {
+      "calls": 100,
+      "input_tokens": 293053,
+      "output_tokens": 0,
+      "unknown": 0
+    }
+  },
+  "new_embedding": {
+    "calls": 100,
+    "input_tokens": 846
+  },
+  "index_setup_seconds": 1.9371372999994492,
+  "cache_hits": 0,
+  "new_failed_calls": 0,
+  "tests_passed": 84,
+  "production_defaults": {
+    "lexical": 40,
+    "vector": 40,
+    "pool": 20,
+    "rerank": false
+  },
+  "artifacts": {
+    "workspace/rag-recall-live-20261021/plan.json": "93388a2b145ba745bcae70db8fb20435f5dcfd59d5c93cd20c9035e74e2221ee",
+    "workspace/rag-recall-live-20261021/results.json": "84c086c9345a03f90529335f5c7b5e0ccc150076e79bac3c954982786d32b122",
+    "workspace/rag-recall-live-20261021/current-case.json": "09ef59faddb741f377955d3e0388da0b3c472997d4d4072e74565ac1593ff0c9",
+    "workspace/rag-next-20261021/recall-live.log": "396491656de9a35069cbd9ab27bc1083ced80295db267e4accac524321f8022b",
+    "workspace/rag-next-20261021/recall-tests.log": "22822cb8c3c4791813dd40fc946d1b34cef84ac15beb3528f95f87f66ce63faa"
+  }
+}
