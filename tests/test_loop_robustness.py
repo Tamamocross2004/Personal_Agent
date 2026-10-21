@@ -138,7 +138,7 @@ def test_budget_warning_then_projected_overrun_finalizes(registry):
         token_budget=1000,
     )
     assert res.stop_reason == "budget"
-    assert res.answer=='' and len(llm.requests)==2
+    assert res.answer_origin=='program_status' and '未获得最终模型答复' in res.answer and len(llm.requests)==2
     final_msgs = res.messages
     warnings = [m for m in final_msgs if "已使用 900 / 1000" in str(m.get("content"))]
     assert len(warnings) == 1 and warnings[0]["role"] == "user"  # 只提醒一次
@@ -201,7 +201,7 @@ def test_budget_exhausted_does_not_dispatch_an_extra_finalize(registry):
         token_budget=1000,
     )
     assert res.stop_reason == "budget"
-    assert res.answer=='' and res.equivalent_tokens==1210
+    assert res.answer_origin=='program_status' and '程序状态说明' in res.answer and res.equivalent_tokens==1210
     assert len(llm.requests) == 1
     assert "tool_choice" not in llm.requests[-1]
 
