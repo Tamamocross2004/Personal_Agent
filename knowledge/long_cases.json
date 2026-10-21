@@ -1,0 +1,237 @@
+{
+  "kind": "coding_assistant_authored_development_diagnostic",
+  "sources": [
+    {
+      "name": "sqlite-fts5.txt",
+      "url": "https://www.sqlite.org/fts5.html",
+      "sha256": "11e8b8839d8db49e97000761760f077a98ccc975209d3030887d4f18b7b3b6d2",
+      "pages": 1,
+      "characters": 164076,
+      "chunks": 295
+    },
+    {
+      "name": "python-logging.txt",
+      "url": "https://docs.python.org/3.11/howto/logging-cookbook.html",
+      "sha256": "3dfd06bf81a417d8c09cb21d6448dff73ae3729f15f3ba9d0ed91c662acd26ee",
+      "pages": 1,
+      "characters": 149115,
+      "chunks": 264
+    },
+    {
+      "name": "gnu-make.pdf",
+      "url": "https://www.gnu.org/software/make/manual/make.pdf",
+      "sha256": "a4bc06026984382815e392159e60a4bc356cac6c5b81e5ae84fa4f58f621f4d3",
+      "pages": 229,
+      "characters": 571562,
+      "chunks": 1079
+    }
+  ],
+  "facts": {
+    "bm25": {
+      "name": "sqlite-fts5.txt",
+      "page": 1,
+      "start": 56481,
+      "end": 56542,
+      "text_sha256": "55cd31e3da81851d27970433294863b4eed3776c6756e58863e0d67c92a50672",
+      "expected": "FTS5 bm25匹配越好，数值越小；升序把较好结果放前面。"
+    },
+    "near": {
+      "name": "sqlite-fts5.txt",
+      "page": 1,
+      "start": 14405,
+      "end": 14456,
+      "text_sha256": "659f65446225c54b18c8e5a4af17dac31108edc7ae2c9bd7b106d03b7cd9e8c6",
+      "expected": "NEAR不提供距离N时默认10。"
+    },
+    "process": {
+      "name": "python-logging.txt",
+      "page": 1,
+      "start": 46221,
+      "end": 46411,
+      "text_sha256": "abd70d942d305af1bc318bf7696cc3290ced301160bc79f2b4a763f8c83e19d5",
+      "expected": "线程安全不等于支持多个进程直接写同一日志文件。"
+    },
+    "queue": {
+      "name": "python-logging.txt",
+      "page": 1,
+      "start": 18308,
+      "end": 18424,
+      "text_sha256": "fb62f843d40b15c0a0ca30ab8c92d4ea9c26f34be59d0e1940b0bbfd06941d0f",
+      "expected": "QueueHandler负责入队，QueueListener用独立线程取记录并交给实际handler。"
+    },
+    "same_logger": {
+      "name": "python-logging.txt",
+      "page": 1,
+      "start": 300,
+      "end": 398,
+      "text_sha256": "fefffdf2638e93fd0cb5d6be8ec9953b93f1d3e4e6ef4dba230bd74e2dd9a9f5",
+      "expected": "同一解释器进程内，同名getLogger可跨模块获得同一logger对象；不能推广成跨进程同一对象。"
+    },
+    "order": {
+      "name": "gnu-make.pdf",
+      "page": 36,
+      "start": 2493,
+      "end": 2582,
+      "text_sha256": "0a94e6b63cbdfaf5c8d788c755c5fbe240a04535975b04d03b8e2c7ea9e2f109",
+      "expected": "order-only前置条件控制执行次序，不因其更新时间强迫目标重建。"
+    },
+    "phony": {
+      "name": "gnu-make.pdf",
+      "page": 43,
+      "start": 1349,
+      "end": 1471,
+      "text_sha256": "883c5625478072b4a62f2fb49e9136ee27520761dc54053a60d99d51f6cc7063",
+      "expected": ".PHONY避免同名文件冲突并改善性能。"
+    },
+    "implicit": {
+      "name": "gnu-make.pdf",
+      "page": 44,
+      "start": 1612,
+      "end": 1711,
+      "text_sha256": "c49e0f94b591a904c59dd0a0691c2dafb1a5200726f5dbd83727a156d32b263d",
+      "expected": ".PHONY目标跳过隐式规则查找。"
+    },
+    "delete": {
+      "name": "gnu-make.pdf",
+      "page": 67,
+      "start": 2107,
+      "end": 2165,
+      "text_sha256": "59fd9faa4bd3090ecca27e3492b85af9eab45196fd1e0136bb062a31dcb9ec43",
+      "expected": "配方失败且已经修改目标文件时，可显式声明.DELETE_ON_ERROR请求删除目标；不是对所有失败无条件删除。"
+    }
+  },
+  "cases": [
+    {
+      "id": "long-bm25",
+      "query": "SQLite FTS5 的 bm25() 分数是越大越好还是越小越好，SQL排序方向如何选择？",
+      "facts": [
+        "bm25"
+      ]
+    },
+    {
+      "id": "long-near",
+      "query": "FTS5 NEAR 查询省略距离 N 时，默认距离是多少？",
+      "facts": [
+        "near"
+      ]
+    },
+    {
+      "id": "long-process",
+      "query": "Python logging 是线程安全的，所以多个进程可以各自用 FileHandler 直接写同一个文件吗？请依据手册区分进程和线程。",
+      "facts": [
+        "process"
+      ]
+    },
+    {
+      "id": "long-queue",
+      "query": "日志输出阻塞业务线程时，QueueHandler 和 QueueListener 分别做什么？",
+      "facts": [
+        "queue"
+      ]
+    },
+    {
+      "id": "long-logger",
+      "query": "不同Python模块 getLogger 同一个名称，会拿到同一对象吗？这个结论的进程范围是什么？",
+      "facts": [
+        "same_logger"
+      ]
+    },
+    {
+      "id": "long-order",
+      "query": "GNU Make 中 order-only prerequisites 的作用是什么？它更新时是否必然触发目标重建？",
+      "facts": [
+        "order"
+      ]
+    },
+    {
+      "id": "long-phony",
+      "query": "GNU Make 为什么使用 .PHONY？它与隐式规则查找有什么关系？请合并说明。",
+      "facts": [
+        "phony",
+        "implicit"
+      ]
+    },
+    {
+      "id": "long-delete",
+      "query": "GNU Make 的 .DELETE_ON_ERROR 什么时候用于删除目标文件？配方报错就会默认无条件删除吗？",
+      "facts": [
+        "delete"
+      ]
+    },
+    {
+      "id": "long-cross",
+      "query": "分别说明 SQLite FTS5 bm25 的排序方向，以及 GNU Make order-only 前置条件是否触发重建。两部分分别引用出处。",
+      "facts": [
+        "bm25",
+        "order"
+      ]
+    },
+    {
+      "id": "long-unknown",
+      "query": "这些手册规定我们公司使用 GNU Make 的年度服务费具体是多少人民币？",
+      "facts": []
+    }
+  ],
+  "research": [
+    {
+      "id": "e2e-sqlite",
+      "question": "仅依据知识库，解释SQLite FTS5 bm25分数与排序方向，以及NEAR省略N时的默认距离。保存简短中文报告，逐项关联原文证据，注明文件与页码，不联网。",
+      "facts": [
+        "bm25",
+        "near"
+      ]
+    },
+    {
+      "id": "e2e-make",
+      "question": "仅依据知识库GNU Make手册，解释.PHONY的两个用途、为何跳过隐式规则搜索，区分order-only前置条件和目标重建的关系，并说明.DELETE_ON_ERROR的使用条件。保存简短中文报告，关联原文证据，页码用PDF实际页码，不联网。",
+      "facts": [
+        "phony",
+        "implicit",
+        "order",
+        "delete"
+      ]
+    },
+    {
+      "id": "e2e-logging",
+      "question": "仅依据知识库Python logging手册，解释线程安全是否意味着多个进程能各自直接写同一个日志文件，以及QueueHandler/QueueListener怎样分工。保存中文报告，关联原文证据并保留适用范围，不联网。",
+      "facts": [
+        "process",
+        "queue"
+      ]
+    },
+    {
+      "id": "e2e-unknown",
+      "question": "仅依据这些知识库手册，我们公司使用GNU Make的年度服务费具体是多少人民币？若没有公司费用依据请明确未知，不从开源许可推断商业服务费用为零。保存简短报告并说明证据范围，不联网。",
+      "facts": []
+    },
+    {
+      "id": "e2e-coverage",
+      "question": "仅依据知识库，请列出整本GNU Make手册的全部错误恢复机制，并保证毫无遗漏。若本次工具只取得部分片段，请明确不能据此保证全文完整，区分已读条款与未覆盖范围。保存简短报告，关联实际原文证据，不联网。",
+      "facts": [
+        "delete"
+      ],
+      "requires_scope_limit": true
+    }
+  ],
+  "protocol": {
+    "mode": "hybrid",
+    "k": 4,
+    "rerank": [
+      false,
+      true
+    ],
+    "candidate_pool": 20,
+    "chunk_size": 700,
+    "overlap": 120,
+    "seed": 20261022,
+    "build_token_cap": 600000,
+    "retrieval_token_cap": 120000,
+    "research_steps": 15,
+    "research_budget_per_task": 80000,
+    "research_rerank": true,
+    "semantic_review": "coding_assistant; not human or independent stage12 acceptance",
+    "missing_answer": "exclude from retrieval fact coverage; manually inspect final answer",
+    "facts_metric": "exact interval coverage of frozen anchor spans; localization only, not semantic certification",
+    "no_retry": "retain failed calls/results; no resampling or relabeling"
+  }
+}
