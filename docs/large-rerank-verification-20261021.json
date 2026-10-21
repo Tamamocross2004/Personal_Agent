@@ -1,0 +1,780 @@
+{
+  "base_revision": "adae05a090d93e540940f875990afab5bb1f60b4",
+  "dataset": "C-MTEB/EcomRetrieval",
+  "dataset_sources": [
+    {
+      "url": "https://huggingface.co/datasets/C-MTEB/EcomRetrieval/resolve/687de13dc7294d6fd9be10c6945f9e8fec8166b9/data/corpus-00000-of-00001-7f0e87850b5c9454.parquet",
+      "file": "corpus-00000-of-00001-7f0e87850b5c9454.parquet",
+      "sha256": "ad50bc86e74f45ac57ad5b2f475e564a6baef4b286d0af803ac673e26ba0e059",
+      "bytes": 8421575
+    },
+    {
+      "url": "https://huggingface.co/datasets/C-MTEB/EcomRetrieval/resolve/687de13dc7294d6fd9be10c6945f9e8fec8166b9/data/queries-00000-of-00001-46d6d2b2f0ad8826.parquet",
+      "file": "queries-00000-of-00001-46d6d2b2f0ad8826.parquet",
+      "sha256": "ddf99eba426a21182755979e5c8f3b0afe93808096437779a7ab2d6a316df686",
+      "bytes": 26880
+    },
+    {
+      "url": "https://huggingface.co/datasets/C-MTEB/EcomRetrieval-qrels/resolve/39c90699b034ec22ac45b3abf5b0bbb5ffd421f9/data/dev-00000-of-00001-42566aaf5580f662.parquet",
+      "file": "dev-00000-of-00001-42566aaf5580f662.parquet",
+      "sha256": "189c199c2a3c615f8ec476549039e00f8e49f18905ede786d4003237d71d2933",
+      "bytes": 14540
+    }
+  ],
+  "corpus_rows": 100902,
+  "characters": 3327790,
+  "queries": 100,
+  "protocol": {
+    "mode": "hybrid",
+    "lexical_limit": 40,
+    "vector_limit": 40,
+    "rrf_constant": 60,
+    "candidate_pool": 20,
+    "k": 4,
+    "embedding_batch": 32,
+    "embedding_workers": 4,
+    "embedding_token_cap": 8000000,
+    "rerank_token_cap": 500000,
+    "query_embedding": "prewarmed for both arms",
+    "rerank_cache": "cold per query",
+    "labels": "original positive qrels; unjudged treated as nonrelevant; no relabeling",
+    "scope": "presegmented benchmark passages; no chat generation or production import capacity claim"
+  },
+  "embedding": {
+    "model": "Pro/BAAI/bge-m3",
+    "dimensions": 1024,
+    "base_url": "https://api.siliconflow.cn/v1"
+  },
+  "rerank": {
+    "model": "BAAI/bge-reranker-v2-m3",
+    "base_url": "https://api.siliconflow.cn/v1"
+  },
+  "runtime_sha256": "ef05862ecabad2a7f5dec9c08d0d195c8f08156248701fb1926d8dd3f0e31f30",
+  "source_unchanged": true,
+  "complete": true,
+  "summary": {
+    "baseline": {
+      "precision_at_4": 0.13,
+      "recall_at_4": 0.52,
+      "hit_at_4": 0.52,
+      "mrr_at_4": 0.4325,
+      "ndcg_at_4": 0.454703974563633,
+      "recall_at_20": 0.77,
+      "mean_seconds": 1.19704688600008,
+      "median_seconds": 1.1956507499999134,
+      "p95_seconds": 1.2572536000006949
+    },
+    "rerank": {
+      "precision_at_4": 0.1575,
+      "recall_at_4": 0.63,
+      "hit_at_4": 0.63,
+      "mrr_at_4": 0.555,
+      "ndcg_at_4": 0.5744022728928603,
+      "recall_at_20": 0.77,
+      "mean_seconds": 2.0451799220000066,
+      "median_seconds": 2.0332624500006204,
+      "p95_seconds": 2.166721300000063
+    },
+    "paired_ndcg_delta": {
+      "mean": 0.11969829832922736,
+      "bootstrap_95_ci": [
+        0.05162365898139044,
+        0.18846617209633035
+      ],
+      "improved": 23,
+      "worse": 6,
+      "equal": 71
+    }
+  },
+  "validation": {
+    "milvus_stats": {
+      "row_count": 100902
+    },
+    "paired_cases_verified": 100,
+    "candidates_per_case": 20,
+    "new_hit_cases": 12,
+    "lost_hit_cases": 1,
+    "source_unchanged": true,
+    "known_embedding_input_tokens": 2895964,
+    "unknown_embedding_calls": 1,
+    "known_embedding_plus_unknown_reservation": 3158108,
+    "embedding_budget_cap": 8000000,
+    "embedding_budget_with_reservation_within_cap": true,
+    "rerank_api_mean_seconds": 0.82123,
+    "rerank_cache_hits": 0,
+    "changes": [
+      {
+        "id": "200394",
+        "query": "抽烟机滤纸新疆包邮",
+        "relevant": {
+          "398645": 1
+        },
+        "baseline": [
+          "61024",
+          "79805",
+          "53997",
+          "89172"
+        ],
+        "rerank": [
+          "79805",
+          "398645",
+          "99638",
+          "13588"
+        ],
+        "delta": 0.6309297535714575
+      },
+      {
+        "id": "200994",
+        "query": "入党积极分子表",
+        "relevant": {
+          "977743": 1
+        },
+        "baseline": [
+          "31220",
+          "20911",
+          "22004",
+          "15498"
+        ],
+        "rerank": [
+          "31220",
+          "977743",
+          "9601",
+          "7027"
+        ],
+        "delta": 0.6309297535714575
+      },
+      {
+        "id": "200321",
+        "query": "男孩围巾",
+        "relevant": {
+          "327423": 1
+        },
+        "baseline": [
+          "1003",
+          "20759",
+          "1761",
+          "15495"
+        ],
+        "rerank": [
+          "327423",
+          "34343",
+          "55900",
+          "20571"
+        ],
+        "delta": 1.0
+      },
+      {
+        "id": "200493",
+        "query": "25l蒸馏水",
+        "relevant": {
+          "501045": 1
+        },
+        "baseline": [
+          "89989",
+          "501045",
+          "29695",
+          "18335"
+        ],
+        "rerank": [
+          "10303",
+          "10738",
+          "501045",
+          "84920"
+        ],
+        "delta": -0.13092975357145753
+      },
+      {
+        "id": "200018",
+        "query": "爱立舍机油滤芯",
+        "relevant": {
+          "17311": 1
+        },
+        "baseline": [
+          "58757",
+          "87856",
+          "62204",
+          "94446"
+        ],
+        "rerank": [
+          "17311",
+          "87672",
+          "77861",
+          "98855"
+        ],
+        "delta": 1.0
+      },
+      {
+        "id": "200418",
+        "query": "小羊倌意大利",
+        "relevant": {
+          "418660": 1
+        },
+        "baseline": [
+          "92828",
+          "64667",
+          "97",
+          "418660"
+        ],
+        "rerank": [
+          "79164",
+          "64667",
+          "418660",
+          "451952"
+        ],
+        "delta": 0.06932344192660694
+      },
+      {
+        "id": "200315",
+        "query": "鸡柳条",
+        "relevant": {
+          "320887": 1
+        },
+        "baseline": [
+          "47952",
+          "60759",
+          "49011",
+          "320887"
+        ],
+        "rerank": [
+          "60759",
+          "49011",
+          "320887",
+          "47952"
+        ],
+        "delta": 0.06932344192660694
+      },
+      {
+        "id": "200816",
+        "query": "甘肃人参果",
+        "relevant": {
+          "806355": 1
+        },
+        "baseline": [
+          "68954",
+          "806355",
+          "63313",
+          "19177"
+        ],
+        "rerank": [
+          "806355",
+          "77507",
+          "73444",
+          "68954"
+        ],
+        "delta": 0.36907024642854247
+      },
+      {
+        "id": "200144",
+        "query": "涂色书小手画画蒙纸版",
+        "relevant": {
+          "135269": 1
+        },
+        "baseline": [
+          "135269",
+          "77376",
+          "87364",
+          "53945"
+        ],
+        "rerank": [
+          "53945",
+          "58441",
+          "35458",
+          "24756"
+        ],
+        "delta": -1.0
+      },
+      {
+        "id": "200667",
+        "query": "耳穴常见疾病图",
+        "relevant": {
+          "663522": 1
+        },
+        "baseline": [
+          "71507",
+          "663522",
+          "25123",
+          "18000"
+        ],
+        "rerank": [
+          "663522",
+          "56481",
+          "84260",
+          "18000"
+        ],
+        "delta": 0.36907024642854247
+      },
+      {
+        "id": "200723",
+        "query": "手控小汽车",
+        "relevant": {
+          "715734": 1
+        },
+        "baseline": [
+          "715734",
+          "53894",
+          "24668",
+          "94506"
+        ],
+        "rerank": [
+          "94506",
+          "715734",
+          "53065",
+          "13862"
+        ],
+        "delta": -0.36907024642854247
+      },
+      {
+        "id": "200051",
+        "query": "尼泊尔大金刚八瓣",
+        "relevant": {
+          "54231": 1
+        },
+        "baseline": [
+          "91233",
+          "3909",
+          "37927",
+          "23767"
+        ],
+        "rerank": [
+          "54231",
+          "54207",
+          "37912",
+          "40200"
+        ],
+        "delta": 1.0
+      },
+      {
+        "id": "200174",
+        "query": "屿东人  宁海  香榧",
+        "relevant": {
+          "166161": 1
+        },
+        "baseline": [
+          "99817",
+          "166161",
+          "15186",
+          "83580"
+        ],
+        "rerank": [
+          "166161",
+          "1560",
+          "11415",
+          "62192"
+        ],
+        "delta": 0.36907024642854247
+      },
+      {
+        "id": "200366",
+        "query": "mickey糖罐",
+        "relevant": {
+          "371067": 1
+        },
+        "baseline": [
+          "50913",
+          "70436",
+          "60273",
+          "1779"
+        ],
+        "rerank": [
+          "371067",
+          "70436",
+          "33686",
+          "36328"
+        ],
+        "delta": 1.0
+      },
+      {
+        "id": "200602",
+        "query": "豌豆思維",
+        "relevant": {
+          "602747": 1
+        },
+        "baseline": [
+          "602747",
+          "1952",
+          "68023",
+          "10203"
+        ],
+        "rerank": [
+          "11300",
+          "602747",
+          "41430",
+          "68023"
+        ],
+        "delta": -0.36907024642854247
+      },
+      {
+        "id": "200374",
+        "query": "蕃茄酱低脂",
+        "relevant": {
+          "380142": 1
+        },
+        "baseline": [
+          "50295",
+          "29034",
+          "91802",
+          "56380"
+        ],
+        "rerank": [
+          "380142",
+          "4736",
+          "56380",
+          "50295"
+        ],
+        "delta": 1.0
+      },
+      {
+        "id": "200286",
+        "query": "西门子电解电容",
+        "relevant": {
+          "298288": 1
+        },
+        "baseline": [
+          "42256",
+          "47639",
+          "45014",
+          "298288"
+        ],
+        "rerank": [
+          "47639",
+          "298288",
+          "35018",
+          "21024"
+        ],
+        "delta": 0.20025319549806447
+      },
+      {
+        "id": "200105",
+        "query": "五羊本田小公主100套缸",
+        "relevant": {
+          "112235": 1
+        },
+        "baseline": [
+          "32424",
+          "47170",
+          "112235",
+          "15815"
+        ],
+        "rerank": [
+          "112235",
+          "32424",
+          "4426",
+          "44723"
+        ],
+        "delta": 0.5
+      },
+      {
+        "id": "200310",
+        "query": "创维学习机平板电脑",
+        "relevant": {
+          "319764": 1
+        },
+        "baseline": [
+          "319764",
+          "58137",
+          "51785",
+          "85409"
+        ],
+        "rerank": [
+          "58137",
+          "319764",
+          "26690",
+          "71699"
+        ],
+        "delta": -0.36907024642854247
+      },
+      {
+        "id": "200972",
+        "query": "胶皮吸盘",
+        "relevant": {
+          "966663": 1
+        },
+        "baseline": [
+          "99382",
+          "13995",
+          "5537",
+          "61992"
+        ],
+        "rerank": [
+          "966663",
+          "61992",
+          "5537",
+          "26760"
+        ],
+        "delta": 1.0
+      },
+      {
+        "id": "200577",
+        "query": "李宁无界",
+        "relevant": {
+          "581067": 1
+        },
+        "baseline": [
+          "50641",
+          "36648",
+          "49940",
+          "69484"
+        ],
+        "rerank": [
+          "581067",
+          "50641",
+          "50630",
+          "40424"
+        ],
+        "delta": 1.0
+      },
+      {
+        "id": "200208",
+        "query": "双立人锅具三件套",
+        "relevant": {
+          "202380": 1
+        },
+        "baseline": [
+          "64030",
+          "202380",
+          "32556",
+          "70068"
+        ],
+        "rerank": [
+          "202380",
+          "64030",
+          "96708",
+          "70068"
+        ],
+        "delta": 0.36907024642854247
+      },
+      {
+        "id": "200160",
+        "query": "清理地毯",
+        "relevant": {
+          "154212": 1
+        },
+        "baseline": [
+          "67596",
+          "99327",
+          "29370",
+          "66868"
+        ],
+        "rerank": [
+          "154212",
+          "64098",
+          "66868",
+          "61606"
+        ],
+        "delta": 1.0
+      },
+      {
+        "id": "200685",
+        "query": "带抱箍球机支架",
+        "relevant": {
+          "685241": 1
+        },
+        "baseline": [
+          "10598",
+          "2264",
+          "685241",
+          "29411"
+        ],
+        "rerank": [
+          "10598",
+          "685241",
+          "2264",
+          "56897"
+        ],
+        "delta": 0.13092975357145753
+      },
+      {
+        "id": "200273",
+        "query": "玉米面狗粮",
+        "relevant": {
+          "279535": 1
+        },
+        "baseline": [
+          "58861",
+          "45521",
+          "279535",
+          "71299"
+        ],
+        "rerank": [
+          "279535",
+          "45521",
+          "80045",
+          "9313"
+        ],
+        "delta": 0.5
+      },
+      {
+        "id": "200659",
+        "query": "冷焊机 智能 精密电接头",
+        "relevant": {
+          "658499": 1
+        },
+        "baseline": [
+          "5257",
+          "658499",
+          "85106",
+          "73701"
+        ],
+        "rerank": [
+          "658499",
+          "85106",
+          "58101",
+          "5257"
+        ],
+        "delta": 0.36907024642854247
+      },
+      {
+        "id": "200746",
+        "query": "烛台 瓷",
+        "relevant": {
+          "739336": 1
+        },
+        "baseline": [
+          "6175",
+          "13472",
+          "47598",
+          "9564"
+        ],
+        "rerank": [
+          "739336",
+          "52388",
+          "6175",
+          "54703"
+        ],
+        "delta": 1.0
+      },
+      {
+        "id": "200792",
+        "query": "西装男童红色",
+        "relevant": {
+          "783921": 1
+        },
+        "baseline": [
+          "38298",
+          "35746",
+          "809",
+          "20361"
+        ],
+        "rerank": [
+          "783921",
+          "39130",
+          "35746",
+          "77399"
+        ],
+        "delta": 1.0
+      },
+      {
+        "id": "200269",
+        "query": "黄铜小平果钥匙扣",
+        "relevant": {
+          "274679": 1
+        },
+        "baseline": [
+          "274679",
+          "21209",
+          "30506",
+          "56408"
+        ],
+        "rerank": [
+          "38040",
+          "274679",
+          "65259",
+          "56408"
+        ],
+        "delta": -0.36907024642854247
+      }
+    ]
+  },
+  "usage": {
+    "embedding": {
+      "calls": 3255,
+      "returned": 3254,
+      "unknown_usage_calls": 1,
+      "input_tokens": 2895964
+    },
+    "rerank": {
+      "calls": 100,
+      "input_tokens": 73407,
+      "output_tokens": 0,
+      "unknown_usage_calls": 0
+    },
+    "chat_calls": 0,
+    "currency_cost": null,
+    "pricing_status": "unpriced; one embedding request has unknown usage"
+  },
+  "production_default_rerank": false,
+  "production_upload_limits_changed": false,
+  "tests": {
+    "passed": 51,
+    "log": "workspace/large-rerank-storage-final-tests-20261021.log"
+  },
+  "versions": {
+    "milvus-lite": "3.0",
+    "pymilvus": "3.0.2",
+    "openai": "3.33.0",
+    "pyarrow": "26.0.0"
+  },
+  "historical_integrity": {
+    "files": 802,
+    "changed": []
+  },
+  "secret_scan": {
+    "actual_project_key_matches": []
+  },
+  "source_sha256": {
+    "knowledge/large_probe.py": "497c734fde900ff464eea06b736979fc52ccaa964bba28f21ebd3a1464c0c630",
+    "knowledge/vectors.py": "bb8769571649a8fde8d96fc2042dc99df59c7bf08df940c4ab280cc83a7d31f0",
+    "tests/test_large_probe.py": "dbfe801765c08abcc6105bae10b821a37a965a586344afede55094490c338c62",
+    "pyproject.toml": "88ebc4aca40380b156ac760c0111b019e1cddeaead0122ea8b5ebb6efd95e774",
+    "README.md": "5895d014037956b8016c80414a893584a0282a4c0c1f5a2b163d1f1644910234",
+    "ROADMAP.md": "abf590b7df59be0876aed3c52b156d3d4a2b6d036b2fc6e9dafa4d3ab64b04cb",
+    "docs/rag-guide.md": "a809bf134956b3e3de1ce85735dee4b4d9b8dbb2635cf30718842e4b1a32e444",
+    "docs/large-rerank-verification-20261021.md": "3bcba416111e4aab049f688bc3c1e752c522351d106e4cd3792349470330824d"
+  },
+  "artifact_sha256": {
+    "workspace/large-rerank-live-20261021/artifacts.json": "c4343995bc3c0af296a622f0f8cf2b8e8233f2cbef3620b1633ce46db2b72f7f",
+    "workspace/large-rerank-live-20261021/plan.json": "8bf782237c3b51ea461fd57ac178a8d4e188b4149f5415db0e034a717bc77514",
+    "workspace/large-rerank-live-20261021/progress.json": "a10c32f96026eeefbd97612e6805c01a2ef22fe87425d0cfeb9747f83d2625d9",
+    "workspace/large-rerank-live-20261021/results.json": "7d25555ac5ebeacec13a1699ab768f698908136bcfba8cdf1f51daa3891e4adc",
+    "workspace/large-rerank-live-20261021/dataset/corpus-00000-of-00001-7f0e87850b5c9454.parquet": "ad50bc86e74f45ac57ad5b2f475e564a6baef4b286d0af803ac673e26ba0e059",
+    "workspace/large-rerank-live-20261021/dataset/dev-00000-of-00001-42566aaf5580f662.parquet": "189c199c2a3c615f8ec476549039e00f8e49f18905ede786d4003237d71d2933",
+    "workspace/large-rerank-live-20261021/dataset/queries-00000-of-00001-46d6d2b2f0ad8826.parquet": "ddf99eba426a21182755979e5c8f3b0afe93808096437779a7ab2d6a316df686",
+    "workspace/large-rerank-continue1-20261021/artifacts.json": "5568e2a0dd0afef6dc33430aeb3f5993061dfe4e0f560af383ca4e23bb0a3ab4",
+    "workspace/large-rerank-continue1-20261021/continuation.json": "a6909aeef4094008aaa396fd2494c6412e072ae46defd681d1d67ddc25e8a8ea",
+    "workspace/large-rerank-continue1-20261021/plan.json": "8bf782237c3b51ea461fd57ac178a8d4e188b4149f5415db0e034a717bc77514",
+    "workspace/large-rerank-continue1-20261021/progress.json": "076525247f2050241cbb31a7962bac846daea31fb6e40ff0327118301c8b131c",
+    "workspace/large-rerank-continue1-20261021/results.json": "3c61469e5ea666cd1816012c7df51b413805770cb4a155b67cf15355ad34dc76",
+    "workspace/large-rerank-continue1-20261021/dataset/corpus-00000-of-00001-7f0e87850b5c9454.parquet": "ad50bc86e74f45ac57ad5b2f475e564a6baef4b286d0af803ac673e26ba0e059",
+    "workspace/large-rerank-continue1-20261021/dataset/dev-00000-of-00001-42566aaf5580f662.parquet": "189c199c2a3c615f8ec476549039e00f8e49f18905ede786d4003237d71d2933",
+    "workspace/large-rerank-continue1-20261021/dataset/queries-00000-of-00001-46d6d2b2f0ad8826.parquet": "ddf99eba426a21182755979e5c8f3b0afe93808096437779a7ab2d6a316df686",
+    "workspace/large-rerank-continue1-20261021/knowledge/vectors/ecom-527615ac3f734daa.db/collections/chunks/manifest.json": "439bced4db104c9bc364e111da83cd0486ba478d9e84a87f4a8b6156ece9130c",
+    "workspace/large-rerank-continue1-20261021/knowledge/vectors/ecom-527615ac3f734daa.db/collections/chunks/schema.json": "091a94653bffaee066311202f1db0c0e9850fe8749840a67e6189920344759ce",
+    "workspace/large-rerank-continue1-20261021/knowledge/vectors/ecom-527615ac3f734daa.db/collections/chunks/partitions/_default/data/data_000001_010048.parquet": "73090b1c17d7aa4ecd03e855e0e59f3d4a010f84fb4ac527c1eb7d832c9b34af",
+    "workspace/large-rerank-final-20261021/artifacts.json": "817de8b3300e3a09558af2496f29cc1adc459395d35988eba057770ce323079a",
+    "workspace/large-rerank-final-20261021/continuation.json": "12e5b46cc90151291e2f0f7d45c51db89fb51a926f43222aa023cad8299ebdd9",
+    "workspace/large-rerank-final-20261021/current-case.json": "f2838babaf09de104630a2037e2a22d932588f52dcae1cf26d2399acfff8799d",
+    "workspace/large-rerank-final-20261021/plan.json": "cdf09160fc41b2e49ad206eba17e08898c78e113448dd5f8558c565a40e8effc",
+    "workspace/large-rerank-final-20261021/progress.json": "a0cf6518d15814f8b1f68ff6a583808281c4e8b9f5f9151ed39242fda40ad880",
+    "workspace/large-rerank-final-20261021/results.json": "3279ab75cd5e2f539d427736acca6eaba3f2f7bbe2d1beba3451aa6534f9b06c",
+    "workspace/large-rerank-final-20261021/validation.json": "1c4e34b58b0693547e1f160914d143693df0f49ab48d76e4358ecd50f01a87f2",
+    "workspace/large-rerank-final-20261021/dataset/corpus-00000-of-00001-7f0e87850b5c9454.parquet": "ad50bc86e74f45ac57ad5b2f475e564a6baef4b286d0af803ac673e26ba0e059",
+    "workspace/large-rerank-final-20261021/dataset/dev-00000-of-00001-42566aaf5580f662.parquet": "189c199c2a3c615f8ec476549039e00f8e49f18905ede786d4003237d71d2933",
+    "workspace/large-rerank-final-20261021/dataset/queries-00000-of-00001-46d6d2b2f0ad8826.parquet": "ddf99eba426a21182755979e5c8f3b0afe93808096437779a7ab2d6a316df686",
+    "workspace/large-rerank-final-20261021/knowledge/vectors/ecom-527615ac3f734daa.db/collections/chunks/manifest.json": "2bdd9ab0e49f6c46cdb89deca35dfce15c751a08c288e7acdc06ec90edb4f99e",
+    "workspace/large-rerank-final-20261021/knowledge/vectors/ecom-527615ac3f734daa.db/collections/chunks/schema.json": "091a94653bffaee066311202f1db0c0e9850fe8749840a67e6189920344759ce",
+    "workspace/large-rerank-final-20261021/knowledge/vectors/ecom-527615ac3f734daa.db/collections/chunks/partitions/_default/data/data_000001_040192.parquet": "bdd2ff03cbe2a58fa32874556dc9c33da025547d967516e94abe77f884ab8fde",
+    "workspace/large-rerank-final-20261021/knowledge/vectors/ecom-527615ac3f734daa.db/collections/chunks/partitions/_default/data/data_040193_080384.parquet": "326362367faf224a90a25311a981146ac5885b765a01312617c522c2efd99c09",
+    "workspace/large-rerank-final-20261021/knowledge/vectors/ecom-527615ac3f734daa.db/collections/chunks/partitions/_default/data/data_080385_090432.parquet": "5f3a8559586bd8ae8b036d034b755e8a0b5d444f430f570f414067e213c552fe",
+    "workspace/large-rerank-final-20261021/knowledge/vectors/ecom-527615ac3f734daa.db/collections/chunks/partitions/_default/data/data_090433_100480.parquet": "f2b647b5c6a2bc25281a800a2aac5774483b31d1215c739b38f16e0782c9b076",
+    "workspace/large-rerank-final-20261021/knowledge/vectors/ecom-527615ac3f734daa.db/collections/chunks/partitions/_default/data/data_100481_100902.parquet": "7056d6337f259bd73f3b44b4afd3f5572d6e19972f705e9ec4fce7bdf010cf4f",
+    "workspace/large-rerank-live-20261021.log": "69a73eb05c5ba3adfbd919d1a4ad5e22a81f162f3b4c5cced81bdaa886ae5da4",
+    "workspace/large-rerank-continue1-20261021.log": "d52e9aa359d2ad37751f1f494e29ea401cb4087f7b34befa98d00bec5c29f9b4",
+    "workspace/large-rerank-final-20261021.log": "501fd4ae6c4e00add3ad91acbc746ad269116fa6a01e0313e0d3c0b2656794a0",
+    "workspace/large-rerank-tests-20261021.log": "c9ef3fbda4670ea8154948e92c88fd02dfaf24ae27004a0cbe4aed944d2e8323",
+    "workspace/large-rerank-final-tests-20261021.log": "f6b0833b47daef1584f33619cb0883c81447899b3b4ede8f8a9149713a207983",
+    "workspace/large-rerank-storage-tests-20261021.log": "b3e505b74679d9dbf3f5b8571aea5cda5a980f8705d388bd59f9895d99af462d",
+    "workspace/large-rerank-storage-final-tests-20261021.log": "cf263e3afef53f366c5116bb38ae1d3ca1937335fe0d326e0c449857eb416f68",
+    "workspace/large-rerank-original-integrity-20261021.json": "09ad913917675c54d5488001219f33bda5e221569439fe14080449f4198066ed",
+    "workspace/large-rerank-protocol-summary-20261021.json": "9b646dfbfb4e2188a47c521f0c1c59f31ea504e22fabdcf4a92a63bbad6c3dc7"
+  }
+}

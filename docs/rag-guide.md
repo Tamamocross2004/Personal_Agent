@@ -55,6 +55,8 @@ CLI 同样可用：
 
 固定资料的真实对照命令为 `python -m knowledge.rerank_probe --live --output workspace/rerank-probe-new`，会执行嵌入、重排和两轮聊天研究；使用 `--skip-research` 可仅比较检索。资料、相关文档标注、候选数、top4口径与两臂顺序在请求前保存。该开发诊断不替代独立质量验收，完整结果见 [重排实测记录](rerank-verification-20261021.md)。
 
+十万条公开短文本的独立基准使用 `python -m knowledge.large_probe --prepare --output workspace/large-new` 冻结数据与100题协议，再以同目录运行 `python -m knowledge.large_probe --live --output workspace/large-new`。它不调用聊天模型，首次运行会产生整库嵌入及100次重排用量；需安装`.[rag,rag-benchmark]`，不可复用已有结果目录。实测及生产容量边界见[大语料重排对照](large-rerank-verification-20261021.md)。
+
 ## 版本、引用与失败
 
 构建使用新代际，解析、嵌入、向量索引和全文索引完成后才通过 SQLite 事务切换当前版本。失败保留旧版本；请求用量继续保留。并发构建被锁阻止，Milvus 访问也串行释放句柄以兼容本机多进程。

@@ -28,6 +28,7 @@ dependencies = [
 dev = ["pytest>=8.0", "fastapi>=0.115,<1", "uvicorn>=0.30,<1"]
 desktop = ["fastapi>=0.115,<1", "uvicorn>=0.30,<1"]
 rag = ["pypdf>=6,<7", "pymilvus>=3,<3.1", "milvus-lite>=3,<3.1"]
+rag-benchmark = ["pyarrow>=17"]
 
 [build-system]
 requires = ["setuptools>=68"]
