@@ -1,0 +1,73 @@
+{
+  "source_sha256": "fc4371ffca64b8a20c412a3c19e2bad76bf77c3a3db110fd75ff89f2c4ef5810",
+  "complete": true,
+  "source_unchanged": true,
+  "sources": [
+    {
+      "name": "sqlite-fts5.txt",
+      "url": "https://www.sqlite.org/fts5.html",
+      "sha256": "11e8b8839d8db49e97000761760f077a98ccc975209d3030887d4f18b7b3b6d2",
+      "pages": 1,
+      "characters": 164076,
+      "chunks": 295
+    },
+    {
+      "name": "python-logging.txt",
+      "url": "https://docs.python.org/3.11/howto/logging-cookbook.html",
+      "sha256": "3dfd06bf81a417d8c09cb21d6448dff73ae3729f15f3ba9d0ed91c662acd26ee",
+      "pages": 1,
+      "characters": 149115,
+      "chunks": 264
+    },
+    {
+      "name": "gnu-make.pdf",
+      "url": "https://www.gnu.org/software/make/manual/make.pdf",
+      "sha256": "a4bc06026984382815e392159e60a4bc356cac6c5b81e5ae84fa4f58f621f4d3",
+      "pages": 229,
+      "characters": 571562,
+      "chunks": 1079
+    }
+  ],
+  "summary": {
+    "baseline": {
+      "answerable_queries": 9,
+      "all_facts_delivered": 4,
+      "facts_delivered": 4,
+      "facts_total": 11
+    },
+    "rerank": {
+      "answerable_queries": 9,
+      "all_facts_delivered": 6,
+      "facts_delivered": 7,
+      "facts_total": 11
+    }
+  },
+  "hits_verified_against_original_offsets": 177,
+  "usage": {
+    "calls": 113,
+    "returned": 113,
+    "unknown_usage_calls": 0,
+    "input_tokens": 352113
+  },
+  "rerank_usage": {
+    "calls": 10,
+    "input_tokens": 39802,
+    "output_tokens": 0,
+    "unknown_usage_calls": 0
+  },
+  "semantic_limits": [
+    "fixed anchor coverage is not exhaustive relevance or answer correctness",
+    "bm25 reference anchor missing but returned chunks103/105 contain equivalent support; keep original metric",
+    "cross-document query returns only SQLite content, GNU clause not delivered"
+  ],
+  "tests_passed": 55,
+  "artifact_sha256": {
+    "workspace/rag-long-live-20261021/plan.json": "7142fdfb9c90b1f6d03152c5c8d8286d7ab8e8a2c71c25e70a8b00b86df1cd69",
+    "workspace/rag-long-live-20261021/retrieval-results.json": "a4538fddef061246aba49a622eee35d4235769c894daa8cc881d643b3aea7e76",
+    "workspace/rag-next-20261021/long-live.log": "2abca525f5b9db44fe3fcf20182ef5bee3caf9f1a432242f54e605962b4aecb8",
+    "workspace/rag-next-20261021/long-tests.log": "326aa78f30c0c09eeb4fe69ad85cdafe0ed9902a27b9acf9277d910c8b850693",
+    "workspace/rag-long-live-20261021/documents/sqlite-fts5.txt": "11e8b8839d8db49e97000761760f077a98ccc975209d3030887d4f18b7b3b6d2",
+    "workspace/rag-long-live-20261021/documents/python-logging.txt": "3dfd06bf81a417d8c09cb21d6448dff73ae3729f15f3ba9d0ed91c662acd26ee",
+    "workspace/rag-long-live-20261021/documents/gnu-make.pdf": "a4bc06026984382815e392159e60a4bc356cac6c5b81e5ae84fa4f58f621f4d3"
+  }
+}
