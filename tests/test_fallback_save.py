@@ -29,7 +29,8 @@ def test_no_budget_does_not_save_program_notice_as_model_report(tmp_path):
     model=ScriptedLLM([])
     result=research(model,Settings(_env_file=None,memory_enabled=False),
                     '不联网，说明材料。',5,1,task_dir=tmp_path)
-    assert result.stop_reason=='budget' and result.answer=='' and not model.requests
+    assert result.stop_reason=='budget' and result.answer_origin=='program_status' and not model.requests
+    assert '程序状态说明' in result.answer
     assert not (tmp_path/'report.md').exists() and not (tmp_path/PROVENANCE).exists()
 
 

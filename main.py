@@ -205,7 +205,7 @@ def _research(
 
     reports = sorted(p for p in task_dir.glob("*.md") if p.name != NOTES_FILE)
     # 被强制收尾且没写过报告时，收尾回答本身就是（不完整的）报告，替用户存下来
-    if not reports and result.stop_reason in FINALIZE_REASONS and result.answer.strip():
+    if not reports and result.stop_reason in FINALIZE_REASONS and result.answer.strip() and result.answer_origin=='model':
         agent._save_checkpoint('postprocess',pending={'kind':'fallback','reason':'兜底报告多文件保存中，需核对未提交写入'},
                                result=checkpoint.read()['result'] if checkpoint and checkpoint.path.exists() else None)
         fallback = task_dir / "report.md"

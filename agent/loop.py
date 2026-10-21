@@ -52,6 +52,7 @@ from agent.quality import inspect_report, save_check, structure_repair_feedback
 from agent.evidence import EvidenceLedger, mapping_sha, write_json
 from agent.review import ReviewValidationError, build_review_messages, fingerprint, parse_review, review_feedback, save_review
 from agent.task_contract import TaskContract, extract_contract, save_contract_check
+from agent.report_validation import compact_feedback
 from agent.prompts import (
     CONTINUE_PROMPT,
     EMPTY_REPLY_PROMPT,
@@ -144,6 +145,7 @@ class AgentResult:
     total_tokens: int = 0  # 原始 token 总数（输入 + 输出）
     error: str | None = None
     equivalent_tokens: float = 0.0  # 按缓存折算的等效 token，预算按它计算
+    answer_origin: Literal['model','program_status'] = 'model'
 
     @property
     def tool_calls(self) -> list[tuple[str, str]]:
@@ -251,6 +253,7 @@ class Agent(CheckpointMixin):
         self._pending_reviews={}
         self._finalizing_reason=None
         self._delivery_reserved_tokens=0
+        self._knowledge_no_new_streak=0
         if self.research_session is not None:
             self.research_session.tool_activity={}
         if self.compactor:
@@ -352,7 +355,12 @@ class Agent(CheckpointMixin):
             self._checkpoint_pending=None
         if self._checkpoint_pending is None:
             self._refresh_report_checks()
-        result=AgentResult(answer,self._steps,stop,messages,self._tokens,error,round(self._equiv))
+        origin='model'
+        if stop=='budget' and not answer.strip():
+            answer='任务因预算预检停止，未获得最终模型答复；报告保存或审稿可能未完成，请查看任务目录中的实际产物与状态。此文字为程序状态说明，不是研究报告。'
+            origin='program_status'
+            self._emit('final',text=answer,stop_reason=stop,answer_origin=origin)
+        result=AgentResult(answer,self._steps,stop,messages,self._tokens,error,round(self._equiv),origin)
         if stop in ('interrupted','needs_verification') or self._checkpoint_pending is not None:
             self._save_checkpoint(pending=self._checkpoint_pending,
                 status='needs_verification' if self._checkpoint_pending else 'interrupted',
@@ -495,6 +503,7 @@ class Agent(CheckpointMixin):
         for call in msg.tool_calls or []:
             self._check_stop()
             name, arguments = call.function.name, call.function.arguments
+            document_before=self.research_session.document_characters() if self.research_session and name=='search_knowledge' else 0
             self._emit("tool_call", id=call.id, name=name, arguments=arguments)
             activity=None
             if self.research_session is not None:
@@ -555,6 +564,8 @@ class Agent(CheckpointMixin):
                                                 'maximum':int(maximum),'suggested_target':int(int(maximum)*.6)})
             if name=='write_report' and result.validation:
                 rejected_feedback.append(result.validation)
+                if len(arguments)>2000:
+                    rejected_length_calls.add(call.id)
                 if any(i['code']=='brief_length' for i in result.validation['issues']):
                     rejected_length_calls.add(call.id)
                     length_measurements.extend(result.validation.get('measurements',[]))
@@ -579,6 +590,15 @@ class Agent(CheckpointMixin):
                         preview=source['text'][:100] if source['kind']=='web' else source['text'].split('成功输出：',1)[-1][:120]
                         content += '\n'+json.dumps({'source_id':source_id,'kind':source['kind'],'range':[source.get('start'),source.get('end')],
                                                     'preview':preview},ensure_ascii=False)
+            if name=='search_knowledge' and not result.is_error and self.research_session and self._evidence:
+                added=max(0,self.research_session.document_characters()-document_before)
+                self._knowledge_no_new_streak=0 if added else self._knowledge_no_new_streak+1
+                progress={'new_retained_document_characters':added,'consecutive_no_new_returns':self._knowledge_no_new_streak,
+                          'meaning':'仅按同版本已送达且保留区间去重，不认证答案、全文覆盖或库中不存在信息。'}
+                content+='\n【检索增量】'+json.dumps(progress,ensure_ascii=False)
+                if self._knowledge_no_new_streak>=2:
+                    content+='\n连续检索未增加保留原文。请核对必答项与已有依据；缺少明确依据才调整检索，已有依据先整理成稿，无法证实的保留未知。'
+                self._emit('retrieval_progress',tool_call_id=call.id,**progress)
             if name == "fetch_url" and not result.is_error:
                 self._source_readings.append({"tool_call_id": call.id, "arguments": arguments[:2000],
                     "content": content[:8000], "possibly_truncated": len(result.content) > min(self.max_tool_result_chars, 8000) or len(arguments) > 2000})
@@ -632,12 +652,13 @@ class Agent(CheckpointMixin):
             self._last_prompt = 0
             self._len_at_last_call = 0
             messages.append({'role':'assistant','content':
-                '【上下文整理】本批超限write_report未保存。被拒写稿参数已移出模型上下文，完整记录仍在trace。'
-                '原任务、其他工具结果和证据索引保留；请重新生成显著更短的完整稿，不能复用被拒稿。'
+                '【上下文整理】本批被拒write_report未保存。被拒写稿参数已移出模型上下文，完整记录仍在trace。'
+                '原任务、其他工具结果和证据索引保留；按具体错误修正正文和claims，quote须逐字取自修订后的正文。'
+                '仅在篇幅反馈要求时缩短；不能凭反馈猜测ID、补写摘录或把候选哈希当作已保存稿基准。'
                 '程序计量（不是放宽上限）：'+json.dumps(length_measurements[:4],ensure_ascii=False)
                 +'\n仍须逐项纠正的校验反馈（未自动修正；若截断须重查）：'
-                +json.dumps(rejected_feedback,ensure_ascii=False)[:6200]})
-            self._emit('notice',text='已从模型上下文移除本批超限写稿调用；原始参数/反馈仍保留在trace，证据索引不变。')
+                +compact_feedback(rejected_feedback)})
+            self._emit('notice',text='已从模型上下文移除本批被拒写稿调用；原始参数/反馈仍保留在trace，证据索引不变。')
 
         if length_rejected and not reports_written and not self._length_repair_requested:
             self._length_repair_requested = True

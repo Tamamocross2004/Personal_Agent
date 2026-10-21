@@ -74,6 +74,21 @@ def test_rejected_long_draft_is_removed_but_other_diagnostics_reach_next_call(tm
     assert not (tmp_path/'report.md').exists()
 
 
+def test_non_length_rejection_compacts_draft_without_repairing_claims(tmp_path):
+    question='不联网，依据材料写报告。价格7元。'
+    session=ResearchSession()
+    bad='# 报告\n\n'+'背景内容。'*500
+    llm=ScriptedLLM([completion('{}'),completion(tool_calls=[('bad','write_report',{
+        'content':bad,'claims':[claim(quote='不在正文里的价格7元',source='user-1')]} )]),completion('尚未完成')])
+    events=[]
+    Agent(llm,ToolRegistry([make_write_report(tmp_path,session,question=question)]),task_dir=tmp_path,
+          research_session=session,on_event=events.append).run(question)
+    shown=json.dumps(llm.requests[-1]['messages'],ensure_ascii=False)
+    assert bad not in shown and 'quote_missing' in shown and 'omitted_rejections' in shown
+    assert any(e.kind=='tool_call' and json.loads(e.data['arguments']).get('content')==bad for e in events)
+    assert not (tmp_path/'report.md').exists()
+
+
 def test_corrected_submission_is_saved_and_only_then_reviewed(tmp_path):
     question='不联网，报告全文不超过500字。材料：价格7元。'
     text='# 核对\n\n## 摘要\n价格7元。\n\n## 方法与范围\n仅材料。\n\n## 正文\n价格7元。\n\n## 结论\n价格7元。\n\n## 局限性\n未外查。\n\n## 参考资料\n用户材料。'

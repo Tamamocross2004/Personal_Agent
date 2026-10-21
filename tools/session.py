@@ -46,6 +46,20 @@ class ResearchSession:
     failed_fetches: dict[str, str] = field(default_factory=dict)  # 已实际返回FetchError的操作目标，非引用来源
     tool_activity: dict[str, dict[str, int]] = field(default_factory=dict)
 
+    def document_characters(self) -> int:
+        """已送达且保留的同版本原文区间并集；重复和重叠不算新增。"""
+        groups={}
+        for record in self.evidence.records.values() if self.evidence else []:
+            if record['kind']!='document': continue
+            key=(record.get('document_id'),record.get('file_sha256'),record.get('generation'),record.get('page'))
+            groups.setdefault(key,[]).append((record['start'],record['end']))
+        total=0
+        for intervals in groups.values():
+            end=0
+            for left,right in sorted(intervals):
+                total+=max(0,right-max(end,left)); end=max(end,right)
+        return total
+
     def activity_summary(self, *, snapshot_call_id: str | None = None) -> dict:
         records=list(self.evidence.records.values()) if self.evidence else []
         docs=[r for r in records if r['kind']=='document']

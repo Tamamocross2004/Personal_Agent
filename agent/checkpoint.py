@@ -17,7 +17,7 @@ STATE_FIELDS = ('_tokens','_equiv','_last_prompt','_len_at_last_call','_steps','
                 '_blocked','_review_count','_report_completeness','_structure_repair_requested',
                 '_length_repair_requested','_calculation_results','_calculations_omitted',
                 '_source_readings','_source_readings_omitted','_last_report_texts','_last_reviews',
-                '_pending_text','_empty_replies','_pending_reviews','_finalizing_reason','_delivery_reserved_tokens')
+                '_pending_text','_empty_replies','_pending_reviews','_finalizing_reason','_delivery_reserved_tokens','_knowledge_no_new_streak')
 OPTION_FIELDS = ('max_steps','max_tool_result_chars','token_budget','budget_warn_ratio','tool_timeout',
                  'max_blocked_repeats','steps_warn_remaining','wrapup_max_calls','review_reports',
                  'review_max_calls','review_max_tokens','generation_max_tokens')

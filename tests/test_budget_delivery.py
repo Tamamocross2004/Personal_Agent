@@ -17,7 +17,8 @@ def test_insufficient_planning_input_is_not_dispatched(tmp_path):
     llm=ScriptedLLM([])
     result=Agent(llm,ToolRegistry([]),task_dir=tmp_path,token_budget=1).run('测试')
     assert result.stop_reason=='budget' and not llm.requests
-    assert result.total_tokens==0 and result.answer==''
+    assert result.total_tokens==0 and result.answer_origin=='program_status'
+    assert '未获得最终模型答复' in result.answer
 
 
 def test_output_is_limited_by_remaining_estimate_and_provider_setting():

@@ -143,6 +143,12 @@ class EvidenceLedger:
                 shown=max(0,min(item['output_end'],visible_limit)-item['output_start'])
                 text=content[item['output_start']:item['output_start']+shown]
                 if not shown or text!=item['text'][:shown]: continue
+                previous=next((r for r in self.records.values() if r['kind']=='document'
+                    and (r.get('document_id'),r.get('file_sha256'),r.get('generation'),r.get('page'),r.get('start'),r.get('end'),r['text'])
+                    ==(item['doc_id'],item['file_sha256'],item['generation'],item['page'],item['start'],item['start']+shown,text)),None)
+                if previous:
+                    ids.append(previous['id'])
+                    continue  # 复用实际已送达的相同版本/区间，不改变其首次送达来源。
                 source=self.add('document',text,tool_call_id=call_id,
                     document_id=item['doc_id'],document_name=item['name'],file_sha256=item['file_sha256'],
                     page_sha256=item['page_sha256'],generation=item['generation'],page=item['page'],

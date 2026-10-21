@@ -2,6 +2,17 @@
 import json
 
 
+def compact_feedback(feedback, limit=6200):
+    payload={'rejections':[],'omitted_rejections':len(feedback)}
+    for row in reversed(feedback):
+        payload['rejections'].append(row)
+        payload['omitted_rejections']-=1
+        if len(json.dumps(payload,ensure_ascii=False))>limit:
+            payload['rejections'].pop(); payload['omitted_rejections']+=1
+            break
+    return json.dumps(payload,ensure_ascii=False)
+
+
 class ReportValidationError(ValueError):
     MAX_ISSUES = 24
     MAX_CHARS = 6000
