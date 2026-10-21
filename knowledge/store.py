@@ -199,6 +199,14 @@ class KnowledgeStore:
             db.execute('INSERT OR REPLACE INTO rerank_cache VALUES (?,?)',(key,json.dumps(rows,allow_nan=False)))
         return rows,events,False
 
+    def _chunks(self,generation,indices):
+        indices=list(dict.fromkeys(indices))
+        if not indices: return {}
+        with self.connect() as db:
+            return {r['idx']:json.loads(r['data']) for r in db.execute(
+                'SELECT idx,data FROM chunks WHERE generation=? AND idx IN ('+','.join('?' for _ in indices)+')',
+                [generation,*indices])}
+
     def search(self,query,*,generation=None,mode='hybrid',k=4,budget=None,rerank=None):
         if mode not in ('keyword','vector','hybrid') or not query.strip() or len(query)>1000 or not 1<=k<=8:
             raise ValueError('检索参数无效；问题最多1000字符，k为1至8')
@@ -211,7 +219,6 @@ class KnowledgeStore:
         if mode!='keyword' and current['signature']!=self.signature:
             raise ValueError('嵌入模型配置已变更，请重建索引或显式选择关键词检索')
         with self.connect() as db:
-            chunks={r['idx']:json.loads(r['data']) for r in db.execute('SELECT idx,data FROM chunks WHERE generation=?',(current['id'],))}
             terms=search_terms(query)
             lexical=[]
             if terms and mode!='vector':
@@ -222,11 +229,13 @@ class KnowledgeStore:
         if mode!='keyword':
             vectors,events,_=self._cached_vectors([query],'query:'+current['id'],budget)
             budget-=sum(e['input_tokens'] for e in events)
-            dense=self.vectors.search(self.root,current['id'],vectors[0],min(40,len(chunks)))
+            dense=self.vectors.search(self.root,current['id'],vectors[0],min(40,current['chunks']))
         scores={}
         for ranks in (lexical,dense):
             for rank,index in enumerate(ranks,1): scores[index]=scores.get(index,0)+1/(60+rank)
         pool=sorted(scores,key=lambda i:(-scores[i],i))[:self.settings.knowledge_rerank_candidates]
+        chunks=self._chunks(current['id'],pool)
+        if len(chunks)!=len(pool): raise ValueError('检索索引与片段元数据不一致')
         ranking=list(pool);rerank_scores={}
         reranking={'enabled':use_rerank,'status':'disabled' if not use_rerank else 'empty',
                    'model':self.settings.rerank_model if use_rerank else None,'candidate_count':len(pool),'cache_hit':False}
@@ -237,6 +246,8 @@ class KnowledgeStore:
             ranking=sorted(pool,key=lambda i:(-rerank_scores[i],pool.index(i)))
             reranking.update(status='applied',cache_hit=cache_hit)
         direct=ranking[:k]
+        neighbors=[n for i in direct for n in (i-1,i+1) if n not in chunks]
+        chunks.update(self._chunks(current['id'],neighbors))
         selected=[(i,'direct') for i in direct]
         for index in direct:
             for neighbor in (index-1,index+1):

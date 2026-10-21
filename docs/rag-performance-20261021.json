@@ -1,0 +1,49 @@
+{
+  "paired_comparisons": 200,
+  "questions": 100,
+  "payload_equal": true,
+  "source_unchanged": true,
+  "new_requests": 0,
+  "timing_cache": "query embeddings and reranks prewarmed, both arms; no network",
+  "summary": {
+    "before": {
+      "False": {
+        "mean_seconds": 3.8622338050001783,
+        "median_seconds": 1.241726350001045,
+        "p95_seconds": 8.26914559999932
+      },
+      "True": {
+        "mean_seconds": 3.8939298699999565,
+        "median_seconds": 1.2359775499990064,
+        "p95_seconds": 8.024521300001652
+      }
+    },
+    "after": {
+      "False": {
+        "mean_seconds": 2.3025708589999705,
+        "median_seconds": 0.8439272499999788,
+        "p95_seconds": 4.950976099997206
+      },
+      "True": {
+        "mean_seconds": 2.3139951020000082,
+        "median_seconds": 0.829299599998194,
+        "p95_seconds": 4.766506299998582
+      }
+    }
+  },
+  "python_allocation_mean_bytes": {
+    "before": 172989965.66666666,
+    "after": 21796979.333333332
+  },
+  "scope": "variable host load; keep short vector leases; no claim of production100k upload capacity",
+  "tests_passed": 53,
+  "artifacts": {
+    "workspace/rag-next-20261021/performance.py": "81e13fcaa1e9b42046e6f5eb59435b927e3574082e9176050402320b9a32325b",
+    "workspace/rag-next-20261021/performance-results.json": "58067dd6d7ec5e0cf3f9def2d3a5aefda027b16883d1c7578e499f286ae2760d",
+    "workspace/rag-next-20261021/performance-memory.json": "3408e8041de785b681b73d4bee0eb2e43d51615331ce53d56a004e4a45dc3c53",
+    "workspace/rag-next-20261021/performance.log": "9519f65614db61077542631c30ca598c03ded59c39e368abc5721f8542430746",
+    "workspace/rag-next-20261021/perf-tests.log": "3a509a02451d64da176274c4564ebbdaf1a308d6f90ca427e077f44d154b8e2e",
+    "workspace/rag-next-20261021/store-before.py": "1b6b8299ac7e28108cdb9db6b3dce916b776376c0cc8b782c3bbc2093c9938e4",
+    "workspace/rag-next-20261021/sequence-plan.json": "e49a72074d1991710538509ce82c5f71030f8b09605078cfdbb14248f94aab1f"
+  }
+}
