@@ -8,6 +8,14 @@ _NUMBER = re.compile(r'(?<![\d.])(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?|\
 _IDENTIFIER = re.compile(r'(?<![A-Za-z0-9_])[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z0-9_]+)*')
 _PAGE = re.compile(r'(?:PDF\s*)?第\s*(\d+)(?:\s*[–—\-至]\s*(\d+))?\s*页|\b(?:PDF\s+)?(?:pages?|pp?\.)\s*(\d+)(?:\s*[–\-]\s*(\d+))?', re.I)
 _SECTION = re.compile(r'第\s*(\d+(?:\.\d+)*)\s*[章节]|(?<![\d.])(\d+(?:\.\d+)+)\s*节|\b(?:section|chapter)\s+(\d+(?:\.\d+)*)', re.I)
+_MAN = re.compile(r'(?<![A-Za-z0-9_.\-])([A-Za-z_][A-Za-z0-9_.+\-]*)\(([0-9][A-Za-z]*)\)(?![A-Za-z0-9_])')
+
+
+def man_headings(text):
+    # 只把完整已读标题当作手册分区依据，普通函数调用/数量括号不构成定位证明。
+    ref=r'([A-Za-z_][A-Za-z0-9_.+\-]*\([0-9][A-Za-z]*\))'
+    return {m[1] or m[2] for m in re.finditer(
+        r'(?m)^(?:[ \t]*#{1,6}[ \t]+'+ref+r'[ \t]*$|[ \t]*'+ref+r'[ \t]*\n[ \t]*[=\-]{3,}[ \t]*$)',text)}
 
 
 def identifiers(text):
@@ -27,6 +35,8 @@ def numbers(text, record_ids=()):
     # 来源中的显式页码/章节标记也不是金额或数量的数值依据。
     text = _PAGE.sub(' ', text)
     text = _SECTION.sub(' ', text)
+    headings=man_headings(text)
+    text = _MAN.sub(lambda m:' '*len(m[0]) if m[0] in headings else m[0],text)
     for match in reversed(identifiers(text)):
         text = text[:match.start()] + ' ' * len(match[0]) + text[match.end():]
     values = set()
@@ -53,6 +63,10 @@ def check_direct(quote, refs, records):
     pages = {s.get('page') for s in sources if s['kind'] == 'document'}
     masked = quote
     locations = []
+    headings=set().union(*(man_headings(s['text']) for s in sources))
+    for match in _MAN.finditer(quote):
+        if match[0] in headings:
+            locations.append(match.span())
     for match in _PAGE.finditer(quote):
         left, right = (match[1], match[2]) if match[1] else (match[3], match[4])
         first, last = int(left), int(right or left)
@@ -68,5 +82,6 @@ def check_direct(quote, refs, records):
         locations.append(match.span())
     for left, right in sorted(locations, reverse=True):
         masked = masked[:left] + ' ' * (right-left) + masked[right:]
-    supplied = set().union(*(numbers(r['excerpt'], records) for r in refs))
+    supplied = set().union(*(numbers(_MAN.sub(
+        lambda m:' '*len(m[0]) if m[0] in headings else m[0],r['excerpt']), records) for r in refs))
     return numbers(masked, records) - supplied

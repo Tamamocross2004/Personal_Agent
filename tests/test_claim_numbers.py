@@ -71,3 +71,21 @@ def test_heading_delimiters_and_markdown_are_general_not_question_exceptions(lab
 def test_heading_prefix_and_inline_mentions_cannot_substitute_for_exact_heading(text):
     with pytest.raises(ValueError,match='章节'):
         check('第7节说明数量27',text+'\n数量27',excerpt='数量27')
+
+
+@pytest.mark.parametrize('reference',['quartz-view(8)','matrix_copy(3p)','loader.ext(1)','parse-json(5)'])
+def test_man_section_locator_requires_bound_read_heading(reference):
+    text=reference+'\n===========\nThe default is disabled.'
+    assert not check(reference+'说明默认关闭',text,excerpt='The default is disabled.')
+    assert check(reference+'说明默认关闭','Other manual\nThe default is disabled.',
+                 name=reference+'.txt',excerpt='The default is disabled.')  # 文件名不能证明已读标题。
+
+
+def test_parenthesized_values_and_wrong_section_remain_numeric_checks():
+    assert check('费用(7)元','费用(6)元')=={Decimal(7)}
+    assert check('f(7)返回结果','f(6)返回结果')=={Decimal(7)}
+    assert check('quartz(7)说明','quartz(8)\n说明')=={Decimal(7)}
+    assert check('容量为8','quartz(8)\n====\n容量未知')=={Decimal(8)}
+    assert check('quartz(8)费用为8元','quartz(8)\n====\n费用未知',excerpt='费用未知')=={Decimal(8)}
+    assert check('parse(3p)费用为3元','parse(3p)\n====\n费用未知',excerpt='费用未知')=={Decimal(3)}
+    assert check('f(7)返回结果','f(7)\n输入未知',excerpt='输入未知')=={Decimal(7)}
