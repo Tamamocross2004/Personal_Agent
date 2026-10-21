@@ -1,0 +1,43 @@
+{
+  "runtime_sha256": "0fe3d660b9bfff9c44924047fb746e77e876b7ed5961bbdcbfc29bdbe3af8701",
+  "source_manifest_sha256": "cc16badf01e624c4f18408ee60596428d898368a3acc0518d70fc395cd1611e0",
+  "preparation_script_sha256": "1b3ba2f5e0ec0b7e2df16bd7308f3abc1d05e453e83d9031df32e492b43593b0",
+  "suite_sha256": "da66e41303ef336b94c57d3601840e234a332902726b294c93756cb2103604f5",
+  "build_token_budget": 60000,
+  "per_task_steps": 12,
+  "per_task_equivalent_token_budget": 80000,
+  "configuration": {
+    "model": {
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "base_url": "https://api.deepseek.com",
+      "temperature": 0.3,
+      "max_tokens": null,
+      "thinking": "disabled",
+      "max_retries": 3
+    },
+    "embedding_model": "Pro/BAAI/bge-m3",
+    "embedding_dimensions": 1024,
+    "embedding_base_url": "https://api.siliconflow.cn/v1",
+    "embedding_timeout": 30.0,
+    "rerank_model": "BAAI/bge-reranker-v2-m3",
+    "rerank_enabled": true,
+    "rerank_base_url": "https://api.siliconflow.cn/v1",
+    "rerank_timeout": 30.0,
+    "lexical": 40,
+    "vector": 40,
+    "pool": 20,
+    "search_budget": 30000,
+    "weights": [
+      0.1,
+      2.0
+    ],
+    "generation_max_tokens": 4096,
+    "review_enabled": true,
+    "review_max_calls": 2,
+    "review_max_tokens": 2048,
+    "memory_enabled": false
+  },
+  "reviewer": "coding_assistant",
+  "stage12_accepted": false
+}

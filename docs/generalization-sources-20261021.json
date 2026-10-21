@@ -1,0 +1,55 @@
+{
+  "sources": [
+    {
+      "name": "gitignore.txt",
+      "requested_url": "https://raw.githubusercontent.com/git/git/v2.47.0/Documentation/gitignore.txt",
+      "final_url": "https://raw.githubusercontent.com/git/git/v2.47.0/Documentation/gitignore.txt",
+      "retrieved_at_utc": "2026-10-21T11:56:29.721879+00:00",
+      "raw_filename": "gitignore.txt.raw.txt",
+      "raw_sha256": "55e921fbc99d55d757739df4f0e143a00dcc93ea92c57ab27eeb1075f3c89577",
+      "document_sha256": "55e921fbc99d55d757739df4f0e143a00dcc93ea92c57ab27eeb1075f3c89577",
+      "characters": 8918,
+      "chunks": 16,
+      "embedding_estimated_input_tokens": 3256
+    },
+    {
+      "name": "git-rm.txt",
+      "requested_url": "https://raw.githubusercontent.com/git/git/v2.47.0/Documentation/git-rm.txt",
+      "final_url": "https://raw.githubusercontent.com/git/git/v2.47.0/Documentation/git-rm.txt",
+      "retrieved_at_utc": "2026-10-21T11:56:30.306903+00:00",
+      "raw_filename": "git-rm.txt.raw.txt",
+      "raw_sha256": "f161a3ff1d519cc25acb74a53f57abd64c75e31e02535f6140a8faeb3ee0365d",
+      "document_sha256": "f161a3ff1d519cc25acb74a53f57abd64c75e31e02535f6140a8faeb3ee0365d",
+      "characters": 7236,
+      "chunks": 13,
+      "embedding_estimated_input_tokens": 2635
+    },
+    {
+      "name": "postgres-transactions.txt",
+      "requested_url": "https://www.postgresql.org/docs/17/tutorial-transactions.html",
+      "final_url": "https://www.postgresql.org/docs/17/tutorial-transactions.html",
+      "retrieved_at_utc": "2026-10-21T11:56:32.926338+00:00",
+      "raw_filename": "postgres-transactions.txt.raw.html",
+      "raw_sha256": "a4cd14a60b682d3cdc3dcf3d29b3b4c6b30f13e72bc1686346fe3154e8171076",
+      "document_sha256": "e421baff6f73387ce7bb708767200ca5af1c436695c6e271f4078cca24195413",
+      "characters": 6755,
+      "chunks": 13,
+      "embedding_estimated_input_tokens": 2504
+    },
+    {
+      "name": "postgres-isolation.txt",
+      "requested_url": "https://www.postgresql.org/docs/17/transaction-iso.html",
+      "final_url": "https://www.postgresql.org/docs/17/transaction-iso.html",
+      "retrieved_at_utc": "2026-10-21T11:56:33.968691+00:00",
+      "raw_filename": "postgres-isolation.txt.raw.html",
+      "raw_sha256": "e3475df0c76b214dbda0bc681015099763b83778e1355e17ee7b908e6fd38a26",
+      "document_sha256": "dd09f6c0b9dfdfeaa6b2ce53afda52a4d64710278f8ba90b5e7eeddf3e68afec",
+      "characters": 23913,
+      "chunks": 49,
+      "embedding_estimated_input_tokens": 9032
+    }
+  ],
+  "runtime_sha256": "0fe3d660b9bfff9c44924047fb746e77e876b7ed5961bbdcbfc29bdbe3af8701",
+  "error_type": null,
+  "transformation": "Git plain UTF8 bytes unchanged; HTML via existing tools.fetch.extract(...).text, UTF8 without added metadata"
+}

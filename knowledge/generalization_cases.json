@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "purpose": "new-source development recheck of final delivery fixes; coding assistant authored and reviewed, not independent stage12 acceptance",
+  "max_steps": 12,
+  "token_budget": 80000,
+  "cases": [
+    {
+      "id": "proposal-state-summary",
+      "question": "不联网，仅依据以下虚构会议纪要，写一份全文不超过280字的简短报告：周一的审查会上，有人建议将数据保留期从14天改为21天；该建议尚未批准，也尚未执行；负责人没有提供。说明原值、建议值、目前状态和负责人信息的边界。不要补具体日期，不做额外计算或资料搜索。",
+      "checks": ["14天为原值，21天仅为建议值；不能写成新政策已生效或已经修改", "负责人未提供，不等于无人负责；不补实际日期或把相对时间替换为系统日期", "全文按既有可见非空白字符口径不超过280，保留必要依据与限制"]
+    },
+    {
+      "id": "git-ignore-and-index",
+      "question": "不联网，依据本地gitignore和git-rm文档写简短说明：为什么把已经跟踪的文件写进.gitignore仍不会停止跟踪？若希望以后忽略该文件但保留工作目录里的文件，文档给出的操作及条件是什么？另说明在父目录已被忽略时，仅写一个对子文件的!规则是否足够。关联两份文档的实际片段，只解释，不实际修改仓库或运行命令。",
+      "checks": ["忽略规则面向未跟踪文件，不自动取消已跟踪文件的索引记录", "git rm --cached只从索引移除，工作目录文件保留；保留文档对暂存内容与HEAD或磁盘匹配的条件，不误用普通git rm", "父目录被排除时不能仅靠子文件否定规则重新纳入；不宣称命令已经执行"],
+      "anchors": [
+        {"name": "gitignore.txt", "page": 1, "contains": "Files already tracked by Git are not affected"},
+        {"name": "gitignore.txt", "page": 1, "contains": "It is not possible to re-include a file"},
+        {"name": "git-rm.txt", "page": 1, "contains": "Working tree files"}
+      ]
+    },
+    {
+      "id": "default-versus-deployment",
+      "question": "不联网，仅依据本地PostgreSQL隔离级别文档，区分文档描述的默认隔离级别与本项目生产连接的实际配置。能否据此确认本项目使用Serializable，并且已经验证不会出现串行化失败？写简短结论，说明文档事实、实际配置及测试结果各自有什么依据或缺口；不要执行SQL或声称已做生产测试。",
+      "checks": ["文档默认值为Read Committed，默认值不能证明本项目当前实际配置，甚至不能证明实际部署了该数据库", "Serializable的已提交事务一致性保证，不等于没有串行化失败或不需要重试；必须区分异常与成功提交的性质", "实际配置、验证执行与结果没有记录时保留未知；有限检索不能证明全库绝对缺少这些记录"],
+      "anchors": [
+        {"name": "postgres-isolation.txt", "page": 1, "contains": "default isolation level in PostgreSQL"},
+        {"name": "postgres-isolation.txt", "page": 1, "contains": "serialization failures"}
+      ]
+    },
+    {
+      "id": "savepoint-and-activity",
+      "question": "不联网，依据本地PostgreSQL事务教程，简短解释SAVEPOINT与ROLLBACK TO：回到保存点时，之前与之后的数据库修改分别如何处理，是否会像完整ROLLBACK那样结束整个事务？同时注明截至写稿前本任务已返回结果的检索请求次数，以及实际送达并保留片段涉及的文档版本数，给出记录依据和统计边界。不要执行SQL，也不要把教程示例说成本机实测。",
+      "checks": ["回到保存点丢弃定义该点后到回滚之间的数据库修改，之前的修改保留；不把局部回滚等同结束整个事务", "可继续事务并最终提交保留的操作；只描述文档机制，不虚构实际执行", "工具请求与返回、保留文档版本数量按真实轨迹及快照边界核对，不预设固定次数，不把它们当作全库覆盖或服务商API请求数"],
+      "anchors": [
+        {"name": "postgres-transactions.txt", "page": 1, "contains": "changes earlier than the savepoint are kept"}
+      ]
+    }
+  ]
+}
