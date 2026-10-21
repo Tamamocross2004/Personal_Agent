@@ -47,7 +47,13 @@ class KnowledgeQuery(BaseModel):
     rerank:bool|None=None
 
 
-def create_app(manager:Manager,token:str,ui_dir:Path|None=None):
+class FolderGrant(BaseModel):
+    path:str=Field(min_length=1,max_length=2048)
+
+
+def create_app(manager:Manager,token:str,ui_dir:Path|None=None,*,folder_grant_token:str|None=None):
+    from folder_assistant.store import FolderStore
+    folders=FolderStore(manager.root/'folders',excluded_roots=(manager.root,))
     @asynccontextmanager
     async def lifespan(app):
         yield
@@ -87,6 +93,19 @@ def create_app(manager:Manager,token:str,ui_dir:Path|None=None):
 
     @app.get('/api/config')
     def config():return manager.config()
+    @app.get('/api/folders')
+    def folder_list():return {'folders':folders.folders(),'policy':folders.policy()}
+    @app.post('/api/folders')
+    def folder_grant(body:FolderGrant,request:Request):
+        if not folder_grant_token or not secrets.compare_digest(request.headers.get('x-folder-grant',''),folder_grant_token):
+            raise HTTPException(403,'请通过桌面原生目录选择器添加目录，或使用本地CLI')
+        return folders.grant(body.path)
+    @app.delete('/api/folders/{fid}')
+    def folder_revoke(fid:str):return folders.revoke(fid)
+    @app.post('/api/folders/{fid}/scan')
+    def folder_scan(fid:str):return folders.scan(fid)
+    @app.get('/api/folders/{fid}/scan')
+    def folder_manifest(fid:str):return folders.manifest(fid)
     @app.get('/api/knowledge')
     def knowledge():return redact(manager.knowledge_status())
     @app.post('/api/knowledge/import')
@@ -194,10 +213,11 @@ def main():
         from desktop_app.lifecycle import watch_parent
         threading.Thread(target=watch_parent,args=(args.parent,),daemon=True).start()
     token=os.environ.pop('PERSONAL_AGENT_DESKTOP_TOKEN',None) or secrets.token_urlsafe(32)
+    folder_grant_token=os.environ.pop('PERSONAL_AGENT_FOLDER_GRANT_TOKEN',None)
     manager=Manager(PROJECT_ROOT/'workspace')
     sock=socket.socket();sock.bind(('127.0.0.1',args.port));sock.listen(128)
     print(json.dumps({'event':'ready','port':sock.getsockname()[1]}),flush=True)
-    app=create_app(manager,token,args.ui_dir)
+    app=create_app(manager,token,args.ui_dir,folder_grant_token=folder_grant_token)
     try:uvicorn.Server(uvicorn.Config(app,log_level='warning',access_log=False)).run(sockets=[sock])
     finally:manager.close();sock.close()
 

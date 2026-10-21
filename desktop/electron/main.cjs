@@ -9,6 +9,7 @@ let backend = null,
   connection = null,
   quitting = false;
 const token = crypto.randomBytes(32).toString("hex");
+const folderGrantToken = crypto.randomBytes(32).toString("hex");
 app.setName("Personal Agent");
 if (!app.requestSingleInstanceLock()) app.quit();
 app.on("second-instance", () => {
@@ -27,6 +28,18 @@ function allowed(event) {
 ipcMain.handle("connection", (event) => {
   if (!allowed(event)) throw Error("Unauthorized");
   return connection;
+});
+ipcMain.handle("pick-folder", async (event) => {
+  if (!allowed(event) || !connection) throw Error("Unauthorized");
+  const result = await dialog.showOpenDialog(mainWindow, {title:"选择只读资料目录",properties:["openDirectory"]});
+  if (result.canceled || !result.filePaths.length) return null;
+  const response = await fetch(connection.url + "/api/folders", {
+    method:"POST", headers:{Authorization:"Bearer " + token,"Content-Type":"application/json","X-Folder-Grant":folderGrantToken},
+    body:JSON.stringify({path:result.filePaths[0]})
+  });
+  const value = await response.json();
+  if (!response.ok) throw Error(value.detail || "目录授权失败");
+  return value;
 });
 ipcMain.handle("open-external", async (event, url) => {
   if (!allowed(event)) return;
@@ -76,6 +89,7 @@ function startBackend() {
         env: {
           ...process.env,
           PERSONAL_AGENT_DESKTOP_TOKEN: token,
+          PERSONAL_AGENT_FOLDER_GRANT_TOKEN: folderGrantToken,
           PYTHONIOENCODING: "utf-8",
         },
         stdio: ["ignore", "pipe", log],

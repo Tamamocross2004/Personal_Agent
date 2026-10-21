@@ -1474,3 +1474,8 @@ small {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+.folder-modal { width: min(1180px, 94vw); max-height: 88vh; overflow: auto; }
+.folder-modal select { max-width: 48vw; }
+.folder-file-list { max-height: 48vh; overflow: auto; }
+.folder-file-list table { width: 100%; font-size: 12px; border-collapse: collapse; }
+.folder-file-list th, .folder-file-list td { text-align: left; padding: 8px; border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }

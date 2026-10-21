@@ -35,7 +35,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["agent*", "tools*", "desktop_app*", "knowledge*"]
+include = ["agent*", "tools*", "desktop_app*", "knowledge*", "folder_assistant*"]
 
 [tool.setuptools.package-data]
 agent = ["*.json"]
