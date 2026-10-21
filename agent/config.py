@@ -71,6 +71,17 @@ class Settings(BaseSettings):
     zhipu_api_key: str = ""
     moonshot_api_key: str = ""
     custom_api_key: str = ""
+    siliconflow_api_key: str = ""
+
+    knowledge_enabled: bool = False
+    knowledge_path: Path = PROJECT_ROOT / 'workspace' / 'knowledge'
+    embedding_base_url: str = 'https://api.siliconflow.cn/v1'
+    embedding_model: str = 'Pro/BAAI/bge-m3'
+    embedding_dimensions: int = Field(default=1024, ge=2, le=8192)
+    embedding_timeout: float = Field(default=30, gt=0, le=120)
+    knowledge_chunk_size: int = Field(default=700, ge=200, le=2000)
+    knowledge_chunk_overlap: int = Field(default=120, ge=0, le=400)
+    knowledge_build_token_budget: int = Field(default=300000, ge=1000, le=2000000)
 
     llm_temperature: float = 0.3
     llm_timeout: float = 60.0

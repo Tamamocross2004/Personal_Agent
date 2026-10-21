@@ -55,6 +55,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("question", nargs="?", help="要提问的问题；省略则进入交互模式")
     p.add_argument("--chat", action="store_true", help="纯对话模式（不使用工具，阶段 0 行为）")
     p.add_argument("--no-memory", action="store_true", help="本次不读取或写入长期记忆")
+    p.add_argument("--knowledge", action="store_true", help="启用本地原始文档知识库检索")
     p.add_argument("--provider", choices=list(PROVIDERS), help="覆盖 .env 中的 LLM_PROVIDER")
     p.add_argument("--model", help="覆盖模型名")
     p.add_argument("--max-steps", type=int, help="最大循环步数（默认取 .env 的 AGENT_MAX_STEPS，30）")
@@ -171,6 +172,7 @@ def _research(
             question=question,
             contract=contract,
             code_exec_timeout=min(settings.code_exec_timeout, settings.tool_timeout * 0.8),
+            knowledge_settings=settings if settings.knowledge_enabled else None,
         ),
         system_prompt=research_system_prompt(date.today().isoformat(), max_steps),
         max_steps=max_steps,
@@ -310,6 +312,8 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         settings = Settings()
+        if args.knowledge:
+            settings = settings.model_copy(update={'knowledge_enabled':True})
         if args.no_memory:
             settings = settings.model_copy(update={"memory_enabled": False})
         cfg = load_llm_config(provider=args.provider, model=args.model, settings=settings)

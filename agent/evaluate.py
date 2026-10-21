@@ -63,7 +63,7 @@ def metadata(mode: str, suite: dict, cases: list[dict]) -> dict:
     checksum = hashlib.sha256(json.dumps(suite, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
     code_digest = hashlib.sha256()
     files = [PROJECT_ROOT / "main.py", CASE_FILE]
-    for directory in ("agent", "tools", "tests"):
+    for directory in ("agent", "tools", "knowledge", "tests"):
         files.extend((PROJECT_ROOT / directory).glob("*.py"))
     files.extend((PROJECT_ROOT / 'agent').glob('*.json'))
     files.extend((PROJECT_ROOT / "tests" / "fixtures").rglob("*.*"))

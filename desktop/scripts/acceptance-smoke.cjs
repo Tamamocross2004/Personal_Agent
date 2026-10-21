@@ -216,6 +216,67 @@ async function verifyCrashCleanup() {
     assert.equal((await fetch(connection.url + "/api/config")).status, 401);
     checks.push("native startup, preload and authenticated loopback API");
 
+    await page
+      .getByRole("button", { name: "原始资料知识库", exact: true })
+      .click();
+    await page
+      .getByLabel("选择知识文档")
+      .setInputFiles({
+        name: "界面原文.md",
+        mimeType: "text/markdown",
+        buffer: Buffer.from(
+          '档案保留期限为七个工作日。<script>throw Error("untrusted")</script>',
+        ),
+      });
+    await page.getByRole("button", { name: "导入并构建", exact: true }).click();
+    await until(
+      async () => {
+        const s = await api("/knowledge");
+        return !s.busy && s.active?.files?.length === 1;
+      },
+      "knowledge build",
+      45000,
+    );
+    await page.getByRole("button", { name: "预览", exact: true }).click();
+    assert.equal(await page.getByLabel("选择知识文档").inputValue(), "");
+    await page
+      .locator(".knowledge-modal .source-text")
+      .getByText("档案保留期限", { exact: false })
+      .waitFor();
+    await page.getByLabel("知识库检索问题").fill("档案保留期限");
+    await page.getByRole("button", { name: "检索", exact: true }).click();
+    await page.locator(".knowledge-hit").waitFor();
+    assert.equal((await api("/knowledge")).usage.calls, 1);
+    await page.screenshot({
+      path: path.join(evidence, evidencePrefix + "-knowledge.png"),
+      fullPage: true,
+    });
+    const oldGeneration = (await api("/knowledge")).active.id;
+    await page.getByRole("button", { name: "重建索引", exact: true }).click();
+    await until(
+      async () => {
+        const s = await api("/knowledge");
+        return !s.busy && s.active?.id !== oldGeneration;
+      },
+      "cached rebuild",
+      45000,
+    );
+    assert.equal((await api("/knowledge")).usage.calls, 1);
+    await page
+      .getByRole("button", { name: "从当前库移除", exact: true })
+      .click();
+    await until(async () => {
+      const s = await api("/knowledge");
+      return !s.busy && s.active?.files?.length === 0;
+    }, "knowledge remove");
+    await page
+      .locator(".knowledge-modal")
+      .getByRole("button", { name: "关闭", exact: true })
+      .click();
+    checks.push(
+      "knowledge import, escaped preview, independent keyword retrieval, cached rebuild and remove",
+    );
+
     // 模拟一次完整事件帧后的正常EOF，验证cursor续传且不重新提交任务。
     let streamRequests = 0;
     await page.route("**/api/runs/*/events?*", async (route) => {

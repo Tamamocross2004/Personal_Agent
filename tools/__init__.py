@@ -16,6 +16,7 @@ from tools.plan import make_update_plan
 from tools.report import make_write_report
 from tools.search import DDGSBackend, SearchBackend, make_web_search
 from tools.session import ResearchSession
+from tools.knowledge import make_search_knowledge
 from agent.task_contract import TaskContract, extract_contract
 
 
@@ -30,6 +31,7 @@ def default_registry(
     code_exec_timeout: float = 30.0,
     question: str = "",
     contract: TaskContract | None = None,
+    knowledge_settings=None,
 ) -> ToolRegistry:
     """为一次研究任务组装全部工具。
 
@@ -58,6 +60,8 @@ def default_registry(
             calculator,
             days_between,
             get_current_time,
+            *([make_search_knowledge(
+                knowledge_settings,task_dir,session)] if knowledge_settings is not None else []),
         ]
     )
 

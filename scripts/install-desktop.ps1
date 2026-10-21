@@ -12,7 +12,7 @@ $pythonPath = Join-Path $projectRoot '.venv\Scripts\python.exe'
 if (-not (Test-Path -LiteralPath $pythonPath)) { throw '请先在项目中创建 .venv 并安装 Python 依赖。' }
 Push-Location $projectRoot
 try {
-    & $pythonPath -m pip install -e '.[desktop]'
+    & $pythonPath -m pip install -e '.[desktop,rag]'
     if ($LASTEXITCODE -ne 0) { throw 'Python 桌面依赖安装失败。' }
     Push-Location (Join-Path $projectRoot 'desktop')
     try {

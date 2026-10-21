@@ -18,7 +18,9 @@ def main():
     if args.parent:threading.Thread(target=watch_parent,args=(args.parent,),daemon=True).start()
     request=json.loads((args.task_dir/'.desktop-request.json').read_text(encoding='utf-8'))
     options=request['options']
-    settings=Settings().model_copy(update={'memory_enabled':options['memory']})
+    settings=Settings().model_copy(update={'memory_enabled':options['memory'],
+        'knowledge_enabled':options.get('knowledge',False),
+        'knowledge_path':Path(request.get('knowledge_path',Settings().knowledge_path))})
     try:
         if request.get('resume'):
             result=resume_research(args.task_dir,should_stop=(args.task_dir/'.desktop-stop').exists,clear_stop_marker=False)

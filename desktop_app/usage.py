@@ -84,7 +84,7 @@ class TraceUsageReader:
             signature=(stat.st_dev,stat.st_ino)
             if (previous is None or previous['identity']!=signature or stat.st_size<previous['position']
                 or (previous['size']==stat.st_size and previous['mtime']!=stat.st_mtime_ns)):
-                previous={'identity':signature,'position':0,'events':[],'invalid_lines':0,'finished':False}
+                previous={'identity':signature,'position':0,'events':[],'embedding_events':[],'invalid_lines':0,'finished':False}
             with path.open('rb') as stream:
                 stream.seek(previous['position'])
                 for _ in range(100000):
@@ -102,6 +102,7 @@ class TraceUsageReader:
                     kind=event.get('kind')
                     if not isinstance(kind,str):previous['invalid_lines']+=1;continue
                     if kind in {'llm_call','llm_error'}:previous['events'].append(event)
+                    elif kind=='embedding_call':previous['embedding_events'].append(event)
                     elif kind in {'run_start','run_resume'}:previous['finished']=False
                     elif kind=='run_end':previous['finished']=True
             previous.update(size=stat.st_size,mtime=stat.st_mtime_ns)

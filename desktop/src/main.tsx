@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import "./style.css";
 import { UsagePanel, PricingEditor, money } from "./usage";
+import { KnowledgeLibrary } from "./knowledge";
 
 declare global {
   interface Window {
@@ -155,12 +156,14 @@ function App() {
     max_steps: 30,
     budget: 300000,
     memory: true,
+    knowledge: false,
   });
   const [settings, setSettings] = useState(false),
     [inspector, setInspector] = useState(true),
     [tab, setTab] = useState("report"),
     [selectedFile, setSelectedFile] = useState("report.md");
   const [pricingExpanded, setPricingExpanded] = useState(false);
+  const [knowledgeOpen, setKnowledgeOpen] = useState(false);
   const [content, setContent] = useState(""),
     [fileError, setFileError] = useState(""),
     [busy, setBusy] = useState(false),
@@ -209,6 +212,7 @@ function App() {
           max_steps: c.max_steps,
           budget: c.budget,
           memory: c.memory,
+          knowledge: c.knowledge,
         });
         setReady(true);
       } catch (e) {
@@ -614,6 +618,12 @@ function App() {
           <ArrowDownToLine size={14} />
           导入已有任务
         </button>
+        <button
+          className="import-history"
+          onClick={() => setKnowledgeOpen(true)}
+        >
+          <BookOpen size={14} /> 原始资料知识库
+        </button>
         <button className="settings-entry" onClick={() => setSettings(true)}>
           <div className="avatar">P</div>
           <div>
@@ -904,6 +914,19 @@ function App() {
                   }
                 />
                 历史背景
+              </label>
+              <label
+                className="memory-toggle"
+                title="检索导入的原始资料；混合检索会调用硅基流动嵌入服务"
+              >
+                <input
+                  type="checkbox"
+                  checked={options.knowledge}
+                  onChange={(e) =>
+                    setOptions({ ...options, knowledge: e.target.checked })
+                  }
+                />
+                知识库
               </label>
               <span className="spacer" />
               {selected && active(selected) && (
@@ -1425,6 +1448,9 @@ function App() {
           </div>
         </div>
       )}
+      {knowledgeOpen && (
+        <KnowledgeLibrary api={api} onClose={() => setKnowledgeOpen(false)} />
+      )}
       {settings && (
         <div className="modal-overlay" onClick={() => setSettings(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -1526,7 +1552,10 @@ function App() {
             </div>
             <p className="muted">
               {source.kind} ·{" "}
-              {source.title || source.description || "本次任务保留的原始数据"}
+              {source.document_name ||
+                source.title ||
+                source.description ||
+                "本次任务保留的原始数据"}
             </p>
             {source.url && (
               <button
@@ -1541,7 +1570,15 @@ function App() {
               <br />
               区间：{source.start ?? "—"} – {source.end ?? "—"}
               <br />
-              页面日期：{source.page_date || "未知"}（元数据类型未核实）
+              {source.kind === "document" ? (
+                <>
+                  页码：{source.page} · 版本：{source.generation}
+                  <br />
+                  文件 SHA256：{source.file_sha256}
+                </>
+              ) : (
+                <>页面日期：{source.page_date || "未知"}（元数据类型未核实）</>
+              )}
               <br />
               截断：
               {source.truncated || source.delivery_truncated ? "是" : "否"}

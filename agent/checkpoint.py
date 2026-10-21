@@ -37,7 +37,8 @@ def digest(value):
 
 def runtime_identity():
     root=Path(__file__).resolve().parent.parent
-    files=[root/'main.py',*sorted((root/'agent').glob('*.py')),*sorted((root/'tools').glob('*.py'))]
+    files=[root/'main.py',*sorted((root/'agent').glob('*.py')),*sorted((root/'tools').glob('*.py')),
+           *sorted((root/'knowledge').glob('*.py'))]
     return digest({p.relative_to(root).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in files})
 
 

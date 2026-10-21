@@ -46,6 +46,12 @@ class Manager:
         self.root=root.resolve()
         self.root.mkdir(parents=True,exist_ok=True)
         self.settings=settings or Settings()
+        # 正式应用与CLI共用项目配置；自定义workspace（隔离验收）不接触正式库。
+        knowledge_path=(self.settings.knowledge_path if self.root==(PROJECT_ROOT/'workspace').resolve()
+                        else self.root/'knowledge')
+        self.knowledge_settings=self.settings.model_copy(update={'knowledge_path':knowledge_path})
+        self.knowledge_thread=None
+        self.knowledge_error=None
         self.store=Store(self.root/'desktop.sqlite3')
         self.pricing=PricingBook(self.root/'desktop-pricing.json')
         self.usage_reader=TraceUsageReader()
@@ -82,8 +88,32 @@ class Manager:
         except ValueError:configured=False; model=s.llm_model or 'deepseek-flash'
         return {'provider':s.llm_provider,'model':model,'key_configured':configured,
                 'max_steps':s.agent_max_steps,'budget':s.agent_token_budget,'memory':s.memory_enabled,
+                'knowledge':s.knowledge_enabled,
                 'review_enabled':s.report_review_enabled,'review_max_calls':s.report_review_max_calls,
                 'project_root':str(PROJECT_ROOT),'workspace_root':str(self.root)}
+
+    def knowledge_store(self):
+        from knowledge.store import KnowledgeStore
+        return KnowledgeStore(self.knowledge_settings)
+
+    def knowledge_status(self):
+        with self.lock:
+            return {**self.knowledge_store().status(),
+                    'busy':bool(self.knowledge_thread and self.knowledge_thread.is_alive()),
+                    'job_error':self.knowledge_error}
+
+    def knowledge_build(self,uploads=(),*,mode='append',remove=()):
+        with self.lock:
+            if self.closed.is_set(): raise ValueError('本地服务已停止')
+            if self.knowledge_thread and self.knowledge_thread.is_alive(): raise ValueError('知识库正在构建，请等待')
+            self.knowledge_error=None
+            def build():
+                try: self.knowledge_store().build(uploads,mode=mode,remove=remove)
+                except Exception as exc:
+                    self.knowledge_error=str(exc) if isinstance(exc,ValueError) else '构建失败：'+type(exc).__name__
+            self.knowledge_thread=threading.Thread(target=build,daemon=True)
+            self.knowledge_thread.start()
+            return {'accepted':True}
 
     def submit(self,sid,question,options):
         with self.lock:
@@ -155,6 +185,7 @@ class Manager:
             path=self.safe_task(pending)
             resuming=pending['state']=='resuming'
             request={'question':pending['question'],'options':pending['options'],'resume':resuming,
+                     'knowledge_path':str(self.knowledge_settings.knowledge_path),
                      'historical_context':None if resuming else self.context(pending)}
             (path/'.desktop-request.json').write_text(json.dumps(request,ensure_ascii=False),encoding='utf-8')
             self.log=(path/'.desktop-console.log').open('ab' if resuming else 'wb')
@@ -231,9 +262,12 @@ class Manager:
         except (OSError,ValueError,KeyError,TypeError):evidence={'status':'unavailable','semantic_support':'not_certified'}
         if review.get('evidence_mapping_sha256') and review['evidence_mapping_sha256']!=evidence.get('mapping_sha256'):
             review={**review,'status':'stale'}
+        # 与同一管理器的恢复请求互斥，避免轮询的短暂检查锁被误认成另一个研究进程。
+        with self.lock:
+            checkpoint_status=CheckpointStore(root).status()
         return {**row,'files':files,'review':review,'evidence':evidence,
                 'provenance':fallback_status(root),
-                'checkpoint':CheckpointStore(root).status(),
+                'checkpoint':checkpoint_status,
                 'usage':self.usage(row),
                 'quality':read_json(root/'report.quality.json',{}),'plan':read_json(root/'plan.json',{}),
                 'contract':read_json(root/'task_contract.json',{}),
@@ -242,7 +276,21 @@ class Manager:
     def usage(self,row):
         try:trace=self.usage_reader.read(self.safe_task(row)/'trace.jsonl')
         except OSError:trace=None
-        return summarize(trace,row,self.pricing)
+        value=summarize(trace,row,self.pricing)
+        recorded={e['id']:e for e in trace.get('embedding_events',[]) if e.get('id')} if trace else {}
+        journal=self.safe_task(row)/'embedding_usage.jsonl'
+        if journal.is_file() and not journal.is_symlink() and journal.stat().st_size<=2_000_000:
+            with journal.open(encoding='utf-8') as stream:
+                for line in stream:
+                    try:
+                        event=json.loads(line)
+                        if isinstance(event,dict) and event.get('id'): recorded[event['id']]=event
+                    except ValueError: pass
+        events=list(recorded.values())
+        value['embedding']={'calls':len(events),'input_tokens':sum(e.get('input_tokens') or 0 for e in events),
+            'unknown_usage_calls':sum(e.get('input_tokens') is None for e in events),
+            'estimated_cost':None,'note':'本轮检索嵌入单独统计；未配置费率，费用未计价。建库用量见知识库。'}
+        return value
 
     def import_history(self):
         imported=0

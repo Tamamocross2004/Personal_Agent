@@ -1427,3 +1427,40 @@ small {
   font-size: 11px;
   line-height: 1.8;
 }
+.knowledge-modal {
+  width: min(1100px, 95vw);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.knowledge-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin: 16px 0;
+}
+.knowledge-actions input:not([type="file"]) {
+  flex: 1;
+  min-width: 180px;
+}
+.knowledge-documents > div {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.knowledge-documents span {
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+.knowledge-hit {
+  margin: 14px 0;
+  padding: 14px;
+  background: rgba(128, 128, 128, 0.08);
+  border-radius: 8px;
+}
+.knowledge-hit pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

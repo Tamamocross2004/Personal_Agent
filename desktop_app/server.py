@@ -10,11 +10,13 @@ import socket
 import threading
 from contextlib import asynccontextmanager
 from pathlib import Path
+from typing import Literal
 
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.concurrency import run_in_threadpool
 from pydantic import BaseModel, Field
 
 from agent.config import PROJECT_ROOT,ProviderName
@@ -34,6 +36,13 @@ class RunInput(BaseModel):
     max_steps:int=Field(default=30,ge=3,le=200)
     budget:int=Field(default=300000,ge=1000,le=2000000)
     memory:bool=True
+    knowledge:bool=False
+
+
+class KnowledgeQuery(BaseModel):
+    query:str=Field(min_length=1,max_length=1000)
+    mode:Literal['keyword','vector','hybrid']='keyword'
+    k:int=Field(default=4,ge=1,le=8)
 
 
 def create_app(manager:Manager,token:str,ui_dir:Path|None=None):
@@ -76,6 +85,25 @@ def create_app(manager:Manager,token:str,ui_dir:Path|None=None):
 
     @app.get('/api/config')
     def config():return manager.config()
+    @app.get('/api/knowledge')
+    def knowledge():return redact(manager.knowledge_status())
+    @app.post('/api/knowledge/import')
+    async def knowledge_import(request:Request,filename:str,mode:Literal['append','replace']='append'):
+        from knowledge.documents import MAX_BYTES,parse
+        data=bytearray()
+        async for chunk in request.stream():
+            data.extend(chunk)
+            if len(data)>MAX_BYTES: raise ValueError('文档超过20MB')
+        await run_in_threadpool(parse,bytes(data),filename)
+        return manager.knowledge_build([(filename,bytes(data))],mode=mode)
+    @app.post('/api/knowledge/rebuild')
+    def knowledge_rebuild():return manager.knowledge_build(mode='rebuild')
+    @app.delete('/api/knowledge/documents/{doc_id}')
+    def knowledge_delete(doc_id:str):return manager.knowledge_build(remove=[doc_id])
+    @app.get('/api/knowledge/documents/{doc_id}')
+    def knowledge_preview(doc_id:str,page:int=1):return redact(manager.knowledge_store().preview(doc_id,page))
+    @app.post('/api/knowledge/search')
+    def knowledge_search(body:KnowledgeQuery):return redact(manager.knowledge_store().search(**body.model_dump()))
     @app.get('/api/pricing')
     def pricing():return redact({**manager.pricing.read(),'presets':[flash_profile(),flash_profile(False)]})
     @app.put('/api/pricing')

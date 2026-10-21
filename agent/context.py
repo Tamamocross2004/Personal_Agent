@@ -135,6 +135,10 @@ class ContextCompactor:
                 new = self._stub_fetch(content)
             elif name == "web_search":
                 new = self._stub_search(content)
+            elif name == "search_knowledge":
+                new = (f"{COMPACTED_MARKER} 本地资料检索的旧原文已移出上下文。"
+                       "这不是原文摘要，也不证明全文已读。用read_evidence重读本轮已保留的证据，"
+                       "或用search_knowledge重新检索本任务固定代际；嵌入缓存未命中时仍可能产生用量。")
             else:
                 continue
             saving += estimate_tokens(content) - estimate_tokens(new)

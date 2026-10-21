@@ -43,6 +43,53 @@ def test_api_access_and_redaction(manager):
         assert client.post(f"/api/sessions/{row['session_id']}/runs",json={**OPTIONS,'question':'   '}).status_code==400
 
 
+def test_polling_checkpoint_status_does_not_collide_with_resume(manager,monkeypatch):
+    from concurrent.futures import ThreadPoolExecutor
+    from contextlib import nullcontext
+    import threading
+    import desktop_app.manager as module
+    row=new_run(manager);manager.store.set_run(row['id'],'interrupted')
+    entered=threading.Event();release=threading.Event();active=threading.Lock()
+    class Checkpoint:
+        def __init__(self,root): pass
+        def status(self):
+            if not active.acquire(blocking=False): raise ValueError('轮询与恢复争抢了检查锁')
+            try:
+                if not entered.is_set(): entered.set();assert release.wait(3)
+                return {'resumable':True}
+            finally: active.release()
+        def lease(self,**kwargs): return nullcontext()
+    monkeypatch.setattr(module,'CheckpointStore',Checkpoint)
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        detail=pool.submit(manager.detail,row['id'])
+        assert entered.wait(3)
+        resume=pool.submit(manager.resume,row['id'])
+        release.set()
+        assert detail.result(timeout=3)['checkpoint']['resumable']
+        assert resume.result(timeout=3)['state']=='resuming'
+
+
+def test_embedding_journal_counts_unknown_then_returned_without_double_count(manager):
+    row=new_run(manager);journal=Path(row['task_dir'])/'embedding_usage.jsonl'
+    event={'id':'embedding-1','status':'started','input_tokens':None}
+    journal.write_text(json.dumps(event)+'\n',encoding='utf-8')
+    assert manager.usage(row)['embedding']['unknown_usage_calls']==1
+    with journal.open('a',encoding='utf-8') as stream:
+        stream.write(json.dumps({**event,'status':'returned','input_tokens':73})+'\n')
+    usage=manager.usage(row)
+    assert usage['embedding']['calls']==1 and usage['embedding']['input_tokens']==73
+    assert usage['embedding']['unknown_usage_calls']==0 and usage['calls']==0
+
+
+def test_production_workspace_honors_configured_knowledge_path(tmp_path,monkeypatch):
+    import desktop_app.manager as module
+    monkeypatch.setattr(module,'PROJECT_ROOT',tmp_path)
+    configured=tmp_path/'shared-documents'
+    manager=Manager(tmp_path/'workspace',start=False,settings=Settings(_env_file=None,knowledge_path=configured))
+    try: assert manager.knowledge_settings.knowledge_path==configured
+    finally: manager.close()
+
+
 def test_queue_cancel_archive_and_restart(manager):
     row=new_run(manager)
     manager.store.update_session(row['session_id'],title='重命名',archived=True)

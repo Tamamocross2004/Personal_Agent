@@ -489,12 +489,18 @@ class Agent(CheckpointMixin):
                 result, seconds = ToolResult(wrapup_refused_result(name), True), 0.0
             else:
                 result, seconds = self._run_tool(name, arguments)
-            if self.checkpoint and getattr(self,'_tool_outcome_uncertain',False):
+            if (self.checkpoint or name=='search_knowledge') and getattr(self,'_tool_outcome_uncertain',False):
                 self._emit('tool_result',id=call.id,name=name,content=result.content,is_error=True,seconds=seconds)
                 self._save_checkpoint('tool_batch',pending={'kind':'tool','id':call.id,'name':name,
                                                            'reason':'工具线程超时，后台副作用可能仍在进行'})
                 raise NeedsVerification('工具超时且结果不确定，已停止派发后续操作；需核对，未自动重做')
             content = _truncate(result.content, self.max_tool_result_chars)
+            for usage in result.usage or []:
+                self._emit('embedding_call',**usage)
+                if usage.get('input_tokens') is None:
+                    raise NeedsVerification('嵌入请求用量未知，已停止；需核对实际服务消耗，不能自动重做')
+                self._equiv+=usage['input_tokens']
+                self._tokens+=usage['input_tokens']
             if name == 'fetch_url' and result.is_error and result.content.startswith('ERROR: FetchError:') and self.research_session is not None:
                 from tools.session import normalize_url
                 try:
@@ -888,6 +894,8 @@ class Agent(CheckpointMixin):
 
     def _run_tool(self, name: str, arguments: str) -> tuple[ToolResult, float]:
         """执行一次工具调用：先做重复检测，再带超时执行。"""
+        if self.research_session is not None:
+            self.research_session.embedding_budget_remaining=max(0,int(self.token_budget-self._equiv))
         sig = (name, _normalize_args(arguments))
         stats = self._call_stats.setdefault(sig, [0, 0])
         calls, successes = stats

@@ -97,7 +97,7 @@ class Claim(BaseModel):
         description='可选前提：evidence附真实摘录；assumption明确新增假设；unknown明确缺口。不得为填字段编造假设。')
     limits: str = Field(default='', max_length=600)
     scope: Literal['excerpt', 'whole_document'] | None = Field(
-        default=None, description='网页结论的覆盖范围；whole_document要求关联网页版本已完整送达。未填不代表全文已读。')
+        default=None, description='原文结论范围。excerpt可关联已读网页/本地文档；whole_document只支持已完整送达的网页版本，本地文档首版不支持全文覆盖认证。')
     artifact_version: Literal['current','snapshot'] = Field(
         default='current', description='文件证据默认证明当前版本并检查哈希；snapshot仅描述记录时快照，必须填limits注明历史范围，不证明当前内容。')
 
@@ -137,7 +137,19 @@ class EvidenceLedger:
 
     def capture(self, tool: str, arguments: str, content: str, call_id: str, metadata: list[dict] | None, visible_limit: int) -> list[str]:
         ids = []
-        if tool == 'fetch_url':
+        if tool == 'search_knowledge':
+            for item in metadata or []:
+                shown=max(0,min(item['output_end'],visible_limit)-item['output_start'])
+                text=content[item['output_start']:item['output_start']+shown]
+                if not shown or text!=item['text'][:shown]: continue
+                source=self.add('document',text,tool_call_id=call_id,
+                    document_id=item['doc_id'],document_name=item['name'],file_sha256=item['file_sha256'],
+                    page_sha256=item['page_sha256'],generation=item['generation'],page=item['page'],
+                    chunk_id=item['chunk_id'],start=item['start'],end=item['start']+shown,
+                    context_role=item['role'],delivery_truncated=shown<len(item['text']),
+                    description='本任务固定知识库代际中实际送达的提取原文；不证明原文件事实真实或当前库状态')
+                if source: ids.append(source)
+        elif tool == 'fetch_url':
             for item in metadata or []:
                 start = item['output_start']
                 shown = max(0, min(item['output_end'],visible_limit)-start)
@@ -216,7 +228,7 @@ class EvidenceLedger:
                 if resolved is None:
                     raise ValueError('摘录不在证据'+ref.source_id+'中：'+ref.excerpt[:100]
                         +'；用read_evidence(source_id="'+ref.source_id+'", query="关键词")读取真实原文，不要反复猜ID或重算。')
-                if claim.kind == 'direct' and source['kind'] not in ('web','user'):
+                if claim.kind == 'direct' and source['kind'] not in ('web','user','document'):
                     raise ValueError('direct仅用于用户材料/已读原文；历史摘要和计算不能冒充当前直接事实')
                 if source['kind'] == 'artifact' and claim.artifact_version=='current':
                     from agent.artifacts import check_artifact_version
@@ -234,8 +246,11 @@ class EvidenceLedger:
                 raise ValueError('snapshot仅用于observed历史文件快照，须全部关联artifact并填写limits说明记录时范围，不证明当前内容')
             if claim.scope is not None:
                 web = [self.records[r['source_id']] for r in refs if r['source_kind']=='web']
-                if not web:
-                    raise ValueError('scope仅用于关联网页证据的结论')
+                documents = [r for r in refs if r['source_kind']=='document']
+                if not web and not documents:
+                    raise ValueError('scope仅用于关联已读原文证据的结论')
+                if claim.scope=='whole_document' and documents:
+                    raise ValueError('本地文档首版仅支持excerpt范围，不认证整份文档已完整送达')
                 if claim.scope=='whole_document' and any(not self.web_coverage(r)['full_page_delivered'] for r in web):
                     raise ValueError('结论声明覆盖全文，但关联网页版本未完整送达；请补读或限定结论范围')
             if claim.kind == 'direct':
@@ -357,16 +372,17 @@ def audit_mapping(root: Path, report_name: str = 'report.md') -> dict:
     if len(records)!=len(ledger['records']): raise ValueError('证据ID重复')
     for r in records.values():
         if sha(r['text'])!=r['text_sha256']: raise ValueError('证据正文哈希不匹配')
-        if r['kind']=='web' and r['end']-r['start']!=len(r['text']): raise ValueError('网页偏移不匹配')
+        if r['kind'] in ('web','document') and r['end']-r['start']!=len(r['text']): raise ValueError('原文偏移不匹配')
     report=path.read_text(encoding='utf-8')
     for claim in mapping['claims']:
         restore_claim(claim)  # 旧格式仍可读；新前提字段也必须满足结构约束。
         if claim['quote'] not in report: raise ValueError('结论原句失效')
         if claim.get('scope') is not None:
             web = [records[r['source_id']] for r in claim_refs(claim) if records[r['source_id']]['kind']=='web']
-            if not web or (claim['scope']=='whole_document' and any(
-                    not reading_coverage(records.values(),r)['full_page_delivered'] for r in web)):
-                raise ValueError('网页结论范围与实际送达记录不匹配')
+            documents = [records[r['source_id']] for r in claim_refs(claim) if records[r['source_id']]['kind']=='document']
+            if (not web and not documents) or (claim['scope']=='whole_document' and (documents or any(
+                    not reading_coverage(records.values(),r)['full_page_delivered'] for r in web))):
+                raise ValueError('原文结论范围与实际送达记录不匹配')
         for premise in claim.get('premises', []):
             if not premise['text'].strip() or (premise['basis']=='evidence') != bool(premise['supports']):
                 raise ValueError('前提来源类型与引用不一致')

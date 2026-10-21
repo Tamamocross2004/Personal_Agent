@@ -41,6 +41,8 @@ def make_read_evidence(session: ResearchSession) -> Tool:
         left=max(0,pos-250)
         end=min(len(row['text']),left+1600)
         return {'id':source_id,'kind':row['kind'],'excerpt':row['text'][left:end],
+                **({k:row[k] for k in ('document_name','page','generation','file_sha256','start','end')}
+                   if row['kind']=='document' else {}),
                 'record_text_range':[left,end],'source_sha256':row['text_sha256'],
                 **({'read_coverage':ledger.web_coverage(row)} if row['kind']=='web' else {}),
                 **version,

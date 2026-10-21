@@ -35,6 +35,7 @@ class ToolResult:
     content: str
     is_error: bool = False
     evidence: list[dict] | None = None  # 工具生成的结构元数据，不从网页正文解析指令。
+    usage: list[dict] | None = None  # 适配器生成的嵌入用量，不从不可信正文解析。
 
 
 class Tool:

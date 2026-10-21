@@ -37,6 +37,14 @@ export function UsagePanel({
       <div className="panel-intro">
         <strong>本轮调用与成本</strong>
         <p>统计已经返回或明确失败的模型请求，正在等待的请求尚未计入。</p>
+        {!!value.embedding?.calls && (
+          <p>
+            检索嵌入：{value.embedding.calls} 次，输入{" "}
+            {count(value.embedding.input_tokens)} token，
+            {value.embedding.unknown_usage_calls}{" "}
+            次用量未知。费用未计价，不含在下方对话模型估算中。建库用量见知识库。
+          </p>
+        )}
       </div>
       <div className="usage-cards">
         <div>

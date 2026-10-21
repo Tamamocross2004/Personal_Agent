@@ -50,6 +50,8 @@ def show_event(ev: AgentEvent, full: bool = False) -> None:
             f"[dim]  模型调用 {d.get('seconds', 0):.1f}s · 输入 {d.get('prompt_tokens', 0)}{cache} / "
             f"输出 {d.get('completion_tokens', 0)} tokens{extra}[/]"
         )
+    elif k == "embedding_call":
+        console.print(Text(f"  嵌入调用 {d.get('model','')} · 输入 {d.get('input_tokens') if d.get('input_tokens') is not None else '未知'} tokens · {d.get('status')} · 费用未计价",style='dim'))
     elif k == "thought":
         console.print(Text(d["text"], style="italic dim"))
     elif k == "tool_call":

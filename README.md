@@ -4,6 +4,8 @@
 
 完整路线图见 [ROADMAP.md](ROADMAP.md)。
 
+已接入可选的本地原始文档 RAG：桌面“原始资料知识库”导入资料，研究时勾选“知识库”；CLI 使用 `main.py --knowledge`。安装、命令、云端嵌入用量及版本边界见 [RAG 使用说明](docs/rag-guide.md)。这与历史研究记忆分别管理，不改变阶段 12 尚未通过的状态。
+
 ## 当前进度
 
 - [x] 阶段 0：环境搭建 + LLM 客户端（多厂商切换、重试、token 统计）
@@ -75,8 +77,8 @@ python -m venv .venv
 # macOS / Linux / Git Bash:
 # source .venv/bin/activate
 
-# 2. 安装依赖（含测试依赖）。依赖有更新时重新执行一次即可
-python -m pip install -e ".[dev]"
+# 2. 安装依赖（含测试与RAG依赖）。依赖有更新时重新执行一次即可
+python -m pip install -e ".[dev,rag]"
 
 # 3. 配置密钥
 cp .env.example .env      # Windows 可用: copy .env.example .env
@@ -500,6 +502,9 @@ tools/
   notes.py     # save_note / read_notes
   session.py   # 一个任务内各工具共享的状态（读过的网页、笔记）
 main.py        # CLI 入口：研究模式（默认）与纯对话模式（--chat）
+
+knowledge/     # 原始资料RAG：有界解析、SQLite/FTS5、Milvus Lite、嵌入缓存与调用日志
+               # python -m knowledge 管理；knowledge.probe 显式付费隔离诊断
 tests/         # 用假模型测试，不调用真实 API
   fakes.py     # 剧本化的假模型 ScriptedLLM
 workspace/     # 运行产物（已 gitignore）

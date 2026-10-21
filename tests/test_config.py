@@ -54,7 +54,7 @@ def test_custom_provider_requires_model():
         load_llm_config(settings=s)
 
 
-@pytest.mark.parametrize("field", [p.key_field for p in PROVIDERS.values()] + ["jina_api_key"])
+@pytest.mark.parametrize("field", [p.key_field for p in PROVIDERS.values()] + ["jina_api_key", "siliconflow_api_key"])
 def test_project_api_key_overrides_global_key(tmp_path, monkeypatch, field):
     project_env = tmp_path / ".env"
     project_env.write_text(f"{field.upper()}=project-test-key\n", encoding="utf-8")
@@ -81,7 +81,7 @@ def test_missing_project_key_never_falls_back_to_global(tmp_path, monkeypatch, c
         load_llm_config(settings=settings)
 
 
-@pytest.mark.parametrize("field", [p.key_field for p in PROVIDERS.values()] + ["jina_api_key"])
+@pytest.mark.parametrize("field", [p.key_field for p in PROVIDERS.values()] + ["jina_api_key", "siliconflow_api_key"])
 def test_disabled_dotenv_does_not_load_global_keys(monkeypatch, field):
     monkeypatch.setenv(field.upper(), "global-test-key")
     assert getattr(Settings(_env_file=None), field) == ""
