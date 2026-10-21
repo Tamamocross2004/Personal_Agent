@@ -31,11 +31,19 @@ ipcMain.handle("connection", (event) => {
 });
 ipcMain.handle("pick-folder", async (event) => {
   if (!allowed(event) || !connection) throw Error("Unauthorized");
-  const result = await dialog.showOpenDialog(mainWindow, {title:"选择只读资料目录",properties:["openDirectory"]});
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: "选择只读资料目录",
+    properties: ["openDirectory"],
+  });
   if (result.canceled || !result.filePaths.length) return null;
   const response = await fetch(connection.url + "/api/folders", {
-    method:"POST", headers:{Authorization:"Bearer " + token,"Content-Type":"application/json","X-Folder-Grant":folderGrantToken},
-    body:JSON.stringify({path:result.filePaths[0]})
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + token,
+      "Content-Type": "application/json",
+      "X-Folder-Grant": folderGrantToken,
+    },
+    body: JSON.stringify({ path: result.filePaths[0] }),
   });
   const value = await response.json();
   if (!response.ok) throw Error(value.detail || "目录授权失败");

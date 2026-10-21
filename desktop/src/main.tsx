@@ -36,7 +36,11 @@ declare global {
   interface Window {
     desktop: {
       connection: () => Promise<{ url: string; token: string }>;
-      pickFolder: () => Promise<{id:string;path:string;active:number}|null>;
+      pickFolder: () => Promise<{
+        id: string;
+        path: string;
+        active: number;
+      } | null>;
       openTask: (path: string) => Promise<void>;
       openExternal: (url: string) => Promise<void>;
     };
@@ -629,7 +633,9 @@ function App() {
         >
           <BookOpen size={14} /> 原始资料知识库
         </button>
-        <button className="import-history" onClick={() => setFoldersOpen(true)}><FolderOpen size={14} /> 资料文件夹</button>
+        <button className="import-history" onClick={() => setFoldersOpen(true)}>
+          <FolderOpen size={14} /> 资料文件夹
+        </button>
         <button className="settings-entry" onClick={() => setSettings(true)}>
           <div className="avatar">P</div>
           <div>
@@ -1472,7 +1478,9 @@ function App() {
       {knowledgeOpen && (
         <KnowledgeLibrary api={api} onClose={() => setKnowledgeOpen(false)} />
       )}
-      {foldersOpen && <FolderLibrary api={api} onClose={() => setFoldersOpen(false)} />}
+      {foldersOpen && (
+        <FolderLibrary api={api} onClose={() => setFoldersOpen(false)} />
+      )}
       {settings && (
         <div className="modal-overlay" onClick={() => setSettings(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
