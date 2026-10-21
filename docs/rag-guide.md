@@ -57,6 +57,8 @@ CLI 同样可用：
 
 十万条公开短文本的独立基准使用 `python -m knowledge.large_probe --prepare --output workspace/large-new` 冻结数据与100题协议，再以同目录运行 `python -m knowledge.large_probe --live --output workspace/large-new`。它不调用聊天模型，首次运行会产生整库嵌入及100次重排用量；需安装`.[rag,rag-benchmark]`，不可复用已有结果目录。实测及生产容量边界见[大语料重排对照](large-rerank-verification-20261021.md)。
 
+关键词和向量的各自召回量可用`KNOWLEDGE_LEXICAL_CANDIDATES`、`KNOWLEDGE_VECTOR_CANDIDATES`设置（默认均40，范围8至200），再由重排候选池截取。扩大召回量不保证最终命中改善；另100题配置对照及原样保留的端到端失败见[后续执行记录](rag-next-plan-20261021.md)。实验热索引会话只用于隔离基准目录，正式桌面的短时锁/关闭、上传上限和默认为关闭重排的设置不变。
+
 ## 版本、引用与失败
 
 构建使用新代际，解析、嵌入、向量索引和全文索引完成后才通过 SQLite 事务切换当前版本。失败保留旧版本；请求用量继续保留。并发构建被锁阻止，Milvus 访问也串行释放句柄以兼容本机多进程。

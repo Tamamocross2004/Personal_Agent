@@ -1,0 +1,288 @@
+{
+  "matrix_executed_complete": true,
+  "source_unchanged": true,
+  "source_sha256": "cb58a441b3ec0a5da27546af7a015a72440826b514433629351ec37efc8d12bf",
+  "model": "deepseek-flash",
+  "tasks": [
+    {
+      "id": "e2e-sqlite",
+      "reviewer_kind": "coding_assistant",
+      "delivery_verdict": "fail",
+      "report": "workspace/rag-long-live-20261021/e2e-sqlite/report.md",
+      "report_sha256": "3e913e283b3477f389a440a495149be4913ff0da08aa85742e74f1e9d4eb6efa",
+      "stop_reason": "loop_detected",
+      "steps": 11,
+      "equivalent_tokens": 104969,
+      "review_status": "not_reviewed",
+      "evidence_status": "draft",
+      "mapped_claims": 0,
+      "tool_error_returns": 11,
+      "chat_calls": 16,
+      "model_names": [
+        "deepseek-flash"
+      ],
+      "selected_content": "bm25较小值优先、NEAR默认10与已送达原文一致。",
+      "findings": [
+        "11条write_report错误返回，包括技术名称FTS5中的5被当成未支持数值、Schema误用、结论定位失败和重复调用。",
+        "以loop_detected结束，runtime兜底保存，not_reviewed，不能算正常交付。"
+      ],
+      "usage": {
+        "embedding": {
+          "calls": 2,
+          "known_input_tokens": 31,
+          "unknown_calls": 0
+        },
+        "rerank": {
+          "calls": 2,
+          "known_input_tokens": 7451,
+          "unknown_calls": 0
+        }
+      }
+    },
+    {
+      "id": "e2e-make",
+      "reviewer_kind": "coding_assistant",
+      "delivery_verdict": "fail",
+      "report": "workspace/rag-long-live-20261021/e2e-make/report.md",
+      "report_sha256": "5c0114a6ad486c5678faefd2e8470d4d48f019ccdf22f66af42d53d86f20eac9",
+      "stop_reason": "budget",
+      "steps": 11,
+      "equivalent_tokens": 134323,
+      "review_status": "not_reviewed",
+      "evidence_status": "draft",
+      "mapped_claims": 0,
+      "tool_error_returns": 7,
+      "chat_calls": 15,
+      "model_names": [
+        "deepseek-flash"
+      ],
+      "selected_content": ".PHONY、order-only与.DELETE_ON_ERROR主体条件有已读依据；未认证全部额外推断。",
+      "findings": [
+        "章节号和PDF页码参与正文数字比较，另有摘录边界及结论原句不匹配，共7条工具错误返回。",
+        "budget停止、兜底草稿未审稿；模型声称未保存是程序兜底保存前的原文，以provenance为准。"
+      ],
+      "usage": {
+        "embedding": {
+          "calls": 5,
+          "known_input_tokens": 88,
+          "unknown_calls": 0
+        },
+        "rerank": {
+          "calls": 5,
+          "known_input_tokens": 17914,
+          "unknown_calls": 0
+        }
+      }
+    },
+    {
+      "id": "e2e-logging",
+      "reviewer_kind": "coding_assistant",
+      "delivery_verdict": "fail",
+      "report": "workspace/rag-long-live-20261021/e2e-logging/logging-thread-safety-and-queue-handlers.md",
+      "report_sha256": "7181766214374bdf619a89c32e41ec22e9fab8652d655df922ff241a4138729c",
+      "stop_reason": "budget",
+      "steps": 11,
+      "equivalent_tokens": 99175,
+      "review_status": "skipped_budget",
+      "evidence_status": "mapped",
+      "mapped_claims": 8,
+      "tool_error_returns": 2,
+      "chat_calls": 14,
+      "model_names": [
+        "deepseek-flash"
+      ],
+      "selected_content": "进程/线程区别及QueueHandler与QueueListener分工有实际送达依据。",
+      "findings": [
+        "曾引用不属于指定证据的摘录，2次工具错误；最终selected claims mapped不证明全文正确。",
+        "内容明显偏长并消耗预算，审稿skipped_budget；不能称完整通过。"
+      ],
+      "usage": {
+        "embedding": {
+          "calls": 5,
+          "known_input_tokens": 94,
+          "unknown_calls": 0
+        },
+        "rerank": {
+          "calls": 5,
+          "known_input_tokens": 19286,
+          "unknown_calls": 0
+        }
+      }
+    },
+    {
+      "id": "e2e-unknown",
+      "reviewer_kind": "coding_assistant",
+      "delivery_verdict": "fail",
+      "report": "workspace/rag-long-live-20261021/e2e-unknown/gnu-make-service-fee.md",
+      "report_sha256": "71c088aee126f6bda147fdfc156528069b761048fea6100dc29b4b5a4910b0b2",
+      "stop_reason": "budget",
+      "steps": 7,
+      "equivalent_tokens": 66937,
+      "review_status": "partial",
+      "evidence_status": "mapped",
+      "mapped_claims": 5,
+      "tool_error_returns": 0,
+      "chat_calls": 10,
+      "model_names": [
+        "deepseek-flash"
+      ],
+      "selected_content": "金额保持未知，没有从开源/文档许可推为服务费零元。",
+      "findings": [
+        "摘要称库内没有合同、发票或任何费用记录，强于片段检索能证明的范围；正文范围限定不能自动消除摘要强断言，标记uncertain。",
+        "审稿partial，仅4条选定结论检查完成、另1条省略，预算停止。"
+      ],
+      "usage": {
+        "embedding": {
+          "calls": 4,
+          "known_input_tokens": 61,
+          "unknown_calls": 0
+        },
+        "rerank": {
+          "calls": 4,
+          "known_input_tokens": 10418,
+          "unknown_calls": 0
+        }
+      }
+    },
+    {
+      "id": "e2e-coverage",
+      "reviewer_kind": "coding_assistant",
+      "delivery_verdict": "fail",
+      "report": "workspace/rag-long-live-20261021/e2e-coverage/gnu-make-error-recovery.md",
+      "report_sha256": "b16855e2808355f560d3f312224acb575408ed96d2804b34191e9d541822564b",
+      "stop_reason": "budget",
+      "steps": 9,
+      "equivalent_tokens": 85577,
+      "review_status": "skipped_budget",
+      "evidence_status": "mapped",
+      "mapped_claims": 8,
+      "tool_error_returns": 3,
+      "chat_calls": 10,
+      "model_names": [
+        "deepseek-flash"
+      ],
+      "selected_content": "明确不保证整本手册无遗漏，列出的内容限定为实际已读条款。",
+      "findings": [
+        "3条工具错误返回含篇幅及Schema问题；最终审稿skipped_budget。",
+        "没有通读整库，关于库中只有某份资料的措辞仍需范围约束；未认证全部额外机制描述。"
+      ],
+      "usage": {
+        "embedding": {
+          "calls": 6,
+          "known_input_tokens": 113,
+          "unknown_calls": 0
+        },
+        "rerank": {
+          "calls": 6,
+          "known_input_tokens": 20930,
+          "unknown_calls": 0
+        }
+      }
+    }
+  ],
+  "normal_complete_tasks": 0,
+  "stage12_accepted": false,
+  "reviewer_kind": "coding_assistant",
+  "selected_fact_review_only": true,
+  "delivered_document_records_verified": 208,
+  "equivalent_tokens": 490981,
+  "chat": {
+    "calls": 65,
+    "input_tokens": 1324256,
+    "cached_tokens": 1152256,
+    "output_tokens": 63685,
+    "unknown_usage_calls": 0
+  },
+  "embedding": {
+    "calls": 22,
+    "known_input_tokens": 387,
+    "unknown_calls": 0
+  },
+  "rerank": {
+    "calls": 22,
+    "known_input_tokens": 75999,
+    "unknown_calls": 0
+  },
+  "full_regression": {
+    "passed": 913,
+    "log": "workspace/rag-next-20261021/final-pytest.log"
+  },
+  "artifact_sha256": {
+    "workspace/rag-long-live-20261021/research-plan.json": "b9764fc63b6ee32f840f8cbc2ece020b0262bfae39b9928e42a08c69d6bb362b",
+    "workspace/rag-long-live-20261021/research-results.json": "74255516f65519f10bc3ffd69c34f5a0c003acc885e9b220053f7717ea754436",
+    "workspace/rag-next-20261021/research-live.log": "8e403995dae270c090ecb61790b641e7ef4663181dde3afa3736aa472891465b",
+    "workspace/rag-next-20261021/final-pytest.log": "63d221e47761aacb9e58ff3577cbaada065f5022f5f554102dbd85119c7adca3",
+    "workspace/rag-long-live-20261021/e2e-coverage/embedding_usage.jsonl": "da5ac293168583183356bf9fe3e61c8880d15acbd439713e43a3aa991f6bfbb0",
+    "workspace/rag-long-live-20261021/e2e-coverage/evidence.json": "56af1f7ceaf6a754bab853163cb14d4ebef559da3751399bd28ee9c94664f9ee",
+    "workspace/rag-long-live-20261021/e2e-coverage/gnu-make-error-recovery.contract.json": "e2a557ba5204da343a3bd290b38362d1afd9612dc9167493e452bcc6232f663d",
+    "workspace/rag-long-live-20261021/e2e-coverage/gnu-make-error-recovery.evidence.json": "a0c44797e2a9dbd23b3e878ac74fb77f33897e35c092172d53e90a6c06096ae3",
+    "workspace/rag-long-live-20261021/e2e-coverage/gnu-make-error-recovery.md": "b16855e2808355f560d3f312224acb575408ed96d2804b34191e9d541822564b",
+    "workspace/rag-long-live-20261021/e2e-coverage/gnu-make-error-recovery.quality.json": "19ab8ef2e1363671b626cf51f899ec36942c652c29c13e7384a1cdc90cbb6512",
+    "workspace/rag-long-live-20261021/e2e-coverage/gnu-make-error-recovery.review.json": "2987cf48ee91a8844793069e36b03b84df6f622e86c2a67785fb4045e8209f93",
+    "workspace/rag-long-live-20261021/e2e-coverage/gnu-make-error-recovery.reviews.jsonl": "2053fefd326e55e6f9f27181a99b5df332f767e2c4c202e5ad692d3de59da742",
+    "workspace/rag-long-live-20261021/e2e-coverage/knowledge_snapshot.json": "0c7b75904b4c280e51a16ba63d8e0d40baa14aa065086d48ee39c4ae34ec9664",
+    "workspace/rag-long-live-20261021/e2e-coverage/messages.json": "73bedcd2f0c7a60b68679707498d50559989d02b9e1b26b9cae7968f612cea33",
+    "workspace/rag-long-live-20261021/e2e-coverage/plan.json": "dd0e70904f61d4136e4ec5cbf851880a729843cdfc32722434dcbcd5c11faf8d",
+    "workspace/rag-long-live-20261021/e2e-coverage/rerank_usage.jsonl": "d6a6404564e18ff149b268d6c4d500176d2c07d1fb2444e80d670a80cca1ad80",
+    "workspace/rag-long-live-20261021/e2e-coverage/task_contract.json": "210494444fdba847e56f079c727632d460d13237d803e3925070bb306b97aefc",
+    "workspace/rag-long-live-20261021/e2e-coverage/trace.jsonl": "9c104acf35fcd76af0f34f3e209ecb7c6f018b4d178bc6b5cb03de2f8102adb3",
+    "workspace/rag-long-live-20261021/e2e-logging/embedding_usage.jsonl": "0b4e99244e6c06e7c41fd870e192bc89c0a471ddd641d092929fc8c3d9b9243d",
+    "workspace/rag-long-live-20261021/e2e-logging/evidence.json": "e8fc0cdf9d63683a5230d6dd3a6ff60ec5e476fc5faae962c8e7ae42818e96b9",
+    "workspace/rag-long-live-20261021/e2e-logging/knowledge_snapshot.json": "0c7b75904b4c280e51a16ba63d8e0d40baa14aa065086d48ee39c4ae34ec9664",
+    "workspace/rag-long-live-20261021/e2e-logging/logging-thread-safety-and-queue-handlers.contract.json": "1e65503536481de91cfca647b6f0bdc7465a1141a2ebd60f471c2719c6a6e569",
+    "workspace/rag-long-live-20261021/e2e-logging/logging-thread-safety-and-queue-handlers.evidence.json": "00b4db999a4eeda1fd94302509a84c88fc9cab445aed29963544ca607dd5cb86",
+    "workspace/rag-long-live-20261021/e2e-logging/logging-thread-safety-and-queue-handlers.md": "7181766214374bdf619a89c32e41ec22e9fab8652d655df922ff241a4138729c",
+    "workspace/rag-long-live-20261021/e2e-logging/logging-thread-safety-and-queue-handlers.quality.json": "f48cd53699ccf4caecc32e6d00b5db7468baa08e2396ccb32bc2dd15239671b7",
+    "workspace/rag-long-live-20261021/e2e-logging/logging-thread-safety-and-queue-handlers.review.json": "5451d93eb341bf6f0610143f34394eeae08c05b17188b9da6b47235988c96305",
+    "workspace/rag-long-live-20261021/e2e-logging/logging-thread-safety-and-queue-handlers.reviews.jsonl": "5090bad544070f63db767aafbe982f80157019ea4d9fc9272b86481d89032120",
+    "workspace/rag-long-live-20261021/e2e-logging/messages.json": "af03289099b497d79d8e6c9b734cfe6763d526765555da0f6cc328cbe87d5b3c",
+    "workspace/rag-long-live-20261021/e2e-logging/plan.json": "a91eee4b70d8e482c3db8042fbbfca70fca5d194eb7ec4cb386bc704e39957ef",
+    "workspace/rag-long-live-20261021/e2e-logging/rerank_usage.jsonl": "0a2e4b957f04baf0bb43f8118a59c5bde1004d01aa3c86bf3cb0c8a34ecce3f0",
+    "workspace/rag-long-live-20261021/e2e-logging/task_contract.json": "53c16e48b17c3091681a3068a7afc116b4d4225375bd532927d7686b4955585c",
+    "workspace/rag-long-live-20261021/e2e-logging/trace.jsonl": "76a5acafcf30274001c760aaf72c79b8918f3d19faad2a1ff3d93e6d8e5c489f",
+    "workspace/rag-long-live-20261021/e2e-make/embedding_usage.jsonl": "6078a83d2f02b49c7ca12550d09bfbffc704b0b8aaa31ec5ecae14c1fd1f0710",
+    "workspace/rag-long-live-20261021/e2e-make/evidence.json": "7e9249ed4d933c21e425c0fd7e8de3166aa18d3d2f552e61922bc91b26304da2",
+    "workspace/rag-long-live-20261021/e2e-make/knowledge_snapshot.json": "0c7b75904b4c280e51a16ba63d8e0d40baa14aa065086d48ee39c4ae34ec9664",
+    "workspace/rag-long-live-20261021/e2e-make/messages.json": "ca665573aa16101586f5df90fa90be1879f0a790cbb826cb374ab021f7edfd9d",
+    "workspace/rag-long-live-20261021/e2e-make/plan.json": "6d8ed8c85306c7abfab7495d414010e6d8c12a7581a18236cfe9a1d39ab8f4e6",
+    "workspace/rag-long-live-20261021/e2e-make/report.contract.json": "f4382c6177d1e8e0b94b0f77e7f32d160a0ca87319166e803654fe156918d315",
+    "workspace/rag-long-live-20261021/e2e-make/report.evidence.json": "b5be3e6f39dd38c931fd4b7f4fbded15405f72b3fef93a56053ab0ac80889041",
+    "workspace/rag-long-live-20261021/e2e-make/report.md": "5c0114a6ad486c5678faefd2e8470d4d48f019ccdf22f66af42d53d86f20eac9",
+    "workspace/rag-long-live-20261021/e2e-make/report.provenance.json": "aa80096244355a20223b6fe6064436abfc7193f4ae0ede619cf149234f5f7ec1",
+    "workspace/rag-long-live-20261021/e2e-make/report.quality.json": "71658e4f43b1b6ac8b00c32a0d406ecf07468d609a1ae920414de5d65eba2b0b",
+    "workspace/rag-long-live-20261021/e2e-make/report.review.json": "4d48dacd41d8ef57e4404b5a2e2c40f618228afb542dc41f38eacb55d35a0b1b",
+    "workspace/rag-long-live-20261021/e2e-make/report.reviews.jsonl": "91136bb88f91122995a381af18fbf01d344ab7dbd843af7e56933607b0e05abe",
+    "workspace/rag-long-live-20261021/e2e-make/rerank_usage.jsonl": "6255ff631659a6fec6581ab652d7fae07c0e69b01165217a6b45723ef7afa08e",
+    "workspace/rag-long-live-20261021/e2e-make/task_contract.json": "b02f4b8ee2dc351a34a2cc972ac541dd16d18d3695cb091170098f63d285a4d8",
+    "workspace/rag-long-live-20261021/e2e-make/trace.jsonl": "0efb4e9e1dde13b339d35c538a50673f274390e9afd5eeee36b15fdba21cdb52",
+    "workspace/rag-long-live-20261021/e2e-sqlite/embedding_usage.jsonl": "932706587794bc4efd44edbe8019f511368b7878445dab251febca8bfa9164d2",
+    "workspace/rag-long-live-20261021/e2e-sqlite/evidence.json": "887ee28f0d0d6c2d4c9737858b0aab73edcf0e08e19dc7594b643b791ec1b346",
+    "workspace/rag-long-live-20261021/e2e-sqlite/knowledge_snapshot.json": "0c7b75904b4c280e51a16ba63d8e0d40baa14aa065086d48ee39c4ae34ec9664",
+    "workspace/rag-long-live-20261021/e2e-sqlite/messages.json": "84a89dd080688fad25ccd53b611e117e0fd7696b7fab6d0247da9d5c5fd3d193",
+    "workspace/rag-long-live-20261021/e2e-sqlite/plan.json": "ae7d44a6230d299956e7475028747cae45db64949fc0e17a7fc397987d6ce889",
+    "workspace/rag-long-live-20261021/e2e-sqlite/report.contract.json": "d6839cafa939524d45a7e788dd484f4fbafeebd8ae2c4906a9956e283a4c0db5",
+    "workspace/rag-long-live-20261021/e2e-sqlite/report.evidence.json": "5b40686b3046a9efdba06566b354ba281a0ee6f9a0b63c89f659d34111c3023a",
+    "workspace/rag-long-live-20261021/e2e-sqlite/report.md": "3e913e283b3477f389a440a495149be4913ff0da08aa85742e74f1e9d4eb6efa",
+    "workspace/rag-long-live-20261021/e2e-sqlite/report.provenance.json": "d804eb5a869b8f46928c5708884e51e73939a3b41a88f6024b0fadcf952b9a6a",
+    "workspace/rag-long-live-20261021/e2e-sqlite/report.quality.json": "b4316027e308d80f9bcea50d148e73d199044a619147f24c55c92dcf906f3b72",
+    "workspace/rag-long-live-20261021/e2e-sqlite/report.review.json": "aac4ef9df50912e33a1fdf5f534dbef43a37b379fe6c1f8e34654bd21c8fee47",
+    "workspace/rag-long-live-20261021/e2e-sqlite/report.reviews.jsonl": "cc0a24363ea4b400ca3374746ad1550fd6a67eaefe7e2a0a0a1ac348ead5fc7b",
+    "workspace/rag-long-live-20261021/e2e-sqlite/rerank_usage.jsonl": "1f4654444d4029967a69744959ee0f296fb4a8f8515e7827a04b05855eb668f1",
+    "workspace/rag-long-live-20261021/e2e-sqlite/task_contract.json": "848ba9f51914847c62d4efd4a07929a77f7ded5c1ab18e135d945a1a474082bf",
+    "workspace/rag-long-live-20261021/e2e-sqlite/trace.jsonl": "788beb624779cc97a617c6d326fa18515c92668cde1dadbd2bc7fc3d55707bd4",
+    "workspace/rag-long-live-20261021/e2e-unknown/embedding_usage.jsonl": "0e829417efd1a83ebe4d23297dba3e8c1d0797bfbca4f23a5e302ae92bebc17a",
+    "workspace/rag-long-live-20261021/e2e-unknown/evidence.json": "d977c0ef1be231c947d84738d806d66a3c137ef4524e4011600773e0497f2170",
+    "workspace/rag-long-live-20261021/e2e-unknown/gnu-make-service-fee.contract.json": "613961e3bdd1a1de5cc8a0ba3f50957b7976203830138224035b3f3c595e6df7",
+    "workspace/rag-long-live-20261021/e2e-unknown/gnu-make-service-fee.evidence.json": "1f91c65dfb9232534ba750fe526f1bf7193bf5b10b87beb4e7b8d3ae8eb093d9",
+    "workspace/rag-long-live-20261021/e2e-unknown/gnu-make-service-fee.md": "71c088aee126f6bda147fdfc156528069b761048fea6100dc29b4b5a4910b0b2",
+    "workspace/rag-long-live-20261021/e2e-unknown/gnu-make-service-fee.quality.json": "8293358732489274fd6276512fe78aed4cb6ce300f8b866a794bd96b70c51552",
+    "workspace/rag-long-live-20261021/e2e-unknown/gnu-make-service-fee.review.json": "7ffc4b8a218a0ca867774e8e526693042c6bf1a197a7ac549cdf22327848f222",
+    "workspace/rag-long-live-20261021/e2e-unknown/gnu-make-service-fee.reviews.jsonl": "bfec508d97f67c510743fc2dd65dc907d19504b88ec2ba4d00aeade9820323ba",
+    "workspace/rag-long-live-20261021/e2e-unknown/knowledge_snapshot.json": "0c7b75904b4c280e51a16ba63d8e0d40baa14aa065086d48ee39c4ae34ec9664",
+    "workspace/rag-long-live-20261021/e2e-unknown/messages.json": "71ef4c0290c1cce7beba6bd0a2a11c658260bdb9e3b9d855f28eacc36203abd5",
+    "workspace/rag-long-live-20261021/e2e-unknown/plan.json": "5d8a35b6ee2fbfda9ca3f14f65c1ccfe57bc2e7f1ea7a8374d0b163fb9f7707c",
+    "workspace/rag-long-live-20261021/e2e-unknown/rerank_usage.jsonl": "c62e65cfe4798e439f4ad328f0399ea6e1871fef5d7be2e0bcda62caeb71a6fa",
+    "workspace/rag-long-live-20261021/e2e-unknown/task_contract.json": "87d57fde5755bd4b8eef50207e314ea30c971ca3124cd0d7048bcca30662189d",
+    "workspace/rag-long-live-20261021/e2e-unknown/trace.jsonl": "81da437dae8ba4a6a4cc67f392457ed57e2922dbb1c94c8ca64a6d2d3d0bc80a"
+  }
+}
