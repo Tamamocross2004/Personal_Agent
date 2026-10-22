@@ -1,5 +1,6 @@
 """Version 2 extraction contracts. Exact quotes prove text presence, never entailment."""
 from typing import Literal
+import json
 import re
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -157,3 +158,11 @@ comparison只有用户要求对照或字段整理才填写，逐来源保留原�
 stated的value必须与value_quote的quote完全相同，保持原文单位和写法；两个quote都须属于本行citations。quote需为原文连续非空字符串。允许字段名按问题整理，但不编对象或值。
 unknown或blank的value保留null或空字符串，value_quote=null；blank须有对应依据。保留空白、零、未知的差别，不能从缺失推出否定。公式无缓存则未知，不计算。
 unknowns只列与问题相关的未知项；有限检索无依据不表示全目录不存在。仅输出JSON，不输出HTML或可执行代码。'''
+
+
+SCHEMA_MARKER='\n输出结构由程序实际验证模型生成。subject_quote/value_quote均为含citation_id和quote的对象或null，不是字符串；comparison必须是数组，不是null。严格遵守以下JSON Schema（包含双方条件的relation结构）：\n'
+
+
+def instruction():
+    """One source of truth for model and validator; no answer-specific examples or coercion."""
+    return SYSTEM+SCHEMA_MARKER+json.dumps(Answer.model_json_schema(),ensure_ascii=False,separators=(',',':'))

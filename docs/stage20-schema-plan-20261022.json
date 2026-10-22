@@ -1,0 +1,170 @@
+{
+  "date": "2026-10-22",
+  "purpose": "fresh follow-up to generic schema communication fix; first eight failures remain unchanged",
+  "workspace": "workspace/stage20-schema-live-20261022",
+  "documents_sha256": {
+    "归档.txt": "18f1a6d6731e9d292ec859beeaad75f452d78f8dc077844d08cb4c9e5d712efa",
+    "清洁乙.txt": "bf7d7b740920125d4a5a723110364795a12528ce012009cd2244a5b0db273387",
+    "清洁甲.txt": "1455eceae9527eb4e35a50fe4232954a54d12f1ce1acd86b0859cecdf7ed85b3",
+    "灯光乙.txt": "0b9a2a9fb1d38b2a9cc1e44c9c182fd1ac642d39b37825030ed5716f4031dbb2",
+    "灯光甲.txt": "acaa41760980da4bb86011e8a86940b296b038a7fc79443adf48c7bc11a79b8e",
+    "装箱.csv": "bd43052aef5982d3f71ad6244cad5fba67a7fb0cbd6380d31ad31cf822afe2e1",
+    "议程.txt": "cd9ef9bb8b500503c0159ebdaf56b3dffb6d83b3a75d92876f235a025412ceda",
+    "采集.xlsx": "6f7e6a677b2949f40ddada9ab9842813e8a4b95ff51d8ada9a61b3b28682ac0b"
+  },
+  "questions": [
+    {
+      "id": "record_objects",
+      "query": "请给出F-61和J-80的附件数量、复查备注对照。",
+      "files": [
+        "装箱.csv"
+      ],
+      "mode": "keyword",
+      "criteria": [
+        "两个箱号分别作为对象，引用与值绑定相应记录",
+        "2和空白/未知区分，不填0或猜复查状态",
+        "规范嵌套引用对象，不因类型不符丢失对照表"
+      ]
+    },
+    {
+      "id": "cell_objects",
+      "query": "整理N-73和W-26的采集值，给出对象、值及依据。",
+      "files": [
+        "采集.xlsx"
+      ],
+      "mode": "keyword",
+      "criteria": [
+        "对象是两个仪表编号，来源另列",
+        "N-73为0，W-26无公式缓存、值未知，不算为9",
+        "对象和值对应实际工作表记录"
+      ]
+    },
+    {
+      "id": "same_conditions_conflict",
+      "query": "比较两份记录对设备V-67灯光状态的描述，解释同条件下是否能同时成立。",
+      "files": [
+        "灯光甲.txt",
+        "灯光乙.txt"
+      ],
+      "mode": "hybrid",
+      "criteria": [
+        "同设备同模式同时间窗口，常亮/熄灭互斥，不全部回避为未知",
+        "关系字段包含共同范围和可比理由，并保留双方原句",
+        "不猜测哪份正确、实际状态或原因"
+      ]
+    },
+    {
+      "id": "inference_boundaries",
+      "query": "假设16:10从入口出发、按记录中的估时步行且无额外耽搁，能否赶上讲解？说明假设和限制。",
+      "files": [
+        "议程.txt"
+      ],
+      "mode": "keyword",
+      "criteria": [
+        "仅在假设下估算约16:24到达、早于16:40",
+        "推断有假设和限制，不声称实际到达",
+        "原文估时与计划开始时间有真实引用"
+      ]
+    },
+    {
+      "id": "unknown_fields",
+      "query": "E-35的保管联系人和采购单价是什么？",
+      "files": [
+        "归档.txt"
+      ],
+      "mode": "keyword",
+      "criteria": [
+        "保持未知，不填0或编造",
+        "比较列表是数组，即使没有对照也不能为null",
+        "限当前证据，不宣称其他资料不存在"
+      ]
+    },
+    {
+      "id": "unresolved_difference",
+      "query": "比较两份资料的清洁周期，说明现有信息能否认定矛盾。",
+      "files": [
+        "清洁甲.txt",
+        "清洁乙.txt"
+      ],
+      "mode": "keyword",
+      "criteria": [
+        "保留3个工作日/5个自然日，不擅自换算、补日期或设优先顺序",
+        "区别口径差异与同条件互斥，条件未明不能直接断言矛盾",
+        "差异关系与双方依据完整；不把未记载字段冒充真实空白单元格"
+      ]
+    }
+  ],
+  "limits": {
+    "llm_calls": 6,
+    "embedding_calls": 3,
+    "rerank_calls": 0,
+    "known_tokens": 60000,
+    "per_question_tokens": 10000,
+    "attempts_per_question": 1,
+    "max_output_tokens_unchanged": 1200
+  },
+  "procedure": [
+    "first attempt remains archived without regrading",
+    "validator and output types unchanged; only model schema communication fixed",
+    "fresh sources and queries; frozen criteria never sent to model",
+    "full regression and UI before paid calls",
+    "one initial sync and one request per question",
+    "stop on provider failure or unknown usage; preserve all raw responses",
+    "no retries, coercion, answer patches or post-call code changes for this run"
+  ],
+  "validator_and_models_ast_sha256": "155b7c1941ebfc09cd0a4efc4923b0e3f28ac0d7d4b3f39017c91e8ef187fda0",
+  "validator_unchanged_from_first": true,
+  "reviewer": "coding_assistant",
+  "stage12_accepted": false,
+  "configuration": {
+    "provider": "deepseek",
+    "model": "deepseek-flash",
+    "base_url": "https://api.deepseek.com",
+    "embedding_model": "Pro/BAAI/bge-m3",
+    "embedding_base_url": "https://api.siliconflow.cn/v1",
+    "dimensions": 1024,
+    "rerank": false,
+    "retries": 0,
+    "llm_timeout": 30,
+    "embedding_timeout": 30,
+    "build_budget": 10000,
+    "temperature": 0.3,
+    "thinking": "disabled",
+    "output_cap": 1200,
+    "chunk_size": 700,
+    "chunk_overlap": 120,
+    "lexical_candidates": 40,
+    "vector_candidates": 40,
+    "rerank_candidates": 20
+  },
+  "runtime_sha256": {
+    "folder_assistant/answers.py": "b785e6ce23fb3efdcb9c0408652a68a87d6ea8740ba0a99be80c61e48bc81414",
+    "folder_assistant/contracts.py": "cf458c527399377fa8faa5de38ce0d9cc45828116c9079621fe2fcecf9ad03de",
+    "folder_assistant/exports.py": "aea16dd74ec3169781b242c195b908d3d14e9dedd769f0856560aefbb40e7831",
+    "folder_assistant/index.py": "494c2b7a22299575a758286569437a932a3bd0c5d070f075569e3fdcee733b32",
+    "folder_assistant/jobs.py": "cbba0a3ce6f19a320ff6be4f81a18299512bd63149083c920431568b27f9556b",
+    "folder_assistant/parse_worker.py": "e1603c813ea3ed124e4f744af7db7fabb13343c09ab570a651722338cbf49387",
+    "folder_assistant/parsing.py": "474dd43160b91025576f4bbd802f2fe3a1122818ce6a8536ba194564722a0acf",
+    "folder_assistant/store.py": "05b64a41ab1f56fac02d6e804e6f8e44814354fd18a33de7a1d9437eca520490",
+    "folder_assistant/__init__.py": "36656300506ebee15611b11a8eec4d2ba51af2278e92d74a5226fa32a1dd6277",
+    "folder_assistant/__main__.py": "06a2e6220e729537fd6126dca60a03c1322581225ae8d8138df54b8784227c9a",
+    "knowledge/documents.py": "4c2372f461f357cce017e9704392571c1d1bd1cf7e8f601867e6aa5eeb9305e2",
+    "knowledge/embedding.py": "7cfc277bf79b51205bff5c1447bb7165d73189a1773bfb7e013696349bdd2c43",
+    "knowledge/large_probe.py": "497c734fde900ff464eea06b736979fc52ccaa964bba28f21ebd3a1464c0c630",
+    "knowledge/locking.py": "c2f87541b323e39f8d080067aab7c15f7870f9a50b522ca9bcb596a4b89002ee",
+    "knowledge/long_probe.py": "824878c533475b0d48cca92f538fe00228108ede3274cf4bd43996ada91bb403",
+    "knowledge/probe.py": "564fc1190358d125bdd7d1c7d0fbe2bc1a998258e1dbe4f0b268585552e5666a",
+    "knowledge/recall_probe.py": "fb5657819c94b93083d3a11e6e546342345f3d35ac14fe70c662449f40143ca9",
+    "knowledge/report_probe.py": "486c955ce7368a5beb181b9def74546fc3b3ad9188c013105d643570102ac7df",
+    "knowledge/reranking.py": "8118a7613b87909571050ad1b6d6d3bee2a9beb8aa68b0dbc4ab60570cf384ec",
+    "knowledge/rerank_probe.py": "4c49f1e3a7f0e8dcd50edb647ba9beb521398ea05c01da538b25f1c99b9b75bc",
+    "knowledge/store.py": "ea8c2c021bc2d1ad41bc2254aa8b4f80023d1daa421fb5cb49caa09f18db58ac",
+    "knowledge/vectors.py": "520aff951c342401e1f1c4fcf5a532bd8f3ae859f6c01eb920414f8d2fdafd1b",
+    "knowledge/__init__.py": "5fcbc38c72e9f0e4c0938373622ff86daadbe7389238d3003d9a73d3acfb1533",
+    "knowledge/__main__.py": "fc231000c92128f2dacd50c8e4a2131c197130af52b5c13500673af31e4dec43",
+    "agent/config.py": "5a398f74572d97545119f4abf55491302611272e0ff62387519d04f73ab88f00",
+    "agent/context.py": "36e90a9d217215b0f5ecafb5c8cb1ef4a4af66ab0f7139a4df6f2355b56b02e3",
+    "agent/llm.py": "703907d24e06ad2c37537f35f73b820cc4b099f4b96017152f49f7c3e729e1c8",
+    "scripts/folder_quality_check.py": "e78a0743e576ce6bbd33e5a1d193f0dd6335f2ea9328cdab77c8c584a5def86b"
+  }
+}

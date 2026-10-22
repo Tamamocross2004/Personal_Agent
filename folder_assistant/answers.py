@@ -9,7 +9,7 @@ from agent.config import load_llm_config
 from agent.context import estimate_tokens
 from knowledge.documents import sha
 from knowledge.store import now
-from .contracts import VERSION, SYSTEM as SYSTEM_V2, ContractError, validate as validate_v2
+from .contracts import VERSION, instruction, ContractError, validate as validate_v2
 
 
 class Finding(BaseModel):
@@ -65,7 +65,7 @@ def answer_once(jobs,jid):
                           'unknowns':['尚缺可引用的资料片段'],'comparison':[]},
                 'answer_schema_version':VERSION,'content_status':'insufficient_evidence','review_status':'not_reviewed'}
     supplied=[{k:e[k] for k in ('citation_id','name','file_sha256','source_location','text')} for e in evidence]
-    messages=[{'role':'system','content':SYSTEM_V2},
+    messages=[{'role':'system','content':instruction()},
               {'role':'user','content':json.dumps({'question':inputs['query'],'evidence':supplied},ensure_ascii=False)}]
     input_estimate=estimate_tokens(json.dumps(messages,ensure_ascii=False))
     used=jobs.used_tokens(jid)

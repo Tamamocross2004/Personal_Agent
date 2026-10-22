@@ -162,3 +162,19 @@ def test_new_answer_export_preserves_object_quotes_and_inference_limits(library)
     assert '假设（未证实）' in summary and 'No review process is recorded.' in summary
     assert json.loads((output/'record.json').read_text('utf-8'))['model_output']==job['model_output']
     assert len(chat.calls)==1
+
+
+def test_request_contains_actual_nested_schema_without_relaxing_types(library):
+    from folder_assistant.contracts import Answer,SCHEMA_MARKER
+    sync(library);jobs,chat=service(library);job=finished(jobs,ask(library,jobs))
+    wire=json.loads(chat.calls[0][0][0]['content'].split(SCHEMA_MARKER)[1])
+    assert wire==Answer.model_json_schema()
+    nested=wire['$defs']['Comparison']['properties']['subject_quote']['anyOf']
+    assert {'$ref':'#/$defs/Quote'} in nested and {'type':'null'} in nested
+    assert wire['properties']['comparison']['type']=='array'
+    invalid=body();invalid['comparison']=None
+    with pytest.raises(ContractError):check(invalid)
+    invalid=body(comparison=[{'subject':'Sensor-P','subject_type':'entity','subject_quote':'Sensor-P','field':'reading',
+                             'value':'0','value_quote':'0','status':'stated','citations':['C1']}])
+    with pytest.raises(ContractError):check(invalid)
+    assert len(chat.calls)==1 and job['result']['review_status']=='not_reviewed'
