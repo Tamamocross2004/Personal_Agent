@@ -64,7 +64,7 @@ def export_job(jobs,jid):
             return '; '.join(cid+' '+evidence[cid]['name']+' '+json.dumps(evidence[cid]['source_location'],ensure_ascii=False)+
                              ' SHA256 '+evidence[cid]['file_sha256'] for cid in ids)
         comparison=[['subject','field','value','status','citations_and_source_versions']]
-        v2=answer.get('schema_version')==2
+        v2=answer.get('schema_version',1)>=2
         if v2:comparison[0].extend(['subject_type','subject_quote','value_quote'])
         for row in answer.get('comparison',[]):
             values=[row['subject'],row['field'],row['value'],row['status'],refs(row['citations'])]

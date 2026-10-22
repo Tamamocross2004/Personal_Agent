@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from folder_assistant.contracts import ContractError,validate
+from folder_assistant.contracts import VERSION,ContractError,validate
 from folder_assistant.exports import export_job
 from folder_assistant.jobs import FolderJobs
 from test_folder_index import library,sync
@@ -17,7 +17,7 @@ def finding(kind='direct',**values):
 
 
 def body(**values):
-    return {'schema_version':2,'findings':[finding()],'unknowns':[],'comparison':[],**values}
+    return {'schema_version':VERSION,'findings':[finding()],'unknowns':[],'comparison':[],**values}
 
 
 EVIDENCE=[{'citation_id':'C1','name':'readings.txt','text':'Sensor-P: reading 0. Reviewed status not recorded.'},
@@ -178,3 +178,29 @@ def test_request_contains_actual_nested_schema_without_relaxing_types(library):
                              'value':'0','value_quote':'0','status':'stated','citations':['C1']}])
     with pytest.raises(ContractError):check(invalid)
     assert len(chat.calls)==1 and job['result']['review_status']=='not_reviewed'
+
+
+def test_context_quotes_bind_exact_spans_without_normalization():
+    evidence=[{'citation_id':'C1','name':'notes.txt','text':'Zone-B reading: 4 mA; repeat 4 mA.'}]
+    q={'citation_id':'C1','quote':'Zone-B reading: 4 mA; repeat 4 mA.'}
+    row={'subject':'Zone-B','subject_type':'entity','subject_quote':q,'field':'reading','value':'4 mA',
+         'value_quote':q,'status':'stated','citations':['C1']}
+    value=body(findings=[{'statement':'Recorded reading','kind':'direct','citations':['C1'],'support':[q]}],comparison=[row])
+    answer,report=check(value,evidence)
+    span=next(r for r in report['quotes'] if r['path']=='comparison.0.value_quote')
+    assert answer['comparison'][0]['value']=='4 mA' and len(span['value_matches'])==2
+    for position in span['value_matches']:assert evidence[0]['text'][position['start']:position['end']]=='4 mA'
+    for invented in ('0.004 A','4mA','4 mA guaranteed'):
+        row['value']=invented
+        with pytest.raises(ContractError):check(value,evidence)
+
+
+def test_stored_v2_exports_remain_read_only_under_current_contract(library):
+    _,folders,fid,index,embedding,_=library
+    generation=sync(library);jobs=FolderJobs(index)
+    saved={'id':'d'*32,'folder_id':fid,'kind':'answer','status':'completed','inputs':{'query':'stored v2','generation':generation,
+           'source_snapshot':[]},'result':{'answer':{'schema_version':2,'findings':[],'unknowns':[],'comparison':[]},'review_status':'not_reviewed'}}
+    jobs.save(saved);export_job(jobs,saved['id']);output=folders.root/'outputs'/saved['id'];before=(output/'record.json').read_bytes()
+    assert jobs.get(saved['id'])==saved and export_job(jobs,saved['id'])['cached']
+    assert (output/'record.json').read_bytes()==before
+    assert 'subject_quote' in (output/'comparison.csv').read_text('utf-8-sig')

@@ -1,0 +1,1259 @@
+{
+  "stage": 20,
+  "round": "schema-followup",
+  "runtime_commit": "bfbef39",
+  "reviewer": "coding_assistant",
+  "stage12_accepted": false,
+  "full_regression": "1032 passed in 406.69s",
+  "formatted_answers": 4,
+  "needs_verification": 2,
+  "content_acceptance_passed": false,
+  "usage": {
+    "embedding_calls": 2,
+    "llm_calls": 6,
+    "rerank_calls": 0,
+    "known_tokens": 13866,
+    "unknown_usage_ids": []
+  },
+  "cases": [
+    {
+      "case_id": "record_objects",
+      "job_id": "4a51533ac4ef4242ab413ccf184611e1",
+      "result": {
+        "answer": {
+          "schema_version": 2,
+          "findings": [
+            {
+              "statement": "F-61的附件数量为2，复查备注为空。",
+              "kind": "direct",
+              "citations": [
+                "C2"
+              ],
+              "support": [
+                {
+                  "citation_id": "C2",
+                  "quote": "[\"F-61\", \"2\", \"\"]"
+                }
+              ],
+              "assumptions": [],
+              "limitations": [],
+              "relation": null
+            },
+            {
+              "statement": "J-80的附件数量为空，复查备注为“待确认”。",
+              "kind": "direct",
+              "citations": [
+                "C3"
+              ],
+              "support": [
+                {
+                  "citation_id": "C3",
+                  "quote": "[\"J-80\", \"\", \"待确认\"]"
+                }
+              ],
+              "assumptions": [],
+              "limitations": [],
+              "relation": null
+            },
+            {
+              "statement": "F-61与J-80的附件数量不同：F-61为2，J-80为空。",
+              "kind": "difference",
+              "citations": [
+                "C2",
+                "C3"
+              ],
+              "support": [
+                {
+                  "citation_id": "C2",
+                  "quote": "[\"F-61\", \"2\", \"\"]"
+                },
+                {
+                  "citation_id": "C3",
+                  "quote": "[\"J-80\", \"\", \"待确认\"]"
+                }
+              ],
+              "assumptions": [],
+              "limitations": [],
+              "relation": {
+                "field": "附件数量",
+                "common_scope": "装箱.csv中箱号F-61与J-80的记录",
+                "comparability": "established",
+                "reason": "两条记录均来自同一来源的同一字段“附件数量”，对象分别为F-61和J-80，可直接对照原值。"
+              }
+            },
+            {
+              "statement": "F-61与J-80的复查备注不同：F-61为空，J-80为“待确认”。",
+              "kind": "difference",
+              "citations": [
+                "C2",
+                "C3"
+              ],
+              "support": [
+                {
+                  "citation_id": "C2",
+                  "quote": "[\"F-61\", \"2\", \"\"]"
+                },
+                {
+                  "citation_id": "C3",
+                  "quote": "[\"J-80\", \"\", \"待确认\"]"
+                }
+              ],
+              "assumptions": [],
+              "limitations": [],
+              "relation": {
+                "field": "复查备注",
+                "common_scope": "装箱.csv中箱号F-61与J-80的记录",
+                "comparability": "established",
+                "reason": "两条记录均来自同一来源的同一字段“复查备注”，对象分别为F-61和J-80，可直接对照原值。"
+              }
+            }
+          ],
+          "unknowns": [
+            "J-80附件数量为空所代表的具体含义（未填写、未知或其他）未在送达证据中说明。",
+            "F-61复查备注为空所代表的具体含义未在送达证据中说明。"
+          ],
+          "comparison": [
+            {
+              "subject": "F-61",
+              "subject_type": "entity",
+              "subject_quote": {
+                "citation_id": "C2",
+                "quote": "F-61"
+              },
+              "field": "附件数量",
+              "value": "2",
+              "value_quote": {
+                "citation_id": "C2",
+                "quote": "2"
+              },
+              "status": "stated",
+              "citations": [
+                "C2"
+              ]
+            },
+            {
+              "subject": "F-61",
+              "subject_type": "entity",
+              "subject_quote": {
+                "citation_id": "C2",
+                "quote": "F-61"
+              },
+              "field": "复查备注",
+              "value": "",
+              "value_quote": null,
+              "status": "blank",
+              "citations": [
+                "C2"
+              ]
+            },
+            {
+              "subject": "J-80",
+              "subject_type": "entity",
+              "subject_quote": {
+                "citation_id": "C3",
+                "quote": "J-80"
+              },
+              "field": "附件数量",
+              "value": "",
+              "value_quote": null,
+              "status": "blank",
+              "citations": [
+                "C3"
+              ]
+            },
+            {
+              "subject": "J-80",
+              "subject_type": "entity",
+              "subject_quote": {
+                "citation_id": "C3",
+                "quote": "J-80"
+              },
+              "field": "复查备注",
+              "value": "待确认",
+              "value_quote": {
+                "citation_id": "C3",
+                "quote": "待确认"
+              },
+              "status": "stated",
+              "citations": [
+                "C3"
+              ]
+            }
+          ]
+        },
+        "content_status": "unreviewed",
+        "answer_schema_version": 2,
+        "contract_checks": {
+          "version": 2,
+          "status": "structure_checked",
+          "meaning": "仅检查结构、引用与原句匹配，不认证语义蕴含、对象关系、业务状态或矛盾判断",
+          "warnings": [],
+          "quotes": [
+            {
+              "path": "findings.0.support.0",
+              "citation_id": "C2",
+              "quote": "[\"F-61\", \"2\", \"\"]",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 17
+                }
+              ]
+            },
+            {
+              "path": "findings.1.support.0",
+              "citation_id": "C3",
+              "quote": "[\"J-80\", \"\", \"待确认\"]",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 19
+                }
+              ]
+            },
+            {
+              "path": "findings.2.support.0",
+              "citation_id": "C2",
+              "quote": "[\"F-61\", \"2\", \"\"]",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 17
+                }
+              ]
+            },
+            {
+              "path": "findings.2.support.1",
+              "citation_id": "C3",
+              "quote": "[\"J-80\", \"\", \"待确认\"]",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 19
+                }
+              ]
+            },
+            {
+              "path": "findings.3.support.0",
+              "citation_id": "C2",
+              "quote": "[\"F-61\", \"2\", \"\"]",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 17
+                }
+              ]
+            },
+            {
+              "path": "findings.3.support.1",
+              "citation_id": "C3",
+              "quote": "[\"J-80\", \"\", \"待确认\"]",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 19
+                }
+              ]
+            },
+            {
+              "path": "comparison.0.subject_quote",
+              "citation_id": "C2",
+              "quote": "F-61",
+              "matches": [
+                {
+                  "start": 2,
+                  "end": 6
+                }
+              ]
+            },
+            {
+              "path": "comparison.0.value_quote",
+              "citation_id": "C2",
+              "quote": "2",
+              "matches": [
+                {
+                  "start": 10,
+                  "end": 11
+                }
+              ]
+            },
+            {
+              "path": "comparison.1.subject_quote",
+              "citation_id": "C2",
+              "quote": "F-61",
+              "matches": [
+                {
+                  "start": 2,
+                  "end": 6
+                }
+              ]
+            },
+            {
+              "path": "comparison.2.subject_quote",
+              "citation_id": "C3",
+              "quote": "J-80",
+              "matches": [
+                {
+                  "start": 2,
+                  "end": 6
+                }
+              ]
+            },
+            {
+              "path": "comparison.3.subject_quote",
+              "citation_id": "C3",
+              "quote": "J-80",
+              "matches": [
+                {
+                  "start": 2,
+                  "end": 6
+                }
+              ]
+            },
+            {
+              "path": "comparison.3.value_quote",
+              "citation_id": "C3",
+              "quote": "待确认",
+              "matches": [
+                {
+                  "start": 14,
+                  "end": 17
+                }
+              ]
+            }
+          ]
+        },
+        "review_status": "not_reviewed"
+      },
+      "model_output": "{\"schema_version\":2,\"findings\":[{\"statement\":\"F-61的附件数量为2，复查备注为空。\",\"kind\":\"direct\",\"citations\":[\"C2\"],\"support\":[{\"citation_id\":\"C2\",\"quote\":\"[\\\"F-61\\\", \\\"2\\\", \\\"\\\"]\"}]},{\"statement\":\"J-80的附件数量为空，复查备注为“待确认”。\",\"kind\":\"direct\",\"citations\":[\"C3\"],\"support\":[{\"citation_id\":\"C3\",\"quote\":\"[\\\"J-80\\\", \\\"\\\", \\\"待确认\\\"]\"}]},{\"statement\":\"F-61与J-80的附件数量不同：F-61为2，J-80为空。\",\"kind\":\"difference\",\"citations\":[\"C2\",\"C3\"],\"support\":[{\"citation_id\":\"C2\",\"quote\":\"[\\\"F-61\\\", \\\"2\\\", \\\"\\\"]\"},{\"citation_id\":\"C3\",\"quote\":\"[\\\"J-80\\\", \\\"\\\", \\\"待确认\\\"]\"}],\"relation\":{\"field\":\"附件数量\",\"common_scope\":\"装箱.csv中箱号F-61与J-80的记录\",\"comparability\":\"established\",\"reason\":\"两条记录均来自同一来源的同一字段“附件数量”，对象分别为F-61和J-80，可直接对照原值。\"}},{\"statement\":\"F-61与J-80的复查备注不同：F-61为空，J-80为“待确认”。\",\"kind\":\"difference\",\"citations\":[\"C2\",\"C3\"],\"support\":[{\"citation_id\":\"C2\",\"quote\":\"[\\\"F-61\\\", \\\"2\\\", \\\"\\\"]\"},{\"citation_id\":\"C3\",\"quote\":\"[\\\"J-80\\\", \\\"\\\", \\\"待确认\\\"]\"}],\"relation\":{\"field\":\"复查备注\",\"common_scope\":\"装箱.csv中箱号F-61与J-80的记录\",\"comparability\":\"established\",\"reason\":\"两条记录均来自同一来源的同一字段“复查备注”，对象分别为F-61和J-80，可直接对照原值。\"}}],\"unknowns\":[\"J-80附件数量为空所代表的具体含义（未填写、未知或其他）未在送达证据中说明。\",\"F-61复查备注为空所代表的具体含义未在送达证据中说明。\"],\"comparison\":[{\"subject\":\"F-61\",\"subject_type\":\"entity\",\"subject_quote\":{\"citation_id\":\"C2\",\"quote\":\"F-61\"},\"field\":\"附件数量\",\"value\":\"2\",\"value_quote\":{\"citation_id\":\"C2\",\"quote\":\"2\"},\"status\":\"stated\",\"citations\":[\"C2\"]},{\"subject\":\"F-61\",\"subject_type\":\"entity\",\"subject_quote\":{\"citation_id\":\"C2\",\"quote\":\"F-61\"},\"field\":\"复查备注\",\"value\":\"\",\"value_quote\":null,\"status\":\"blank\",\"citations\":[\"C2\"]},{\"subject\":\"J-80\",\"subject_type\":\"entity\",\"subject_quote\":{\"citation_id\":\"C3\",\"quote\":\"J-80\"},\"field\":\"附件数量\",\"value\":\"\",\"value_quote\":null,\"status\":\"blank\",\"citations\":[\"C3\"]},{\"subject\":\"J-80\",\"subject_type\":\"entity\",\"subject_quote\":{\"citation_id\":\"C3\",\"quote\":\"J-80\"},\"field\":\"复查备注\",\"value\":\"待确认\",\"value_quote\":{\"citation_id\":\"C3\",\"quote\":\"待确认\"},\"status\":\"stated\",\"citations\":[\"C3\"]}]}",
+      "evidence": [
+        {
+          "citation_id": "C1",
+          "ordinal": 0,
+          "start": 0,
+          "end": 22,
+          "text": "[\"箱号\", \"附件数量\", \"复查备注\"]",
+          "text_sha256": "7f02bdc27e8955f56fb4d7fa36b22ce9413cbbdbf339de0a6732cb7f4ca110f7",
+          "source_location": {
+            "kind": "csv_record",
+            "record": 1,
+            "physical_line_start": 1,
+            "physical_line_end": 1
+          },
+          "source_block_id": 1,
+          "file_id": "81c693deead16ad3a94ad92a48b56f42bed7ee410f035c85811fdef8eabf0a3c",
+          "doc_id": "f01257999d2a4b670581ba4ba7040717e3a721e5eaf8124ab29d27ee0c24dbd7",
+          "name": "装箱.csv",
+          "file_sha256": "bd43052aef5982d3f71ad6244cad5fba67a7fb0cbd6380d31ad31cf822afe2e1",
+          "generation": "fc0ae3ef3fe340a1926824299c80bc48",
+          "chunk_id": 5,
+          "role": "direct",
+          "rank_score": 0.01639344262295082,
+          "rerank_score": null,
+          "partial": false,
+          "delivered_sha256": "7f02bdc27e8955f56fb4d7fa36b22ce9413cbbdbf339de0a6732cb7f4ca110f7"
+        },
+        {
+          "citation_id": "C2",
+          "ordinal": 0,
+          "start": 0,
+          "end": 17,
+          "text": "[\"F-61\", \"2\", \"\"]",
+          "text_sha256": "d449a4a4544663f0c6477302f9f7d41b23213e0c2574ea2914d3d591aa6b34dc",
+          "source_location": {
+            "kind": "csv_record",
+            "record": 2,
+            "physical_line_start": 2,
+            "physical_line_end": 2
+          },
+          "source_block_id": 2,
+          "file_id": "81c693deead16ad3a94ad92a48b56f42bed7ee410f035c85811fdef8eabf0a3c",
+          "doc_id": "f01257999d2a4b670581ba4ba7040717e3a721e5eaf8124ab29d27ee0c24dbd7",
+          "name": "装箱.csv",
+          "file_sha256": "bd43052aef5982d3f71ad6244cad5fba67a7fb0cbd6380d31ad31cf822afe2e1",
+          "generation": "fc0ae3ef3fe340a1926824299c80bc48",
+          "chunk_id": 6,
+          "role": "direct",
+          "rank_score": 0.016129032258064516,
+          "rerank_score": null,
+          "partial": false,
+          "delivered_sha256": "d449a4a4544663f0c6477302f9f7d41b23213e0c2574ea2914d3d591aa6b34dc"
+        },
+        {
+          "citation_id": "C3",
+          "ordinal": 0,
+          "start": 0,
+          "end": 19,
+          "text": "[\"J-80\", \"\", \"待确认\"]",
+          "text_sha256": "94e4922f10b80f2f97a74facc45b3aad8582696b6c59fdbd719a2ad1610240fc",
+          "source_location": {
+            "kind": "csv_record",
+            "record": 3,
+            "physical_line_start": 3,
+            "physical_line_end": 3
+          },
+          "source_block_id": 3,
+          "file_id": "81c693deead16ad3a94ad92a48b56f42bed7ee410f035c85811fdef8eabf0a3c",
+          "doc_id": "f01257999d2a4b670581ba4ba7040717e3a721e5eaf8124ab29d27ee0c24dbd7",
+          "name": "装箱.csv",
+          "file_sha256": "bd43052aef5982d3f71ad6244cad5fba67a7fb0cbd6380d31ad31cf822afe2e1",
+          "generation": "fc0ae3ef3fe340a1926824299c80bc48",
+          "chunk_id": 7,
+          "role": "direct",
+          "rank_score": 0.015873015873015872,
+          "rerank_score": null,
+          "partial": false,
+          "delivered_sha256": "94e4922f10b80f2f97a74facc45b3aad8582696b6c59fdbd719a2ad1610240fc"
+        }
+      ],
+      "usage_events": [
+        {
+          "id": "4a51533ac4ef4242ab413ccf184611e1-answer",
+          "operation": "llm",
+          "status": "returned",
+          "provider": "deepseek",
+          "model": "deepseek-flash",
+          "input_tokens": 1827,
+          "output_tokens": 715,
+          "request_attempts": 1,
+          "started": "2026-10-22T03:19:46.541921+00:00",
+          "returned_model": "deepseek-flash",
+          "cached_tokens": 384,
+          "finished": "2026-10-22T03:19:49.504110+00:00"
+        }
+      ],
+      "finish_reason": "stop"
+    },
+    {
+      "case_id": "cell_objects",
+      "job_id": "eca5ae0dde544f7d95e0ec5467734a31",
+      "result": {
+        "answer": {
+          "schema_version": 2,
+          "findings": [
+            {
+              "statement": "采集表中N-73的采集值为0。",
+              "kind": "direct",
+              "citations": [
+                "C2"
+              ],
+              "support": [
+                {
+                  "citation_id": "C2",
+                  "quote": "\"value\": 0"
+                }
+              ],
+              "assumptions": [],
+              "limitations": [],
+              "relation": null
+            },
+            {
+              "statement": "采集表中W-26的采集值单元格为公式（=MAX(3,9)），但缺少缓存值，因此送达证据中未记载其采集值。",
+              "kind": "unknown",
+              "citations": [
+                "C3"
+              ],
+              "support": [
+                {
+                  "citation_id": "C3",
+                  "quote": "\"value\": null, \"type\": \"formula_cached_missing\", \"formula\": \"=MAX(3,9)\""
+                }
+              ],
+              "assumptions": [],
+              "limitations": [],
+              "relation": null
+            }
+          ],
+          "unknowns": [
+            "W-26的采集值：其单元格为公式且无缓存值，证据未给出结果。"
+          ],
+          "comparison": [
+            {
+              "subject": "N-73",
+              "subject_type": "entity",
+              "subject_quote": {
+                "citation_id": "C2",
+                "quote": "N-73"
+              },
+              "field": "采集值",
+              "value": "0",
+              "value_quote": {
+                "citation_id": "C2",
+                "quote": "0"
+              },
+              "status": "stated",
+              "citations": [
+                "C2"
+              ]
+            },
+            {
+              "subject": "W-26",
+              "subject_type": "entity",
+              "subject_quote": {
+                "citation_id": "C3",
+                "quote": "W-26"
+              },
+              "field": "采集值",
+              "value": null,
+              "value_quote": null,
+              "status": "unknown",
+              "citations": [
+                "C3"
+              ]
+            }
+          ]
+        },
+        "content_status": "unreviewed",
+        "answer_schema_version": 2,
+        "contract_checks": {
+          "version": 2,
+          "status": "structure_checked",
+          "meaning": "仅检查结构、引用与原句匹配，不认证语义蕴含、对象关系、业务状态或矛盾判断",
+          "warnings": [],
+          "quotes": [
+            {
+              "path": "findings.0.support.0",
+              "citation_id": "C2",
+              "quote": "\"value\": 0",
+              "matches": [
+                {
+                  "start": 72,
+                  "end": 82
+                }
+              ]
+            },
+            {
+              "path": "findings.1.support.0",
+              "citation_id": "C3",
+              "quote": "\"value\": null, \"type\": \"formula_cached_missing\", \"formula\": \"=MAX(3,9)\"",
+              "matches": [
+                {
+                  "start": 72,
+                  "end": 143
+                }
+              ]
+            },
+            {
+              "path": "comparison.0.subject_quote",
+              "citation_id": "C2",
+              "quote": "N-73",
+              "matches": [
+                {
+                  "start": 36,
+                  "end": 40
+                }
+              ]
+            },
+            {
+              "path": "comparison.0.value_quote",
+              "citation_id": "C2",
+              "quote": "0",
+              "matches": [
+                {
+                  "start": 81,
+                  "end": 82
+                }
+              ]
+            },
+            {
+              "path": "comparison.1.subject_quote",
+              "citation_id": "C3",
+              "quote": "W-26",
+              "matches": [
+                {
+                  "start": 36,
+                  "end": 40
+                }
+              ]
+            }
+          ]
+        },
+        "review_status": "not_reviewed"
+      },
+      "model_output": "{\"schema_version\":2,\"findings\":[{\"statement\":\"采集表中N-73的采集值为0。\",\"kind\":\"direct\",\"citations\":[\"C2\"],\"support\":[{\"citation_id\":\"C2\",\"quote\":\"\\\"value\\\": 0\"}]},{\"statement\":\"采集表中W-26的采集值单元格为公式（=MAX(3,9)），但缺少缓存值，因此送达证据中未记载其采集值。\",\"kind\":\"unknown\",\"citations\":[\"C3\"],\"support\":[{\"citation_id\":\"C3\",\"quote\":\"\\\"value\\\": null, \\\"type\\\": \\\"formula_cached_missing\\\", \\\"formula\\\": \\\"=MAX(3,9)\\\"\"}]}],\"unknowns\":[\"W-26的采集值：其单元格为公式且无缓存值，证据未给出结果。\"],\"comparison\":[{\"subject\":\"N-73\",\"subject_type\":\"entity\",\"subject_quote\":{\"citation_id\":\"C2\",\"quote\":\"N-73\"},\"field\":\"采集值\",\"value\":\"0\",\"value_quote\":{\"citation_id\":\"C2\",\"quote\":\"0\"},\"status\":\"stated\",\"citations\":[\"C2\"]},{\"subject\":\"W-26\",\"subject_type\":\"entity\",\"subject_quote\":{\"citation_id\":\"C3\",\"quote\":\"W-26\"},\"field\":\"采集值\",\"value\":null,\"value_quote\":null,\"status\":\"unknown\",\"citations\":[\"C3\"]}]}",
+      "evidence": [
+        {
+          "citation_id": "C1",
+          "ordinal": 0,
+          "start": 0,
+          "end": 100,
+          "text": "{\"cells\": [{\"cell\": \"A1\", \"value\": \"仪表\", \"type\": \"s\"}, {\"cell\": \"B1\", \"value\": \"采集值\", \"type\": \"s\"}]}",
+          "text_sha256": "3ae1543998c81bdf45ae5247c8261ceee802281da7a6385de02982621ba6c8d3",
+          "source_location": {
+            "kind": "spreadsheet_row",
+            "sheet": "采集",
+            "row": 1,
+            "cells": [
+              "A1",
+              "B1"
+            ]
+          },
+          "source_block_id": 1,
+          "file_id": "e6a18538836bec397840a8265db485460e2bdb6e9073b1cb9030bb7ae63529f6",
+          "doc_id": "8c0e2ef535cfb508c73794956497050f02a813478cdee52d12e3c4623d34a73c",
+          "name": "采集.xlsx",
+          "file_sha256": "6f7e6a677b2949f40ddada9ab9842813e8a4b95ff51d8ada9a61b3b28682ac0b",
+          "generation": "fc0ae3ef3fe340a1926824299c80bc48",
+          "chunk_id": 9,
+          "role": "direct",
+          "rank_score": 0.01639344262295082,
+          "rerank_score": null,
+          "partial": false,
+          "delivered_sha256": "3ae1543998c81bdf45ae5247c8261ceee802281da7a6385de02982621ba6c8d3"
+        },
+        {
+          "citation_id": "C2",
+          "ordinal": 0,
+          "start": 0,
+          "end": 98,
+          "text": "{\"cells\": [{\"cell\": \"A2\", \"value\": \"N-73\", \"type\": \"s\"}, {\"cell\": \"B2\", \"value\": 0, \"type\": \"n\"}]}",
+          "text_sha256": "0fd648cc2a74f04105c30bbf285b5b3c20f060f95479d9214b9e9844ece4d72a",
+          "source_location": {
+            "kind": "spreadsheet_row",
+            "sheet": "采集",
+            "row": 2,
+            "cells": [
+              "A2",
+              "B2"
+            ]
+          },
+          "source_block_id": 3,
+          "file_id": "e6a18538836bec397840a8265db485460e2bdb6e9073b1cb9030bb7ae63529f6",
+          "doc_id": "8c0e2ef535cfb508c73794956497050f02a813478cdee52d12e3c4623d34a73c",
+          "name": "采集.xlsx",
+          "file_sha256": "6f7e6a677b2949f40ddada9ab9842813e8a4b95ff51d8ada9a61b3b28682ac0b",
+          "generation": "fc0ae3ef3fe340a1926824299c80bc48",
+          "chunk_id": 10,
+          "role": "direct",
+          "rank_score": 0.016129032258064516,
+          "rerank_score": null,
+          "partial": false,
+          "delivered_sha256": "0fd648cc2a74f04105c30bbf285b5b3c20f060f95479d9214b9e9844ece4d72a"
+        },
+        {
+          "citation_id": "C3",
+          "ordinal": 0,
+          "start": 0,
+          "end": 146,
+          "text": "{\"cells\": [{\"cell\": \"A3\", \"value\": \"W-26\", \"type\": \"s\"}, {\"cell\": \"B3\", \"value\": null, \"type\": \"formula_cached_missing\", \"formula\": \"=MAX(3,9)\"}]}",
+          "text_sha256": "1f43f4c58c5f265df9a601e7e50ae05942a628a66f17a656724aeeb0011bc76b",
+          "source_location": {
+            "kind": "spreadsheet_row",
+            "sheet": "采集",
+            "row": 3,
+            "cells": [
+              "A3",
+              "B3"
+            ]
+          },
+          "source_block_id": 5,
+          "file_id": "e6a18538836bec397840a8265db485460e2bdb6e9073b1cb9030bb7ae63529f6",
+          "doc_id": "8c0e2ef535cfb508c73794956497050f02a813478cdee52d12e3c4623d34a73c",
+          "name": "采集.xlsx",
+          "file_sha256": "6f7e6a677b2949f40ddada9ab9842813e8a4b95ff51d8ada9a61b3b28682ac0b",
+          "generation": "fc0ae3ef3fe340a1926824299c80bc48",
+          "chunk_id": 11,
+          "role": "direct",
+          "rank_score": 0.015873015873015872,
+          "rerank_score": null,
+          "partial": false,
+          "delivered_sha256": "1f43f4c58c5f265df9a601e7e50ae05942a628a66f17a656724aeeb0011bc76b"
+        }
+      ],
+      "usage_events": [
+        {
+          "id": "eca5ae0dde544f7d95e0ec5467734a31-answer",
+          "operation": "llm",
+          "status": "returned",
+          "provider": "deepseek",
+          "model": "deepseek-flash",
+          "input_tokens": 1982,
+          "output_tokens": 297,
+          "request_attempts": 1,
+          "started": "2026-10-22T03:19:51.638504+00:00",
+          "returned_model": "deepseek-flash",
+          "cached_tokens": 1280,
+          "finished": "2026-10-22T03:19:53.193449+00:00"
+        }
+      ],
+      "finish_reason": "stop"
+    },
+    {
+      "case_id": "same_conditions_conflict",
+      "job_id": "0596d96d2b7e488eaf2363af70c8bf9f",
+      "result": {
+        "answer": null,
+        "content_status": "needs_verification",
+        "review_status": "not_reviewed",
+        "answer_schema_version": 2,
+        "contract_checks": {
+          "version": 2,
+          "status": "invalid",
+          "issues": [
+            {
+              "code": "unanchored_value",
+              "path": "comparison.0",
+              "message": "已知值须保留原文写法并绑定依据，不自行补单位或换算"
+            }
+          ]
+        },
+        "message": "已知值须保留原文写法并绑定依据，不自行补单位或换算；原始响应已保留，未自动重试或修补。"
+      },
+      "model_output": "{\"schema_version\":2,\"findings\":[{\"statement\":\"灯光乙.txt记载：设备V-67在2026-12-03 20:00至20:30、相同控制模式下，指示灯为熄灭。\",\"kind\":\"direct\",\"citations\":[\"C1\"],\"support\":[{\"citation_id\":\"C1\",\"quote\":\"设备V-67，2026-12-03 20:00至20:30，相同控制模式下，指示灯为熄灭。\"}]},{\"statement\":\"灯光甲.txt记载：设备V-67在2026-12-03 20:00至20:30、相同控制模式下，指示灯为常亮。\",\"kind\":\"direct\",\"citations\":[\"C2\"],\"support\":[{\"citation_id\":\"C2\",\"quote\":\"设备V-67，2026-12-03 20:00至20:30，相同控制模式下，指示灯为常亮。\"}]},{\"statement\":\"两份记录对设备V-67指示灯状态的描述不同：一份为熄灭，另一份为常亮。\",\"kind\":\"difference\",\"citations\":[\"C1\",\"C2\"],\"support\":[{\"citation_id\":\"C1\",\"quote\":\"设备V-67，2026-12-03 20:00至20:30，相同控制模式下，指示灯为熄灭。\"},{\"citation_id\":\"C2\",\"quote\":\"设备V-67，2026-12-03 20:00至20:30，相同控制模式下，指示灯为常亮。\"}],\"relation\":{\"field\":\"指示灯状态\",\"common_scope\":\"设备V-67，2026-12-03 20:00至20:30，相同控制模式\",\"comparability\":\"established\",\"reason\":\"两份记录指向同一设备、同一时间段和同一控制模式，仅指示灯状态取值不同，属同一条件下的不同描述。\"}},{\"statement\":\"在设备V-67、2026-12-03 20:00至20:30、相同控制模式这一共同条件下，两份记录不能同时成立：指示灯不可能同时为熄灭和常亮。\",\"kind\":\"conflict\",\"citations\":[\"C1\",\"C2\"],\"support\":[{\"citation_id\":\"C1\",\"quote\":\"设备V-67，2026-12-03 20:00至20:30，相同控制模式下，指示灯为熄灭。\"},{\"citation_id\":\"C2\",\"quote\":\"设备V-67，2026-12-03 20:00至20:30，相同控制模式下，指示灯为常亮。\"}],\"relation\":{\"field\":\"指示灯状态\",\"common_scope\":\"设备V-67，2026-12-03 20:00至20:30，相同控制模式\",\"comparability\":\"established\",\"reason\":\"两份记录的设备、时间段与控制模式均一致，而“熄灭”与“常亮”为互斥状态，在同一条件下不能同时为真。\"}}],\"unknowns\":[\"两份记录中哪一份反映设备V-67的实际灯光状态，证据未说明。\",\"两份记录是否存在记录时间、观测方式或记录人员等差异，证据未说明。\"],\"comparison\":[{\"subject\":\"设备V-67\",\"subject_type\":\"entity\",\"subject_quote\":{\"citation_id\":\"C1\",\"quote\":\"设备V-67\"},\"field\":\"指示灯状态\",\"value\":\"熄灭\",\"value_quote\":{\"citation_id\":\"C1\",\"quote\":\"指示灯为熄灭\"},\"status\":\"stated\",\"citations\":[\"C1\"]},{\"subject\":\"设备V-67\",\"subject_type\":\"entity\",\"subject_quote\":{\"citation_id\":\"C2\",\"quote\":\"设备V-67\"},\"field\":\"指示灯状态\",\"value\":\"常亮\",\"value_quote\":{\"citation_id\":\"C2\",\"quote\":\"指示灯为常亮\"},\"status\":\"stated\",\"citations\":[\"C2\"]}]}",
+      "evidence": [
+        {
+          "citation_id": "C1",
+          "ordinal": 0,
+          "start": 0,
+          "end": 46,
+          "text": "设备V-67，2026-12-03 20:00至20:30，相同控制模式下，指示灯为熄灭。\n",
+          "text_sha256": "0b9a2a9fb1d38b2a9cc1e44c9c182fd1ac642d39b37825030ed5716f4031dbb2",
+          "source_location": {
+            "kind": "line",
+            "page": null,
+            "line": 1,
+            "start": 0,
+            "end": 46
+          },
+          "source_block_id": 1,
+          "file_id": "5541b76e2b841a5bc36b1c7040b532eac23cb80767ff3d37b73e9e8525ea5ef7",
+          "doc_id": "a10d6b5a5b1b5ca6f68122bbdb2c240fbeae1d2ddcb4cb84c17a90050018adbd",
+          "name": "灯光乙.txt",
+          "file_sha256": "0b9a2a9fb1d38b2a9cc1e44c9c182fd1ac642d39b37825030ed5716f4031dbb2",
+          "generation": "fc0ae3ef3fe340a1926824299c80bc48",
+          "chunk_id": 3,
+          "role": "direct",
+          "rank_score": 0.03252247488101534,
+          "rerank_score": null,
+          "partial": false,
+          "delivered_sha256": "0b9a2a9fb1d38b2a9cc1e44c9c182fd1ac642d39b37825030ed5716f4031dbb2"
+        },
+        {
+          "citation_id": "C2",
+          "ordinal": 0,
+          "start": 0,
+          "end": 46,
+          "text": "设备V-67，2026-12-03 20:00至20:30，相同控制模式下，指示灯为常亮。\n",
+          "text_sha256": "acaa41760980da4bb86011e8a86940b296b038a7fc79443adf48c7bc11a79b8e",
+          "source_location": {
+            "kind": "line",
+            "page": null,
+            "line": 1,
+            "start": 0,
+            "end": 46
+          },
+          "source_block_id": 1,
+          "file_id": "2d865271056833cf115659d02d8179a8d8b433b6757245ecf91e7450983d7f49",
+          "doc_id": "5f49cb91ca51b85c2f883ec019646f60e00e1518440e9b0d794a441f30fc6b98",
+          "name": "灯光甲.txt",
+          "file_sha256": "acaa41760980da4bb86011e8a86940b296b038a7fc79443adf48c7bc11a79b8e",
+          "generation": "fc0ae3ef3fe340a1926824299c80bc48",
+          "chunk_id": 4,
+          "role": "direct",
+          "rank_score": 0.03252247488101534,
+          "rerank_score": null,
+          "partial": false,
+          "delivered_sha256": "acaa41760980da4bb86011e8a86940b296b038a7fc79443adf48c7bc11a79b8e"
+        }
+      ],
+      "usage_events": [
+        {
+          "id": "5a619218abea4f55a3a67fe418bd47a9",
+          "purpose": "query:fc0ae3ef3fe340a1926824299c80bc48",
+          "provider": "siliconflow",
+          "model": "Pro/BAAI/bge-m3",
+          "status": "returned",
+          "input_tokens": 27,
+          "estimated_input_tokens": 26,
+          "request_attempts": 1,
+          "seconds": 0.176
+        },
+        {
+          "id": "0596d96d2b7e488eaf2363af70c8bf9f-answer",
+          "operation": "llm",
+          "status": "returned",
+          "provider": "deepseek",
+          "model": "deepseek-flash",
+          "input_tokens": 1759,
+          "output_tokens": 779,
+          "request_attempts": 1,
+          "started": "2026-10-22T03:19:54.062475+00:00",
+          "returned_model": "deepseek-flash",
+          "cached_tokens": 1280,
+          "finished": "2026-10-22T03:19:57.092294+00:00"
+        }
+      ],
+      "finish_reason": "stop"
+    },
+    {
+      "case_id": "inference_boundaries",
+      "job_id": "2c4ac98053464db5808340bd60dd1d08",
+      "result": {
+        "answer": {
+          "schema_version": 2,
+          "findings": [
+            {
+              "statement": "按记录，从入口到会厅通常约需14分钟步行，讲解计划16:40开始。",
+              "kind": "direct",
+              "citations": [
+                "C1"
+              ],
+              "support": [
+                {
+                  "citation_id": "C1",
+                  "quote": "从入口到会厅通常需要约14分钟步行。讲解计划16:40开始。"
+                }
+              ],
+              "assumptions": [],
+              "limitations": [],
+              "relation": null
+            },
+            {
+              "statement": "若16:10从入口出发，按记录中约14分钟的步行估时且无额外耽搁，预计约16:24到达会厅，早于16:40的讲解开始时间，因此按该假设可以赶上讲解。",
+              "kind": "inference",
+              "citations": [
+                "C1"
+              ],
+              "support": [
+                {
+                  "citation_id": "C1",
+                  "quote": "从入口到会厅通常需要约14分钟步行。讲解计划16:40开始。"
+                },
+                {
+                  "citation_id": "C1",
+                  "quote": "实际出发时间和现场拥堵情况未记录。"
+                }
+              ],
+              "assumptions": [
+                "16:10出发时间按问题给定，视为成立",
+                "步行耗时采用记录中的约14分钟，且途中无额外耽搁",
+                "讲解按计划16:40开始"
+              ],
+              "limitations": [
+                "记录未载明实际出发时间和现场拥堵情况，实际到达时间与能否赶上无法确认",
+                "“约14分钟”为估时，存在波动"
+              ],
+              "relation": null
+            }
+          ],
+          "unknowns": [
+            "实际出发时间未记录",
+            "现场拥堵情况未记录",
+            "实际步行耗时是否等于约14分钟无法确认",
+            "讲解是否按计划16:40开始无法确认"
+          ],
+          "comparison": []
+        },
+        "content_status": "unreviewed",
+        "answer_schema_version": 2,
+        "contract_checks": {
+          "version": 2,
+          "status": "structure_checked",
+          "meaning": "仅检查结构、引用与原句匹配，不认证语义蕴含、对象关系、业务状态或矛盾判断",
+          "warnings": [],
+          "quotes": [
+            {
+              "path": "findings.0.support.0",
+              "citation_id": "C1",
+              "quote": "从入口到会厅通常需要约14分钟步行。讲解计划16:40开始。",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 30
+                }
+              ]
+            },
+            {
+              "path": "findings.1.support.0",
+              "citation_id": "C1",
+              "quote": "从入口到会厅通常需要约14分钟步行。讲解计划16:40开始。",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 30
+                }
+              ]
+            },
+            {
+              "path": "findings.1.support.1",
+              "citation_id": "C1",
+              "quote": "实际出发时间和现场拥堵情况未记录。",
+              "matches": [
+                {
+                  "start": 30,
+                  "end": 47
+                }
+              ]
+            }
+          ]
+        },
+        "review_status": "not_reviewed"
+      },
+      "model_output": "{\"schema_version\":2,\"findings\":[{\"statement\":\"按记录，从入口到会厅通常约需14分钟步行，讲解计划16:40开始。\",\"kind\":\"direct\",\"citations\":[\"C1\"],\"support\":[{\"citation_id\":\"C1\",\"quote\":\"从入口到会厅通常需要约14分钟步行。讲解计划16:40开始。\"}]},{\"statement\":\"若16:10从入口出发，按记录中约14分钟的步行估时且无额外耽搁，预计约16:24到达会厅，早于16:40的讲解开始时间，因此按该假设可以赶上讲解。\",\"kind\":\"inference\",\"citations\":[\"C1\"],\"support\":[{\"citation_id\":\"C1\",\"quote\":\"从入口到会厅通常需要约14分钟步行。讲解计划16:40开始。\"},{\"citation_id\":\"C1\",\"quote\":\"实际出发时间和现场拥堵情况未记录。\"}],\"assumptions\":[\"16:10出发时间按问题给定，视为成立\",\"步行耗时采用记录中的约14分钟，且途中无额外耽搁\",\"讲解按计划16:40开始\"],\"limitations\":[\"记录未载明实际出发时间和现场拥堵情况，实际到达时间与能否赶上无法确认\",\"“约14分钟”为估时，存在波动\"]}],\"unknowns\":[\"实际出发时间未记录\",\"现场拥堵情况未记录\",\"实际步行耗时是否等于约14分钟无法确认\",\"讲解是否按计划16:40开始无法确认\"],\"comparison\":[]}",
+      "evidence": [
+        {
+          "citation_id": "C1",
+          "ordinal": 0,
+          "start": 0,
+          "end": 48,
+          "text": "从入口到会厅通常需要约14分钟步行。讲解计划16:40开始。实际出发时间和现场拥堵情况未记录。\n",
+          "text_sha256": "cd9ef9bb8b500503c0159ebdaf56b3dffb6d83b3a75d92876f235a025412ceda",
+          "source_location": {
+            "kind": "line",
+            "page": null,
+            "line": 1,
+            "start": 0,
+            "end": 48
+          },
+          "source_block_id": 1,
+          "file_id": "3255fce0d0a7798213bad070e6812b4c6f56122ad2e7ce27fb6f15b8336711d7",
+          "doc_id": "14ce7efa8e1d37ca4586fb14ec49e56621eb4e83b73ea7e2741494c32f534ba8",
+          "name": "议程.txt",
+          "file_sha256": "cd9ef9bb8b500503c0159ebdaf56b3dffb6d83b3a75d92876f235a025412ceda",
+          "generation": "fc0ae3ef3fe340a1926824299c80bc48",
+          "chunk_id": 8,
+          "role": "direct",
+          "rank_score": 0.01639344262295082,
+          "rerank_score": null,
+          "partial": false,
+          "delivered_sha256": "cd9ef9bb8b500503c0159ebdaf56b3dffb6d83b3a75d92876f235a025412ceda"
+        }
+      ],
+      "usage_events": [
+        {
+          "id": "2c4ac98053464db5808340bd60dd1d08-answer",
+          "operation": "llm",
+          "status": "returned",
+          "provider": "deepseek",
+          "model": "deepseek-flash",
+          "input_tokens": 1633,
+          "output_tokens": 313,
+          "request_attempts": 1,
+          "started": "2026-10-22T03:19:57.550536+00:00",
+          "returned_model": "deepseek-flash",
+          "cached_tokens": 1280,
+          "finished": "2026-10-22T03:19:59.365270+00:00"
+        }
+      ],
+      "finish_reason": "stop"
+    },
+    {
+      "case_id": "unknown_fields",
+      "job_id": "cc19566c089f4bf29c78677cd4481caf",
+      "result": {
+        "answer": {
+          "schema_version": 2,
+          "findings": [
+            {
+              "statement": "档案卷编号E-35，装订册数为4册；未记录保管联系人，也未记录采购单价。",
+              "kind": "direct",
+              "citations": [
+                "C1"
+              ],
+              "support": [
+                {
+                  "citation_id": "C1",
+                  "quote": "档案卷编号E-35，装订册数为4册。未记录保管联系人，也未记录采购单价。"
+                }
+              ],
+              "assumptions": [],
+              "limitations": [],
+              "relation": null
+            }
+          ],
+          "unknowns": [
+            "E-35的保管联系人未记录",
+            "E-35的采购单价未记录"
+          ],
+          "comparison": []
+        },
+        "content_status": "unreviewed",
+        "answer_schema_version": 2,
+        "contract_checks": {
+          "version": 2,
+          "status": "structure_checked",
+          "meaning": "仅检查结构、引用与原句匹配，不认证语义蕴含、对象关系、业务状态或矛盾判断",
+          "warnings": [],
+          "quotes": [
+            {
+              "path": "findings.0.support.0",
+              "citation_id": "C1",
+              "quote": "档案卷编号E-35，装订册数为4册。未记录保管联系人，也未记录采购单价。",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 36
+                }
+              ]
+            }
+          ]
+        },
+        "review_status": "not_reviewed"
+      },
+      "model_output": "{\"schema_version\":2,\"findings\":[{\"statement\":\"档案卷编号E-35，装订册数为4册；未记录保管联系人，也未记录采购单价。\",\"kind\":\"direct\",\"citations\":[\"C1\"],\"support\":[{\"citation_id\":\"C1\",\"quote\":\"档案卷编号E-35，装订册数为4册。未记录保管联系人，也未记录采购单价。\"}]}],\"unknowns\":[\"E-35的保管联系人未记录\",\"E-35的采购单价未记录\"],\"comparison\":[]}",
+      "evidence": [
+        {
+          "citation_id": "C1",
+          "ordinal": 0,
+          "start": 0,
+          "end": 37,
+          "text": "档案卷编号E-35，装订册数为4册。未记录保管联系人，也未记录采购单价。\n",
+          "text_sha256": "18f1a6d6731e9d292ec859beeaad75f452d78f8dc077844d08cb4c9e5d712efa",
+          "source_location": {
+            "kind": "line",
+            "page": null,
+            "line": 1,
+            "start": 0,
+            "end": 37
+          },
+          "source_block_id": 1,
+          "file_id": "4a20f4786957702ae681a7b42c8d7320cc2896b3656be6f25ac36382692862fe",
+          "doc_id": "c47d067bf05a3868c981400a0ad9607a8c58442aac75d5f1a46e23c99242d829",
+          "name": "归档.txt",
+          "file_sha256": "18f1a6d6731e9d292ec859beeaad75f452d78f8dc077844d08cb4c9e5d712efa",
+          "generation": "fc0ae3ef3fe340a1926824299c80bc48",
+          "chunk_id": 0,
+          "role": "direct",
+          "rank_score": 0.01639344262295082,
+          "rerank_score": null,
+          "partial": false,
+          "delivered_sha256": "18f1a6d6731e9d292ec859beeaad75f452d78f8dc077844d08cb4c9e5d712efa"
+        }
+      ],
+      "usage_events": [
+        {
+          "id": "cc19566c089f4bf29c78677cd4481caf-answer",
+          "operation": "llm",
+          "status": "returned",
+          "provider": "deepseek",
+          "model": "deepseek-flash",
+          "input_tokens": 1613,
+          "output_tokens": 115,
+          "request_attempts": 1,
+          "started": "2026-10-22T03:19:59.778315+00:00",
+          "returned_model": "deepseek-flash",
+          "cached_tokens": 1280,
+          "finished": "2026-10-22T03:20:00.521614+00:00"
+        }
+      ],
+      "finish_reason": "stop"
+    },
+    {
+      "case_id": "unresolved_difference",
+      "job_id": "ad327042d2934ce1ad8798dbc1def071",
+      "result": {
+        "answer": null,
+        "content_status": "needs_verification",
+        "review_status": "not_reviewed",
+        "answer_schema_version": 2,
+        "contract_checks": {
+          "version": 2,
+          "status": "invalid",
+          "issues": [
+            {
+              "code": "unanchored_value",
+              "path": "comparison.0",
+              "message": "已知值须保留原文写法并绑定依据，不自行补单位或换算"
+            }
+          ]
+        },
+        "message": "已知值须保留原文写法并绑定依据，不自行补单位或换算；原始响应已保留，未自动重试或修补。"
+      },
+      "model_output": "{\"schema_version\":2,\"findings\":[{\"statement\":\"清洁甲记载碧泉大厅的清洁周期为3个工作日。\",\"kind\":\"direct\",\"citations\":[\"C1\"],\"support\":[{\"citation_id\":\"C1\",\"quote\":\"碧泉大厅的清洁周期为3个工作日。\"}]},{\"statement\":\"清洁乙记载碧泉大厅的清洁周期为5个自然日。\",\"kind\":\"direct\",\"citations\":[\"C2\"],\"support\":[{\"citation_id\":\"C2\",\"quote\":\"碧泉大厅的清洁周期为5个自然日。\"}]},{\"statement\":\"两份资料对碧泉大厅清洁周期的数值和计量口径不同：清洁甲为3个工作日，清洁乙为5个自然日。\",\"kind\":\"difference\",\"citations\":[\"C1\",\"C2\"],\"support\":[{\"citation_id\":\"C1\",\"quote\":\"碧泉大厅的清洁周期为3个工作日。\"},{\"citation_id\":\"C2\",\"quote\":\"碧泉大厅的清洁周期为5个自然日。\"}],\"relation\":{\"field\":\"清洁周期\",\"common_scope\":\"碧泉大厅\",\"comparability\":\"not_established\",\"reason\":\"两份资料均针对碧泉大厅，但一份以工作日计、另一份以自然日计，且均未记载起算日期、工作日安排及适用优先顺序，无法换算为同一口径，故不能在同一条件下判定二者不能同时成立。\"}},{\"statement\":\"现有信息不足以认定两份资料的清洁周期存在矛盾。\",\"kind\":\"inference\",\"citations\":[\"C1\",\"C2\"],\"support\":[{\"citation_id\":\"C1\",\"quote\":\"未记载具体起算日期及工作日安排。\"},{\"citation_id\":\"C2\",\"quote\":\"未记载具体起算日期及适用优先顺序。\"}],\"assumptions\":[\"矛盾认定要求两个陈述在共同范围与必要条件明确后，于同一条件下不能同时成立。\"],\"limitations\":[\"未记载起算日期、工作日安排及适用优先顺序，无法将工作日与自然日换算到同一口径。\",\"不能确认两份资料是否适用于同一时间段或同一具体场景。\"]}],\"unknowns\":[\"碧泉大厅清洁周期的具体起算日期。\",\"工作日安排（哪些日期计为工作日）。\",\"两份资料之间是否存在适用优先顺序。\",\"两份资料是否针对同一时间段或同一具体适用场景。\"],\"comparison\":[{\"subject\":\"碧泉大厅\",\"subject_type\":\"entity\",\"subject_quote\":{\"citation_id\":\"C1\",\"quote\":\"碧泉大厅\"},\"field\":\"清洁周期\",\"value\":\"3个工作日\",\"value_quote\":{\"citation_id\":\"C1\",\"quote\":\"碧泉大厅的清洁周期为3个工作日。\"},\"status\":\"stated\",\"citations\":[\"C1\"]},{\"subject\":\"碧泉大厅\",\"subject_type\":\"entity\",\"subject_quote\":{\"citation_id\":\"C2\",\"quote\":\"碧泉大厅\"},\"field\":\"清洁周期\",\"value\":\"5个自然日\",\"value_quote\":{\"citation_id\":\"C2\",\"quote\":\"碧泉大厅的清洁周期为5个自然日。\"},\"status\":\"stated\",\"citations\":[\"C2\"]}]}",
+      "evidence": [
+        {
+          "citation_id": "C1",
+          "ordinal": 0,
+          "start": 0,
+          "end": 33,
+          "text": "碧泉大厅的清洁周期为3个工作日。未记载具体起算日期及工作日安排。\n",
+          "text_sha256": "1455eceae9527eb4e35a50fe4232954a54d12f1ce1acd86b0859cecdf7ed85b3",
+          "source_location": {
+            "kind": "line",
+            "page": null,
+            "line": 1,
+            "start": 0,
+            "end": 33
+          },
+          "source_block_id": 1,
+          "file_id": "7b1b9eeffaf65a7eb825f21f616bbde45c3738d262481a6d05d64c9c1941ca61",
+          "doc_id": "8e85a3b510ab2ab00d197f737346eeec8039119746a157db5e181c41f278904b",
+          "name": "清洁甲.txt",
+          "file_sha256": "1455eceae9527eb4e35a50fe4232954a54d12f1ce1acd86b0859cecdf7ed85b3",
+          "generation": "fc0ae3ef3fe340a1926824299c80bc48",
+          "chunk_id": 2,
+          "role": "direct",
+          "rank_score": 0.01639344262295082,
+          "rerank_score": null,
+          "partial": false,
+          "delivered_sha256": "1455eceae9527eb4e35a50fe4232954a54d12f1ce1acd86b0859cecdf7ed85b3"
+        },
+        {
+          "citation_id": "C2",
+          "ordinal": 0,
+          "start": 0,
+          "end": 34,
+          "text": "碧泉大厅的清洁周期为5个自然日。未记载具体起算日期及适用优先顺序。\n",
+          "text_sha256": "bf7d7b740920125d4a5a723110364795a12528ce012009cd2244a5b0db273387",
+          "source_location": {
+            "kind": "line",
+            "page": null,
+            "line": 1,
+            "start": 0,
+            "end": 34
+          },
+          "source_block_id": 1,
+          "file_id": "dbd269a25c2a49234bbc4c34c999c0bf81b21b157a50af443de365b697116eec",
+          "doc_id": "d463f101db23e927bd0b842007db44b4b51cef3ab5e17cd3db7408c5c36a6b7a",
+          "name": "清洁乙.txt",
+          "file_sha256": "bf7d7b740920125d4a5a723110364795a12528ce012009cd2244a5b0db273387",
+          "generation": "fc0ae3ef3fe340a1926824299c80bc48",
+          "chunk_id": 1,
+          "role": "direct",
+          "rank_score": 0.016129032258064516,
+          "rerank_score": null,
+          "partial": false,
+          "delivered_sha256": "bf7d7b740920125d4a5a723110364795a12528ce012009cd2244a5b0db273387"
+        }
+      ],
+      "usage_events": [
+        {
+          "id": "ad327042d2934ce1ad8798dbc1def071-answer",
+          "operation": "llm",
+          "status": "returned",
+          "provider": "deepseek",
+          "model": "deepseek-flash",
+          "input_tokens": 1733,
+          "output_tokens": 637,
+          "request_attempts": 1,
+          "started": "2026-10-22T03:20:00.951082+00:00",
+          "returned_model": "deepseek-flash",
+          "cached_tokens": 1280,
+          "finished": "2026-10-22T03:20:03.915077+00:00"
+        }
+      ],
+      "finish_reason": "stop"
+    }
+  ],
+  "observations": {
+    "record_objects": "对象及原值正确；仍有把缺失数量写作数量不同的表述，空白不是一个可比较数值。",
+    "cell_objects": "两个对象名称、零值和无缓存公式未知的结构化引用对应。",
+    "same_conditions_conflict": "原始回复明确同条件互斥、relation完整；因值为原句中的较短摘录而被等长约束误拦。",
+    "inference_boundaries": "推断假设及限制齐全，保留实际状态未知。",
+    "unknown_fields": "未知字段未填0，comparison正确为空数组。",
+    "unresolved_difference": "原始回复保留口径/条件差异；因值比引用句短而被误拦，另有把工作日安排说成双方都未记载的过度概括。"
+  },
+  "artifact_sha256": {
+    "workspace/stage20-schema-live-20261022/attempt.json": "a4062a5378a6430f654e81d6ed5e3db6d0e55a4941846f63faecc8ca543f8252",
+    "workspace/stage20-schema-live-20261022/documents/归档.txt": "18f1a6d6731e9d292ec859beeaad75f452d78f8dc077844d08cb4c9e5d712efa",
+    "workspace/stage20-schema-live-20261022/documents/清洁乙.txt": "bf7d7b740920125d4a5a723110364795a12528ce012009cd2244a5b0db273387",
+    "workspace/stage20-schema-live-20261022/documents/清洁甲.txt": "1455eceae9527eb4e35a50fe4232954a54d12f1ce1acd86b0859cecdf7ed85b3",
+    "workspace/stage20-schema-live-20261022/documents/灯光乙.txt": "0b9a2a9fb1d38b2a9cc1e44c9c182fd1ac642d39b37825030ed5716f4031dbb2",
+    "workspace/stage20-schema-live-20261022/documents/灯光甲.txt": "acaa41760980da4bb86011e8a86940b296b038a7fc79443adf48c7bc11a79b8e",
+    "workspace/stage20-schema-live-20261022/documents/装箱.csv": "bd43052aef5982d3f71ad6244cad5fba67a7fb0cbd6380d31ad31cf822afe2e1",
+    "workspace/stage20-schema-live-20261022/documents/议程.txt": "cd9ef9bb8b500503c0159ebdaf56b3dffb6d83b3a75d92876f235a025412ceda",
+    "workspace/stage20-schema-live-20261022/documents/采集.xlsx": "6f7e6a677b2949f40ddada9ab9842813e8a4b95ff51d8ada9a61b3b28682ac0b",
+    "workspace/stage20-schema-live-20261022/runtime/agent/config.py": "5a398f74572d97545119f4abf55491302611272e0ff62387519d04f73ab88f00",
+    "workspace/stage20-schema-live-20261022/runtime/agent/context.py": "36e90a9d217215b0f5ecafb5c8cb1ef4a4af66ab0f7139a4df6f2355b56b02e3",
+    "workspace/stage20-schema-live-20261022/runtime/agent/llm.py": "703907d24e06ad2c37537f35f73b820cc4b099f4b96017152f49f7c3e729e1c8",
+    "workspace/stage20-schema-live-20261022/runtime/folder_assistant/answers.py": "b785e6ce23fb3efdcb9c0408652a68a87d6ea8740ba0a99be80c61e48bc81414",
+    "workspace/stage20-schema-live-20261022/runtime/folder_assistant/contracts.py": "cf458c527399377fa8faa5de38ce0d9cc45828116c9079621fe2fcecf9ad03de",
+    "workspace/stage20-schema-live-20261022/runtime/folder_assistant/exports.py": "aea16dd74ec3169781b242c195b908d3d14e9dedd769f0856560aefbb40e7831",
+    "workspace/stage20-schema-live-20261022/runtime/folder_assistant/index.py": "494c2b7a22299575a758286569437a932a3bd0c5d070f075569e3fdcee733b32",
+    "workspace/stage20-schema-live-20261022/runtime/folder_assistant/jobs.py": "cbba0a3ce6f19a320ff6be4f81a18299512bd63149083c920431568b27f9556b",
+    "workspace/stage20-schema-live-20261022/runtime/folder_assistant/parse_worker.py": "e1603c813ea3ed124e4f744af7db7fabb13343c09ab570a651722338cbf49387",
+    "workspace/stage20-schema-live-20261022/runtime/folder_assistant/parsing.py": "474dd43160b91025576f4bbd802f2fe3a1122818ce6a8536ba194564722a0acf",
+    "workspace/stage20-schema-live-20261022/runtime/folder_assistant/store.py": "05b64a41ab1f56fac02d6e804e6f8e44814354fd18a33de7a1d9437eca520490",
+    "workspace/stage20-schema-live-20261022/runtime/folder_assistant/__init__.py": "36656300506ebee15611b11a8eec4d2ba51af2278e92d74a5226fa32a1dd6277",
+    "workspace/stage20-schema-live-20261022/runtime/folder_assistant/__main__.py": "06a2e6220e729537fd6126dca60a03c1322581225ae8d8138df54b8784227c9a",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/documents.py": "4c2372f461f357cce017e9704392571c1d1bd1cf7e8f601867e6aa5eeb9305e2",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/embedding.py": "7cfc277bf79b51205bff5c1447bb7165d73189a1773bfb7e013696349bdd2c43",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/large_probe.py": "497c734fde900ff464eea06b736979fc52ccaa964bba28f21ebd3a1464c0c630",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/locking.py": "c2f87541b323e39f8d080067aab7c15f7870f9a50b522ca9bcb596a4b89002ee",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/long_probe.py": "824878c533475b0d48cca92f538fe00228108ede3274cf4bd43996ada91bb403",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/probe.py": "564fc1190358d125bdd7d1c7d0fbe2bc1a998258e1dbe4f0b268585552e5666a",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/recall_probe.py": "fb5657819c94b93083d3a11e6e546342345f3d35ac14fe70c662449f40143ca9",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/report_probe.py": "486c955ce7368a5beb181b9def74546fc3b3ad9188c013105d643570102ac7df",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/reranking.py": "8118a7613b87909571050ad1b6d6d3bee2a9beb8aa68b0dbc4ab60570cf384ec",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/rerank_probe.py": "4c49f1e3a7f0e8dcd50edb647ba9beb521398ea05c01da538b25f1c99b9b75bc",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/store.py": "ea8c2c021bc2d1ad41bc2254aa8b4f80023d1daa421fb5cb49caa09f18db58ac",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/vectors.py": "520aff951c342401e1f1c4fcf5a532bd8f3ae859f6c01eb920414f8d2fdafd1b",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/__init__.py": "5fcbc38c72e9f0e4c0938373622ff86daadbe7389238d3003d9a73d3acfb1533",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/__main__.py": "fc231000c92128f2dacd50c8e4a2131c197130af52b5c13500673af31e4dec43",
+    "workspace/stage20-schema-live-20261022/runtime/scripts/folder_quality_check.py": "e78a0743e576ce6bbd33e5a1d193f0dd6335f2ea9328cdab77c8c584a5def86b",
+    "workspace/stage20-schema-live-20261022/state/.jobs-start.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/0596d96d2b7e488eaf2363af70c8bf9f.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/2c4ac98053464db5808340bd60dd1d08.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/4a51533ac4ef4242ab413ccf184611e1.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/ad327042d2934ce1ad8798dbc1def071.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/catalog.sqlite3": "fe867dc8c2e8d214c2b03bdddb14eca1dae7018fabbbbb44ae3ef0ca7ac3619b",
+    "workspace/stage20-schema-live-20261022/state/cc19566c089f4bf29c78677cd4481caf.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/eca5ae0dde544f7d95e0ec5467734a31.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/indexes/f0ea0736ba014db29d893328c17ce832/.build.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/indexes/f0ea0736ba014db29d893328c17ce832/.sync.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/indexes/f0ea0736ba014db29d893328c17ce832/.vectors.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/indexes/f0ea0736ba014db29d893328c17ce832/knowledge.sqlite3": "456c06509d85ef27f317bbce3c1d60f6af2453e3393a5d20f595333ce1939688",
+    "workspace/stage20-schema-live-20261022/state/indexes/f0ea0736ba014db29d893328c17ce832/vectors/fc0ae3ef3fe340a1926824299c80bc48.db/LOCK": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workspace/stage20-schema-live-20261022/state/indexes/f0ea0736ba014db29d893328c17ce832/vectors/fc0ae3ef3fe340a1926824299c80bc48.db/collections/chunks/manifest.json": "30c40147e1b7e382c40477e5719ab129ff2d81d87679a0afb59230b1f7abbd9a",
+    "workspace/stage20-schema-live-20261022/state/indexes/f0ea0736ba014db29d893328c17ce832/vectors/fc0ae3ef3fe340a1926824299c80bc48.db/collections/chunks/manifest.json.prev": "439bced4db104c9bc364e111da83cd0486ba478d9e84a87f4a8b6156ece9130c",
+    "workspace/stage20-schema-live-20261022/state/indexes/f0ea0736ba014db29d893328c17ce832/vectors/fc0ae3ef3fe340a1926824299c80bc48.db/collections/chunks/schema.json": "091a94653bffaee066311202f1db0c0e9850fe8749840a67e6189920344759ce",
+    "workspace/stage20-schema-live-20261022/state/indexes/f0ea0736ba014db29d893328c17ce832/vectors/fc0ae3ef3fe340a1926824299c80bc48.db/collections/chunks/partitions/_default/data/data_000001_000012.parquet": "382fac939afe2fc3e8307b0414857d794d06552df5b6ba86c37a923389f6bd51",
+    "workspace/stage20-schema-live-20261022/state/indexes/f0ea0736ba014db29d893328c17ce832/vectors/fc0ae3ef3fe340a1926824299c80bc48.db/collections/chunks/partitions/_default/indexes/data_000001_000012.vector.autoindex.idx": "7782f69966131a93a8972b685665c2907a5cca5b5f28519d2397b8c55eab9e22",
+    "workspace/stage20-schema-live-20261022/state/outputs/0596d96d2b7e488eaf2363af70c8bf9f/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/outputs/0596d96d2b7e488eaf2363af70c8bf9f/comparison.csv": "e725769e07f7bdb20c2ca66eea7ed53bf0a25e16c3999620628a5cac7652f752",
+    "workspace/stage20-schema-live-20261022/state/outputs/0596d96d2b7e488eaf2363af70c8bf9f/comparison.xlsx": "1a961def16cdd17bf1b12950825a6063f65810aae286d65f15192698190ba94f",
+    "workspace/stage20-schema-live-20261022/state/outputs/0596d96d2b7e488eaf2363af70c8bf9f/export.json": "b0e2a3099385b4ebf0ded6bec861f47b0bcfb5ca2917aa411f3e29e54f068ad0",
+    "workspace/stage20-schema-live-20261022/state/outputs/0596d96d2b7e488eaf2363af70c8bf9f/record.json": "ebcc2d61649964f54fe0914b4d1d282020e47461e32f54c9d57a985ce536a703",
+    "workspace/stage20-schema-live-20261022/state/outputs/0596d96d2b7e488eaf2363af70c8bf9f/sources.csv": "60482813fbc82c767a4cb890f70ac1435e1081108f35e2438d2c8d10cf3e5520",
+    "workspace/stage20-schema-live-20261022/state/outputs/0596d96d2b7e488eaf2363af70c8bf9f/sources.json": "f6d158a0f05fad969939a737f6580c64ae780257ceda11e56f71b51ff7b427e0",
+    "workspace/stage20-schema-live-20261022/state/outputs/0596d96d2b7e488eaf2363af70c8bf9f/summary.md": "8c9c5c9fbe9868ca88b897cfeb37b74030d9c657a6097c02489a900200cd16df",
+    "workspace/stage20-schema-live-20261022/state/outputs/2c4ac98053464db5808340bd60dd1d08/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/outputs/2c4ac98053464db5808340bd60dd1d08/comparison.csv": "cd8b7f8ff777da7e062759c5b5c6085182168a46ba424a560cb0fedb786859cb",
+    "workspace/stage20-schema-live-20261022/state/outputs/2c4ac98053464db5808340bd60dd1d08/comparison.xlsx": "8a2a40855b13b0fa025884c922755043a457d296866b8361d0cd2fe615ca6085",
+    "workspace/stage20-schema-live-20261022/state/outputs/2c4ac98053464db5808340bd60dd1d08/export.json": "212c7a0deaa4d3f6586e255e78042e19f946d293b7adc078707a098471733a71",
+    "workspace/stage20-schema-live-20261022/state/outputs/2c4ac98053464db5808340bd60dd1d08/record.json": "87b1d28688d6be4da187b50cc0222d6a0ff1e86aaa1b58e5a61b384d9d047524",
+    "workspace/stage20-schema-live-20261022/state/outputs/2c4ac98053464db5808340bd60dd1d08/sources.csv": "5c906a6509ab3a694dafe107393953d23e84641e636ab8178f9f8fda35712e63",
+    "workspace/stage20-schema-live-20261022/state/outputs/2c4ac98053464db5808340bd60dd1d08/sources.json": "fca43d561f9ffe02fceca0ebfb3291803e687bdde3d1900fe2adeea814a664fa",
+    "workspace/stage20-schema-live-20261022/state/outputs/2c4ac98053464db5808340bd60dd1d08/summary.md": "3751df1f7131360a3bbffcb58df585fbf30d4c22e44794f93864ae1b3c9ca92c",
+    "workspace/stage20-schema-live-20261022/state/outputs/4a51533ac4ef4242ab413ccf184611e1/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/outputs/4a51533ac4ef4242ab413ccf184611e1/comparison.csv": "595aa087f053cec5df4f932c254d0b5daf5e3b38d8f65d3f076a6659d3db1e7f",
+    "workspace/stage20-schema-live-20261022/state/outputs/4a51533ac4ef4242ab413ccf184611e1/comparison.xlsx": "008b6586233665bc0257c30a85e61ddaca1f620cc580f582fafc397a2566ee36",
+    "workspace/stage20-schema-live-20261022/state/outputs/4a51533ac4ef4242ab413ccf184611e1/export.json": "146576182ab15024edaf9af02e9071b1c392019c396234e28495c20d481ac7b5",
+    "workspace/stage20-schema-live-20261022/state/outputs/4a51533ac4ef4242ab413ccf184611e1/record.json": "eb494bce425d6e2500cd5a01979a69b1b2e20f95e7401fa28cf3aa7421a22e9a",
+    "workspace/stage20-schema-live-20261022/state/outputs/4a51533ac4ef4242ab413ccf184611e1/sources.csv": "24a29a12c355888692f33ee198bbd1ce7e8f99fac64b7775e80bb2e76d9c4154",
+    "workspace/stage20-schema-live-20261022/state/outputs/4a51533ac4ef4242ab413ccf184611e1/sources.json": "fd0f85ee835a7e359271831025a79acb7278d2930d065b6c5ac1e563c63a2cac",
+    "workspace/stage20-schema-live-20261022/state/outputs/4a51533ac4ef4242ab413ccf184611e1/summary.md": "3f2f51843e6941d707b28de2d1015b2fcadfec4ed5df71f9fc1f7c1206792ea2",
+    "workspace/stage20-schema-live-20261022/state/outputs/ad327042d2934ce1ad8798dbc1def071/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/outputs/ad327042d2934ce1ad8798dbc1def071/comparison.csv": "e725769e07f7bdb20c2ca66eea7ed53bf0a25e16c3999620628a5cac7652f752",
+    "workspace/stage20-schema-live-20261022/state/outputs/ad327042d2934ce1ad8798dbc1def071/comparison.xlsx": "55785d932fbb99acdaff07a6eb547ebb077599dfc0ff2be9b210f87e994b9671",
+    "workspace/stage20-schema-live-20261022/state/outputs/ad327042d2934ce1ad8798dbc1def071/export.json": "72d5dc90df70f34a7621436542e131928bbc2346a402bea01f71f30d11ef0e67",
+    "workspace/stage20-schema-live-20261022/state/outputs/ad327042d2934ce1ad8798dbc1def071/record.json": "b35a580a882f571f200fdb77c2090436d1847a1076120f76fe723fba6645db4b",
+    "workspace/stage20-schema-live-20261022/state/outputs/ad327042d2934ce1ad8798dbc1def071/sources.csv": "79413af36b3538edb38ce852415a980ae2e8eeb5917ac8bf17340ad24884e3aa",
+    "workspace/stage20-schema-live-20261022/state/outputs/ad327042d2934ce1ad8798dbc1def071/sources.json": "c7c5216f46c42f802f9fc305d30e6766bbea70c68f118162cad2df12c8d00aaf",
+    "workspace/stage20-schema-live-20261022/state/outputs/ad327042d2934ce1ad8798dbc1def071/summary.md": "818e60b233075ff96e2e2c04710f25cc1dfc4644321510e6e95afd743522ee06",
+    "workspace/stage20-schema-live-20261022/state/outputs/cc19566c089f4bf29c78677cd4481caf/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/outputs/cc19566c089f4bf29c78677cd4481caf/comparison.csv": "cd8b7f8ff777da7e062759c5b5c6085182168a46ba424a560cb0fedb786859cb",
+    "workspace/stage20-schema-live-20261022/state/outputs/cc19566c089f4bf29c78677cd4481caf/comparison.xlsx": "d308411ca31a4671537d3bd81a28465a90b1c1ba8d5dcdf66fb6046c1b074035",
+    "workspace/stage20-schema-live-20261022/state/outputs/cc19566c089f4bf29c78677cd4481caf/export.json": "37459c0aa673b38f17181ccca5fc44d12ad922196b08dbcf036b75eb12d23c32",
+    "workspace/stage20-schema-live-20261022/state/outputs/cc19566c089f4bf29c78677cd4481caf/record.json": "c4e19b159ae95efa06763ab5978fe1479d772f57335ce4353bf88567fbbd54a9",
+    "workspace/stage20-schema-live-20261022/state/outputs/cc19566c089f4bf29c78677cd4481caf/sources.csv": "2bfe5068da0c0631b9122e1c511924a6040b995c16bfa03a3743a68f0d7c92b4",
+    "workspace/stage20-schema-live-20261022/state/outputs/cc19566c089f4bf29c78677cd4481caf/sources.json": "b8f85bfadd4c9ba84a66fe3a9dda7778f43f5d3db9cd96eebb6c4008a8fc5f42",
+    "workspace/stage20-schema-live-20261022/state/outputs/cc19566c089f4bf29c78677cd4481caf/summary.md": "591f9f6e6e6c399750812f6af9058fe55669aeb15ab83726fcf57dda4878929d",
+    "workspace/stage20-schema-live-20261022/state/outputs/eca5ae0dde544f7d95e0ec5467734a31/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/outputs/eca5ae0dde544f7d95e0ec5467734a31/comparison.csv": "24bc9003d1e058f7bdeb7e4ae18716bf6abef52212af06b15f1563c32bca5777",
+    "workspace/stage20-schema-live-20261022/state/outputs/eca5ae0dde544f7d95e0ec5467734a31/comparison.xlsx": "6a375a494bbd64445e293f755ee3744adbf3d6cedf90ac7b0604791f469218c2",
+    "workspace/stage20-schema-live-20261022/state/outputs/eca5ae0dde544f7d95e0ec5467734a31/export.json": "452373460c07ba1fa6cdfde5b313bc4b905afa5447cbc885f560d14a11c131bd",
+    "workspace/stage20-schema-live-20261022/state/outputs/eca5ae0dde544f7d95e0ec5467734a31/record.json": "3141abaf1e7afc2f637882951ef8e726d9fa096b42fc5cbec64af7e6f3d26fe8",
+    "workspace/stage20-schema-live-20261022/state/outputs/eca5ae0dde544f7d95e0ec5467734a31/sources.csv": "1b1124b4363b77e42fd49dc2645a26411c3cc3c9b261e44595fec63c0bde6cd8",
+    "workspace/stage20-schema-live-20261022/state/outputs/eca5ae0dde544f7d95e0ec5467734a31/sources.json": "bccafc094308c8728a9413f1bef43b4da1bba9f41c30f18cc1a9e65f2a1c430b",
+    "workspace/stage20-schema-live-20261022/state/outputs/eca5ae0dde544f7d95e0ec5467734a31/summary.md": "9327f0ad5c135a06de1ac818a3007ba63a8bc631b11ae9255e84ab7768b4e9a0",
+    "workspace/stage20-schema-live-20261022/state/parsed/0b9a2a9fb1d38b2a9cc1e44c9c182fd1ac642d39b37825030ed5716f4031dbb2-1.txt.json": "b4bd63f855d8587fd29f28da2f0bcfc91864c7d1c06d4bde37902933e433cf9b",
+    "workspace/stage20-schema-live-20261022/state/parsed/1455eceae9527eb4e35a50fe4232954a54d12f1ce1acd86b0859cecdf7ed85b3-1.txt.json": "8e24c7e4838abf53fd450ea27eedbc5935bf875c89cad8741f0b1724b1fa9333",
+    "workspace/stage20-schema-live-20261022/state/parsed/18f1a6d6731e9d292ec859beeaad75f452d78f8dc077844d08cb4c9e5d712efa-1.txt.json": "3110e1e8fcfdd69bb17f5cfaa0e0cc217b4be5fe2fef92cc596ffa63a6589878",
+    "workspace/stage20-schema-live-20261022/state/parsed/6f7e6a677b2949f40ddada9ab9842813e8a4b95ff51d8ada9a61b3b28682ac0b-1.xlsx.json": "be71fb103a5efc81c26e9e3e65612935c9dbecd16e0e87bf4291272c4865fef3",
+    "workspace/stage20-schema-live-20261022/state/parsed/acaa41760980da4bb86011e8a86940b296b038a7fc79443adf48c7bc11a79b8e-1.txt.json": "6da271e6cc2a4c7ca0716b84c5928db9767d5ae9a786c6df3f8eaaa79068eda8",
+    "workspace/stage20-schema-live-20261022/state/parsed/bd43052aef5982d3f71ad6244cad5fba67a7fb0cbd6380d31ad31cf822afe2e1-1.csv.json": "e0422eb65eb204846507951d5357506390c802044cc860499d62ad938bb8087f",
+    "workspace/stage20-schema-live-20261022/state/parsed/bf7d7b740920125d4a5a723110364795a12528ce012009cd2244a5b0db273387-1.txt.json": "10965e274d49c75232ba24df21d4ef4d5109283b7123487cb4facd2ad7e73a0b",
+    "workspace/stage20-schema-live-20261022/state/parsed/cd9ef9bb8b500503c0159ebdaf56b3dffb6d83b3a75d92876f235a025412ceda-1.txt.json": "391070b99494de2da48b927b296d574bab5453df27543d04609bc81969bc86f5"
+  }
+}

@@ -121,6 +121,8 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         await page.locator(".folder-answer").innerText(),
         /对象身份未明确/,
       );
+      await page.locator(".folder-answer").getByText("值原文", {exact:true}).first().click();
+      await page.locator(".folder-answer").getByText(/本次送达片段中的取值字符区间/).waitFor();
       await page.locator(".folder-answer .folder-citation").first().click();
       await page
         .locator(".folder-citation-preview")

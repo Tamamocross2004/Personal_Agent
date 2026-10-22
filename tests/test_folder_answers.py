@@ -17,10 +17,11 @@ class Chat:
         if self.fail:raise RuntimeError('provider-private-secret')
         body={'findings':[{'statement':'测试替身仅验证引用协议','kind':'direct','citations':['C999' if self.bad else 'C1']}],
               'unknowns':[],'comparison':[{'subject':'测试资料','field':'摘录','value':'=danger','status':'stated','citations':['C1']}]}
-        if 'schema_version=2' in messages[0]['content']:
+        if '输出JSON结构' in messages[0]['content'] or '输出结构由程序实际验证模型生成' in messages[0]['content']:
             evidence=json.loads(messages[1]['content'])['evidence'][0]
             q={'citation_id':'C1','quote':evidence['text']}
-            body['schema_version']=2
+            from folder_assistant.contracts import VERSION
+            body['schema_version']=VERSION
             body['findings'][0]['support']=[q]
             body['comparison']=[{'subject':None,'subject_type':'unknown','subject_quote':None,'field':'摘录',
                                  'value':evidence['text'],'value_quote':q,'status':'stated','citations':['C1']}]

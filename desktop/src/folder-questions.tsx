@@ -298,11 +298,11 @@ export function FolderQuestions({
               <thead>
                 <tr>
                   <th>
-                    {current.result.answer.schema_version === 2
+                    {current.result.answer.schema_version >= 2
                       ? "对象（来源另列）"
                       : "对象/来源（旧版）"}
                   </th>
-                  {current.result.answer.schema_version === 2 && <th>来源</th>}
+                  {current.result.answer.schema_version >= 2 && <th>来源</th>}
                   <th>字段</th>
                   <th>值/状态</th>
                   <th>依据</th>
@@ -325,7 +325,7 @@ export function FolderQuestions({
                         </small>
                       )}
                     </td>
-                    {current.result.answer.schema_version === 2 && (
+                    {current.result.answer.schema_version >= 2 && (
                       <td>
                         {Array.from(
                           new Set<string>(
@@ -360,6 +360,17 @@ export function FolderQuestions({
                         <details>
                           <summary>值原文</summary>
                           <blockquote>{r.value_quote.quote}</blockquote>
+                          {current.result?.contract_checks?.quotes
+                            ?.find(
+                              (q: any) =>
+                                q.path === `comparison.${i}.value_quote`,
+                            )
+                            ?.value_matches?.map((span: any, j: number) => (
+                              <p key={j}>
+                                本次送达片段中的取值字符区间：[{span.start},{" "}
+                                {span.end})
+                              </p>
+                            ))}
                         </details>
                       )}
                     </td>

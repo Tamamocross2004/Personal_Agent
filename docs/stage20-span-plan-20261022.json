@@ -1,0 +1,126 @@
+{
+  "date": "2026-10-22",
+  "purpose": "fresh literal-span contract validation, previous two rounds remain unchanged; no answer-specific rules",
+  "workspace": "workspace/stage20-span-live-20261022",
+  "documents_sha256": {
+    "保养乙.txt": "f3360c7eee7730d6b765aa9180fb6e78d221c0fc93a19ee31491ced9e0513028",
+    "保养甲.txt": "afbabf341588286d534dd03ae09fcdf2838967ae34581690941312f758619a32",
+    "设定.csv": "0144985d06a55f3ae78dce7452ace981cd7a6552d9e6736100ce7d1cdc1203e2",
+    "风机乙.txt": "b5966a4bded4619030faef1aac59c2bef1bf2d6bf143e87a01a11eb0d650aa17",
+    "风机甲.txt": "54ca9fff75d2a0b90edcb3c39774454ac6471b352c8af72825020fc22fba911e"
+  },
+  "questions": [
+    {
+      "id": "state_context",
+      "query": "对照两份风机记录，说明相同时间和模式下的状态能否同时成立，列出对象和状态依据。",
+      "files": [
+        "风机甲.txt",
+        "风机乙.txt"
+      ],
+      "mode": "hybrid",
+      "criteria": [
+        "保留风机对象、同窗口同模式及运行/停机的互斥，不猜实际状态",
+        "对象和值来自实际送达引用，允许连续原句含上下文但不改字",
+        "条件及双方依据齐全，未正式审稿"
+      ]
+    },
+    {
+      "id": "period_context",
+      "query": "请对照两份资料的保养间隔，并说明这些记录是否足以认定互相矛盾。保留原值与依据。",
+      "files": [
+        "保养甲.txt",
+        "保养乙.txt"
+      ],
+      "mode": "keyword",
+      "criteria": [
+        "保留6个工作日和9个自然日，不擅自换算或设优先顺序",
+        "起算和口径条件不明时不直接宣称矛盾",
+        "值的字符区间对应引用，格式和内容分别判断"
+      ]
+    },
+    {
+      "id": "literal_units",
+      "query": "按U-40和U-52列出设定值及原文依据，不换算单位。",
+      "files": [
+        "设定.csv"
+      ],
+      "mode": "keyword",
+      "criteria": [
+        "两个对象及12 kPa/18 kPa对应实际记录",
+        "不归一化、补单位或计算统计",
+        "保留来源及对象和值的可核对字符区间"
+      ]
+    }
+  ],
+  "limits": {
+    "llm_calls": 3,
+    "embedding_calls": 3,
+    "rerank_calls": 0,
+    "known_tokens": 30000,
+    "per_question_tokens": 10000,
+    "attempts_per_question": 1,
+    "max_output_tokens_unchanged": 1200
+  },
+  "procedure": [
+    "version3 binds object/value to exact substring spans within exactly delivered context quotes",
+    "no normalization, inference of missing values or alteration of raw responses",
+    "prior 8+6 attempts and scores remain unchanged; not a paired improvement estimate",
+    "full regression and UI before calls",
+    "one sync and one request per question",
+    "stop on unknown usage or provider failure",
+    "no retries, post-call code changes or criteria changes for this run"
+  ],
+  "reviewer": "coding_assistant",
+  "stage12_accepted": false,
+  "configuration": {
+    "provider": "deepseek",
+    "model": "deepseek-flash",
+    "base_url": "https://api.deepseek.com",
+    "embedding_model": "Pro/BAAI/bge-m3",
+    "embedding_base_url": "https://api.siliconflow.cn/v1",
+    "dimensions": 1024,
+    "rerank": false,
+    "retries": 0,
+    "llm_timeout": 30,
+    "embedding_timeout": 30,
+    "build_budget": 10000,
+    "temperature": 0.3,
+    "thinking": "disabled",
+    "output_cap": 1200,
+    "chunk_size": 700,
+    "chunk_overlap": 120,
+    "lexical_candidates": 40,
+    "vector_candidates": 40,
+    "rerank_candidates": 20
+  },
+  "runtime_sha256": {
+    "folder_assistant/answers.py": "b785e6ce23fb3efdcb9c0408652a68a87d6ea8740ba0a99be80c61e48bc81414",
+    "folder_assistant/contracts.py": "69e97e543ea571271452f01f3981587f937fb8414a36cf15b58d7d41cda5f2a3",
+    "folder_assistant/exports.py": "7c409585ef177c976f339163840a4db84a8fee25b4ddfa9b52fea2cabce470cf",
+    "folder_assistant/index.py": "494c2b7a22299575a758286569437a932a3bd0c5d070f075569e3fdcee733b32",
+    "folder_assistant/jobs.py": "cbba0a3ce6f19a320ff6be4f81a18299512bd63149083c920431568b27f9556b",
+    "folder_assistant/parse_worker.py": "e1603c813ea3ed124e4f744af7db7fabb13343c09ab570a651722338cbf49387",
+    "folder_assistant/parsing.py": "474dd43160b91025576f4bbd802f2fe3a1122818ce6a8536ba194564722a0acf",
+    "folder_assistant/store.py": "05b64a41ab1f56fac02d6e804e6f8e44814354fd18a33de7a1d9437eca520490",
+    "folder_assistant/__init__.py": "36656300506ebee15611b11a8eec4d2ba51af2278e92d74a5226fa32a1dd6277",
+    "folder_assistant/__main__.py": "06a2e6220e729537fd6126dca60a03c1322581225ae8d8138df54b8784227c9a",
+    "knowledge/documents.py": "4c2372f461f357cce017e9704392571c1d1bd1cf7e8f601867e6aa5eeb9305e2",
+    "knowledge/embedding.py": "7cfc277bf79b51205bff5c1447bb7165d73189a1773bfb7e013696349bdd2c43",
+    "knowledge/large_probe.py": "497c734fde900ff464eea06b736979fc52ccaa964bba28f21ebd3a1464c0c630",
+    "knowledge/locking.py": "c2f87541b323e39f8d080067aab7c15f7870f9a50b522ca9bcb596a4b89002ee",
+    "knowledge/long_probe.py": "824878c533475b0d48cca92f538fe00228108ede3274cf4bd43996ada91bb403",
+    "knowledge/probe.py": "564fc1190358d125bdd7d1c7d0fbe2bc1a998258e1dbe4f0b268585552e5666a",
+    "knowledge/recall_probe.py": "fb5657819c94b93083d3a11e6e546342345f3d35ac14fe70c662449f40143ca9",
+    "knowledge/report_probe.py": "486c955ce7368a5beb181b9def74546fc3b3ad9188c013105d643570102ac7df",
+    "knowledge/reranking.py": "8118a7613b87909571050ad1b6d6d3bee2a9beb8aa68b0dbc4ab60570cf384ec",
+    "knowledge/rerank_probe.py": "4c49f1e3a7f0e8dcd50edb647ba9beb521398ea05c01da538b25f1c99b9b75bc",
+    "knowledge/store.py": "ea8c2c021bc2d1ad41bc2254aa8b4f80023d1daa421fb5cb49caa09f18db58ac",
+    "knowledge/vectors.py": "520aff951c342401e1f1c4fcf5a532bd8f3ae859f6c01eb920414f8d2fdafd1b",
+    "knowledge/__init__.py": "5fcbc38c72e9f0e4c0938373622ff86daadbe7389238d3003d9a73d3acfb1533",
+    "knowledge/__main__.py": "fc231000c92128f2dacd50c8e4a2131c197130af52b5c13500673af31e4dec43",
+    "agent/config.py": "5a398f74572d97545119f4abf55491302611272e0ff62387519d04f73ab88f00",
+    "agent/context.py": "36e90a9d217215b0f5ecafb5c8cb1ef4a4af66ab0f7139a4df6f2355b56b02e3",
+    "agent/llm.py": "703907d24e06ad2c37537f35f73b820cc4b099f4b96017152f49f7c3e729e1c8",
+    "scripts/folder_quality_check.py": "e78a0743e576ce6bbd33e5a1d193f0dd6335f2ea9328cdab77c8c584a5def86b"
+  }
+}
