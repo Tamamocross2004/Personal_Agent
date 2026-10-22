@@ -51,21 +51,38 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
     const page = await app.firstWindow();
     page.setDefaultTimeout(20000);
     page.on("pageerror", (e) => errors.push(e.message));
-    await page.getByRole("button", { name: "文件夹资料助手", exact: true }).click();
+    await page
+      .getByRole("button", { name: "文件夹资料助手", exact: true })
+      .click();
     await page
       .getByRole("button", { name: "① 添加资料文件夹", exact: true })
       .click();
-    await page.getByRole("button", { name: "② 扫描文件清单", exact: true }).click();
+    await page
+      .getByRole("button", { name: "② 扫描文件清单", exact: true })
+      .click();
     await page.getByRole("cell", { name: "readme.txt", exact: true }).waitFor();
     await page.getByRole("cell", { name: ".env", exact: true }).waitFor();
     assert.match(await page.locator(".folder-file-list").innerText(), /已排除/);
     if (process.argv.includes("--index")) {
-      await page.getByRole("button", {name: "同步资料索引（调用嵌入服务）", exact: true}).click();
+      await page
+        .getByRole("button", {
+          name: "同步资料索引（调用嵌入服务）",
+          exact: true,
+        })
+        .click();
       await page.getByText(/操作状态：completed/).waitFor();
-      await page.getByRole("textbox", {name: "资料检索问题"}).fill("本地资料");
-      await page.getByRole("button", {name: "检索资料", exact:true}).click();
-      await page.locator(".folder-retrieval").getByText("本地资料原文。", {exact:true}).waitFor();
-      assert.match(await page.locator(".folder-index-panel").innerText(), /未变化 1/);
+      await page
+        .getByRole("textbox", { name: "资料检索问题" })
+        .fill("本地资料");
+      await page.getByRole("button", { name: "检索资料", exact: true }).click();
+      await page
+        .locator(".folder-retrieval")
+        .getByText("本地资料原文。", { exact: true })
+        .waitFor();
+      assert.match(
+        await page.locator(".folder-index-panel").innerText(),
+        /未变化 1/,
+      );
     }
     const conn = await page.evaluate(() => window.desktop.connection());
     const denied = await fetch(conn.url + "/api/folders", {

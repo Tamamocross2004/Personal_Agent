@@ -106,7 +106,9 @@ export function FolderLibrary({
         <p className="muted">
           只读浏览用户选定的本地目录，源文件不会被修改。扫描和内容预览均在本地；点击同步或混合检索才调用相应云端服务。
         </p>
-        <p className="folder-steps">使用顺序：添加文件夹 → 扫描清单 → 点击文件右侧“打开内容预览”</p>
+        <p className="folder-steps">
+          使用顺序：添加文件夹 → 扫描清单 → 点击文件右侧“打开内容预览”
+        </p>
         {policy && (
           <details>
             <summary>扫描范围与排除规则</summary>
@@ -205,7 +207,14 @@ export function FolderLibrary({
             {error}
           </p>
         )}
-        {selected && <FolderIndexPanel key={selected + (scan?.id || "")} api={api} folderId={selected} scanId={scan?.id} />}
+        {selected && (
+          <FolderIndexPanel
+            key={selected + (scan?.id || "")}
+            api={api}
+            folderId={selected}
+            scanId={scan?.id}
+          />
+        )}
         {scan && (
           <>
             <p>
@@ -364,7 +373,9 @@ export function FolderLibrary({
                         <>
                           <p>
                             值：
-                            {b.value === null ? "空白 / 未知" : String(b.value)}{" "}
+                            {b.value === null
+                              ? "空白 / 未知"
+                              : String(b.value)}{" "}
                             · 类型：{b.type} · 格式：{b.number_format}
                           </p>
                           {b.formula !== null && (
