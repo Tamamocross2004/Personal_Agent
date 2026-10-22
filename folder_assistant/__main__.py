@@ -17,6 +17,8 @@ def main():
     search=sub.add_parser('search');search.add_argument('folder_id');search.add_argument('query');search.add_argument('--mode',choices=['keyword','hybrid'],default='keyword')
     ask=sub.add_parser('ask');ask.add_argument('folder_id');ask.add_argument('query');ask.add_argument('--mode',choices=['keyword','hybrid'],default='keyword')
     ask.add_argument('--budget',type=int,default=10000);ask.add_argument('--file-id',action='append',default=None)
+    ask.add_argument('--strategy',choices=['retrieval','exhaustive'],default='retrieval')
+    ask.add_argument('--max-batches',type=int,default=3);ask.add_argument('--resume-from')
     sub.add_parser('history').add_argument('folder_id')
     for command in ('job','stop','export'):sub.add_parser(command).add_argument('job_id')
     args=p.parse_args();store=FolderStore(args.state_dir,excluded_roots=(PROJECT_ROOT/'workspace',))
@@ -37,7 +39,8 @@ def main():
                 jobs=FolderJobs(index)
                 try:
                     if args.command=='ask':
-                        job=jobs.start(args.folder_id,'answer',{'query':args.query,'mode':args.mode,'budget':args.budget,'file_ids':args.file_id})
+                        job=jobs.start(args.folder_id,'answer',{'query':args.query,'mode':args.mode,'budget':args.budget,'file_ids':args.file_id,
+                                                              'strategy':args.strategy,'max_batches':args.max_batches,'resume_from':args.resume_from})
                         jobs.threads[job['id']].join();result=jobs.get(job['id'])
                     elif args.command=='history':result=jobs.list(args.folder_id)
                     elif args.command=='job':result=jobs.get(args.job_id)

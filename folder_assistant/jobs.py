@@ -99,6 +99,29 @@ class FolderJobs:
                 if not manifest['complete']: raise ValueError('清单不完整，请重新扫描')
             elif kind=='answer':
                 from agent.config import load_llm_config
+                strategy=inputs.setdefault('strategy','retrieval')
+                if strategy not in ('retrieval','exhaustive'):raise ValueError('读取策略无效')
+                if strategy=='exhaustive':
+                    count=inputs.setdefault('max_batches',3)
+                    if type(count) is not int or not 1<=count<=8:raise ValueError('每次最多1至8批')
+                    if inputs.get('resume_from'):
+                        previous=self.get(inputs['resume_from'])
+                        if (previous['folder_id']!=fid or previous['kind']!='answer' or previous['status'] in ('queued','running')
+                            or previous['inputs'].get('strategy')!='exhaustive' or not previous.get('coverage')):
+                            raise ValueError('续读来源无效')
+                        coverage=previous['coverage']
+                        # Sent input is distinct from usable output. Explicit continuation
+                        # retries an unfinished batch; never silently skip its records.
+                        unfinished=next((b['start_offset'] for b in previous.get('batches',[])
+                                         if not (b.get('result') or {}).get('answer') or b.get('finish_reason')!='stop'),
+                                        coverage['returned_until'])
+                        next_offset=coverage.get('next_offset',unfinished)
+                        if next_offset>=coverage['total_segments']:raise ValueError('已到提取范围末尾；没有剩余内容')
+                        for key in ('generation','file_ids','query','mode'):inputs[key]=previous['inputs'][key]
+                        inputs.update(start_offset=next_offset,previous_structured_segments=coverage['structured_segments'],
+                                      previous_returned_until=coverage['returned_until'])
+                    else:inputs.update(start_offset=0,previous_structured_segments=0,previous_returned_until=0)
+                elif inputs.get('resume_from'):raise ValueError('局部检索不支持顺序续读')
                 if not 1<=len(inputs['query'].strip())<=1000 or not 256<=inputs['budget']<=50000: raise ValueError('问题或预算无效')
                 if inputs['mode'] not in ('keyword','hybrid'): raise ValueError('检索方式无效')
                 generation=self.index.store(fid).generation(inputs.get('generation'))
@@ -110,6 +133,9 @@ class FolderJobs:
                 inputs.update(generation=generation['id'],file_ids=files)
                 snapshot=[{k:v for k,v in d.items() if k!='pages'} for d in generation['files'] if files is None or d['file_id'] in files]
                 inputs['source_snapshot']=snapshot
+                if strategy=='exhaustive':
+                    from .reading import ReadingPlan
+                    inputs['reading_plan']=ReadingPlan(self.index,fid,generation['id'],files).signature
                 inputs['model']={'provider':config.provider,'model':config.model,'base_url':config.base_url,'retries':0}
                 if self.pricing:inputs['pricing']=self.pricing.get(config.provider,config.model)
             else: raise ValueError('操作类型无效')
@@ -137,8 +163,12 @@ class FolderJobs:
                     result=self.index.sync(job['folder_id'],job['inputs']['scan_id'],check=lambda:self.check(jid),
                                            event_callback=lambda row:self.update_event(jid,row),progress=progress)
                 else:
-                    from .answers import answer_once
-                    result=answer_once(self,jid)
+                    if job['inputs'].get('strategy')=='exhaustive':
+                        from .exhaustive import answer_exhaustive
+                        result=answer_exhaustive(self,jid)
+                    else:
+                        from .answers import answer_once
+                        result=answer_once(self,jid)
                 self.patch(jid,status='completed',result=result,finished=now())
             except Exception as exc:
                 with self.lock:

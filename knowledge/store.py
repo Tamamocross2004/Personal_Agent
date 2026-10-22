@@ -22,6 +22,7 @@ class KnowledgeStore:
     def __init__(self,settings,*,vectors=None,embedding_client=None,rerank_client=None,event_callback=None):
         self.settings=settings
         self.event_callback=event_callback
+        self.check=lambda:None
         self.root=Path(settings.knowledge_path)
         if not self.root.is_absolute(): self.root=PROJECT_ROOT/self.root
         self.root=self.root.resolve()
@@ -113,6 +114,7 @@ class KnowledgeStore:
                 if row: rows[h]=json.loads(row[0]); hits+=1
         missing=list(dict.fromkeys(t for t in texts if sha(t) not in rows))
         for offset in range(0,len(missing),16):
+            self.check()
             batch=missing[offset:offset+16]
             vectors,usage=self.embedder.embed(batch,purpose,budget)
             events+=usage
@@ -122,6 +124,7 @@ class KnowledgeStore:
                     rows[sha(text)]=vector
                     db.execute('INSERT OR REPLACE INTO vectors VALUES (?,?,?)',
                                (self.signature,sha(text),json.dumps(vector)))
+            self.check()
         return [rows[sha(t)] for t in texts],events,hits
 
     def build(self,uploads=(),*,mode='append',remove=(),prepared=(),before_activate=None):

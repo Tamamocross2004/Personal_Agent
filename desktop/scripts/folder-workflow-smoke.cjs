@@ -8,6 +8,11 @@ const project = path.resolve(__dirname, "../.."),
 const docs = path.join(fixture, "资料 空间");
 fs.mkdirSync(docs);
 fs.writeFileSync(path.join(docs, "readme.txt"), "本地资料原文。");
+if (process.argv.includes("--reading"))
+  fs.appendFileSync(
+    path.join(docs, "readme.txt"),
+    "\n" + Array.from({ length: 8 }, (_, i) => `续读记录${i + 1}。`).join("\n"),
+  );
 fs.writeFileSync(path.join(docs, ".env"), "SENSITIVE=must-not-read");
 const parseMode = process.argv.includes("--parse");
 if (parseMode)
@@ -163,6 +168,65 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         /本地资料原文/,
       );
     }
+    if (process.argv.includes("--reading")) {
+      await page
+        .locator(".folder-citation-preview")
+        .getByRole("button", {
+          name: "查看前后相邻原文（本地，不发送模型）",
+          exact: true,
+        })
+        .click();
+      await page
+        .locator(".folder-citation-preview")
+        .getByText("续读记录1。", { exact: true })
+        .waitFor();
+      await page
+        .getByRole("combobox", { name: "资料处理方式" })
+        .selectOption("exhaustive");
+      await page
+        .getByRole("button", {
+          name: "查看读取计划与首批原文（本地）",
+          exact: true,
+        })
+        .click();
+      await page
+        .locator(".folder-reading-preview")
+        .getByText(/9个提取块/)
+        .waitFor();
+      await page.getByRole("spinbutton", { name: "最多整理批数" }).fill("1");
+      await page
+        .getByRole("button", { name: "开始分批整理（调用模型）", exact: true })
+        .click();
+      await page
+        .locator(".folder-coverage")
+        .getByText(/剩余3段/)
+        .waitFor();
+      await page
+        .getByRole("button", {
+          name: "继续整理剩余范围（新任务，使用上方预算并调用模型）",
+          exact: true,
+        })
+        .click();
+      await page
+        .locator(".folder-coverage")
+        .getByText(/剩余0段/)
+        .waitFor();
+      assert.match(
+        await page.locator(".folder-coverage").innerText(),
+        /该范围提取文字已全部送达/,
+      );
+      assert.match(
+        await page.locator(".folder-coverage").innerText(),
+        /前次结果保留/,
+      );
+      await page
+        .getByRole("button", {
+          name: "⑤ 导出摘要 / 对照表 / 来源清单（本地）",
+          exact: true,
+        })
+        .click();
+      await page.getByText(/已导出至 /).waitFor();
+    }
     const conn = await page.evaluate(() => window.desktop.connection());
     const denied = await fetch(conn.url + "/api/folders", {
       method: "POST",
@@ -241,9 +305,11 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         "workspace",
         parseMode
           ? "folder-workflow-current-multiformat.png"
-          : process.argv.includes("--experience")
-            ? "stage21-folder-workflow.png"
-            : "folder-workflow-current.png",
+          : process.argv.includes("--reading")
+            ? "stage22-folder-workflow.png"
+            : process.argv.includes("--experience")
+              ? "stage21-folder-workflow.png"
+              : "folder-workflow-current.png",
       ),
     });
     await page
@@ -268,7 +334,10 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
       await page.locator(".folder-answer .folder-citation").first().click();
       await page
         .locator(".folder-citation-preview")
-        .getByText("本地资料原文。", { exact: true })
+        .getByText(
+          process.argv.includes("--reading") ? "续读记录6。" : "本地资料原文。",
+          { exact: true },
+        )
         .first()
         .waitFor();
       assert.equal(
@@ -281,10 +350,11 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         false,
       );
     }
-    assert.equal(
-      fs.readFileSync(path.join(docs, "readme.txt"), "utf8"),
-      "本地资料原文。",
-    );
+    if (!process.argv.includes("--reading"))
+      assert.equal(
+        fs.readFileSync(path.join(docs, "readme.txt"), "utf8"),
+        "本地资料原文。",
+      );
     assert.deepEqual(errors, []);
     assert.deepEqual(
       Object.fromEntries(
@@ -318,6 +388,18 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
             : []),
           ...(process.argv.includes("--export")
             ? ["export-roundtrip", "revoked-history-read-only"]
+            : []),
+          ...(process.argv.includes("--experience")
+            ? ["file-filters", "hidden-selection-preserved"]
+            : []),
+          ...(process.argv.includes("--reading")
+            ? [
+                "local-neighbors",
+                "reading-plan",
+                "bounded-partial",
+                "explicit-continuation",
+                "full-input-coverage",
+              ]
             : []),
         ],
         errors,

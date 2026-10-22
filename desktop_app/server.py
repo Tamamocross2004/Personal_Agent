@@ -61,6 +61,16 @@ class FolderQuestion(BaseModel):
     budget:int=Field(default=10000,ge=256,le=50000)
     file_ids:list[str]|None=Field(default=None,max_length=50)
     generation:str|None=Field(default=None,max_length=64)
+    strategy:Literal['retrieval','exhaustive']='retrieval'
+    max_batches:int=Field(default=3,ge=1,le=8)
+    resume_from:str|None=Field(default=None,max_length=64)
+
+
+class FolderReading(BaseModel):
+    generation:str=Field(min_length=1,max_length=64)
+    file_ids:list[str]|None=Field(default=None,max_length=50)
+    offset:int=Field(default=0,ge=0)
+    limit:int=Field(default=6,ge=1,le=6)
 
 
 def create_app(manager:Manager,token:str,ui_dir:Path|None=None,*,folder_grant_token:str|None=None):
@@ -146,6 +156,17 @@ def create_app(manager:Manager,token:str,ui_dir:Path|None=None,*,folder_grant_to
     def folder_job_stop(jid:str):return redact(folder_jobs.stop(jid))
     @app.post('/api/folders/{fid}/questions')
     def folder_question(fid:str,body:FolderQuestion):return redact(folder_jobs.start(fid,'answer',body.model_dump()))
+    @app.post('/api/folders/{fid}/reading')
+    def folder_reading(fid:str,body:FolderReading):
+        from folder_assistant.reading import read_batch
+        return redact(read_batch(folder_index,fid,**body.model_dump()))
+    @app.get('/api/folder-jobs/{jid}/citations/{cid}/neighbors')
+    def folder_neighbors(jid:str,cid:str):
+        from folder_assistant.reading import neighbors
+        job=folder_jobs.get(jid)
+        evidence=next((e for e in job.get('evidence',[]) if e['citation_id']==cid),None)
+        if not evidence:raise KeyError('引用不属于该任务')
+        return redact(neighbors(folder_index,job['folder_id'],job['inputs']['generation'],evidence['doc_id'],evidence['source_block_id']))
     @app.get('/api/folder-jobs/{jid}/citations/{cid}')
     def folder_citation(jid:str,cid:str):
         job=folder_jobs.get(jid)

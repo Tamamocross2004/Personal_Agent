@@ -65,10 +65,15 @@ def main():
             if available<256:raise ValueError('剩余诊断预算不足，未发送下一题')
             inputs={'query':case['query'],'mode':case['mode'],'budget':min(plan['limits']['per_question_tokens'],available),
                     'generation':generation,'file_ids':None if case['files'] is None else [files[name] for name in case['files']]}
+            for key in ('strategy','max_batches'):
+                if key in case:inputs[key]=case[key]
+            if case.get('resume_case'):
+                inputs['resume_from']=next(r['job_id'] for r in attempt['questions'] if r['case_id']==case['resume_case'])
             job=jobs.start(fid,'answer',inputs)
             row={'case_id':case['id'],'job_id':job['id'],'inputs':inputs};attempt['questions'].append(row);save()
             jobs.threads[job['id']].join(120);job=jobs.get(job['id'])
             row.update(status=job['status'],content_status=job.get('result',{}).get('content_status'),finish_reason=job.get('finish_reason'));save()
+            if job.get('coverage'):row['coverage']=job['coverage'];save()
             if job['status'] in ('queued','running'):
                 jobs.stop(job['id']);raise ValueError('超时，保留未确定状态并停止')
             if job['status']!='completed':raise ValueError('请求未正常完成，保留记录并停止：'+job['status'])

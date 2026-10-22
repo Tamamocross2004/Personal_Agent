@@ -19,12 +19,14 @@ class Chat:
               'unknowns':[],'comparison':[{'subject':'测试资料','field':'摘录','value':'=danger','status':'stated','citations':['C1']}]}
         if '输出JSON结构' in messages[0]['content'] or '输出结构由程序实际验证模型生成' in messages[0]['content']:
             evidence=json.loads(messages[1]['content'])['evidence'][0]
-            q={'citation_id':'C1','quote':evidence['text']}
+            cid=evidence['citation_id']
+            q={'citation_id':cid,'quote':evidence['text']}
             from folder_assistant.contracts import VERSION
             body['schema_version']=VERSION
             body['findings'][0]['support']=[q]
+            body['findings'][0]['citations']=['C999' if self.bad else cid]
             body['comparison']=[{'subject':None,'subject_type':'unknown','subject_quote':None,'field':'摘录',
-                                 'value':evidence['text'],'value_quote':q,'status':'stated','citations':['C1']}]
+                                 'value':evidence['text'],'value_quote':q,'status':'stated','citations':[cid]}]
         return NS(model='test-model',usage=None if self.unknown else NS(prompt_tokens=80,completion_tokens=40),
                   choices=[NS(message=NS(content=json.dumps(body,ensure_ascii=False)),finish_reason='length' if self.partial else 'stop')])
 

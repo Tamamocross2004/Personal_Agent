@@ -159,9 +159,14 @@ export function FolderIndexPanel({
             <span>
               {" "}
               ·{" "}
-              {({ parse: "解析", index: "嵌入与建库", done: "完成" } as any)[
-                job.progress.phase
-              ] || job.progress.phase}{" "}
+              {(
+                {
+                  parse: "解析",
+                  index: "嵌入与建库",
+                  done: "完成",
+                  reading: "顺序分批整理",
+                } as any
+              )[job.progress.phase] || job.progress.phase}{" "}
               {job.progress.completed} / {job.progress.total ?? "未知"} ·{" "}
               {job.progress.current}
             </span>

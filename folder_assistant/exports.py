@@ -55,20 +55,32 @@ def export_job(jobs,jid):
                     raise ValueError('已有导出文件发生变化；保留原文件，未自动覆盖')
             return {'directory':str(output),'files':list(saved['files']),'cached':True}
         answer=(job.get('result') or {}).get('answer') or {}
+        batches=job.get('batches',[])
+        if batches:
+            # Concatenate for export only, with batch labels; no synthesized merged answer.
+            answer={'schema_version':3,'findings':[],'comparison':[],'unknowns':[]}
+            for batch in batches:
+                body=(batch.get('result') or {}).get('answer') or {}
+                for key in ('findings','comparison'):
+                    answer[key].extend({**r,'export_batch':batch['number']} for r in body.get(key,[]))
+                answer['unknowns'].extend(f"第{batch['number']}批：{s}" for s in body.get('unknowns',[]))
         evidence={e['citation_id']:e for e in job.get('evidence',[])}
         source={'task_id':jid,'generation':job['inputs']['generation'],'review_status':'not_reviewed',
                 'scope_files':job['inputs']['source_snapshot'],'delivered_evidence':list(evidence.values()),
                 'retrieval':job.get('retrieval'),
                 'meaning':'范围文件不等于模型阅读全文；引用/定位仅认证保存来源，不认证结论正确。'}
+        if 'coverage' in job:source['coverage']=job['coverage']
         def refs(ids):
             return '; '.join(cid+' '+evidence[cid]['name']+' '+json.dumps(evidence[cid]['source_location'],ensure_ascii=False)+
                              ' SHA256 '+evidence[cid]['file_sha256'] for cid in ids)
         comparison=[['subject','field','value','status','citations_and_source_versions']]
         v2=answer.get('schema_version',1)>=2
         if v2:comparison[0].extend(['subject_type','subject_quote','value_quote'])
+        if batches:comparison[0].append('batch_number')
         for row in answer.get('comparison',[]):
             values=[row['subject'],row['field'],row['value'],row['status'],refs(row['citations'])]
             if v2:values.extend([row.get('subject_type','legacy'),json.dumps(row.get('subject_quote'),ensure_ascii=False),json.dumps(row.get('value_quote'),ensure_ascii=False)])
+            if batches:values.append(row['export_batch'])
             comparison.append(values)
         sources=[['relative_path','file_sha256','scan_id','generation','delivered_citations','meaning']]
         for doc in source['scope_files']:
@@ -79,7 +91,14 @@ def export_job(jobs,jid):
                '未正式审稿；执行状态：'+job['status']+'；内容状态：'+(job.get('result') or {}).get('content_status','未形成答案'),
                '固定索引：'+source['generation'],'']
         if job.get('message'): lines.extend([md(job['message']),''])
+        if 'coverage' in job:
+            lines.extend(['顺序分批整理：以下结果按批次保留，未做跨批合并；续读的前次结果保留在原任务。',
+                          '提取范围送达不认证完整抽取或语义正确。',md(json.dumps(job['coverage'],ensure_ascii=False)),''])
+            for batch in batches:
+                if not (batch.get('result') or {}).get('answer'):
+                    lines.append(f"第{batch['number']}批未形成可用结构化结果；原始响应见record.json。")
         for finding in answer.get('findings',[]):
+            if batches:lines.append('第'+str(finding['export_batch'])+'批：')
             lines.extend(['- '+md(finding['kind']+'：'+finding['statement'])+' '+md(' '.join('['+c+']' for c in finding['citations'])),''])
             if v2:
                 for label,key in [('假设（未证实）','assumptions'),('判断限制','limitations')]:

@@ -58,6 +58,15 @@ def answer_once(jobs,jid):
                              mode=inputs['mode'],budget=budget,event_callback=event)
     evidence=[{'citation_id':'C'+str(i+1),**h,'delivered_sha256':sha(h['text'])} for i,h in enumerate(result['hits'])]
     jobs.patch(jid,evidence=evidence,retrieval={k:v for k,v in result.items() if k!='hits'})
+    return answer_evidence(jobs,jid,evidence)
+
+
+class BudgetInsufficient(ValueError):pass
+
+
+def answer_evidence(jobs,jid,evidence,*,call_suffix='answer',reading_scope=None):
+    job=jobs.get(jid);inputs=job['inputs'];budget=inputs['budget']
+    def event(row):jobs.update_event(jid,row)
     jobs.check(jid)
     if not evidence:
         return {'answer':{'schema_version':VERSION,'findings':[{'statement':'当前限定范围的有限检索没有返回依据，无法据此判断原资料是否包含答案。',
@@ -65,17 +74,21 @@ def answer_once(jobs,jid):
                           'unknowns':['尚缺可引用的资料片段'],'comparison':[]},
                 'answer_schema_version':VERSION,'content_status':'insufficient_evidence','review_status':'not_reviewed'}
     supplied=[{k:e[k] for k in ('citation_id','name','file_sha256','source_location','text')} for e in evidence]
+    if reading_scope is not None:
+        supplied=[{**s,'role':e['role'],'block_start':e['start'],'block_end':e['end']} for s,e in zip(supplied,evidence)]
     messages=[{'role':'system','content':instruction()},
               {'role':'user','content':json.dumps({'question':inputs['query'],'evidence':supplied},ensure_ascii=False)}]
+    if reading_scope is not None:
+        messages[1]['content']=json.dumps({'question':inputs['query'],'reading_scope':reading_scope,'evidence':supplied},ensure_ascii=False)
     input_estimate=estimate_tokens(json.dumps(messages,ensure_ascii=False))
     used=jobs.used_tokens(jid)
     max_output=min(1200,jobs.index.settings.agent_call_max_tokens,budget-used-input_estimate)
-    if max_output<128: raise ValueError('剩余预算不足以发送短答请求；未调用语言模型')
+    if max_output<128: raise BudgetInsufficient('剩余预算不足以发送短答请求；未调用语言模型')
     jobs.patch(jid,request={'messages':messages,'estimated_input_tokens':input_estimate,'max_output_tokens':max_output,'answer_schema_version':VERSION})
     config=replace(load_llm_config(settings=jobs.index.settings),max_retries=0)
     client=jobs.llm_factory(config)
     jobs.check(jid)
-    call={'id':jid+'-answer','operation':'llm','status':'started','provider':config.provider,'model':config.model,
+    call={'id':jid+'-'+call_suffix,'operation':'llm','status':'started','provider':config.provider,'model':config.model,
           'input_tokens':None,'output_tokens':None,'request_attempts':1,'started':now()}
     event(call)
     try:

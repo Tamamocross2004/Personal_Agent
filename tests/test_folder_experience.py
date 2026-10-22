@@ -34,6 +34,19 @@ def test_failed_unknown_usage_not_zero(library,tmp_path):
     assert result['estimated_cost'] is None
 
 
+def test_rerank_and_failed_response_preserve_known_token_components(library,tmp_path):
+    _,_,fid,index,_,_=library
+    jobs,_=service(library)
+    index.store(fid).record_event({'id':'rerank-example','operation':'rerank','provider':'siliconflow','model':'fake',
+                                  'status':'returned','input_tokens':18,'output_tokens':3})
+    index.store(fid).record_event({'id':'failed-embedding','provider':'siliconflow','model':'fake',
+                                  'status':'failed','input_tokens':7})
+    result=summarize_folder(jobs,fid,PricingBook(tmp_path/'prices.json'))
+    assert result['by_operation']['rerank']['output_tokens']==3
+    assert result['by_operation']['embedding']['input_tokens']==7
+    assert result['estimated_cost'] is None
+
+
 def test_stopped_scan_never_replaces_saved_manifest(library):
     _,folders,fid,_,_,_=library
     first=folders.scan(fid)

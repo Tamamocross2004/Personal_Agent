@@ -23,9 +23,15 @@ export function FolderQuestions({
     [view, setView] = useState<any>(null),
     [citation, setCitation] = useState<any>(null);
   const [exported, setExported] = useState<any>(null);
+  const [strategy, setStrategy] = useState("retrieval"),
+    [maxBatches, setMaxBatches] = useState(3);
+  const [reading, setReading] = useState<any>(null),
+    [neighbors, setNeighbors] = useState<any>(null),
+    [batchNumber, setBatchNumber] = useState(0);
   const [historyError, setHistoryError] = useState("");
   const alive = useRef(true),
     turn = useRef(0);
+  const readingTurn = useRef(0);
   useEffect(() => {
     alive.current = true;
     api(`/folders/${folderId}/jobs`)
@@ -40,7 +46,40 @@ export function FolderQuestions({
       turn.current++;
     };
   }, [folderId, job?.status]);
-  const current = view || (job?.kind === "answer" ? job : history[0]);
+  const saved = view || (job?.kind === "answer" ? job : history[0]);
+  const batch = saved?.batches?.[batchNumber];
+  const current = batch
+    ? {
+        ...saved,
+        result: batch.result || { content_status: "尚未形成该批答案" },
+        model_output: batch.model_output,
+        finish_reason: batch.finish_reason,
+        evidence: batch.evidence,
+      }
+    : saved;
+  useEffect(() => {
+    setBatchNumber(0);
+    setNeighbors(null);
+    setCitation(null);
+    turn.current++;
+  }, [saved?.id]);
+  useEffect(() => {
+    setReading(null);
+    readingTurn.current++;
+  }, [index?.active?.id, scope, files]);
+  const loadReading = (offset = 0) =>
+    act(async () => {
+      const request = ++readingTurn.current;
+      const value = await api(`/folders/${folderId}/reading`, {
+        method: "POST",
+        body: JSON.stringify({
+          generation: index.active.id,
+          file_ids: scope === "all" ? null : files,
+          offset,
+        }),
+      });
+      if (alive.current && readingTurn.current === request) setReading(value);
+    });
   const labels: any = {
     direct: "原文整理",
     inference: "推断（基于假设，未证实）",
@@ -61,7 +100,10 @@ export function FolderQuestions({
             act(async () => {
               const request = ++turn.current,
                 value = await api(`/folder-jobs/${current.id}/citations/${id}`);
-              if (alive.current && turn.current === request) setCitation(value);
+              if (alive.current && turn.current === request) {
+                setCitation(value);
+                setNeighbors(null);
+              }
             })
           }
         >
@@ -78,7 +120,7 @@ export function FolderQuestions({
         </p>
       )}
       <p>
-        短答调用语言模型；混合检索还使用嵌入及配置的重排服务。仅发送实际召回的有限片段。结果未正式审稿，请核对引用和条件。
+        局部问答只发送有限召回片段；全量整理按固定范围分批送达已解析文字。两种方式均调用语言模型，结果未正式审稿，请核对引用和条件。
       </p>
       <label>
         问题
@@ -93,6 +135,29 @@ export function FolderQuestions({
       </label>
       <div className="knowledge-actions">
         <select
+          aria-label="资料处理方式"
+          value={strategy}
+          onChange={(e) => setStrategy(e.target.value)}
+        >
+          <option value="retrieval">局部检索问答</option>
+          <option value="exhaustive">
+            全量整理（按固定范围分批，可能部分完成）
+          </option>
+        </select>
+        {strategy === "exhaustive" && (
+          <label>
+            本次最多批数{" "}
+            <input
+              aria-label="最多整理批数"
+              type="number"
+              min={1}
+              max={8}
+              value={maxBatches}
+              onChange={(e) => setMaxBatches(Number(e.target.value))}
+            />
+          </label>
+        )}
+        <select
           aria-label="问答文件范围"
           value={scope}
           onChange={(e) => setScope(e.target.value)}
@@ -102,6 +167,7 @@ export function FolderQuestions({
         </select>
         <select
           aria-label="问答检索方式"
+          disabled={strategy === "exhaustive"}
           value={mode}
           onChange={(e) => setMode(e.target.value)}
         >
@@ -157,6 +223,50 @@ export function FolderQuestions({
           </FileFilter>
         </fieldset>
       )}
+      {strategy === "exhaustive" && (
+        <aside>
+          <p>
+            顺序读取所选索引版本的已解析文字，每批最多6个700字符片段，并在预算内逐批调用模型；不按关键词筛掉记录，不调用检索嵌入/重排。分批不会自动推断表头、连接跨页表格或合并业务对象。预算和批数限制可能导致部分完成。
+          </p>
+          <button
+            disabled={
+              busy || !index?.active || (scope === "selected" && !files.length)
+            }
+            onClick={() => loadReading()}
+          >
+            查看读取计划与首批原文（本地）
+          </button>
+          {reading && (
+            <div className="folder-reading-preview">
+              <p>
+                固定版本 {reading.generation} · {reading.total_blocks}个提取块 /{" "}
+                {reading.total_segments}段 · {reading.total_characters}字符。
+                {reading.meaning}
+              </p>
+              {reading.hits.map((h: any) => (
+                <article key={h.segment}>
+                  <p>
+                    {h.name} · {locationLabel(h.source_location)} · 块内字符[
+                    {h.start}, {h.end}) ·{" "}
+                    {h.role === "table_origin_unverified_header"
+                      ? "表格首条记录（未认证表头）"
+                      : h.role === "explicit_markdown_heading"
+                        ? "原文标题"
+                        : "顺序片段"}
+                  </p>
+                  <pre>{h.text || "（空白提取块）"}</pre>
+                </article>
+              ))}
+              <button
+                disabled={busy || reading.next_offset >= reading.total_segments}
+                onClick={() => loadReading(reading.next_offset)}
+              >
+                继续查看下一批原文（本地，不发送模型）
+              </button>
+            </div>
+          )}
+        </aside>
+      )}
       <button
         className="folder-cta"
         disabled={
@@ -165,7 +275,10 @@ export function FolderQuestions({
           !question.trim() ||
           (scope === "selected" && !files.length) ||
           budget < 256 ||
-          budget > 50000
+          budget > 50000 ||
+          !Number.isFinite(budget) ||
+          (strategy === "exhaustive" &&
+            (!Number.isInteger(maxBatches) || maxBatches < 1 || maxBatches > 8))
         }
         onClick={() =>
           act(async () => {
@@ -177,6 +290,8 @@ export function FolderQuestions({
                 budget,
                 file_ids: scope === "all" ? null : files,
                 generation: index.active.id,
+                strategy,
+                max_batches: maxBatches,
               }),
             });
             if (alive.current) {
@@ -188,7 +303,9 @@ export function FolderQuestions({
           })
         }
       >
-        开始资料短答（调用模型）
+        {strategy === "exhaustive"
+          ? "开始分批整理（调用模型）"
+          : "开始资料短答（调用模型）"}
       </button>
       <p className="muted">
         本次范围：
@@ -223,6 +340,101 @@ export function FolderQuestions({
       {current && (
         <div className="folder-answer">
           <h4>回答 · 未正式审稿</h4>
+          {saved?.coverage && (
+            <aside className="folder-coverage">
+              <p>
+                已确认送达输入范围 {saved.coverage.returned_until} /{" "}
+                {saved.coverage.total_segments}段；未完成整理剩余
+                {saved.coverage.remaining_segments}段。
+                {saved.coverage.input_coverage_complete
+                  ? "该范围提取文字已全部送达"
+                  : "部分完成，尚未送达全部范围"}
+                。
+              </p>
+              {saved.coverage.protocol_version >= 2 && (
+                <p>
+                  尚未确认送达 {saved.coverage.unsent_segments}{" "}
+                  段；已送达但响应无效或截断的批次仍属于未完成范围，手动继续会重新发送该批并另计调用。
+                </p>
+              )}
+              {!saved.coverage.protocol_version && (
+                <p>
+                  旧版范围记录仅统计送达位置；继续时依据保存的批次定位未完成内容，旧记录保持只读。
+                </p>
+              )}
+              <p>
+                结构及原句检查通过且未截断的批次对应
+                {saved.coverage.structured_segments}
+                段；不代表这些段中的所有事实都已抽取或判断正确。停止原因：
+                {(
+                  {
+                    batch_limit: "达到本次批数上限",
+                    token_budget: "剩余Token预算不足，未发送下一批",
+                    invalid_or_truncated_output:
+                      "响应格式无效或被截断，已停止后续批次",
+                    provider_reported_budget_exceeded:
+                      "服务返回的实际用量超出预算",
+                    end_of_extraction: "到达已解析文字末尾",
+                  } as any
+                )[saved.coverage.stop_reason] || saved.status}
+                。
+              </p>
+              {saved.inputs.resume_from && (
+                <p>
+                  续读任务：前次结果保留在历史任务 {saved.inputs.resume_from}
+                  ，本次不自动合并。
+                </p>
+              )}
+              <select
+                aria-label="查看分批结果"
+                value={batchNumber}
+                onChange={(e) => {
+                  setBatchNumber(Number(e.target.value));
+                  turn.current++;
+                  setCitation(null);
+                  setNeighbors(null);
+                }}
+              >
+                {saved.batches?.map((b: any, i: number) => (
+                  <option key={i} value={i}>
+                    第{b.number}批 · [{b.start_offset}, {b.next_offset}) ·{" "}
+                    {b.result?.content_status || b.status}
+                  </option>
+                ))}
+              </select>
+              <button
+                disabled={
+                  busy ||
+                  !saved.coverage.remaining_segments ||
+                  budget < 256 ||
+                  budget > 50000
+                }
+                onClick={() =>
+                  act(async () => {
+                    const value = await api(`/folders/${folderId}/questions`, {
+                      method: "POST",
+                      body: JSON.stringify({
+                        query: saved.inputs.query,
+                        mode: saved.inputs.mode,
+                        budget,
+                        strategy: "exhaustive",
+                        max_batches: maxBatches,
+                        resume_from: saved.id,
+                      }),
+                    });
+                    if (alive.current) {
+                      setView(null);
+                      setCitation(null);
+                      setJob(value);
+                    }
+                  })
+                }
+              >
+                继续整理剩余范围（新任务，使用上方预算并调用模型）
+              </button>
+              <p>{saved.result?.message || saved.message}</p>
+            </aside>
+          )}
           <button
             className="folder-cta"
             disabled={busy || ["queued", "running"].includes(current.status)}
@@ -415,8 +627,11 @@ export function FolderQuestions({
               </p>
             ))}
             <p>
-              实际送达 {current.evidence?.length || 0}{" "}
-              段；候选及全文缓存不等于模型已读。
+              {batch && batch.status !== "returned"
+                ? "本批准备的请求片段（未确认送达）"
+                : "本次实际送达片段"}{" "}
+              {current.evidence?.length || 0}{" "}
+              段；候选及全文缓存不等于模型已读。全量整理的累计送达范围以上方覆盖记录为准。
             </p>
             {current.evidence?.map((e: any) => (
               <article key={e.citation_id}>
@@ -452,6 +667,34 @@ export function FolderQuestions({
           </p>
           <p>本次实际送达片段：</p>
           <pre>{citation.delivered.text}</pre>
+          <button
+            onClick={() =>
+              act(async () => {
+                const request = ++turn.current;
+                const value = await api(
+                  `/folder-jobs/${current.id}/citations/${citation.delivered.citation_id}/neighbors`,
+                );
+                if (alive.current && turn.current === request)
+                  setNeighbors(value);
+              })
+            }
+          >
+            查看前后相邻原文（本地，不发送模型）
+          </button>
+          {neighbors && (
+            <div>
+              <p>{neighbors.meaning}</p>
+              {neighbors.blocks.map((b: any) => (
+                <article key={b.id}>
+                  <p>
+                    {locationLabel(b.location)}
+                    {b.partial ? "（显示前4000字符）" : ""}
+                  </p>
+                  <pre>{b.text || "（空白提取块）"}</pre>
+                </article>
+              ))}
+            </div>
+          )}
           <details>
             <summary>
               该位置的完整提取块（补充查看，不代表模型已读全部）

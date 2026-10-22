@@ -1,0 +1,109 @@
+{
+  "output_root": "D:\\code\\personal_agent\\workspace\\stage22-live-20261022",
+  "sources_sha256": {
+    "conditions.md": "f26ef59a2d76d1f7e12c8c0ac79e90e30f16aaf40470c2d0e3560eb3d6b57342",
+    "pressure.csv": "55945ea078edae8c7cd231375588dde6bbc5f6d58ce0ed0ae5a1d98f00e2479e"
+  },
+  "runtime_sha256": {
+    "folder_assistant/reading.py": "54febef7b0313bd16517d4f5882c7054100c8e4b75e51c8310d9ec92b22d9b8f",
+    "folder_assistant/exhaustive.py": "f5aadb484e9bc79e724353caf125f1b35d5eb0e9ca27a3daa11c6f2527da728d",
+    "folder_assistant/answers.py": "f6ffc17d463399b3a64bac2767d903e0f9164e51cc1749ab51aaee32aec3e4a2",
+    "folder_assistant/contracts.py": "69e97e543ea571271452f01f3981587f937fb8414a36cf15b58d7d41cda5f2a3",
+    "folder_assistant/jobs.py": "e02e623af60accaf1725135637ac1abbbe8dc0dc55cdb7d697e780e247fc6963",
+    "folder_assistant/index.py": "6c70d3975f5918bd76d2149f5938e5aaf6a369caff6af5feca3e5af7bc133db3",
+    "folder_assistant/store.py": "27a5f165119ef621715db67cfcfcecd9d494272cd5cae3f5b6de828ab7d3390d",
+    "folder_assistant/parsing.py": "474dd43160b91025576f4bbd802f2fe3a1122818ce6a8536ba194564722a0acf",
+    "folder_assistant/exports.py": "cd163dfe268288cd68f9aef3130ddb7c6aebe378091bf7b5355e7417b3081b8a",
+    "folder_assistant/usage.py": "bf86177a3397159586053bbc7e4431d45b37e3121678e04ad6ee42069db2d240",
+    "knowledge/store.py": "3fc3b7c28d42baf9aee644f9edcd25ab12c547a5b8de37552ae399ce8d5d6837",
+    "knowledge/documents.py": "4c2372f461f357cce017e9704392571c1d1bd1cf7e8f601867e6aa5eeb9305e2",
+    "knowledge/embedding.py": "7cfc277bf79b51205bff5c1447bb7165d73189a1773bfb7e013696349bdd2c43",
+    "knowledge/reranking.py": "8118a7613b87909571050ad1b6d6d3bee2a9beb8aa68b0dbc4ab60570cf384ec",
+    "agent/config.py": "5a398f74572d97545119f4abf55491302611272e0ff62387519d04f73ab88f00",
+    "scripts/folder_quality_check.py": "503103e646962f5b3182cefe267802a0746bdfb5e98de58c6c42e8f089dc4852"
+  },
+  "configuration": {
+    "provider": "deepseek",
+    "model": "deepseek-flash",
+    "base_url": "https://api.deepseek.com",
+    "embedding_model": "Pro/BAAI/bge-m3",
+    "embedding_base_url": "https://api.siliconflow.cn/v1",
+    "dimensions": 1024,
+    "rerank": false,
+    "retries": 0,
+    "llm_timeout": 30,
+    "embedding_timeout": 30,
+    "build_budget": 10000,
+    "temperature": 0.3,
+    "thinking": "disabled",
+    "output_cap": 1200,
+    "chunk_size": 700,
+    "chunk_overlap": 120,
+    "lexical_candidates": 40,
+    "vector_candidates": 40,
+    "rerank_candidates": 20
+  },
+  "limits": {
+    "embedding_calls": 3,
+    "llm_calls": 6,
+    "rerank_calls": 0,
+    "known_tokens": 45000,
+    "per_question_tokens": 12000
+  },
+  "questions": [
+    {
+      "id": "local-table",
+      "query": "整理所选资料中所有设备的压力原值，逐条列出，保留零、空白和未知；提供引用。",
+      "mode": "keyword",
+      "files": [
+        "pressure.csv"
+      ]
+    },
+    {
+      "id": "table-first-batch",
+      "query": "整理所选资料中所有设备的压力原值，逐条列出，保留零、空白和未知；提供引用。",
+      "mode": "keyword",
+      "files": [
+        "pressure.csv"
+      ],
+      "strategy": "exhaustive",
+      "max_batches": 1
+    },
+    {
+      "id": "table-explicit-continuation",
+      "query": "整理所选资料中所有设备的压力原值，逐条列出，保留零、空白和未知；提供引用。",
+      "mode": "keyword",
+      "files": [
+        "pressure.csv"
+      ],
+      "strategy": "exhaustive",
+      "max_batches": 3,
+      "resume_case": "table-first-batch"
+    },
+    {
+      "id": "conditional-difference",
+      "query": "比较两条维护周期记录，说明是否能够直接认定矛盾，以及仍缺少哪些条件。",
+      "mode": "keyword",
+      "files": [
+        "conditions.md"
+      ],
+      "strategy": "exhaustive",
+      "max_batches": 1
+    }
+  ],
+  "criteria_not_sent_to_model": {
+    "expected_device_records": 13,
+    "require_literal_values_and_same_record": true,
+    "zero_and_empty_distinct": true,
+    "separate_input_delivery_and_extraction_completeness": true,
+    "no_forced_workday_conversion": true,
+    "reviewer": "coding_assistant",
+    "stage12_accepted": false
+  },
+  "workspace": "workspace/stage22-live-20261022",
+  "documents_sha256": {
+    "conditions.md": "f26ef59a2d76d1f7e12c8c0ac79e90e30f16aaf40470c2d0e3560eb3d6b57342",
+    "pressure.csv": "55945ea078edae8c7cd231375588dde6bbc5f6d58ce0ed0ae5a1d98f00e2479e"
+  },
+  "startup_note": "The first launcher stopped on missing plan field before creating attempt.json or making provider calls. Original plan and log retained."
+}

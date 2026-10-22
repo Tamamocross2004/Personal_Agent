@@ -81,6 +81,7 @@ class FolderIndex:
     def sync(self,fid,scan_id,*,check=lambda:None,event_callback=None,progress=lambda **v:None):
         store=self.store(fid)
         store.event_callback=event_callback
+        store.check=check
         with lease(store.root/'.sync.lock'):
             manifest=self.folders.manifest(fid,scan_id)
             if not manifest['complete']: raise ValueError('扫描不完整，请解决限制或读取错误后重新扫描；未发送嵌入请求')

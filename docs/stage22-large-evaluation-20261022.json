@@ -1,0 +1,150 @@
+{
+  "preregistration": {
+    "paid_calls": 0,
+    "fake_providers": true,
+    "sources": {
+      "conditions.docx": "3d0080548d6144825e443179867e93d832f9dac7f4be1ada7f6cec8c2bff7b2c",
+      "ledger-00.csv": "939ec167dea142d33260741c4381f24dc415e6570cf95ae8c964303192e48353",
+      "ledger-01.csv": "fe351b6cc7dbdd865015bb75acd0e9f66b69aadab8628e0a257800cfe580e710",
+      "ledger-02.csv": "9be1e8ee69776f7acbfdd4c6f9d60315fee912659a861cb9789e206de22cae8a",
+      "ledger-03.csv": "234253dd312ab7119e767935280da4b4bbde7c82aad067da6b95e3a0076fb720",
+      "ledger-04.csv": "4a8d6958df632a0848b17303e7aa42895604c897e7539688ee38711050aea821",
+      "ledger-05.csv": "d9b89fae7f5199bab8fc11d684689d5b2e061444b08fff2a5937fab6069f0909",
+      "ledger-06.csv": "fc72b60550ff8e1cdef1c5cd2fd790fae8439956af39fe5a538e0be967779860",
+      "ledger-07.csv": "d39e6e5bd896cbed0086b3955146375ad353c1708e5e7a3d51846f17e085b422",
+      "ledger-08.csv": "84ec07a4ba96e3ea58f2930c7389c43d26395a9fe63d31583a974df479c10a20",
+      "ledger-09.csv": "eaae0e0998031083fda2ead20b76bf5b89df388f74acbc2703d1ecdb1dd22cee",
+      "notes-0.md": "9c45e10417df36670fd788a135f4ad05dc8b0a49006a7c9eb7047e5196209587",
+      "notes-1.md": "9c45e10417df36670fd788a135f4ad05dc8b0a49006a7c9eb7047e5196209587",
+      "notes-2.md": "9c45e10417df36670fd788a135f4ad05dc8b0a49006a7c9eb7047e5196209587",
+      "notes-3.md": "9c45e10417df36670fd788a135f4ad05dc8b0a49006a7c9eb7047e5196209587",
+      "pages.pdf": "b45ac1ca13d9f2deb3484727a0c89bb392d3a2599b94e7f962146f8343b6a6e4",
+      "pressure.xlsx": "77a1cb8d33cfdb56012094e0167576dd16e3bd08dc85989055ebf3e8b1aa2fc1"
+    },
+    "expected_csv_records": 2010,
+    "query": "cycle",
+    "case": "header-only lexical query versus local sequential plan",
+    "production_capacity_changes": false,
+    "semantic_quality_assessed": false
+  },
+  "generation": "446dadb6a5e843b49175d6b71b0c0dbd",
+  "sources_unchanged": true,
+  "file_count": 17,
+  "indexed_chunks": 2573,
+  "reading_plan": {
+    "generation": "446dadb6a5e843b49175d6b71b0c0dbd",
+    "plan_sha256": "0b0aab3030df30d4592fb1b3bbb57c4d3adb196f1d1ff272e0463fb83e78fafb",
+    "total_segments": 2573,
+    "total_blocks": 2573,
+    "total_characters": 133797,
+    "files": [
+      {
+        "file_id": "c3336233e1ce60746bba90c7494270c8415955a3addab6e3bed6a813860f746a",
+        "name": "conditions.docx",
+        "blocks": 32
+      },
+      {
+        "file_id": "ae9c2b3bb6a095fbe6b57067648c96924fb0fb9cdcb38495aadddeffb84f3c9c",
+        "name": "ledger-00.csv",
+        "blocks": 201
+      },
+      {
+        "file_id": "498fd8fae30b0f375bb63561da75d3e5b154f186c108a38b5dbc3f28b86ee06c",
+        "name": "ledger-01.csv",
+        "blocks": 201
+      },
+      {
+        "file_id": "d5a590cd98987238bb99ee983d27857ebdbc136582ad2f1427576026f6c3b3c1",
+        "name": "ledger-02.csv",
+        "blocks": 201
+      },
+      {
+        "file_id": "d00e23b5069d7bdb4e4e9168b3d159a3ab24e3e411ca98c0d0c8c236f1a84136",
+        "name": "ledger-03.csv",
+        "blocks": 201
+      },
+      {
+        "file_id": "5f8bc329529a08794073d947ca50743a84017cda28c533e5954bfe1966e0ec29",
+        "name": "ledger-04.csv",
+        "blocks": 201
+      },
+      {
+        "file_id": "e1795a85956a0bac36a63ee59998c73c11108255460945f9832b490a48a06b0b",
+        "name": "ledger-05.csv",
+        "blocks": 201
+      },
+      {
+        "file_id": "8e9e4010fa0295b4a32832f989828db8686670a3d434fb35b83f243a8f340f8f",
+        "name": "ledger-06.csv",
+        "blocks": 201
+      },
+      {
+        "file_id": "c38e6937638869e8d8c04069791d42a8a20319b4e356b22ced96808a21eadece",
+        "name": "ledger-07.csv",
+        "blocks": 201
+      },
+      {
+        "file_id": "70873fd5eecb9aec9c687bbc8047ab716f07ebeb2456a59117d2bc0a7e9fcc60",
+        "name": "ledger-08.csv",
+        "blocks": 201
+      },
+      {
+        "file_id": "7745a4910e1c8263f23134b5f5eddbffc4fc543fd2bd2fe709256fda60161f4c",
+        "name": "ledger-09.csv",
+        "blocks": 201
+      },
+      {
+        "file_id": "72a419c0f8d64d1201d6fec9e0a19a14c61febb48496cf9597c94e90679ff848",
+        "name": "notes-0.md",
+        "blocks": 81
+      },
+      {
+        "file_id": "1594cec66dc0cbb52932bcc161b2be4055e87e0f05597a9364b862af38e4a787",
+        "name": "notes-1.md",
+        "blocks": 81
+      },
+      {
+        "file_id": "38f995840763ae76a3e5c33e907345d6c70768ce608299f2e88dad4037631eb8",
+        "name": "notes-2.md",
+        "blocks": 81
+      },
+      {
+        "file_id": "df1b464823bf0ec641014ac4bfb74335e83ed4cd6bda8cb1ae26a7f95d0fd0b8",
+        "name": "notes-3.md",
+        "blocks": 81
+      },
+      {
+        "file_id": "2c7a0862d8333c7daba969484072b28f6d64e3460ca0ce3533838a68b22491ca",
+        "name": "pages.pdf",
+        "blocks": 6
+      },
+      {
+        "file_id": "36e7d16c448a5966ca0e0e22e5d1b83b8b2e943edc5c5a6c578a09771de5da87",
+        "name": "pressure.xlsx",
+        "blocks": 201
+      }
+    ],
+    "meaning": "仅覆盖本版本已解析文字；未含OCR、未提取内容。送达不认证完整提取或语义正确。"
+  },
+  "build_seconds_with_fake_embedding": 16.38,
+  "keyword_seconds": 0.2809,
+  "local_sequential_seconds": 0.1297,
+  "local_batches": 429,
+  "max_batch_characters": 1109,
+  "repeated_context_characters": 18110,
+  "keyword_csv_object_coverage": {
+    "found": 4,
+    "expected": 2000,
+    "ratio": 0.002
+  },
+  "local_sequential_csv_object_coverage": {
+    "found": 2000,
+    "expected": 2000,
+    "ratio": 1
+  },
+  "paid_calls": 0,
+  "real_model_tokens": null,
+  "real_model_cost": null,
+  "semantic_quality": "not_assessed",
+  "limitation": "局部关键词覆盖低是此header-only案例的观察，不是RAG总体召回率；顺序计划遍历100%不等于模型完整抽取、内容正确或真实大库延迟。"
+}

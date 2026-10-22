@@ -40,6 +40,11 @@ def test_native_grant_sync_answer_citation_export_revoke_and_read_only_history(t
         citation=client.get(url+'/citations/C1',headers=headers)
         assert citation.status_code==200 and citation.json()['delivered']['text']=='alpha original'
         assert client.get(url+'/citations/C999',headers=headers).status_code==404
+        reading=client.post(base+'/reading',headers=headers,json={'generation':job['inputs']['generation']})
+        assert reading.status_code==200 and reading.json()['cloud_calls'] is False
+        assert client.post(base+'/reading',headers=headers,json={'generation':job['inputs']['generation'],'file_ids':['foreign']}).status_code==400
+        assert client.get(url+'/citations/C1/neighbors',headers=headers).json()['cloud_calls'] is False
+        assert client.get(url+'/citations/C999/neighbors',headers=headers).status_code==404
         exported=client.post(url+'/export',headers=headers)
         assert exported.status_code==200 and len(exported.json()['files'])==6
         assert client.get(url+'/export/comparison.xlsx',headers=headers).content[:2]==b'PK'
@@ -51,6 +56,8 @@ def test_native_grant_sync_answer_citation_export_revoke_and_read_only_history(t
         assert client.get(base+'/files/'+scan['entries'][0]['id'],headers=headers,params={'scan_id':scan['id']}).status_code==400
         assert client.get(base+'/jobs',headers=headers).status_code==200
         assert client.get(url+'/citations/C1',headers=headers).status_code==200
+        assert client.get(url+'/citations/C1/neighbors',headers=headers).status_code==200
+        assert client.post(base+'/reading',headers=headers,json={'generation':job['inputs']['generation']}).status_code==400
         assert client.post(url+'/export',headers=headers).json()['cached']
         assert (len(embedding.calls),len(chat.calls))==calls
         assert (docs/'a.txt').read_bytes()==b'alpha original'

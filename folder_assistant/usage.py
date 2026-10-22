@@ -1,7 +1,7 @@
 """Read saved events only. Index events cover CLI and preview calls as well as jobs."""
 from decimal import Decimal
 
-from desktop_app.usage import summarize
+from desktop_app.usage import summarize,token
 
 
 def summarize_folder(jobs,fid,book):
@@ -13,12 +13,13 @@ def summarize_folder(jobs,fid,book):
             events.setdefault(event['id'],(event,job['inputs']))
     groups={}
     for operation in ('embedding','rerank','llm'):
-        rows=[]
+        rows=[];saved=[]
         for event,inputs in events.values():
             if event.get('operation','embedding')!=operation:continue
+            saved.append(event)
             converted={**event,'kind':'llm_call' if event['status']=='returned' else 'llm_error',
                        'prompt_tokens':event.get('input_tokens'),
-                       'completion_tokens':event.get('output_tokens') if operation=='llm' else 0,
+                       'completion_tokens':event.get('output_tokens') if operation!='embedding' else 0,
                        'cached_tokens':event.get('cached_tokens') if operation=='llm' else 0,
                        'usage_reported':event.get('input_tokens') is not None,
                        'cache_usage_reported':operation!='llm' or event.get('cached_tokens') is not None,
@@ -26,9 +27,9 @@ def summarize_folder(jobs,fid,book):
             rows.append(summarize({'events':[converted],'finished':True,'invalid_lines':0,'partial_line':False},
                                   {'options':{'pricing':inputs.get('pricing')}},book))
         groups[operation]={'calls':len(rows),
-            'input_tokens':sum(r['input_tokens'] for r in rows),
-            'output_tokens':sum(r['output_tokens'] for r in rows),
-            'unknown_usage_calls':sum(r['unknown_usage_calls'] if r['returned'] else 1 for r in rows),
+            'input_tokens':sum(token(e.get('input_tokens')) or 0 for e in saved),
+            'output_tokens':sum(token(e.get('output_tokens')) or 0 for e in saved),
+            'unknown_usage_calls':sum(token(e.get('input_tokens')) is None or (operation!='embedding' and token(e.get('output_tokens')) is None) for e in saved),
             'unpriced_calls':sum(r['unpriced_calls'] for r in rows),
             'known_cost':str(sum((Decimal(r['known_cost']) for r in rows),Decimal(0))),
             'unpriced_reasons':sorted({s for r in rows for s in r['unpriced_reasons']}),
