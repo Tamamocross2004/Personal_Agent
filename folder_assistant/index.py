@@ -78,7 +78,7 @@ class FolderIndex:
                 'skipped':[{'path':r['relative_path'],'status':r['status'],'reason':r.get('reason')}
                            for r in manifest['entries'] if r['kind']=='file' and r['status']!='ready']}
 
-    def sync(self,fid,scan_id,*,check=lambda:None,event_callback=None):
+    def sync(self,fid,scan_id,*,check=lambda:None,event_callback=None,progress=lambda **v:None):
         store=self.store(fid)
         store.event_callback=event_callback
         with lease(store.root/'.sync.lock'):
@@ -91,6 +91,7 @@ class FolderIndex:
             prepared=[];parse_hits=0
             for row in rows:
                 check()
+                progress(phase='parse',completed=len(prepared),total=len(rows),current=row['relative_path'])
                 preview=self.folders.preview(fid,scan_id,row['id'],limit=100)
                 if preview['status']!='ready': raise ValueError(row['relative_path']+'：'+preview.get('message',preview['status'])+'；本次未切换索引')
                 parse_hits+=int(preview['cache_hit'])
@@ -112,7 +113,9 @@ class FolderIndex:
                     _,data=self.folders.read(fid,scan_id,doc['file_id'])
                     if sha(data)!=doc['file_sha256']: raise ValueError('构建期间源文件变化，请重新扫描同步')
             validate()
+            progress(phase='index',completed=len(prepared),total=len(rows),current='解析完成；嵌入与写入索引中（请求返回前可申请停止）')
             result=store.build(mode='replace',prepared=prepared,before_activate=validate)
+            progress(phase='done',completed=len(rows),total=len(rows),current='索引版本已保存')
             return {**result,'scan_id':scan_id,'parse_cache_hits':parse_hits,'diff':self.diff(fid,scan_id)}
 
     def search(self,fid,query,*,generation=None,file_ids=None,event_callback=None,**kwargs):

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FolderIndexPanel } from "./folder-index";
 import { locationLabel } from "./folder-location";
+import { FileFilter } from "./folder-files";
 
 export function FolderLibrary({
   api,
@@ -15,6 +16,26 @@ export function FolderLibrary({
     [scan, setScan] = useState<any>(null);
   const [busy, setBusy] = useState(false),
     [error, setError] = useState("");
+  const [scanJob, setScanJob] = useState<any>(null);
+  const scanning = scanJob && ["queued", "running"].includes(scanJob.status);
+  useEffect(() => {
+    if (!scanning) return;
+    let disposed = false;
+    const timer = window.setInterval(async () => {
+      try {
+        const value = await api(`/folder-jobs/${scanJob.id}`);
+        if (disposed) return;
+        setScanJob(value);
+        if (value.status === "completed") setScan(value.result);
+      } catch (e) {
+        if (!disposed) setError(String(e));
+      }
+    }, 500);
+    return () => {
+      disposed = true;
+      clearInterval(timer);
+    };
+  }, [scanJob?.id, scanning]);
   const [preview, setPreview] = useState<any>(null),
     [parseStates, setParseStates] = useState<Record<string, string>>({});
   const busyGuard = useRef(false),
@@ -61,6 +82,7 @@ export function FolderLibrary({
   const choose = async (id: string) => {
     const turn = ++selection.current;
     setSelected(id);
+    setScanJob(null);
     setScan(null);
     setPreview(null);
     setParseStates({});
@@ -131,7 +153,7 @@ export function FolderLibrary({
         )}
         <div className="knowledge-actions folder-primary-actions">
           <button
-            disabled={busy}
+            disabled={busy || scanning}
             onClick={() =>
               action(async () => {
                 const row = await window.desktop.pickFolder();
@@ -152,7 +174,7 @@ export function FolderLibrary({
           <select
             aria-label="资料目录"
             value={selected}
-            disabled={busy}
+            disabled={busy || scanning}
             onChange={(e) => choose(e.target.value)}
           >
             <option value="" disabled>
@@ -168,6 +190,7 @@ export function FolderLibrary({
           <button
             disabled={
               busy ||
+              scanning ||
               !selected ||
               !folders.some((f) => f.id === selected && f.active)
             }
@@ -178,15 +201,15 @@ export function FolderLibrary({
                 setPreview(null);
                 setParseStates({});
                 previewTurn.current++;
-                const result = await api("/folders/" + id + "/scan", {
+                const result = await api("/folders/" + id + "/scan-jobs", {
                   method: "POST",
                 });
                 if (alive.current && turn === selection.current)
-                  setScan(result);
+                  setScanJob(result);
               })
             }
           >
-            {busy ? "处理中…" : "② 扫描文件清单"}
+            {scanning ? "扫描中…" : busy ? "处理中…" : "② 扫描文件清单"}
           </button>
           <button
             className="folder-revoke"
@@ -218,6 +241,24 @@ export function FolderLibrary({
             {error}
           </p>
         )}
+        {scanJob && (
+          <p role="status">
+            扫描状态：{scanJob.status} · 已发现{" "}
+            {scanJob.progress?.completed ?? 0} 项 · {scanJob.progress?.current}{" "}
+            {scanJob.message}
+            {scanning && (
+              <button
+                onClick={() =>
+                  api(`/folder-jobs/${scanJob.id}/stop`, { method: "POST" })
+                    .then(setScanJob)
+                    .catch((e) => setError(String(e)))
+                }
+              >
+                停止扫描
+              </button>
+            )}
+          </p>
+        )}
         {selected && (
           <FolderIndexPanel
             key={selected + (scan?.id || "")}
@@ -240,72 +281,80 @@ export function FolderLibrary({
               </p>
             ))}
             <div className="folder-file-list">
-              <table>
-                <thead>
-                  <tr>
-                    <th>相对路径</th>
-                    <th>类型</th>
-                    <th>大小</th>
-                    <th>修改时间</th>
-                    <th>状态 / 原因</th>
-                    <th>本地预览</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {scan.entries.map((f: any) => (
-                    <tr key={f.id}>
-                      <td
-                        style={{
-                          paddingLeft:
-                            Math.min(
-                              f.relative_path.split("/").length - 1,
-                              12,
-                            ) *
-                              12 +
-                            8,
-                        }}
-                      >
-                        {f.relative_path}
-                      </td>
-                      <td>
-                        {f.kind === "directory" ? "目录" : f.suffix || "—"}
-                      </td>
-                      <td>{f.size ?? "—"}</td>
-                      <td>
-                        {f.modified_ns
-                          ? new Date(f.modified_ns / 1000000).toLocaleString()
-                          : "—"}
-                      </td>
-                      <td>
-                        {
-                          (
-                            {
-                              ready: "可读取",
-                              excluded: "已排除",
-                              unsupported: "暂不支持",
-                              unreadable: "不可读取",
-                              over_limit: "超出限制",
-                            } as any
-                          )[f.status]
-                        }{" "}
-                        {f.reason}
-                        {parseStates[f.id] && <div>{parseStates[f.id]}</div>}
-                      </td>
-                      <td>
-                        {f.kind === "file" && f.status === "ready" && (
-                          <button
-                            disabled={busy}
-                            aria-label={"预览 " + f.relative_path}
-                            onClick={() => action(() => openPreview(f))}
+              <FileFilter rows={scan.entries}>
+                {(visible: any[]) => (
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>相对路径</th>
+                        <th>类型</th>
+                        <th>大小</th>
+                        <th>修改时间</th>
+                        <th>状态 / 原因</th>
+                        <th>本地预览</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {visible.map((f: any) => (
+                        <tr key={f.id}>
+                          <td
+                            style={{
+                              paddingLeft:
+                                Math.min(
+                                  f.relative_path.split("/").length - 1,
+                                  12,
+                                ) *
+                                  12 +
+                                8,
+                            }}
                           >
-                            打开内容预览
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                            {f.relative_path}
+                          </td>
+                          <td>
+                            {f.kind === "directory" ? "目录" : f.suffix || "—"}
+                          </td>
+                          <td>{f.size ?? "—"}</td>
+                          <td>
+                            {f.modified_ns
+                              ? new Date(
+                                  f.modified_ns / 1000000,
+                                ).toLocaleString()
+                              : "—"}
+                          </td>
+                          <td>
+                            {
+                              (
+                                {
+                                  ready: "可读取",
+                                  excluded: "已排除",
+                                  unsupported: "暂不支持",
+                                  unreadable: "不可读取",
+                                  over_limit: "超出限制",
+                                } as any
+                              )[f.status]
+                            }{" "}
+                            {f.reason}
+                            {parseStates[f.id] && (
+                              <div>{parseStates[f.id]}</div>
+                            )}
+                          </td>
+                          <td>
+                            {f.kind === "file" && f.status === "ready" && (
+                              <button
+                                disabled={busy}
+                                aria-label={"预览 " + f.relative_path}
+                                onClick={() => action(() => openPreview(f))}
+                              >
+                                打开内容预览
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </FileFilter>
             </div>
           </>
         )}

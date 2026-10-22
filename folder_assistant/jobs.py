@@ -11,12 +11,13 @@ class Stopped(ValueError): pass
 
 
 class FolderJobs:
-    def __init__(self,index,*,llm_factory=None):
+    def __init__(self,index,*,llm_factory=None,pricing=None):
         self.index=index
         self.folders=index.folders
         self.lock=threading.RLock()
         self.threads={}
         self.closed=False
+        self.pricing=pricing
         from agent.llm import LLMClient
         self.llm_factory=llm_factory or LLMClient
         with self.folders.connect() as db:
@@ -92,7 +93,8 @@ class FolderJobs:
         with self.lock,lease(self.folders.root/'.jobs-start.lock',wait=5):
             if any(j['status'] in ('running','queued') for j in self.list(fid)): raise ValueError('该目录已有操作，请等待结束或停止')
             inputs=dict(inputs)
-            if kind=='sync':
+            if kind=='scan':pass
+            elif kind=='sync':
                 manifest=self.folders.manifest(fid,inputs['scan_id'])
                 if not manifest['complete']: raise ValueError('清单不完整，请重新扫描')
             elif kind=='answer':
@@ -109,6 +111,7 @@ class FolderJobs:
                 snapshot=[{k:v for k,v in d.items() if k!='pages'} for d in generation['files'] if files is None or d['file_id'] in files]
                 inputs['source_snapshot']=snapshot
                 inputs['model']={'provider':config.provider,'model':config.model,'base_url':config.base_url,'retries':0}
+                if self.pricing:inputs['pricing']=self.pricing.get(config.provider,config.model)
             else: raise ValueError('操作类型无效')
             jid=uuid4().hex
             holder=lease(self.folders.root/(jid+'.job.lock'));holder.__enter__()
@@ -127,9 +130,12 @@ class FolderJobs:
             job=self.patch(jid,status='running')
             try:
                 self.check(jid)
-                if job['kind']=='sync':
+                progress=lambda **v:self.patch(jid,progress=v)
+                if job['kind']=='scan':
+                    result=self.folders.scan(job['folder_id'],check=lambda:self.check(jid),progress=progress)
+                elif job['kind']=='sync':
                     result=self.index.sync(job['folder_id'],job['inputs']['scan_id'],check=lambda:self.check(jid),
-                                           event_callback=lambda row:self.update_event(jid,row))
+                                           event_callback=lambda row:self.update_event(jid,row),progress=progress)
                 else:
                     from .answers import answer_once
                     result=answer_once(self,jid)

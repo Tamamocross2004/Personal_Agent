@@ -18,12 +18,15 @@ export function FolderIndexPanel({
   const [result, setResult] = useState<any>(null),
     [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [usage, setUsage] = useState<any>(null);
   const guard = useRef(false),
     alive = useRef(true);
   const base = `/folders/${folderId}`;
   const refresh = async () => {
     const value = await api(base + "/index");
     if (alive.current) setIndex(value);
+    const totals = await api(base + "/usage");
+    if (alive.current) setUsage(totals);
   };
   useEffect(() => {
     alive.current = true;
@@ -110,6 +113,14 @@ export function FolderIndexPanel({
                 扫描差异 ·{" "}
                 {index.diff.complete ? "清单完整" : "清单不完整，不能同步"}
               </summary>
+              <p role="status">
+                {index.diff.added.length +
+                index.diff.modified.length +
+                index.diff.missing.length
+                  ? "有尚未同步的资料变化；新问题仍使用当前索引，需要手动同步。"
+                  : "当前索引与最近扫描的可读取文件一致。"}{" "}
+                最近扫描 {index.diff.scan_id}。磁盘后续改动需重新扫描才能发现。
+              </p>
               {[
                 ["added", "新增"],
                 ["modified", "修改"],
@@ -144,6 +155,17 @@ export function FolderIndexPanel({
       {job && (
         <p role="status">
           操作状态：{job.status} {job.message || ""}{" "}
+          {job.progress && (
+            <span>
+              {" "}
+              ·{" "}
+              {({ parse: "解析", index: "嵌入与建库", done: "完成" } as any)[
+                job.progress.phase
+              ] || job.progress.phase}{" "}
+              {job.progress.completed} / {job.progress.total ?? "未知"} ·{" "}
+              {job.progress.current}
+            </span>
+          )}
           {pending && (
             <button
               onClick={() =>
@@ -159,6 +181,36 @@ export function FolderIndexPanel({
             </button>
           )}
         </p>
+      )}
+      {usage && (
+        <details className="folder-usage">
+          <summary>文件夹调用与费用 · {usage.calls}次</summary>
+          {Object.entries(usage.by_operation).map(([kind, g]: any) => (
+            <p key={kind}>
+              {
+                ({ embedding: "嵌入", rerank: "重排", llm: "聊天" } as any)[
+                  kind
+                ]
+              }
+              ：{g.calls}次 · 已知输入{g.input_tokens} / 输出{g.output_tokens}{" "}
+              Token · 用量未知{g.unknown_usage_calls}次 · 费用未定
+              {g.unpriced_calls}次
+              {g.unpriced_reasons.length
+                ? `（${g.unpriced_reasons.join("；")}）`
+                : ""}
+            </p>
+          ))}
+          <p>
+            可估算部分 ¥{usage.known_cost}；
+            {usage.estimated_cost === null
+              ? "总费用未知，未定价服务不记为零"
+              : `估算总额 ¥${usage.estimated_cost}`}
+            。{usage.scope}
+          </p>
+          <p>
+            聊天费率按任务快照或当前已配置参考费率估算；嵌入与重排未配置匹配费率时显示未定价。
+          </p>
+        </details>
       )}
       <h3>检索预览</h3>
       <div className="knowledge-actions">

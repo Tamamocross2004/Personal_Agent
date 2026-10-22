@@ -63,6 +63,27 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
     await page.getByRole("cell", { name: "readme.txt", exact: true }).waitFor();
     await page.getByRole("cell", { name: ".env", exact: true }).waitFor();
     assert.match(await page.locator(".folder-file-list").innerText(), /已排除/);
+    if (process.argv.includes("--experience")) {
+      const list = page.locator(".folder-file-list");
+      await list
+        .getByRole("combobox", { name: "按文件状态筛选" })
+        .selectOption("ready");
+      assert.equal(
+        await list.getByRole("cell", { name: ".env", exact: true }).count(),
+        0,
+      );
+      await list
+        .getByRole("combobox", { name: "按文件状态筛选" })
+        .selectOption("");
+      await list.getByRole("textbox", { name: "搜索文件名" }).fill("absent");
+      assert.equal(
+        await list
+          .getByRole("cell", { name: "readme.txt", exact: true })
+          .count(),
+        0,
+      );
+      await list.getByRole("textbox", { name: "搜索文件名" }).fill("");
+    }
     if (process.argv.includes("--index")) {
       await page
         .getByRole("button", {
@@ -85,6 +106,17 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
       );
     }
     if (process.argv.includes("--questions")) {
+      if (process.argv.includes("--experience")) {
+        await page
+          .getByRole("combobox", { name: "问答文件范围" })
+          .selectOption("selected");
+        const scope = page.locator(".folder-questions fieldset");
+        await scope.getByRole("textbox", { name: "搜索文件名" }).fill("readme");
+        await scope.getByRole("button", { name: "选择筛选结果" }).click();
+        await scope.getByRole("textbox", { name: "搜索文件名" }).fill("hidden");
+        assert.match(await scope.innerText(), /已选 1 项/);
+        assert.match(await scope.innerText(), /本次所选：readme.txt/);
+      }
       await page
         .getByRole("textbox", { name: "文件夹资料问题" })
         .fill("本地资料是什么？");
@@ -209,7 +241,9 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         "workspace",
         parseMode
           ? "folder-workflow-current-multiformat.png"
-          : "folder-workflow-current.png",
+          : process.argv.includes("--experience")
+            ? "stage21-folder-workflow.png"
+            : "folder-workflow-current.png",
       ),
     });
     await page

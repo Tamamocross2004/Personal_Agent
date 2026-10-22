@@ -99,7 +99,7 @@ class FolderStore:
             'max_depth':MAX_DEPTH,'cloud_calls':False,'mode':'local_read_only',
             'notice':'本阶段只浏览及本地解析；不调用模型、嵌入或重排，不注册代码执行工具。'}
 
-    def scan(self,key):
+    def scan(self,key,*,check=lambda:None,progress=lambda **v:None):
         with self.lock:
             root=self.authorized(key);rows=[];total=0;limits=[]
             def walk(parent,depth):
@@ -110,6 +110,8 @@ class FolderStore:
                     self.authorized(key)
                     with os.scandir(parent) as entries:
                         for entry in entries:
+                            check()
+                            if len(rows)%25==0:progress(phase='scan',completed=len(rows),total=None,current=entry.name)
                             if len(rows)>=MAX_ENTRIES:
                                 limits.append('达到条目上限，未继续扫描剩余目录');return
                             relative=(parent/entry.name).relative_to(root).as_posix()
@@ -139,10 +141,12 @@ class FolderStore:
                             except OSError:row.update(status='unreadable',reason='无法读取文件属性或目录')
                 except OSError:limits.append('部分目录无法枚举：'+parent.relative_to(root).as_posix())
             walk(root,0)
+            check()
             self.authorized(key)
             result={'id':uuid.uuid4().hex,'folder_id':key,'entries':rows,'total_bytes':total,
                     'complete':not limits,'limits':list(dict.fromkeys(limits)), 'policy':self.policy()}
             with self.connect() as db:db.execute('INSERT INTO scans VALUES(?,?,?)',(result['id'],key,json.dumps(result,ensure_ascii=False)))
+            progress(phase='scan',completed=len(rows),total=len(rows),current='扫描清单已保存')
             return result
 
     def manifest(self,key,scan_id=None):

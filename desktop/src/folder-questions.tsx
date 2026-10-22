@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { locationLabel } from "./folder-location";
+import { FileFilter } from "./folder-files";
 
 export function FolderQuestions({
   api,
@@ -15,6 +16,9 @@ export function FolderQuestions({
     [budget, setBudget] = useState(10000);
   const [scope, setScope] = useState("all"),
     [files, setFiles] = useState<string[]>([]);
+  useEffect(() => {
+    setFiles([]);
+  }, [index?.active?.id]);
   const [history, setHistory] = useState<any[]>([]),
     [view, setView] = useState<any>(null),
     [citation, setCitation] = useState<any>(null);
@@ -119,22 +123,38 @@ export function FolderQuestions({
       {scope === "selected" && (
         <fieldset>
           <legend>检索前限定文件范围</legend>
-          {index?.active?.files.map((f: any) => (
-            <label className="folder-scope-file" key={f.file_id}>
-              <input
-                type="checkbox"
-                checked={files.includes(f.file_id)}
-                onChange={(e) =>
-                  setFiles((old) =>
-                    e.target.checked
-                      ? [...old, f.file_id]
-                      : old.filter((id) => id !== f.file_id),
-                  )
-                }
-              />
-              {f.name}
-            </label>
-          ))}
+          <FileFilter
+            rows={(index?.active?.files || []).map((f: any) => ({
+              ...f,
+              suffix: "." + f.name.split(".").pop().toLowerCase(),
+              status: index?.diff?.modified.includes(f.name)
+                ? "modified"
+                : index?.diff?.missing.includes(f.name)
+                  ? "missing"
+                  : "unchanged",
+            }))}
+            selected={files}
+            select={setFiles}
+          >
+            {(visible: any[]) =>
+              visible.map((f: any) => (
+                <label className="folder-scope-file" key={f.file_id}>
+                  <input
+                    type="checkbox"
+                    checked={files.includes(f.file_id)}
+                    onChange={(e) =>
+                      setFiles((old) =>
+                        e.target.checked
+                          ? [...old, f.file_id]
+                          : old.filter((id) => id !== f.file_id),
+                      )
+                    }
+                  />
+                  {f.name}
+                </label>
+              ))
+            }
+          </FileFilter>
         </fieldset>
       )}
       <button
@@ -170,6 +190,13 @@ export function FolderQuestions({
       >
         开始资料短答（调用模型）
       </button>
+      <p className="muted">
+        本次范围：
+        {scope === "all"
+          ? `整个已建库目录（${index?.active?.files.length || 0}份）`
+          : `所选${files.length}份`}{" "}
+        · 使用索引 {index?.active?.id || "尚未建库"}。筛选文件不会同步新内容。
+      </p>
       <h4>已保存的短答（只读查看，不重复调用）</h4>
       <select
         aria-label="历史资料问答"

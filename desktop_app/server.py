@@ -69,7 +69,7 @@ def create_app(manager:Manager,token:str,ui_dir:Path|None=None,*,folder_grant_to
     from folder_assistant.index import FolderIndex
     from folder_assistant.jobs import FolderJobs
     folder_index=FolderIndex(folders,manager.settings)
-    folder_jobs=FolderJobs(folder_index)
+    folder_jobs=FolderJobs(folder_index,pricing=manager.pricing)
     @asynccontextmanager
     async def lifespan(app):
         yield
@@ -123,6 +123,12 @@ def create_app(manager:Manager,token:str,ui_dir:Path|None=None,*,folder_grant_to
     def folder_scan(fid:str):return folders.scan(fid)
     @app.get('/api/folders/{fid}/scan')
     def folder_manifest(fid:str):return folders.manifest(fid)
+    @app.post('/api/folders/{fid}/scan-jobs')
+    def folder_scan_job(fid:str):return redact(folder_jobs.start(fid,'scan',{}))
+    @app.get('/api/folders/{fid}/usage')
+    def folder_usage(fid:str):
+        from folder_assistant.usage import summarize_folder
+        return redact(summarize_folder(folder_jobs,fid,manager.pricing))
     @app.get('/api/folders/{fid}/files/{file_id}')
     def folder_preview(fid:str,file_id:str,scan_id:str,offset:int=0,limit:int=50):
         return redact(folders.preview(fid,scan_id,file_id,offset=offset,limit=limit))
