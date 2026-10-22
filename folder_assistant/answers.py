@@ -72,6 +72,9 @@ def prepare_messages(inputs,evidence,reading_scope=None):
               {'role':'user','content':json.dumps({'question':inputs['query'],'evidence':supplied},ensure_ascii=False)}]
     if reading_scope is not None:
         messages[1]['content']=json.dumps({'question':inputs['query'],'reading_scope':reading_scope,'evidence':supplied},ensure_ascii=False)
+    if inputs.get('project_context') is not None:
+        content=json.loads(messages[1]['content']);content['project_context']=inputs['project_context']
+        messages[1]['content']=json.dumps(content,ensure_ascii=False)
     return messages
 
 

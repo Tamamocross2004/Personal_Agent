@@ -1,0 +1,330 @@
+{
+  "stage": 25,
+  "date": "2026-10-23",
+  "work_started": "2026-10-22",
+  "base_commit": "9146b89",
+  "reviewer": "coding_assistant",
+  "engineering_passed": true,
+  "content_acceptance_passed": false,
+  "independent_review": false,
+  "stage12_accepted": false,
+  "tests": {
+    "initial_combination": "28 passed",
+    "targeted_combination": "31 passed",
+    "first_full_before_last_correction": "1095 passed in 398.46s",
+    "final_full": "1095 passed in 204.19s",
+    "build": true,
+    "electron_isolated_fakes": true
+  },
+  "live_plan_sha256": "d7c2c21bb8da4d27a770e1261baf22dbbf4895d1f3daa512c3481e4d10111ed9",
+  "live_runtime_sha256": {
+    "folder_assistant/__init__.py": "36656300506ebee15611b11a8eec4d2ba51af2278e92d74a5226fa32a1dd6277",
+    "folder_assistant/__main__.py": "590c31bef4728539747a3a02b16cf55df006a81938f3e6adb0e2324d7747f560",
+    "folder_assistant/answers.py": "23bc3437169fd242a13e64dba866ec3987a506e8ec4267a35f593eb46b723efd",
+    "folder_assistant/batching.py": "87936b69ccbb6b2d5e4c027de9f68265393e24c037fc57fa783b513bb97800a2",
+    "folder_assistant/contracts.py": "69e97e543ea571271452f01f3981587f937fb8414a36cf15b58d7d41cda5f2a3",
+    "folder_assistant/exhaustive.py": "16c6d1014da941bc8f40dc62551ff3489ca02a47010002fe2334f293ef15bdfc",
+    "folder_assistant/exports.py": "12c5348067e7d9dd5f08903996ddbcd052cf8854b5548fc31dd8b5d9e90983f7",
+    "folder_assistant/index.py": "6c70d3975f5918bd76d2149f5938e5aaf6a369caff6af5feca3e5af7bc133db3",
+    "folder_assistant/jobs.py": "b8c0efab6530c70b619464e32f9ca9092fe08b3f6da722a99dd2900de0010b31",
+    "folder_assistant/parse_worker.py": "e1603c813ea3ed124e4f744af7db7fabb13343c09ab570a651722338cbf49387",
+    "folder_assistant/parsing.py": "474dd43160b91025576f4bbd802f2fe3a1122818ce6a8536ba194564722a0acf",
+    "folder_assistant/project_exports.py": "0f296a8f699722299d191acb00940d95267bd986cc94d49ae5e9c62c2109acbc",
+    "folder_assistant/projects.py": "626a37145e285226170983857afd1f1086eb4dd655fb91a02c7be9b7252f7320",
+    "folder_assistant/reading.py": "54febef7b0313bd16517d4f5882c7054100c8e4b75e51c8310d9ec92b22d9b8f",
+    "folder_assistant/scope.py": "1180705f2cacf02fe068aef1a9a52adebfafe19b7e5baef06259405dd282887f",
+    "folder_assistant/store.py": "27a5f165119ef621715db67cfcfcecd9d494272cd5cae3f5b6de828ab7d3390d",
+    "folder_assistant/usage.py": "bf86177a3397159586053bbc7e4431d45b37e3121678e04ad6ee42069db2d240",
+    "knowledge/__init__.py": "5fcbc38c72e9f0e4c0938373622ff86daadbe7389238d3003d9a73d3acfb1533",
+    "knowledge/__main__.py": "fc231000c92128f2dacd50c8e4a2131c197130af52b5c13500673af31e4dec43",
+    "knowledge/documents.py": "4c2372f461f357cce017e9704392571c1d1bd1cf7e8f601867e6aa5eeb9305e2",
+    "knowledge/embedding.py": "7cfc277bf79b51205bff5c1447bb7165d73189a1773bfb7e013696349bdd2c43",
+    "knowledge/large_probe.py": "497c734fde900ff464eea06b736979fc52ccaa964bba28f21ebd3a1464c0c630",
+    "knowledge/locking.py": "c2f87541b323e39f8d080067aab7c15f7870f9a50b522ca9bcb596a4b89002ee",
+    "knowledge/long_probe.py": "824878c533475b0d48cca92f538fe00228108ede3274cf4bd43996ada91bb403",
+    "knowledge/probe.py": "564fc1190358d125bdd7d1c7d0fbe2bc1a998258e1dbe4f0b268585552e5666a",
+    "knowledge/recall_probe.py": "fb5657819c94b93083d3a11e6e546342345f3d35ac14fe70c662449f40143ca9",
+    "knowledge/report_probe.py": "486c955ce7368a5beb181b9def74546fc3b3ad9188c013105d643570102ac7df",
+    "knowledge/rerank_probe.py": "4c49f1e3a7f0e8dcd50edb647ba9beb521398ea05c01da538b25f1c99b9b75bc",
+    "knowledge/reranking.py": "8118a7613b87909571050ad1b6d6d3bee2a9beb8aa68b0dbc4ab60570cf384ec",
+    "knowledge/store.py": "3fc3b7c28d42baf9aee644f9edcd25ab12c547a5b8de37552ae399ce8d5d6837",
+    "knowledge/vectors.py": "520aff951c342401e1f1c4fcf5a532bd8f3ae859f6c01eb920414f8d2fdafd1b",
+    "agent/config.py": "30f8a3e63d4919113bdc09dc9954623440c18ee399448abd6e5da66ba7d2c60e",
+    "agent/llm.py": "bc58280e4c9663f4cc7f2fdf16041f11358e7b5b3e74b0fb4ce50b2232118867",
+    "agent/context.py": "097c931099e9b28a5222a10f02b03085f76f8aec61b33a02eb57393f7361f76f",
+    "agent/strength.py": "2dc6a5891255eb5e8da1c792e14acd3e39ab170bbd8493469432fd811035d1b1",
+    "workspace/stage25_live.py": "edbd309ad3b62c6360c92f99f1985d68ef49e8eab5fae3a56501ece52b2b5c82"
+  },
+  "live_usage": {
+    "llm_calls": 4,
+    "embedding_calls": 2,
+    "rerank_calls": 0,
+    "known_tokens": 10189
+  },
+  "cny_total": null,
+  "live_editions": [
+    {
+      "step": "initial",
+      "version_id": "7c0db87408cc406b95268b9b8796febb",
+      "parent_id": null,
+      "coverage": {
+        "files": [
+          {
+            "file_id": "e63d9b65047e03018ee65b06d32c094d53be7e99491ccd7acf77203ecc277521",
+            "name": "pump-a.txt",
+            "total_segments": 1,
+            "usable_segments": 1
+          },
+          {
+            "file_id": "46fe602982ed45c0a47f7a024186ec554f290a14b2cbf06d1848e68728d84bfc",
+            "name": "pump-b.txt",
+            "total_segments": 1,
+            "usable_segments": 1
+          }
+        ],
+        "total_segments": 2,
+        "usable_segments": 2
+      },
+      "fields": [
+        [
+          "NR-51",
+          "流量",
+          "0 L/min"
+        ],
+        [
+          "NR-51",
+          "功率",
+          "18 W"
+        ],
+        [
+          "NR-52",
+          "流量",
+          "15 L/min"
+        ],
+        [
+          "NR-52",
+          "功率",
+          "32 W"
+        ]
+      ],
+      "literal_fields_matching": 4,
+      "review_status": "not_reviewed",
+      "semantic_status": "not_certified",
+      "groups": [
+        {
+          "job_id": "0136838c8b1742feb0cd2300f38e9c14",
+          "generation": "74cb82843daf421bbc2fdf3c4b6556ca",
+          "batch": 1
+        },
+        {
+          "job_id": "0136838c8b1742feb0cd2300f38e9c14",
+          "generation": "74cb82843daf421bbc2fdf3c4b6556ca",
+          "batch": 2
+        }
+      ]
+    },
+    {
+      "step": "incremental",
+      "version_id": "9e5bdfa585d2442cb21785fa2bb260b2",
+      "parent_id": "7c0db87408cc406b95268b9b8796febb",
+      "coverage": {
+        "files": [
+          {
+            "file_id": "e63d9b65047e03018ee65b06d32c094d53be7e99491ccd7acf77203ecc277521",
+            "name": "pump-a.txt",
+            "total_segments": 1,
+            "usable_segments": 1
+          },
+          {
+            "file_id": "46fe602982ed45c0a47f7a024186ec554f290a14b2cbf06d1848e68728d84bfc",
+            "name": "pump-b.txt",
+            "total_segments": 1,
+            "usable_segments": 1
+          }
+        ],
+        "total_segments": 2,
+        "usable_segments": 2
+      },
+      "fields": [
+        [
+          "NR-51",
+          "流量",
+          "0 L/min"
+        ],
+        [
+          "NR-51",
+          "功率",
+          "18 W"
+        ],
+        [
+          "NR-52",
+          "流量",
+          "15 L/min"
+        ],
+        [
+          "NR-52",
+          "功率",
+          "34 W"
+        ]
+      ],
+      "literal_fields_matching": 4,
+      "review_status": "not_reviewed",
+      "semantic_status": "not_certified",
+      "groups": [
+        {
+          "job_id": "0136838c8b1742feb0cd2300f38e9c14",
+          "generation": "74cb82843daf421bbc2fdf3c4b6556ca",
+          "batch": 1
+        },
+        {
+          "job_id": "c46dd038adae4f8cb1e1b9fad7ad0510",
+          "generation": "ae37084531924ea6976a003c4dcffffc",
+          "batch": 1
+        }
+      ]
+    }
+  ],
+  "followup": {
+    "job_id": "07768df359f345dba26ef45dd9d92bdd",
+    "value": "0 L/min",
+    "head_unchanged": true,
+    "review_status": "not_reviewed"
+  },
+  "checks": {
+    "historical_files_unchanged": 551,
+    "live_runtime_unchanged_since_preregistration": true,
+    "old_edition_unchanged": true,
+    "new_evidence_only_changed_b": true,
+    "unchanged_a_text_in_historical_background": true,
+    "preregistered_unchanged_a_not_resent_strictly_passed": false,
+    "all_preregistered_criteria_passed": false,
+    "csv_xlsx_roundtrips": 2,
+    "project_keys_checked": 2,
+    "secret_matches": 0,
+    "files_scanned": 416,
+    "answer_v3_validation_unchanged": true
+  },
+  "observations": [
+    "The live sample checks two tiny synthetic text files only, not content acceptance or a model quality benchmark.",
+    "Incremental extraction sends only B as new evidence and preserves A original job/index. Historical result context still contains A text and costs tokens; strict no-resend criterion failed and was not redefined.",
+    "Old sources, editions and failed UI attempts were preserved; no retry of paid diagnostic or question-specific production rules.",
+    "File-level revisions and exact source reuse do not imply paragraph editing, business-key merges, OCR or automatic background synchronization."
+  ],
+  "source_sha256": {
+    "README.md": "f294a7de0e3769e88b10f17c03e4d2a2ef778fd457edd4363df3fb71ed505b3f",
+    "ROADMAP.md": "91fe1177614e6552bec0ca46ece4be37086dc4103b3eea7d4ec7094fbc84f5f7",
+    "desktop/scripts/folder-workflow-smoke.cjs": "b1d1c107dafa7d95508cfb156b07a242c51d7803f521741abe37ecdc1104c7ae",
+    "desktop/src/folder-index.tsx": "74acb955dc3c247b3a0834ce51a0da76fc65d3dc395d7404e293220e9641d6f7",
+    "desktop/src/style.css": "5604dc03e2cdc6439c540e8169a57b88bc3a96e3830e1c0bdccf9f5249b37e99",
+    "desktop_app/server.py": "ef1073d43536408bfe4c954077ed984ba45de949d69b971fd1a836de53a6a342",
+    "folder_assistant/answers.py": "23bc3437169fd242a13e64dba866ec3987a506e8ec4267a35f593eb46b723efd",
+    "folder_assistant/projects.py": "626a37145e285226170983857afd1f1086eb4dd655fb91a02c7be9b7252f7320",
+    "folder_assistant/project_exports.py": "0f296a8f699722299d191acb00940d95267bd986cc94d49ae5e9c62c2109acbc",
+    "desktop/src/folder-projects.tsx": "40fd8de566af8a5b26cae41163b6d23f7fb6b462ce6db5e537fb9c4a8873778a",
+    "tests/test_folder_projects.py": "937b99359303015ad6bf34bc64d8c866e819dd6f317a5e0f5af8ff4641c4f64a",
+    "tests/test_folder_projects_api.py": "191e34e3afc581b646f1e551cfbd1d3e98b8821e2991905c5a66989de547bebc",
+    "docs/folder-projects.md": "e78ec87c1dc6fbea6bfc6aeae5247b29b1ffdd8d7f5d0bb27425a576e9035805",
+    "docs/stage25-verification-20261022.md": "449296ffd9c70a4e8b41764378b6fc2084ec46552e5809691d5002ca308836da",
+    "docs/stage25-live-plan-20261022.json": "d7c2c21bb8da4d27a770e1261baf22dbbf4895d1f3daa512c3481e4d10111ed9"
+  },
+  "artifact_sha256": {
+    "workspace/stage25-live-20261022/attempt.json": "a0bd054bb86484519b659d87795af4cf8f8a5f6198d4c73a2122b5f8376f9509",
+    "workspace/stage25-live-20261022/followup.json": "6f3829143576be96035b35566c5814e613adfed929f44c44225bcfb805331708",
+    "workspace/stage25-live-20261022/documents/pump-a.txt": "0e007e01354ef930aaa83274bebce969f2786711a50a1cd1733f38ac4df08f69",
+    "workspace/stage25-live-20261022/documents/pump-b.txt": "59d129710e870ea71370c79b31fcb275d9ed209be73064f3602c5ca173602ebe",
+    "workspace/stage25-live-20261022/initial-documents/pump-a.txt": "0e007e01354ef930aaa83274bebce969f2786711a50a1cd1733f38ac4df08f69",
+    "workspace/stage25-live-20261022/initial-documents/pump-b.txt": "f52a4a4ab28cc2b6f0a7d000326a3b10a24693c9808ac04e116ea71b33aa0f84",
+    "workspace/stage25-live-20261022/runtime/agent/config.py": "30f8a3e63d4919113bdc09dc9954623440c18ee399448abd6e5da66ba7d2c60e",
+    "workspace/stage25-live-20261022/runtime/agent/context.py": "097c931099e9b28a5222a10f02b03085f76f8aec61b33a02eb57393f7361f76f",
+    "workspace/stage25-live-20261022/runtime/agent/llm.py": "bc58280e4c9663f4cc7f2fdf16041f11358e7b5b3e74b0fb4ce50b2232118867",
+    "workspace/stage25-live-20261022/runtime/agent/strength.py": "2dc6a5891255eb5e8da1c792e14acd3e39ab170bbd8493469432fd811035d1b1",
+    "workspace/stage25-live-20261022/runtime/folder_assistant/answers.py": "23bc3437169fd242a13e64dba866ec3987a506e8ec4267a35f593eb46b723efd",
+    "workspace/stage25-live-20261022/runtime/folder_assistant/batching.py": "87936b69ccbb6b2d5e4c027de9f68265393e24c037fc57fa783b513bb97800a2",
+    "workspace/stage25-live-20261022/runtime/folder_assistant/contracts.py": "69e97e543ea571271452f01f3981587f937fb8414a36cf15b58d7d41cda5f2a3",
+    "workspace/stage25-live-20261022/runtime/folder_assistant/exhaustive.py": "16c6d1014da941bc8f40dc62551ff3489ca02a47010002fe2334f293ef15bdfc",
+    "workspace/stage25-live-20261022/runtime/folder_assistant/exports.py": "12c5348067e7d9dd5f08903996ddbcd052cf8854b5548fc31dd8b5d9e90983f7",
+    "workspace/stage25-live-20261022/runtime/folder_assistant/index.py": "6c70d3975f5918bd76d2149f5938e5aaf6a369caff6af5feca3e5af7bc133db3",
+    "workspace/stage25-live-20261022/runtime/folder_assistant/jobs.py": "b8c0efab6530c70b619464e32f9ca9092fe08b3f6da722a99dd2900de0010b31",
+    "workspace/stage25-live-20261022/runtime/folder_assistant/parse_worker.py": "e1603c813ea3ed124e4f744af7db7fabb13343c09ab570a651722338cbf49387",
+    "workspace/stage25-live-20261022/runtime/folder_assistant/parsing.py": "474dd43160b91025576f4bbd802f2fe3a1122818ce6a8536ba194564722a0acf",
+    "workspace/stage25-live-20261022/runtime/folder_assistant/projects.py": "626a37145e285226170983857afd1f1086eb4dd655fb91a02c7be9b7252f7320",
+    "workspace/stage25-live-20261022/runtime/folder_assistant/project_exports.py": "0f296a8f699722299d191acb00940d95267bd986cc94d49ae5e9c62c2109acbc",
+    "workspace/stage25-live-20261022/runtime/folder_assistant/reading.py": "54febef7b0313bd16517d4f5882c7054100c8e4b75e51c8310d9ec92b22d9b8f",
+    "workspace/stage25-live-20261022/runtime/folder_assistant/scope.py": "1180705f2cacf02fe068aef1a9a52adebfafe19b7e5baef06259405dd282887f",
+    "workspace/stage25-live-20261022/runtime/folder_assistant/store.py": "27a5f165119ef621715db67cfcfcecd9d494272cd5cae3f5b6de828ab7d3390d",
+    "workspace/stage25-live-20261022/runtime/folder_assistant/usage.py": "bf86177a3397159586053bbc7e4431d45b37e3121678e04ad6ee42069db2d240",
+    "workspace/stage25-live-20261022/runtime/folder_assistant/__init__.py": "36656300506ebee15611b11a8eec4d2ba51af2278e92d74a5226fa32a1dd6277",
+    "workspace/stage25-live-20261022/runtime/folder_assistant/__main__.py": "590c31bef4728539747a3a02b16cf55df006a81938f3e6adb0e2324d7747f560",
+    "workspace/stage25-live-20261022/runtime/knowledge/documents.py": "4c2372f461f357cce017e9704392571c1d1bd1cf7e8f601867e6aa5eeb9305e2",
+    "workspace/stage25-live-20261022/runtime/knowledge/embedding.py": "7cfc277bf79b51205bff5c1447bb7165d73189a1773bfb7e013696349bdd2c43",
+    "workspace/stage25-live-20261022/runtime/knowledge/large_probe.py": "497c734fde900ff464eea06b736979fc52ccaa964bba28f21ebd3a1464c0c630",
+    "workspace/stage25-live-20261022/runtime/knowledge/locking.py": "c2f87541b323e39f8d080067aab7c15f7870f9a50b522ca9bcb596a4b89002ee",
+    "workspace/stage25-live-20261022/runtime/knowledge/long_probe.py": "824878c533475b0d48cca92f538fe00228108ede3274cf4bd43996ada91bb403",
+    "workspace/stage25-live-20261022/runtime/knowledge/probe.py": "564fc1190358d125bdd7d1c7d0fbe2bc1a998258e1dbe4f0b268585552e5666a",
+    "workspace/stage25-live-20261022/runtime/knowledge/recall_probe.py": "fb5657819c94b93083d3a11e6e546342345f3d35ac14fe70c662449f40143ca9",
+    "workspace/stage25-live-20261022/runtime/knowledge/report_probe.py": "486c955ce7368a5beb181b9def74546fc3b3ad9188c013105d643570102ac7df",
+    "workspace/stage25-live-20261022/runtime/knowledge/reranking.py": "8118a7613b87909571050ad1b6d6d3bee2a9beb8aa68b0dbc4ab60570cf384ec",
+    "workspace/stage25-live-20261022/runtime/knowledge/rerank_probe.py": "4c49f1e3a7f0e8dcd50edb647ba9beb521398ea05c01da538b25f1c99b9b75bc",
+    "workspace/stage25-live-20261022/runtime/knowledge/store.py": "3fc3b7c28d42baf9aee644f9edcd25ab12c547a5b8de37552ae399ce8d5d6837",
+    "workspace/stage25-live-20261022/runtime/knowledge/vectors.py": "520aff951c342401e1f1c4fcf5a532bd8f3ae859f6c01eb920414f8d2fdafd1b",
+    "workspace/stage25-live-20261022/runtime/knowledge/__init__.py": "5fcbc38c72e9f0e4c0938373622ff86daadbe7389238d3003d9a73d3acfb1533",
+    "workspace/stage25-live-20261022/runtime/knowledge/__main__.py": "fc231000c92128f2dacd50c8e4a2131c197130af52b5c13500673af31e4dec43",
+    "workspace/stage25-live-20261022/runtime/workspace/stage25_live.py": "edbd309ad3b62c6360c92f99f1985d68ef49e8eab5fae3a56501ece52b2b5c82",
+    "workspace/stage25-live-20261022/state/.jobs-start.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage25-live-20261022/state/0136838c8b1742feb0cd2300f38e9c14.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage25-live-20261022/state/07768df359f345dba26ef45dd9d92bdd.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage25-live-20261022/state/b8b28736cb424453b0355d35e1b42b1d.project.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage25-live-20261022/state/c46dd038adae4f8cb1e1b9fad7ad0510.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage25-live-20261022/state/catalog.sqlite3": "f3dc898109aa8be9e427e13122b1b6979889d4ef6baac5e1e3811e94838a753c",
+    "workspace/stage25-live-20261022/state/indexes/d6ff2edb0c3a40a98b05e41620b058fc/.build.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage25-live-20261022/state/indexes/d6ff2edb0c3a40a98b05e41620b058fc/.sync.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage25-live-20261022/state/indexes/d6ff2edb0c3a40a98b05e41620b058fc/.vectors.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage25-live-20261022/state/indexes/d6ff2edb0c3a40a98b05e41620b058fc/knowledge.sqlite3": "9b55d0d647fef7773733db71882d2dfcf17623c7a70dc26be89548087a224471",
+    "workspace/stage25-live-20261022/state/indexes/d6ff2edb0c3a40a98b05e41620b058fc/vectors/74cb82843daf421bbc2fdf3c4b6556ca.db/LOCK": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workspace/stage25-live-20261022/state/indexes/d6ff2edb0c3a40a98b05e41620b058fc/vectors/74cb82843daf421bbc2fdf3c4b6556ca.db/collections/chunks/manifest.json": "093bddb84472feda74c202679303cd62251952f1467f8b96f2c2f0d4e0d7614c",
+    "workspace/stage25-live-20261022/state/indexes/d6ff2edb0c3a40a98b05e41620b058fc/vectors/74cb82843daf421bbc2fdf3c4b6556ca.db/collections/chunks/manifest.json.prev": "439bced4db104c9bc364e111da83cd0486ba478d9e84a87f4a8b6156ece9130c",
+    "workspace/stage25-live-20261022/state/indexes/d6ff2edb0c3a40a98b05e41620b058fc/vectors/74cb82843daf421bbc2fdf3c4b6556ca.db/collections/chunks/schema.json": "091a94653bffaee066311202f1db0c0e9850fe8749840a67e6189920344759ce",
+    "workspace/stage25-live-20261022/state/indexes/d6ff2edb0c3a40a98b05e41620b058fc/vectors/74cb82843daf421bbc2fdf3c4b6556ca.db/collections/chunks/partitions/_default/data/data_000001_000002.parquet": "5a3c19bd80365665b3a4ab4c860fcb6e43d01f12d4a197317e3dc9d73fb3a0ee",
+    "workspace/stage25-live-20261022/state/indexes/d6ff2edb0c3a40a98b05e41620b058fc/vectors/74cb82843daf421bbc2fdf3c4b6556ca.db/collections/chunks/partitions/_default/indexes/data_000001_000002.vector.autoindex.idx": "43de793d47d49d73a66ba1ae76f6521237c74fc1496618e5f06da0a71d2c9c3a",
+    "workspace/stage25-live-20261022/state/indexes/d6ff2edb0c3a40a98b05e41620b058fc/vectors/ae37084531924ea6976a003c4dcffffc.db/LOCK": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workspace/stage25-live-20261022/state/indexes/d6ff2edb0c3a40a98b05e41620b058fc/vectors/ae37084531924ea6976a003c4dcffffc.db/collections/chunks/manifest.json": "093bddb84472feda74c202679303cd62251952f1467f8b96f2c2f0d4e0d7614c",
+    "workspace/stage25-live-20261022/state/indexes/d6ff2edb0c3a40a98b05e41620b058fc/vectors/ae37084531924ea6976a003c4dcffffc.db/collections/chunks/manifest.json.prev": "439bced4db104c9bc364e111da83cd0486ba478d9e84a87f4a8b6156ece9130c",
+    "workspace/stage25-live-20261022/state/indexes/d6ff2edb0c3a40a98b05e41620b058fc/vectors/ae37084531924ea6976a003c4dcffffc.db/collections/chunks/schema.json": "091a94653bffaee066311202f1db0c0e9850fe8749840a67e6189920344759ce",
+    "workspace/stage25-live-20261022/state/indexes/d6ff2edb0c3a40a98b05e41620b058fc/vectors/ae37084531924ea6976a003c4dcffffc.db/collections/chunks/partitions/_default/data/data_000001_000002.parquet": "92378d5e0268ae050e907d1bf78635204c54608e2eeafd796ccdfed0c836334c",
+    "workspace/stage25-live-20261022/state/indexes/d6ff2edb0c3a40a98b05e41620b058fc/vectors/ae37084531924ea6976a003c4dcffffc.db/collections/chunks/partitions/_default/indexes/data_000001_000002.vector.autoindex.idx": "4d4aef786a6cf1a292dd5acf50f151ea438b069a898083aaa68eb0fa0f231538",
+    "workspace/stage25-live-20261022/state/parsed/0e007e01354ef930aaa83274bebce969f2786711a50a1cd1733f38ac4df08f69-1.txt.json": "cd8e464c49e1a6d9452e486f36ccc121718b39186a8d3301da322df7c86ed271",
+    "workspace/stage25-live-20261022/state/parsed/59d129710e870ea71370c79b31fcb275d9ed209be73064f3602c5ca173602ebe-1.txt.json": "7419803226e15e16a37e7b66ead2a8bd54a3582a390ab9a290ec395dd411eed6",
+    "workspace/stage25-live-20261022/state/parsed/f52a4a4ab28cc2b6f0a7d000326a3b10a24693c9808ac04e116ea71b33aa0f84-1.txt.json": "e796575b6cbc2e5c7a4fe7a0ebd09f6516b673bbf01b637130ced18e9c53103b",
+    "workspace/stage25-live-20261022/state/project-outputs/7c0db87408cc406b95268b9b8796febb/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage25-live-20261022/state/project-outputs/7c0db87408cc406b95268b9b8796febb/comparison.csv": "2b1362366229cf6f51379fe3aeaa3deda71c090fa5de67f201e3797ef7ee9864",
+    "workspace/stage25-live-20261022/state/project-outputs/7c0db87408cc406b95268b9b8796febb/comparison.xlsx": "8f6390f87f73a3ebcb3ea0040db8a60da56f170bfd068229137bd42ce7565578",
+    "workspace/stage25-live-20261022/state/project-outputs/7c0db87408cc406b95268b9b8796febb/export.json": "cc30a377a0ffd4d5687d5816a32ea552844dcdf0805945c91f22b3c4f0840fa8",
+    "workspace/stage25-live-20261022/state/project-outputs/7c0db87408cc406b95268b9b8796febb/record.json": "d6613fa8385e9a7469bc3bf93321bdc03d3369f63dd0642cf4846346931eb1f9",
+    "workspace/stage25-live-20261022/state/project-outputs/7c0db87408cc406b95268b9b8796febb/sources.csv": "73db699b2a52a87068259af8a105a13448faddb64a38a848f47d662f7b7b0588",
+    "workspace/stage25-live-20261022/state/project-outputs/7c0db87408cc406b95268b9b8796febb/sources.json": "57610e68b980a329bf34e3d58752b164efdc5f63d6e5ac663fc9a01bc6d77386",
+    "workspace/stage25-live-20261022/state/project-outputs/7c0db87408cc406b95268b9b8796febb/summary.md": "e0bd4e2f7a77cc8960fa522f1e9953f8546c544d7e40559c11db134d3f149af6",
+    "workspace/stage25-live-20261022/state/project-outputs/9e5bdfa585d2442cb21785fa2bb260b2/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage25-live-20261022/state/project-outputs/9e5bdfa585d2442cb21785fa2bb260b2/comparison.csv": "b539d1652bc71078f49eba9e208bdbc3ea1309a02e554bc3e4781c1a411ef5fc",
+    "workspace/stage25-live-20261022/state/project-outputs/9e5bdfa585d2442cb21785fa2bb260b2/comparison.xlsx": "6ff117f5b29221e4f1f559211c90e58546a3166313fbf7a8c673b17eb958fe5a",
+    "workspace/stage25-live-20261022/state/project-outputs/9e5bdfa585d2442cb21785fa2bb260b2/export.json": "6de874ddb9c66d8d4513cd8e7c3d480fb5f4cc0446f4b420ad6867128fe81bee",
+    "workspace/stage25-live-20261022/state/project-outputs/9e5bdfa585d2442cb21785fa2bb260b2/record.json": "743cc0e23511b67d52d46c0cdaa130baf62595690b61331fe37e0e7792c13dc5",
+    "workspace/stage25-live-20261022/state/project-outputs/9e5bdfa585d2442cb21785fa2bb260b2/sources.csv": "1f5ea5d0c687acea48c903b019dc677f1ea1d35fd802a0d2c4faacc056bd3bf6",
+    "workspace/stage25-live-20261022/state/project-outputs/9e5bdfa585d2442cb21785fa2bb260b2/sources.json": "a5d26ed59e23e2334bcf383f6818e46adc67a37a899491c945eef3e27d295ee7",
+    "workspace/stage25-live-20261022/state/project-outputs/9e5bdfa585d2442cb21785fa2bb260b2/summary.md": "e41d386b57c6a07d1a866eb77b0fe1c6e6e96c3f17f459d1e4e0db500c4a8a2b",
+    "workspace/stage25-build-20261022.log": "c05357366970fb6ac3d2b4f24434cd5cace8aad4e66eaec0c5567262a40c2ebd",
+    "workspace/stage25-build-delivery-20261022.log": "3ac01f95cdd0253f6736b496e6df04701c2283c06fcad1891b7981fbaa04fdb4",
+    "workspace/stage25-build-final-20261022.log": "e1dc6d7fe9b5fea07cdb0918cd2d46f5b1fdd46f8a7da53f13828c2468981ad4",
+    "workspace/stage25-build-final2-20261022.log": "31ad24a6cfe0dc84dbd7135eb9af85777f8d84334e5a8415af9eb7e1c59e573b",
+    "workspace/stage25-folder-projects-20261022.png": "efcc0b4f3a8fd5aff8b409612b57de7e98589c3146a6cb9deb2e113888ae58c0",
+    "workspace/stage25-full-20261022.log": "5338dc6d323072fca4d3931328c58687013b72b4ac1380ef01a0bfe9665f349f",
+    "workspace/stage25-full-final-20261022.log": "12f7eb434f4852b91e55b25b9d8d3b264463e132b32dd4bd28dd7dcc2c222f92",
+    "workspace/stage25-initial-20261022.log": "76660d64ec2cb8c76aa6c20ffd86f558313c88f4fe20b64795f66c36114b4a15",
+    "workspace/stage25-inspect-20261022.log": "7e8d3d5edef0291af6ecadd3d888f2b11e4e21fb1aa569142e46b20bc75d9e1f",
+    "workspace/stage25-live-20261022.log": "ffbe0cb062a7c0ba054bafd9e02fcccbbc1ca898c50238cd6af8cc0267577a04",
+    "workspace/stage25-targeted-20261022.log": "b05c7ecdc0c201c9afd8b56751f2e5085588619f7badac68d933ce9b7414f8be",
+    "workspace/stage25-ui-20261022.log": "7a450cbd1dfbb436d18c8756a26c157092780a3aaef30ea413f8b921d8c4286a",
+    "workspace/stage25-ui2-20261022.log": "61cd5606e076361be602dbdd6441dde6e9a0da00a2395bb797dc31cc1ef57ac7",
+    "workspace/stage25-ui3-20261022.log": "d33120393f86b55396b52da365218d7ffa9be11c151b6f9c6501d55973d2e3c6",
+    "workspace/stage25-ui4-20261022.log": "c770b20ef2b6cbfe271898412a4f02997de369186b76c4581c498f828edf28c6"
+  }
+}

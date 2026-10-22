@@ -16,6 +16,7 @@ if (process.argv.includes("--reading"))
 fs.writeFileSync(path.join(docs, ".env"), "SENSITIVE=must-not-read");
 const batchingMode = process.argv.includes("--batching");
 const scopeMode = process.argv.includes("--scope");
+const projectMode = process.argv.includes("--projects");
 const parseMode = process.argv.includes("--parse");
 if (parseMode)
   require("node:child_process").execFileSync(
@@ -111,6 +112,186 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         await page.locator(".folder-index-panel").innerText(),
         /未变化 1/,
       );
+    }
+    if (projectMode) {
+      await page.locator(".folder-projects > summary").click();
+      const region = page.getByRole("region", {
+        name: "持续资料项目",
+        exact: true,
+      });
+      await region
+        .getByRole("textbox", { name: "项目名称", exact: true })
+        .fill("本地资料台账");
+      await region
+        .getByRole("textbox", { name: "固定整理目标", exact: true })
+        .fill("整理本地资料原文，保留来源引用");
+      await region
+        .getByRole("textbox", { name: "项目结果字段", exact: true })
+        .fill("摘录");
+      await region
+        .getByRole("button", { name: "创建资料项目（本地）", exact: true })
+        .click();
+      await region
+        .getByRole("button", {
+          name: "保存项目设置（本地，下次处理生效）",
+          exact: true,
+        })
+        .waitFor();
+      const pid = await region
+        .getByRole("combobox", { name: "资料项目", exact: true })
+        .inputValue();
+      const connection = await page.evaluate(() => window.desktop.connection());
+      const get = async (url) =>
+        (
+          await fetch(connection.url + "/api" + url, {
+            headers: { Authorization: "Bearer " + connection.token },
+          })
+        ).json();
+      const settled = async (old) => {
+        for (let n = 0; n < 100; n++) {
+          const p = await get("/folder-projects/" + pid);
+          if (p.head && p.head !== old && !p.pending) return p;
+          await page.waitForTimeout(200);
+        }
+        throw Error("project did not finish");
+      };
+      const run = () =>
+        region
+          .getByRole("button", {
+            name: "执行项目操作（按预览范围，可能调用模型）",
+            exact: true,
+          })
+          .click();
+      await run();
+      const first = await settled(null);
+      await region.getByText(/可用结构覆盖1\/1段/).waitFor();
+      const initial = await get("/folder-project-versions/" + first.head);
+      await region
+        .getByRole("combobox", { name: "项目操作", exact: true })
+        .selectOption("revise");
+      await region
+        .getByRole("checkbox", { name: "readme.txt", exact: true })
+        .check();
+      await region
+        .getByRole("textbox", { name: "项目修订要求", exact: true })
+        .fill("重新摘录选定文件的原文，其他结果保留");
+      await run();
+      const revision = await settled(first.head);
+      await page.waitForFunction(
+        (id) =>
+          document
+            .querySelector(".project-version > p")
+            ?.textContent.includes(id),
+        revision.head,
+      );
+      assert.deepEqual(
+        await get("/folder-project-versions/" + first.head),
+        initial,
+      );
+      await region
+        .getByRole("textbox", { name: "项目追问", exact: true })
+        .fill("本地资料原文");
+      await region
+        .getByRole("button", {
+          name: "追问当前版本（调用模型，不改结果）",
+          exact: true,
+        })
+        .click();
+      await region
+        .getByRole("button", { name: /本地资料原文.*completed/ })
+        .click();
+      await region.getByText(/保存的追问：/).waitFor();
+      assert.equal((await get("/folder-projects/" + pid)).head, revision.head);
+      // Only the test harness edits its synthetic source; the application stays read-only.
+      assert.equal(
+        fs.readFileSync(path.join(docs, "readme.txt"), "utf8"),
+        "本地资料原文。",
+      );
+      fs.writeFileSync(
+        path.join(docs, "readme.txt"),
+        "本地资料原文。\n本地资料更新记录。",
+      );
+      before["readme.txt"] = require("node:crypto")
+        .createHash("sha256")
+        .update(fs.readFileSync(path.join(docs, "readme.txt")))
+        .digest("hex");
+      await page
+        .getByRole("button", { name: "② 扫描文件清单", exact: true })
+        .click();
+      await page.getByText(/有尚未同步的资料变化/).waitFor();
+      await page
+        .getByRole("button", {
+          name: "同步资料索引（调用嵌入服务）",
+          exact: true,
+        })
+        .click();
+      await page.waitForFunction(
+        (g) =>
+          Array.from(document.querySelectorAll(".folder-index-panel > p")).some(
+            (p) =>
+              p.textContent.trim().startsWith("当前索引：") &&
+              !p.textContent.includes(g),
+          ),
+        initial.generation,
+      );
+      await region
+        .getByRole("combobox", { name: "项目操作", exact: true })
+        .selectOption("update");
+      await region.getByText(/新增0，变化1，删除0/).waitFor();
+      // This protocol fake emits only the first evidence row; keep each batch to one segment.
+      await region
+        .getByRole("spinbutton", { name: "项目每批片段上限", exact: true })
+        .fill("1");
+      await run();
+      const updated = await settled(revision.head);
+      await region.getByText(/可用结构覆盖2\/2段/).waitFor();
+      const latest = await get("/folder-project-versions/" + updated.head);
+      assert.equal(latest.parent_id, revision.head);
+      assert.deepEqual(
+        await get("/folder-project-versions/" + first.head),
+        initial,
+      );
+      await region
+        .getByRole("button", { name: "导出本版汇总结果（本地）", exact: true })
+        .click();
+      await region.getByText(/项目结果已导出：/).waitFor();
+      await region.locator(".project-group .folder-citation").first().click();
+      await region
+        .locator(".project-citation")
+        .getByText("本地资料原文。", { exact: true })
+        .waitFor();
+      const output = path.join(
+        fixture,
+        "state",
+        "folders",
+        "project-outputs",
+        updated.head,
+      );
+      assert.equal(
+        fs.readdirSync(output).filter((n) => !n.startsWith(".")).length,
+        7,
+      );
+      assert.match(
+        fs.readFileSync(path.join(output, "comparison.csv"), "utf8"),
+        /本地资料更新记录/,
+      );
+      await region
+        .getByRole("combobox", { name: "项目结果版本", exact: true })
+        .selectOption(first.head);
+      await region.getByText(/正在查看历史版本/).waitFor();
+      assert.equal(
+        await region
+          .getByRole("button", {
+            name: "执行项目操作（按预览范围，可能调用模型）",
+            exact: true,
+          })
+          .isEnabled(),
+        false,
+      );
+      await region
+        .getByRole("combobox", { name: "项目结果版本", exact: true })
+        .selectOption(updated.head);
+      await region.getByText(/可用结构覆盖2\/2段/).waitFor();
     }
     if (process.argv.includes("--questions")) {
       if (process.argv.includes("--strength")) {
@@ -360,15 +541,23 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         .locator(".folder-coverage")
         .getByText(/剩余0段/)
         .waitFor();
-      if(scopeMode){
-        const scope=page.getByRole("region",{name:"范围与任务链",exact:true});
+      if (scopeMode) {
+        const scope = page.getByRole("region", {
+          name: "范围与任务链",
+          exact: true,
+        });
         await scope.getByText(/有可用结构9段/).waitFor();
-        const latest=await page.getByRole("combobox",{name:"历史资料问答"}).inputValue();
-        const summary=scope.getByText(/查看前序任务与失败尝试（3个任务）/);
-        if(!await summary.locator("..").evaluate(el=>el.open))await summary.click();
-        await scope.getByRole("button",{name:/^原任务 /}).click();
+        const latest = await page
+          .getByRole("combobox", { name: "历史资料问答" })
+          .inputValue();
+        const summary = scope.getByText(/查看前序任务与失败尝试（3个任务）/);
+        if (!(await summary.locator("..").evaluate((el) => el.open)))
+          await summary.click();
+        await scope.getByRole("button", { name: /^原任务 / }).click();
         await scope.getByText(/已返回但响应未完成6段/).waitFor();
-        await page.getByRole("combobox",{name:"历史资料问答"}).selectOption(latest);
+        await page
+          .getByRole("combobox", { name: "历史资料问答" })
+          .selectOption(latest);
         await scope.getByText(/有可用结构9段/).waitFor();
       }
       assert.match(
@@ -468,19 +657,21 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
       path: path.join(
         project,
         "workspace",
-        scopeMode
-          ? "stage24-folder-workflow-20261022.png"
-          : batchingMode
-            ? "stage23-folder-workflow-20261022.png"
-            : parseMode
-              ? "folder-workflow-current-multiformat.png"
-              : process.argv.includes("--strength")
-                ? "model-strength-folder-20261022.png"
-                : process.argv.includes("--reading")
-                  ? "stage22-folder-workflow.png"
-                  : process.argv.includes("--experience")
-                    ? "stage21-folder-workflow.png"
-                    : "folder-workflow-current.png",
+        projectMode
+          ? "stage25-folder-projects-20261022.png"
+          : scopeMode
+            ? "stage24-folder-workflow-20261022.png"
+            : batchingMode
+              ? "stage23-folder-workflow-20261022.png"
+              : parseMode
+                ? "folder-workflow-current-multiformat.png"
+                : process.argv.includes("--strength")
+                  ? "model-strength-folder-20261022.png"
+                  : process.argv.includes("--reading")
+                    ? "stage22-folder-workflow.png"
+                    : process.argv.includes("--experience")
+                      ? "stage21-folder-workflow.png"
+                      : "folder-workflow-current.png",
       ),
     });
     await page
@@ -521,7 +712,7 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         false,
       );
     }
-    if (!process.argv.includes("--reading"))
+    if (!process.argv.includes("--reading") && !projectMode)
       assert.equal(
         fs.readFileSync(path.join(docs, "readme.txt"), "utf8"),
         "本地资料原文。",
@@ -545,6 +736,17 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         multi_format_preview: parseMode,
         fixture,
         checks: [
+          ...(projectMode
+            ? [
+                "persistent-project-create",
+                "versioned-revision",
+                "version-bound-followup",
+                "incremental-source-update",
+                "immutable-old-edition",
+                "project-export-citations",
+                "historical-version-readonly",
+              ]
+            : []),
           ...(scopeMode
             ? [
                 "lineage-failure-visible",

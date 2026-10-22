@@ -84,6 +84,37 @@ class FolderReading(BaseModel):
     limit:int=Field(default=6,ge=1,le=6)
 
 
+class ProjectConfig(BaseModel):
+    title:str=Field(min_length=1,max_length=100)
+    objective:str=Field(min_length=1,max_length=1000)
+    fields:list[str]=Field(min_length=1,max_length=12)
+
+
+class ProjectPatch(ProjectConfig):
+    revision:int=Field(ge=1)
+
+
+class ProjectAction(FolderControls):
+    action:Literal['update','revise','continue']='update'
+    expected_head:str|None=None
+    revision:int=Field(ge=1)
+    instruction:str=Field(default='',max_length=1000)
+    file_ids:list[str]|None=Field(default=None,max_length=50)
+    strength:ModelStrength='default'
+
+
+class ProjectStart(ProjectAction):
+    plan_hash:str=Field(min_length=64,max_length=64)
+
+
+class ProjectFollowup(BaseModel):
+    version_id:str=Field(min_length=32,max_length=32)
+    query:str=Field(min_length=1,max_length=1000)
+    budget:int=Field(default=10000,ge=256,le=50000)
+    output_tokens:int=Field(default=1200,ge=128,le=4096)
+    strength:ModelStrength='default'
+
+
 def create_app(manager:Manager,token:str,ui_dir:Path|None=None,*,folder_grant_token:str|None=None):
     from folder_assistant.store import FolderStore
     folders=FolderStore(manager.root/'folders',excluded_roots=(manager.root,))
@@ -91,6 +122,8 @@ def create_app(manager:Manager,token:str,ui_dir:Path|None=None,*,folder_grant_to
     from folder_assistant.jobs import FolderJobs
     folder_index=FolderIndex(folders,manager.settings)
     folder_jobs=FolderJobs(folder_index,pricing=manager.pricing)
+    from folder_assistant.projects import Projects
+    projects=Projects(folder_jobs)
     @asynccontextmanager
     async def lifespan(app):
         yield
@@ -167,6 +200,34 @@ def create_app(manager:Manager,token:str,ui_dir:Path|None=None,*,folder_grant_to
     def folder_search(fid:str,body:KnowledgeQuery):return redact(folder_index.search(fid,**body.model_dump()))
     @app.get('/api/folders/{fid}/jobs')
     def folder_history(fid:str):return redact(folder_jobs.list(fid))
+    @app.get('/api/folders/{fid}/projects')
+    def project_list(fid:str):return redact(projects.list(fid))
+    @app.post('/api/folders/{fid}/projects')
+    def project_create(fid:str,body:ProjectConfig):return redact(projects.create(fid,**body.model_dump()))
+    @app.get('/api/folder-projects/{pid}')
+    def project_get(pid:str):return redact(projects.get(pid))
+    @app.patch('/api/folder-projects/{pid}')
+    def project_patch(pid:str,body:ProjectPatch):return redact(projects.update(pid,**body.model_dump()))
+    @app.post('/api/folder-projects/{pid}/preview')
+    def project_preview(pid:str,body:ProjectAction):return redact(projects.preview(pid,body.model_dump()))
+    @app.post('/api/folder-projects/{pid}/run')
+    def project_run(pid:str,body:ProjectStart):return redact(projects.start(pid,body.model_dump(exclude={'plan_hash'}),body.plan_hash))
+    @app.post('/api/folder-projects/{pid}/followups')
+    def project_followup(pid:str,body:ProjectFollowup):
+        values=body.model_dump();vid=values.pop('version_id');query=values.pop('query')
+        return redact(projects.followup(pid,vid,query,values))
+    @app.get('/api/folder-project-versions/{vid}')
+    def project_version(vid:str,offset:int=0,limit:int=10):return redact(projects.version(vid,offset,limit))
+    @app.post('/api/folder-project-versions/{vid}/export')
+    def project_export(vid:str):
+        from folder_assistant.project_exports import export_version
+        return redact(export_version(projects,vid))
+    @app.get('/api/folder-project-versions/{vid}/export/{name}')
+    def project_export_read(vid:str,name:str):
+        from folder_assistant.project_exports import export_version
+        from folder_assistant.exports import NAMES
+        if name not in NAMES:raise KeyError('项目导出文件不存在')
+        result=export_version(projects,vid);return FileResponse(Path(result['directory'])/name,filename=name)
     @app.get('/api/folder-jobs/{jid}')
     def folder_job(jid:str):return redact(folder_jobs.get(jid))
     @app.get('/api/folder-jobs/{jid}/scope')

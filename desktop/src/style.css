@@ -1504,6 +1504,15 @@ small {
 .folder-scope-table { overflow-x: auto; }
 .folder-scope button { margin: 4px; white-space: normal; }
 .folder-next-scope { border-top: 1px solid var(--border); margin-top: 12px; }
+.folder-projects { border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin: 14px 0; }
+.folder-projects label { display: block; margin: 8px 0; }
+.folder-projects textarea { width: 100%; min-height: 70px; }
+.folder-projects button { white-space: normal; margin: 4px; }
+.project-version, .project-preview { border-top: 1px solid var(--border); margin-top: 12px; padding-top: 8px; }
+.project-group { overflow-wrap: anywhere; }
+.folder-projects table { width: 100%; border-collapse: collapse; }
+.folder-projects th, .folder-projects td { padding: 8px; text-align: left; border-bottom: 1px solid var(--border); }
+.project-citation pre { white-space: pre-wrap; overflow-wrap: anywhere; }
 .folder-answer td, .folder-answer th { padding: 8px; text-align: left; border-bottom: 1px solid var(--border); }
 .folder-answer pre, .folder-citation-preview pre { white-space: pre-wrap; overflow-wrap: anywhere; }
 .folder-citation { color: #99dcca; border: 1px solid #57978a; padding: 5px 8px; margin: 4px; border-radius: 5px; }

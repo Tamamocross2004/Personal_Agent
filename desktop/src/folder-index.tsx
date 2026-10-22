@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FolderQuestions } from "./folder-questions";
+import { FolderProjects } from "./folder-projects";
 import { locationLabel } from "./folder-location";
 
 export function FolderIndexPanel({
@@ -268,6 +269,15 @@ export function FolderIndexPanel({
           ))}
         </div>
       )}
+      <FolderProjects
+        api={api}
+        folderId={folderId}
+        index={index}
+        job={job}
+        setJob={setJob}
+        busy={busy || pending}
+        act={act}
+      />
       <FolderQuestions
         api={api}
         folderId={folderId}

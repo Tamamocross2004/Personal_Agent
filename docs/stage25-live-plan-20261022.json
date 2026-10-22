@@ -1,0 +1,111 @@
+{
+  "date": "2026-10-22",
+  "workspace": "workspace/stage25-live-20261022",
+  "configuration": {
+    "provider": "deepseek",
+    "model": "deepseek-flash",
+    "base_url": "https://api.deepseek.com",
+    "thinking": "disabled",
+    "strength": "default",
+    "embedding_model": "Pro/BAAI/bge-m3",
+    "dimensions": 1024,
+    "rerank": false,
+    "retries": 0,
+    "timeout": 30,
+    "output_tokens": 1200,
+    "per_operation_budget": 14000,
+    "batch_size": 1,
+    "max_batches": 2,
+    "batch_mode": "fixed"
+  },
+  "initial_sources": {
+    "pump-a.txt": "0e007e01354ef930aaa83274bebce969f2786711a50a1cd1733f38ac4df08f69",
+    "pump-b.txt": "f52a4a4ab28cc2b6f0a7d000326a3b10a24693c9808ac04e116ea71b33aa0f84"
+  },
+  "planned_edit": {
+    "file": "pump-b.txt",
+    "new_text": "设备 NR-52：流量 15 L/min，功率 34 W。",
+    "sha256": "59d129710e870ea71370c79b31fcb275d9ed209be73064f3602c5ca173602ebe"
+  },
+  "runtime_sha256": {
+    "folder_assistant/__init__.py": "36656300506ebee15611b11a8eec4d2ba51af2278e92d74a5226fa32a1dd6277",
+    "folder_assistant/__main__.py": "590c31bef4728539747a3a02b16cf55df006a81938f3e6adb0e2324d7747f560",
+    "folder_assistant/answers.py": "23bc3437169fd242a13e64dba866ec3987a506e8ec4267a35f593eb46b723efd",
+    "folder_assistant/batching.py": "87936b69ccbb6b2d5e4c027de9f68265393e24c037fc57fa783b513bb97800a2",
+    "folder_assistant/contracts.py": "69e97e543ea571271452f01f3981587f937fb8414a36cf15b58d7d41cda5f2a3",
+    "folder_assistant/exhaustive.py": "16c6d1014da941bc8f40dc62551ff3489ca02a47010002fe2334f293ef15bdfc",
+    "folder_assistant/exports.py": "12c5348067e7d9dd5f08903996ddbcd052cf8854b5548fc31dd8b5d9e90983f7",
+    "folder_assistant/index.py": "6c70d3975f5918bd76d2149f5938e5aaf6a369caff6af5feca3e5af7bc133db3",
+    "folder_assistant/jobs.py": "b8c0efab6530c70b619464e32f9ca9092fe08b3f6da722a99dd2900de0010b31",
+    "folder_assistant/parse_worker.py": "e1603c813ea3ed124e4f744af7db7fabb13343c09ab570a651722338cbf49387",
+    "folder_assistant/parsing.py": "474dd43160b91025576f4bbd802f2fe3a1122818ce6a8536ba194564722a0acf",
+    "folder_assistant/project_exports.py": "0f296a8f699722299d191acb00940d95267bd986cc94d49ae5e9c62c2109acbc",
+    "folder_assistant/projects.py": "626a37145e285226170983857afd1f1086eb4dd655fb91a02c7be9b7252f7320",
+    "folder_assistant/reading.py": "54febef7b0313bd16517d4f5882c7054100c8e4b75e51c8310d9ec92b22d9b8f",
+    "folder_assistant/scope.py": "1180705f2cacf02fe068aef1a9a52adebfafe19b7e5baef06259405dd282887f",
+    "folder_assistant/store.py": "27a5f165119ef621715db67cfcfcecd9d494272cd5cae3f5b6de828ab7d3390d",
+    "folder_assistant/usage.py": "bf86177a3397159586053bbc7e4431d45b37e3121678e04ad6ee42069db2d240",
+    "knowledge/__init__.py": "5fcbc38c72e9f0e4c0938373622ff86daadbe7389238d3003d9a73d3acfb1533",
+    "knowledge/__main__.py": "fc231000c92128f2dacd50c8e4a2131c197130af52b5c13500673af31e4dec43",
+    "knowledge/documents.py": "4c2372f461f357cce017e9704392571c1d1bd1cf7e8f601867e6aa5eeb9305e2",
+    "knowledge/embedding.py": "7cfc277bf79b51205bff5c1447bb7165d73189a1773bfb7e013696349bdd2c43",
+    "knowledge/large_probe.py": "497c734fde900ff464eea06b736979fc52ccaa964bba28f21ebd3a1464c0c630",
+    "knowledge/locking.py": "c2f87541b323e39f8d080067aab7c15f7870f9a50b522ca9bcb596a4b89002ee",
+    "knowledge/long_probe.py": "824878c533475b0d48cca92f538fe00228108ede3274cf4bd43996ada91bb403",
+    "knowledge/probe.py": "564fc1190358d125bdd7d1c7d0fbe2bc1a998258e1dbe4f0b268585552e5666a",
+    "knowledge/recall_probe.py": "fb5657819c94b93083d3a11e6e546342345f3d35ac14fe70c662449f40143ca9",
+    "knowledge/report_probe.py": "486c955ce7368a5beb181b9def74546fc3b3ad9188c013105d643570102ac7df",
+    "knowledge/rerank_probe.py": "4c49f1e3a7f0e8dcd50edb647ba9beb521398ea05c01da538b25f1c99b9b75bc",
+    "knowledge/reranking.py": "8118a7613b87909571050ad1b6d6d3bee2a9beb8aa68b0dbc4ab60570cf384ec",
+    "knowledge/store.py": "3fc3b7c28d42baf9aee644f9edcd25ab12c547a5b8de37552ae399ce8d5d6837",
+    "knowledge/vectors.py": "520aff951c342401e1f1c4fcf5a532bd8f3ae859f6c01eb920414f8d2fdafd1b",
+    "agent/config.py": "30f8a3e63d4919113bdc09dc9954623440c18ee399448abd6e5da66ba7d2c60e",
+    "agent/llm.py": "bc58280e4c9663f4cc7f2fdf16041f11358e7b5b3e74b0fb4ce50b2232118867",
+    "agent/context.py": "097c931099e9b28a5222a10f02b03085f76f8aec61b33a02eb57393f7361f76f",
+    "agent/strength.py": "2dc6a5891255eb5e8da1c792e14acd3e39ab170bbd8493469432fd811035d1b1",
+    "workspace/stage25_live.py": "edbd309ad3b62c6360c92f99f1985d68ef49e8eab5fae3a56501ece52b2b5c82"
+  },
+  "limits": {
+    "llm_calls": 4,
+    "embedding_calls": 2,
+    "rerank_calls": 0,
+    "known_tokens": 45000
+  },
+  "steps": [
+    "initial edition, two single-file batches",
+    "if initial usable structure covers both files: edit only pump-b, scan+sync, incremental edition",
+    "if updated edition covers both files: one version-bound followup; no retries of failed operations"
+  ],
+  "criteria_not_sent_to_model": {
+    "expected_initial_fields": [
+      [
+        "NR-51",
+        "0 L/min",
+        "18 W"
+      ],
+      [
+        "NR-52",
+        "15 L/min",
+        "32 W"
+      ]
+    ],
+    "expected_updated_fields": [
+      [
+        "NR-51",
+        "0 L/min",
+        "18 W"
+      ],
+      [
+        "NR-52",
+        "15 L/min",
+        "34 W"
+      ]
+    ],
+    "followup_query": "NR-51 的流量原文是多少？",
+    "old_version_immutable": true,
+    "unchanged_a_not_resent": true,
+    "keep_all_failed_outputs": true,
+    "reviewer": "coding_assistant",
+    "stage12_accepted": false
+  }
+}
