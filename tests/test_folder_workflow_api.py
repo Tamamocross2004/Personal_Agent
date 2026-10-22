@@ -34,6 +34,9 @@ def test_native_grant_sync_answer_citation_export_revoke_and_read_only_history(t
             raise AssertionError('operation did not finish')
         built=wait(client.post(base+'/sync',headers=headers,json={'scan_id':scan['id']}).json()['id'])
         assert built['status']=='completed' and built['usage_events'][0]['input_tokens'] is not None
+        for controls in ({'output_tokens':127},{'output_tokens':4097},{'batch_size':7},{'expected_fields':0},{'batch_mode':'unknown'}):
+            assert client.post(base+'/questions',headers=headers,json={'query':'alpha',**controls}).status_code==422
+        assert not chat.calls
         job=wait(client.post(base+'/questions',headers=headers,json={'query':'alpha'}).json()['id'])
         assert job['status']=='completed'
         url='/api/folder-jobs/'+job['id']

@@ -64,6 +64,17 @@ def answer_once(jobs,jid):
 class BudgetInsufficient(ValueError):pass
 
 
+def prepare_messages(inputs,evidence,reading_scope=None):
+    supplied=[{k:e[k] for k in ('citation_id','name','file_sha256','source_location','text')} for e in evidence]
+    if reading_scope is not None:
+        supplied=[{**s,'role':e['role'],'block_start':e['start'],'block_end':e['end']} for s,e in zip(supplied,evidence)]
+    messages=[{'role':'system','content':instruction()},
+              {'role':'user','content':json.dumps({'question':inputs['query'],'evidence':supplied},ensure_ascii=False)}]
+    if reading_scope is not None:
+        messages[1]['content']=json.dumps({'question':inputs['query'],'reading_scope':reading_scope,'evidence':supplied},ensure_ascii=False)
+    return messages
+
+
 def answer_evidence(jobs,jid,evidence,*,call_suffix='answer',reading_scope=None):
     job=jobs.get(jid);inputs=job['inputs'];budget=inputs['budget']
     def event(row):jobs.update_event(jid,row)
@@ -73,18 +84,15 @@ def answer_evidence(jobs,jid,evidence,*,call_suffix='answer',reading_scope=None)
                                      'kind':'unknown','citations':[],'support':[],'assumptions':[],'limitations':[],'relation':None}],
                           'unknowns':['尚缺可引用的资料片段'],'comparison':[]},
                 'answer_schema_version':VERSION,'content_status':'insufficient_evidence','review_status':'not_reviewed'}
-    supplied=[{k:e[k] for k in ('citation_id','name','file_sha256','source_location','text')} for e in evidence]
-    if reading_scope is not None:
-        supplied=[{**s,'role':e['role'],'block_start':e['start'],'block_end':e['end']} for s,e in zip(supplied,evidence)]
-    messages=[{'role':'system','content':instruction()},
-              {'role':'user','content':json.dumps({'question':inputs['query'],'evidence':supplied},ensure_ascii=False)}]
-    if reading_scope is not None:
-        messages[1]['content']=json.dumps({'question':inputs['query'],'reading_scope':reading_scope,'evidence':supplied},ensure_ascii=False)
+    messages=prepare_messages(inputs,evidence,reading_scope)
     input_estimate=estimate_tokens(json.dumps(messages,ensure_ascii=False))
     used=jobs.used_tokens(jid)
-    max_output=min(1200,jobs.index.settings.agent_call_max_tokens,budget-used-input_estimate)
+    output_cap=min(inputs.get('output_tokens',1200),jobs.index.settings.agent_call_max_tokens)
+    max_output=min(output_cap,budget-used-input_estimate)
     if max_output<128: raise BudgetInsufficient('剩余预算不足以发送短答请求；未调用语言模型')
-    jobs.patch(jid,request={'messages':messages,'estimated_input_tokens':input_estimate,'max_output_tokens':max_output,'answer_schema_version':VERSION})
+    jobs.patch(jid,request={'messages':messages,'estimated_input_tokens':input_estimate,'max_output_tokens':max_output,
+                          'requested_output_tokens':inputs.get('output_tokens',1200),'effective_output_cap':output_cap,
+                          'budget_limited':max_output<output_cap,'answer_schema_version':VERSION})
     config=replace(load_llm_config(settings=jobs.index.settings,strength=inputs.get('strength','default')),max_retries=0)
     client=jobs.llm_factory(config)
     jobs.check(jid)
@@ -100,6 +108,9 @@ def answer_evidence(jobs,jid,evidence,*,call_suffix='answer',reading_scope=None)
         call.update(status='returned',input_tokens=prompt if valid(prompt) else None,
                     output_tokens=output if valid(output) else None,returned_model=response.model,
                     cached_tokens=getattr(usage,'prompt_cache_hit_tokens',None),finished=now())
+        details=getattr(usage,'completion_tokens_details',None)
+        reasoning=details.get('reasoning_tokens') if isinstance(details,dict) else getattr(details,'reasoning_tokens',None)
+        call['reasoning_tokens']=reasoning if valid(reasoning) and valid(output) and reasoning<=output else None
         event(call)
         text=response.choices[0].message.content or ''
         jobs.patch(jid,model_output=text,finish_reason=response.choices[0].finish_reason)

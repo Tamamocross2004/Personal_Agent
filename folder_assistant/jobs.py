@@ -101,6 +101,12 @@ class FolderJobs:
                 from agent.config import load_llm_config
                 strategy=inputs.setdefault('strategy','retrieval')
                 if strategy not in ('retrieval','exhaustive'):raise ValueError('读取策略无效')
+                for key,default,low,high in [('output_tokens',1200,128,4096),('batch_size',6,1,6),('expected_fields',1,1,12)]:
+                    value=inputs.setdefault(key,default)
+                    if type(value) is not int or not low<=value<=high:raise ValueError(f'{key}须为{low}至{high}的整数')
+                if inputs.setdefault('batch_mode','adaptive') not in ('adaptive','fixed'):raise ValueError('分批方式无效')
+                if type(inputs.setdefault('retry_split',False)) is not bool:raise ValueError('retry_split须为布尔值')
+                if inputs['retry_split'] and (strategy!='exhaustive' or not inputs.get('resume_from')):raise ValueError('拆小重做需要原分批任务')
                 if strategy=='exhaustive':
                     count=inputs.setdefault('max_batches',3)
                     if type(count) is not int or not 1<=count<=8:raise ValueError('每次最多1至8批')
@@ -121,6 +127,20 @@ class FolderJobs:
                         inputs['strength']=previous['inputs'].get('strength','default')
                         inputs.update(start_offset=next_offset,previous_structured_segments=coverage['structured_segments'],
                                       previous_returned_until=coverage['returned_until'])
+                        values=[e.get('reasoning_tokens') for e in previous.get('usage_events',[]) if e.get('status')=='returned']
+                        values+=[previous['inputs'].get('previous_reasoning_tokens')]
+                        inputs['previous_reasoning_tokens']=max((v for v in values if type(v) is int and v>=0),default=None)
+                        if inputs['retry_split']:
+                            failed=next((b for b in previous.get('batches',[]) if b['start_offset']==next_offset
+                                         and (not (b.get('result') or {}).get('answer') or b.get('finish_reason')!='stop')),None)
+                            if not failed or failed.get('status')!='returned':raise ValueError('没有已确认返回的未完成批次可拆小重做')
+                            if any(e.get('input_tokens') is None or (e.get('operation')=='llm' and e.get('output_tokens') is None)
+                                   for e in previous.get('usage_events',[])):
+                                raise ValueError('原任务存在未知用量，请先核对，不拆小重发')
+                            size=failed['next_offset']-failed['start_offset']
+                            if size<=1:raise ValueError('该批已为单片段，无法再按片段拆分；可显式调整输出额度')
+                            inputs.update(batch_size=min(inputs['batch_size'],max(1,size//2)),range_end=failed['next_offset'],
+                                          retry_of={'job_id':previous['id'],'batch':failed['number'],'start':next_offset,'end':failed['next_offset']})
                     else:inputs.update(start_offset=0,previous_structured_segments=0,previous_returned_until=0)
                 elif inputs.get('resume_from'):raise ValueError('局部检索不支持顺序续读')
                 if not 1<=len(inputs['query'].strip())<=1000 or not 256<=inputs['budget']<=50000: raise ValueError('问题或预算无效')
@@ -132,12 +152,15 @@ class FolderJobs:
                     raise ValueError('请选择固定版本中的至少一份资料，或选择整个目录')
                 inputs.setdefault('strength',self.index.settings.llm_strength)
                 config=load_llm_config(settings=self.index.settings,strength=inputs['strength'])
+                inputs['effective_output_cap']=min(inputs['output_tokens'],self.index.settings.agent_call_max_tokens)
                 inputs.update(generation=generation['id'],file_ids=files)
                 snapshot=[{k:v for k,v in d.items() if k!='pages'} for d in generation['files'] if files is None or d['file_id'] in files]
                 inputs['source_snapshot']=snapshot
                 if strategy=='exhaustive':
                     from .reading import ReadingPlan
-                    inputs['reading_plan']=ReadingPlan(self.index,fid,generation['id'],files).signature
+                    plan=ReadingPlan(self.index,fid,generation['id'],files)
+                    inputs['reading_plan']=plan.signature
+                    if not inputs['retry_split']:inputs['range_end']=len(plan.segments)
                 inputs['model']={'provider':config.provider,'model':config.model,'base_url':config.base_url,'retries':0,
                                  'thinking':config.thinking,'reasoning_effort':config.reasoning_effort}
                 if self.pricing:inputs['pricing']=self.pricing.get(config.provider,config.model)

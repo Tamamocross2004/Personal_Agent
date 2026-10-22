@@ -70,6 +70,9 @@ def export_job(jobs,jid):
                 'retrieval':job.get('retrieval'),
                 'meaning':'范围文件不等于模型阅读全文；引用/定位仅认证保存来源，不认证结论正确。'}
         if 'coverage' in job:source['coverage']=job['coverage']
+        if 'batch_decisions' in job:
+            source['batch_decisions']=job['batch_decisions']
+            source['output_policy']={k:job['inputs'].get(k) for k in ('output_tokens','effective_output_cap','batch_mode','batch_size','expected_fields','retry_of','range_end')}
         if 'strength' in job['inputs']:
             source.update(strength=job['inputs']['strength'],model=job['inputs'].get('model'))
         def refs(ids):
@@ -94,6 +97,9 @@ def export_job(jobs,jid):
                '固定索引：'+source['generation'],'']
         if job.get('message'): lines.extend([md(job['message']),''])
         if 'strength' in job['inputs']:lines.extend(['模型强度：'+md(job['inputs']['strength'])+'；实际effort：'+md((job['inputs'].get('model') or {}).get('reasoning_effort') or '默认'),''])
+        if 'batch_decisions' in job:
+            lines.extend(['输出与分批设置：'+md(json.dumps(source['output_policy'],ensure_ascii=False)),
+                          '分批只作资源估算，不认证完整性或语义正确；原失败和费用保留，拆小重做属于新的付费请求。',''])
         if 'coverage' in job:
             lines.extend(['顺序分批整理：以下结果按批次保留，未做跨批合并；续读的前次结果保留在原任务。',
                           '提取范围送达不认证完整抽取或语义正确。',md(json.dumps(job['coverage'],ensure_ascii=False)),''])

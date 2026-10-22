@@ -19,6 +19,10 @@ def main():
     ask.add_argument('--budget',type=int,default=10000);ask.add_argument('--file-id',action='append',default=None)
     ask.add_argument('--strategy',choices=['retrieval','exhaustive'],default='retrieval')
     ask.add_argument('--max-batches',type=int,default=3);ask.add_argument('--resume-from')
+    ask.add_argument('--output-tokens',type=int,default=1200)
+    ask.add_argument('--batch-mode',choices=['adaptive','fixed'],default='adaptive')
+    ask.add_argument('--batch-size',type=int,default=6);ask.add_argument('--expected-fields',type=int,default=1)
+    ask.add_argument('--retry-split',action='store_true')
     sub.add_parser('history').add_argument('folder_id')
     for command in ('job','stop','export'):sub.add_parser(command).add_argument('job_id')
     args=p.parse_args();store=FolderStore(args.state_dir,excluded_roots=(PROJECT_ROOT/'workspace',))
@@ -40,7 +44,9 @@ def main():
                 try:
                     if args.command=='ask':
                         job=jobs.start(args.folder_id,'answer',{'query':args.query,'mode':args.mode,'budget':args.budget,'file_ids':args.file_id,
-                                                              'strategy':args.strategy,'max_batches':args.max_batches,'resume_from':args.resume_from})
+                                                              'strategy':args.strategy,'max_batches':args.max_batches,'resume_from':args.resume_from,
+                                                              'output_tokens':args.output_tokens,'batch_mode':args.batch_mode,'batch_size':args.batch_size,
+                                                              'expected_fields':args.expected_fields,'retry_split':args.retry_split})
                         jobs.threads[job['id']].join();result=jobs.get(job['id'])
                     elif args.command=='history':result=jobs.list(args.folder_id)
                     elif args.command=='job':result=jobs.get(args.job_id)

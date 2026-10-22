@@ -36,7 +36,7 @@ def setup_reading(library,rows=15):
 
 def start(library,jobs,**kwargs):
     return jobs.start(library[2],'answer',{'query':'整理所选范围','budget':20000,'mode':'keyword','file_ids':None,
-                                        'strategy':'exhaustive','max_batches':1,**kwargs})
+                                        'strategy':'exhaustive','max_batches':1,'batch_mode':'fixed',**kwargs})
 
 
 def test_batches_continue_pinned_scope_no_omission_or_repeated_main_segments(library,tmp_path):

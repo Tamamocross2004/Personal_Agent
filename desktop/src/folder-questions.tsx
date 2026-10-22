@@ -25,6 +25,10 @@ export function FolderQuestions({
     [citation, setCitation] = useState<any>(null);
   const [exported, setExported] = useState<any>(null);
   const [strength, setStrength] = useState("default");
+  const [outputTokens, setOutputTokens] = useState(1200),
+    [batchMode, setBatchMode] = useState("adaptive"),
+    [batchSize, setBatchSize] = useState(6),
+    [expectedFields, setExpectedFields] = useState(1);
   const [strategy, setStrategy] = useState("retrieval"),
     [maxBatches, setMaxBatches] = useState(3);
   const [reading, setReading] = useState<any>(null),
@@ -59,6 +63,56 @@ export function FolderQuestions({
         evidence: batch.evidence,
       }
     : saved;
+  const retryBatch = saved?.batches?.find(
+    (b: any) =>
+      b.start_offset ===
+        (saved.coverage?.next_offset ?? saved.coverage?.returned_until) &&
+      b.status === "returned" &&
+      (!b.result?.answer || b.finish_reason !== "stop"),
+  );
+  const canSplit =
+    retryBatch &&
+    retryBatch.next_offset - retryBatch.start_offset > 1 &&
+    !saved.usage_events?.some(
+      (e: any) =>
+        e.input_tokens == null ||
+        (e.operation === "llm" && e.output_tokens == null),
+    );
+  const invalidLimits =
+    !Number.isInteger(outputTokens) ||
+    outputTokens < 128 ||
+    outputTokens > 4096 ||
+    !Number.isInteger(batchSize) ||
+    batchSize < 1 ||
+    batchSize > 6 ||
+    !Number.isInteger(expectedFields) ||
+    expectedFields < 1 ||
+    expectedFields > 12;
+  const resume = (split = false) =>
+    act(async () => {
+      const value = await api(`/folders/${folderId}/questions`, {
+        method: "POST",
+        body: JSON.stringify({
+          query: saved.inputs.query,
+          mode: saved.inputs.mode,
+          budget,
+          strategy: "exhaustive",
+          max_batches: maxBatches,
+          resume_from: saved.id,
+          strength: saved.inputs.strength || "default",
+          output_tokens: outputTokens,
+          batch_mode: batchMode,
+          batch_size: batchSize,
+          expected_fields: expectedFields,
+          retry_split: split,
+        }),
+      });
+      if (alive.current) {
+        setView(null);
+        setCitation(null);
+        setJob(value);
+      }
+    });
   useEffect(() => {
     setBatchNumber(0);
     setNeighbors(null);
@@ -189,6 +243,62 @@ export function FolderQuestions({
           />
         </label>
       </div>
+      <details
+        className="folder-budget-settings"
+        open={strategy === "exhaustive"}
+      >
+        <summary>输出额度与分批设置（下次新任务）</summary>
+        <div className="knowledge-actions">
+          <label>
+            每次输出Token上限{" "}
+            <input
+              aria-label="每次输出Token上限"
+              type="number"
+              min={128}
+              max={4096}
+              value={outputTokens}
+              onChange={(e) => setOutputTokens(Number(e.target.value))}
+            />
+          </label>
+          {strategy === "exhaustive" && (
+            <>
+              <select
+                aria-label="分批策略"
+                value={batchMode}
+                onChange={(e) => setBatchMode(e.target.value)}
+              >
+                <option value="adaptive">自动匹配输出空间</option>
+                <option value="fixed">固定片段上限（仍检查预算）</option>
+              </select>
+              <label>
+                每批片段上限{" "}
+                <input
+                  aria-label="每批片段上限"
+                  type="number"
+                  min={1}
+                  max={6}
+                  value={batchSize}
+                  onChange={(e) => setBatchSize(Number(e.target.value))}
+                />
+              </label>
+              <label>
+                每条预计字段数{" "}
+                <input
+                  aria-label="每条预计字段数"
+                  type="number"
+                  min={1}
+                  max={12}
+                  value={expectedFields}
+                  onChange={(e) => setExpectedFields(Number(e.target.value))}
+                />
+              </label>
+            </>
+          )}
+        </div>
+        <p className="muted">
+          默认输出1200，上限还受项目单次上限和剩余预算约束。预计字段数只影响分批估算，不删减答案或改变校验。思考与正文共用输出额度；未知思考用量不当作已知为零，估算不能保证不截断。调整输出额度不会提高总任务预算。
+        </p>
+      </details>
       {scope === "selected" && (
         <fieldset>
           <legend>检索前限定文件范围</legend>
@@ -229,7 +339,7 @@ export function FolderQuestions({
       {strategy === "exhaustive" && (
         <aside>
           <p>
-            顺序读取所选索引版本的已解析文字，每批最多6个700字符片段，并在预算内逐批调用模型；不按关键词筛掉记录，不调用检索嵌入/重排。分批不会自动推断表头、连接跨页表格或合并业务对象。预算和批数限制可能导致部分完成。
+            顺序读取所选索引版本的已解析文字，每批在所设上限内按资料长度、预计字段数和剩余预算分配片段；每段最多700字符，不按关键词筛掉记录，不调用检索嵌入/重排。分批不会自动推断表头、连接跨页表格或合并业务对象。预算、输出空间和批数限制可能导致部分完成。本地原文分页只是浏览，不等于本次实际发送批次。
           </p>
           <button
             disabled={
@@ -280,6 +390,7 @@ export function FolderQuestions({
           budget < 256 ||
           budget > 50000 ||
           !Number.isFinite(budget) ||
+          invalidLimits ||
           (strategy === "exhaustive" &&
             (!Number.isInteger(maxBatches) || maxBatches < 1 || maxBatches > 8))
         }
@@ -296,6 +407,10 @@ export function FolderQuestions({
                 strategy,
                 strength,
                 max_batches: maxBatches,
+                output_tokens: outputTokens,
+                batch_mode: batchMode,
+                batch_size: batchSize,
+                expected_fields: expectedFields,
               }),
             });
             if (alive.current) {
@@ -379,6 +494,10 @@ export function FolderQuestions({
                     provider_reported_budget_exceeded:
                       "服务返回的实际用量超出预算",
                     end_of_extraction: "到达已解析文字末尾",
+                    output_space:
+                      "单片段估算输出仍超出额度；未发送，可显式调整输出额度或分批方式",
+                    retry_range_finished:
+                      "本次拆小重做范围已处理，其他范围需另行继续",
                   } as any
                 )[saved.coverage.stop_reason] || saved.status}
                 。
@@ -389,6 +508,39 @@ export function FolderQuestions({
                   ，本次不自动合并。
                 </p>
               )}
+              {saved.inputs.retry_of && (
+                <p>
+                  本次仅拆小重做原任务 {saved.inputs.retry_of.job_id} 第
+                  {saved.inputs.retry_of.batch}批范围 [
+                  {saved.inputs.retry_of.start}, {saved.inputs.retry_of.end}
+                  )；原失败和费用保留，本任务最多处理到{saved.inputs.range_end}
+                  ，不自动扩展到其他未完成范围。
+                </p>
+              )}
+              <p>
+                本任务输出设置 {saved.inputs.output_tokens ?? 1200}
+                ；项目约束后上限{" "}
+                {saved.inputs.effective_output_cap ?? "旧记录未保存"}；分批策略{" "}
+                {saved.inputs.batch_mode || "旧版固定"}
+                。下一次发送前还会检查剩余预算。
+              </p>
+              {saved.batch_decisions?.map((d: any, i: number) => (
+                <details key={i}>
+                  <summary>
+                    第{i + 1}次分批估算：{d.selected_segments}段，预计正文
+                    {d.estimated_body_tokens} Token，实际可用输出上限
+                    {d.effective_output_tokens}
+                  </summary>
+                  <p>
+                    思考参考用量：
+                    {d.reasoning_usage_unknown
+                      ? "未知"
+                      : d.estimated_reasoning_tokens}
+                    ；剩余预算{d.remaining_tokens}。{d.meaning}
+                  </p>
+                  <pre>{JSON.stringify(d.trials, null, 2)}</pre>
+                </details>
+              ))}
               <select
                 aria-label="查看分批结果"
                 value={batchNumber}
@@ -411,32 +563,42 @@ export function FolderQuestions({
                   busy ||
                   !saved.coverage.remaining_segments ||
                   budget < 256 ||
-                  budget > 50000
+                  budget > 50000 ||
+                  invalidLimits ||
+                  !Number.isFinite(budget) ||
+                  !Number.isInteger(maxBatches) ||
+                  maxBatches < 1 ||
+                  maxBatches > 8
                 }
-                onClick={() =>
-                  act(async () => {
-                    const value = await api(`/folders/${folderId}/questions`, {
-                      method: "POST",
-                      body: JSON.stringify({
-                        query: saved.inputs.query,
-                        mode: saved.inputs.mode,
-                        budget,
-                        strategy: "exhaustive",
-                        max_batches: maxBatches,
-                        resume_from: saved.id,
-                        strength: saved.inputs.strength || "default",
-                      }),
-                    });
-                    if (alive.current) {
-                      setView(null);
-                      setCitation(null);
-                      setJob(value);
-                    }
-                  })
-                }
+                onClick={() => resume()}
               >
                 继续整理剩余范围（新任务，使用上方预算并调用模型）
               </button>
+              {retryBatch && (
+                <>
+                  <button
+                    disabled={
+                      busy ||
+                      !canSplit ||
+                      invalidLimits ||
+                      !Number.isFinite(budget) ||
+                      budget < 256 ||
+                      budget > 50000 ||
+                      !Number.isInteger(maxBatches) ||
+                      maxBatches < 1 ||
+                      maxBatches > 8
+                    }
+                    onClick={() => resume(true)}
+                  >
+                    拆小重做未完成批次（新任务，重新计费）
+                  </button>
+                  <p>
+                    仅重发原未完成批次，片段上限至少减半；输出额度和总预算取上方设置，不后台重试。
+                    {!canSplit &&
+                      "单片段无法再按片段拆分，或原用量仍未知，请先核对。"}
+                  </p>
+                </>
+              )}
               <p>{saved.result?.message || saved.message}</p>
             </aside>
           )}

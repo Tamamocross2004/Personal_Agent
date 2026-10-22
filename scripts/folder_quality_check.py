@@ -65,10 +65,19 @@ def main():
             if available<256:raise ValueError('剩余诊断预算不足，未发送下一题')
             inputs={'query':case['query'],'mode':case['mode'],'budget':min(plan['limits']['per_question_tokens'],available),
                     'generation':generation,'file_ids':None if case['files'] is None else [files[name] for name in case['files']]}
-            for key in ('strategy','max_batches'):
+            for key in ('strategy','max_batches','output_tokens','batch_mode','batch_size','expected_fields','retry_split','strength'):
                 if key in case:inputs[key]=case[key]
             if case.get('resume_case'):
                 inputs['resume_from']=next(r['job_id'] for r in attempt['questions'] if r['case_id']==case['resume_case'])
+                if case.get('skip_if_no_splittable_batch'):
+                    parent=jobs.get(inputs['resume_from']);cursor=parent.get('coverage',{}).get('next_offset')
+                    eligible=any(b['start_offset']==cursor and b.get('status')=='returned'
+                                 and b['next_offset']-b['start_offset']>1
+                                 and (not (b.get('result') or {}).get('answer') or b.get('finish_reason')!='stop')
+                                 for b in parent.get('batches',[]))
+                    if not eligible:
+                        attempt['questions'].append({'case_id':case['id'],'status':'skipped_no_splittable_batch','inputs':inputs})
+                        save();continue
             job=jobs.start(fid,'answer',inputs)
             row={'case_id':case['id'],'job_id':job['id'],'inputs':inputs};attempt['questions'].append(row);save()
             jobs.threads[job['id']].join(120);job=jobs.get(job['id'])

@@ -67,6 +67,11 @@ class FolderQuestion(BaseModel):
     max_batches:int=Field(default=3,ge=1,le=8)
     resume_from:str|None=Field(default=None,max_length=64)
     strength:ModelStrength='default'
+    output_tokens:int=Field(default=1200,ge=128,le=4096)
+    batch_mode:Literal['adaptive','fixed']='adaptive'
+    batch_size:int=Field(default=6,ge=1,le=6)
+    expected_fields:int=Field(default=1,ge=1,le=12)
+    retry_split:bool=False
 
 
 class FolderReading(BaseModel):

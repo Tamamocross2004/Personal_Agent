@@ -14,7 +14,18 @@ from test_folder_answers import Chat
 from folder_assistant.jobs import FolderJobs
 from agent.llm import LLMClient
 _original_jobs_init=FolderJobs.__init__
-def jobs_init(self,index,**kw): _original_jobs_init(self,index,llm_factory=lambda c:Chat())
+class BatchLimitChat(Chat):
+    """Test-only truncation above three main segments, independent of questions."""
+    def chat(self,messages,**kwargs):
+        result=super().chat(messages,**kwargs)
+        scope=json.loads(messages[1]['content']).get('reading_scope')
+        if scope and scope['end_segment']-scope['start_segment']>3:
+            result.choices[0].finish_reason='length'
+        return result
+
+def jobs_init(self,index,**kw):
+    fake=BatchLimitChat if '--batching' in sys.argv else Chat
+    _original_jobs_init(self,index,llm_factory=lambda c:fake())
 FolderJobs.__init__=jobs_init
 
 embedding=Embedding();vectors=Vectors()

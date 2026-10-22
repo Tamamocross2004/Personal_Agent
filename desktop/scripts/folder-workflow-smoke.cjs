@@ -14,6 +14,7 @@ if (process.argv.includes("--reading"))
     "\n" + Array.from({ length: 8 }, (_, i) => `续读记录${i + 1}。`).join("\n"),
   );
 fs.writeFileSync(path.join(docs, ".env"), "SENSITIVE=must-not-read");
+const batchingMode = process.argv.includes("--batching");
 const parseMode = process.argv.includes("--parse");
 if (parseMode)
   require("node:child_process").execFileSync(
@@ -38,7 +39,7 @@ electron.app.disableHardwareAcceleration();electron.app.setPath('userData',${JSO
 const Native=electron.BrowserWindow;electron.BrowserWindow=class extends Native{constructor(o){super({...o,show:false,webPreferences:{...o.webPreferences,offscreen:true,backgroundThrottling:false}});}};
 electron.dialog.showOpenDialog=async()=>({canceled:false,filePaths:[${JSON.stringify(docs)}]});
 electron.dialog.showErrorBox=(title,message)=>console.error(title,message);
-const original=cp.spawn;cp.spawn=function(command,args,options){let log;if(args?.includes('desktop_app.server')){const parent=args[args.indexOf('--parent')+1];args=['-X','utf8',${JSON.stringify(path.join(project, "tests/folder_workflow_server.py"))},${JSON.stringify(fixture)},'--parent',parent];log=fs.openSync(${JSON.stringify(path.join(fixture, "backend.log"))},'a');options={...options,stdio:['ignore','pipe',log]};}const child=original(command,args,options);if(log!==undefined)fs.closeSync(log);return child;};
+const original=cp.spawn;cp.spawn=function(command,args,options){let log;if(args?.includes('desktop_app.server')){const parent=args[args.indexOf('--parent')+1];args=['-X','utf8',${JSON.stringify(path.join(project, "tests/folder_workflow_server.py"))},${JSON.stringify(fixture)},'--parent',parent,${JSON.stringify(batchingMode ? "--batching" : "--normal")}];log=fs.openSync(${JSON.stringify(path.join(fixture, "backend.log"))},'a');options={...options,stdio:['ignore','pipe',log]};}const child=original(command,args,options);if(log!==undefined)fs.closeSync(log);return child;};
 require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
 );
 (async () => {
@@ -217,9 +218,97 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         .getByText(/9个提取块/)
         .waitFor();
       await page.getByRole("spinbutton", { name: "最多整理批数" }).fill("1");
+      if (
+        !(await page
+          .locator(".folder-budget-settings")
+          .evaluate((el) => el.open))
+      )
+        await page
+          .getByText("输出额度与分批设置（下次新任务）", { exact: true })
+          .click();
+      await page
+        .getByRole("combobox", { name: "分批策略" })
+        .selectOption("fixed");
+      if (batchingMode) {
+        await page.locator(".folder-budget-settings").scrollIntoViewIfNeeded();
+        await page.screenshot({
+          path: path.join(project, "workspace/stage23-settings-20261022.png"),
+        });
+      }
       await page
         .getByRole("button", { name: "开始分批整理（调用模型）", exact: true })
         .click();
+      if (batchingMode) {
+        await page
+          .locator(".folder-coverage")
+          .getByText(/剩余9段/)
+          .waitFor();
+        await page
+          .getByRole("button", {
+            name: "拆小重做未完成批次（新任务，重新计费）",
+            exact: true,
+          })
+          .waitFor();
+        const connection = await page.evaluate(() =>
+          window.desktop.connection(),
+        );
+        const getJobs = async () => {
+          const folders = await (
+            await fetch(connection.url + "/api/folders", {
+              headers: { Authorization: "Bearer " + connection.token },
+            })
+          ).json();
+          return await (
+            await fetch(
+              connection.url +
+                "/api/folders/" +
+                folders.folders[0].id +
+                "/jobs",
+              { headers: { Authorization: "Bearer " + connection.token } },
+            )
+          ).json();
+        };
+        const parent = (await getJobs()).find((j) => j.coverage);
+        assert.equal(parent.coverage.next_offset, 0);
+        await page
+          .getByRole("button", {
+            name: "拆小重做未完成批次（新任务，重新计费）",
+            exact: true,
+          })
+          .scrollIntoViewIfNeeded();
+        await page.screenshot({
+          path: path.join(project, "workspace/stage23-retry-20261022.png"),
+        });
+        await page
+          .getByRole("combobox", { name: "分批策略" })
+          .selectOption("adaptive");
+        await page
+          .getByRole("spinbutton", { name: "每次输出Token上限" })
+          .fill("2400");
+        await page.getByRole("spinbutton", { name: "最多整理批数" }).fill("2");
+        await page
+          .getByRole("button", {
+            name: "拆小重做未完成批次（新任务，重新计费）",
+            exact: true,
+          })
+          .click();
+        await page
+          .locator(".folder-coverage")
+          .getByText(/本次拆小重做范围已处理/)
+          .waitFor();
+        const after = await getJobs(),
+          retry = after.find((j) => j.inputs.retry_split);
+        assert.deepEqual(
+          after.find((j) => j.id === parent.id),
+          parent,
+        );
+        assert.equal(retry.inputs.range_end, 6);
+        assert.equal(retry.batches.length, 2);
+        assert.equal(retry.coverage.next_offset, 6);
+        assert.ok(
+          retry.batches.every((b) => b.next_offset - b.start_offset <= 3),
+        );
+      }
       await page
         .locator(".folder-coverage")
         .getByText(/剩余3段/)
@@ -322,19 +411,26 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         .getByText(/公式：=1\+2/)
         .scrollIntoViewIfNeeded();
     }
+    // Hidden offscreen Electron needs a fresh compositor frame after earlier captures.
+    await app.evaluate(({ BrowserWindow }) =>
+      BrowserWindow.getAllWindows().forEach((w) => w.webContents.invalidate()),
+    );
     await page.screenshot({
+      timeout: 60000,
       path: path.join(
         project,
         "workspace",
-        parseMode
-          ? "folder-workflow-current-multiformat.png"
-          : process.argv.includes("--strength")
-            ? "model-strength-folder-20261022.png"
-            : process.argv.includes("--reading")
-              ? "stage22-folder-workflow.png"
-              : process.argv.includes("--experience")
-                ? "stage21-folder-workflow.png"
-                : "folder-workflow-current.png",
+        batchingMode
+          ? "stage23-folder-workflow-20261022.png"
+          : parseMode
+            ? "folder-workflow-current-multiformat.png"
+            : process.argv.includes("--strength")
+              ? "model-strength-folder-20261022.png"
+              : process.argv.includes("--reading")
+                ? "stage22-folder-workflow.png"
+                : process.argv.includes("--experience")
+                  ? "stage21-folder-workflow.png"
+                  : "folder-workflow-current.png",
       ),
     });
     await page
@@ -399,6 +495,14 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         multi_format_preview: parseMode,
         fixture,
         checks: [
+          ...(batchingMode
+            ? [
+                "output-controls",
+                "explicit-split-bounded-range",
+                "parent-and-fees-preserved",
+                "continue-after-split",
+              ]
+            : []),
           "native-picker-capability",
           "scan",
           "excluded-secret",

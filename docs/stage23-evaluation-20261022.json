@@ -1,0 +1,764 @@
+{
+  "stage": 23,
+  "date": "2026-10-22",
+  "runtime_base_commit": "5bf0af2",
+  "reviewer": "coding_assistant",
+  "independent_review": false,
+  "engineering_passed": true,
+  "content_acceptance_passed": false,
+  "stage12_accepted": false,
+  "tests": {
+    "full": "1074 passed in 231.74s",
+    "targeted_initial": "44 passed, 1 test-fixture assumption failed; retained log",
+    "targeted_budget_fix": "12 passed before reasoning-subset test added; final full includes all 12 new tests",
+    "build": true,
+    "electron_fake_providers": true,
+    "cli_help": true
+  },
+  "live_plan_sha256": "1ab526a269e663216ace87e70ae5bd483bb92e441e3a1707f9e7e6308dd724ab",
+  "live_runtime_sha256": {
+    "folder_assistant/__init__.py": "36656300506ebee15611b11a8eec4d2ba51af2278e92d74a5226fa32a1dd6277",
+    "folder_assistant/__main__.py": "6929b6ad19b7ad2cf67ddcf8b3a2ce2bf4802f97a6d6ff9384690427b9b1c46c",
+    "folder_assistant/answers.py": "1060b986adfdcc0f9de32e73f6339d1d31b7a03e64700670b28ab2748b843094",
+    "folder_assistant/batching.py": "87936b69ccbb6b2d5e4c027de9f68265393e24c037fc57fa783b513bb97800a2",
+    "folder_assistant/contracts.py": "69e97e543ea571271452f01f3981587f937fb8414a36cf15b58d7d41cda5f2a3",
+    "folder_assistant/exhaustive.py": "16c6d1014da941bc8f40dc62551ff3489ca02a47010002fe2334f293ef15bdfc",
+    "folder_assistant/exports.py": "22b38213eeff9ef4ff674b20c74724f866318ca1dad1a6fd2a0e5302ccac4499",
+    "folder_assistant/index.py": "6c70d3975f5918bd76d2149f5938e5aaf6a369caff6af5feca3e5af7bc133db3",
+    "folder_assistant/jobs.py": "4b1f2aedadbbf4f5e255b59fc176aa346fd6592aad5c8edb41d37a67ed233113",
+    "folder_assistant/parse_worker.py": "e1603c813ea3ed124e4f744af7db7fabb13343c09ab570a651722338cbf49387",
+    "folder_assistant/parsing.py": "474dd43160b91025576f4bbd802f2fe3a1122818ce6a8536ba194564722a0acf",
+    "folder_assistant/reading.py": "54febef7b0313bd16517d4f5882c7054100c8e4b75e51c8310d9ec92b22d9b8f",
+    "folder_assistant/store.py": "27a5f165119ef621715db67cfcfcecd9d494272cd5cae3f5b6de828ab7d3390d",
+    "folder_assistant/usage.py": "bf86177a3397159586053bbc7e4431d45b37e3121678e04ad6ee42069db2d240",
+    "knowledge/__init__.py": "5fcbc38c72e9f0e4c0938373622ff86daadbe7389238d3003d9a73d3acfb1533",
+    "knowledge/__main__.py": "fc231000c92128f2dacd50c8e4a2131c197130af52b5c13500673af31e4dec43",
+    "knowledge/documents.py": "4c2372f461f357cce017e9704392571c1d1bd1cf7e8f601867e6aa5eeb9305e2",
+    "knowledge/embedding.py": "7cfc277bf79b51205bff5c1447bb7165d73189a1773bfb7e013696349bdd2c43",
+    "knowledge/large_probe.py": "497c734fde900ff464eea06b736979fc52ccaa964bba28f21ebd3a1464c0c630",
+    "knowledge/locking.py": "c2f87541b323e39f8d080067aab7c15f7870f9a50b522ca9bcb596a4b89002ee",
+    "knowledge/long_probe.py": "824878c533475b0d48cca92f538fe00228108ede3274cf4bd43996ada91bb403",
+    "knowledge/probe.py": "564fc1190358d125bdd7d1c7d0fbe2bc1a998258e1dbe4f0b268585552e5666a",
+    "knowledge/recall_probe.py": "fb5657819c94b93083d3a11e6e546342345f3d35ac14fe70c662449f40143ca9",
+    "knowledge/report_probe.py": "486c955ce7368a5beb181b9def74546fc3b3ad9188c013105d643570102ac7df",
+    "knowledge/rerank_probe.py": "4c49f1e3a7f0e8dcd50edb647ba9beb521398ea05c01da538b25f1c99b9b75bc",
+    "knowledge/reranking.py": "8118a7613b87909571050ad1b6d6d3bee2a9beb8aa68b0dbc4ab60570cf384ec",
+    "knowledge/store.py": "3fc3b7c28d42baf9aee644f9edcd25ab12c547a5b8de37552ae399ce8d5d6837",
+    "knowledge/vectors.py": "520aff951c342401e1f1c4fcf5a532bd8f3ae859f6c01eb920414f8d2fdafd1b",
+    "agent/config.py": "30f8a3e63d4919113bdc09dc9954623440c18ee399448abd6e5da66ba7d2c60e",
+    "agent/llm.py": "bc58280e4c9663f4cc7f2fdf16041f11358e7b5b3e74b0fb4ce50b2232118867",
+    "agent/context.py": "097c931099e9b28a5222a10f02b03085f76f8aec61b33a02eb57393f7361f76f",
+    "agent/strength.py": "2dc6a5891255eb5e8da1c792e14acd3e39ab170bbd8493469432fd811035d1b1",
+    "scripts/folder_quality_check.py": "aa12f18a195eddd38ec3546ebb9e46f78a59bb27bd6d54b49505fd1192ed0e84"
+  },
+  "usage": {
+    "embedding_calls": 1,
+    "llm_calls": 5,
+    "rerank_calls": 0,
+    "known_tokens": 15111,
+    "unknown_usage_ids": [],
+    "events": [
+      {
+        "id": "95cb74ab72374a7090e815aec6894f55",
+        "purpose": "build:69421b753e4d474586826ca2f0a94cb1",
+        "provider": "siliconflow",
+        "model": "Pro/BAAI/bge-m3",
+        "status": "returned",
+        "input_tokens": 129,
+        "estimated_input_tokens": 59,
+        "request_attempts": 1,
+        "seconds": 0.621,
+        "recorded_at": "2026-10-22T14:08:38.599003+00:00"
+      },
+      {
+        "id": "9fc83097b82f4e1a9c361f6e07d5a0f8-batch-1",
+        "operation": "llm",
+        "status": "returned",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "thinking": "disabled",
+        "reasoning_effort": null,
+        "input_tokens": 2037,
+        "output_tokens": 704,
+        "request_attempts": 1,
+        "started": "2026-10-22T14:08:53.103403+00:00",
+        "returned_model": "deepseek-flash",
+        "cached_tokens": 1792,
+        "finished": "2026-10-22T14:08:55.624090+00:00",
+        "reasoning_tokens": null
+      },
+      {
+        "id": "9fc83097b82f4e1a9c361f6e07d5a0f8-batch-2",
+        "operation": "llm",
+        "status": "returned",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "thinking": "disabled",
+        "reasoning_effort": null,
+        "input_tokens": 2175,
+        "output_tokens": 895,
+        "request_attempts": 1,
+        "started": "2026-10-22T14:08:55.691527+00:00",
+        "returned_model": "deepseek-flash",
+        "cached_tokens": 1408,
+        "finished": "2026-10-22T14:08:58.822716+00:00",
+        "reasoning_tokens": null
+      },
+      {
+        "id": "65f4e632440a4caaacb208ff0b0abf33-batch-1",
+        "operation": "llm",
+        "status": "returned",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "thinking": "disabled",
+        "reasoning_effort": null,
+        "input_tokens": 2037,
+        "output_tokens": 706,
+        "request_attempts": 1,
+        "started": "2026-10-22T14:08:47.802515+00:00",
+        "returned_model": "deepseek-flash",
+        "cached_tokens": 1408,
+        "finished": "2026-10-22T14:08:50.193754+00:00",
+        "reasoning_tokens": null
+      },
+      {
+        "id": "65f4e632440a4caaacb208ff0b0abf33-batch-2",
+        "operation": "llm",
+        "status": "returned",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "thinking": "disabled",
+        "reasoning_effort": null,
+        "input_tokens": 2040,
+        "output_tokens": 748,
+        "request_attempts": 1,
+        "started": "2026-10-22T14:08:50.273645+00:00",
+        "returned_model": "deepseek-flash",
+        "cached_tokens": 1408,
+        "finished": "2026-10-22T14:08:52.915841+00:00",
+        "reasoning_tokens": null
+      },
+      {
+        "id": "7217b68b52c346b2bc2470c8568e3a3e-batch-1",
+        "operation": "llm",
+        "status": "returned",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "thinking": "disabled",
+        "reasoning_effort": null,
+        "input_tokens": 2440,
+        "output_tokens": 1200,
+        "request_attempts": 1,
+        "started": "2026-10-22T14:08:43.208256+00:00",
+        "returned_model": "deepseek-flash",
+        "cached_tokens": 1280,
+        "finished": "2026-10-22T14:08:46.945345+00:00",
+        "reasoning_tokens": null
+      }
+    ]
+  },
+  "cny_total": null,
+  "cases": [
+    {
+      "case_id": "fixed",
+      "job_id": "7217b68b52c346b2bc2470c8568e3a3e",
+      "coverage": {
+        "generation": "69421b753e4d474586826ca2f0a94cb1",
+        "plan_sha256": "ef2fdee98302c12f355f3a4ca23a143c6a041177301f160732d79c0dc4f104b6",
+        "total_segments": 8,
+        "total_blocks": 8,
+        "total_characters": 180,
+        "files": [
+          {
+            "file_id": "a194c2ab3d366d320b5a7f0725b35183bfcfc3b9c3eeab72f85c3895f8852099",
+            "name": "pumps.csv",
+            "blocks": 8
+          }
+        ],
+        "meaning": "仅覆盖本版本已解析文字；未含OCR、未提取内容。送达不认证完整提取或语义正确。",
+        "protocol_version": 2,
+        "start_offset": 0,
+        "returned_until": 6,
+        "next_offset": 0,
+        "structured_segments": 0,
+        "remaining_segments": 8,
+        "unsent_segments": 2,
+        "input_coverage_complete": false,
+        "structured_coverage_complete": false,
+        "continuation_of": null,
+        "operation_end": 8,
+        "operation_remaining": 8,
+        "stop_reason": "invalid_or_truncated_output"
+      },
+      "calls": 1,
+      "known_tokens": 3640,
+      "valid_literal_object_fields": 0,
+      "expected_object_fields": 14,
+      "matching_fields": [],
+      "mismatched_fields": [],
+      "batches": [
+        {
+          "range": [
+            0,
+            6
+          ],
+          "finish_reason": "length",
+          "output_cap": 1200,
+          "schema_usable": false,
+          "issues": [
+            {
+              "code": "invalid_schema",
+              "path": "",
+              "message": "回答不符合本次约定的数据结构，未自动修补"
+            }
+          ],
+          "input_tokens": 2440,
+          "output_tokens": 1200,
+          "elapsed_seconds": 3.737089,
+          "sizing": {
+            "version": 1,
+            "mode": "fixed",
+            "max_segments": 6,
+            "selected_segments": 6,
+            "expected_fields": 2,
+            "remaining_tokens": 18000,
+            "requested_output_tokens": 1200,
+            "reasoning_usage_unknown": false,
+            "trials": [
+              {
+                "segments": 6,
+                "input_tokens": 2766,
+                "estimated_body_tokens": 1788,
+                "estimated_reasoning_tokens": 0,
+                "effective_output_tokens": 1200,
+                "fits_estimate": false
+              }
+            ],
+            "segments": 6,
+            "input_tokens": 2766,
+            "estimated_body_tokens": 1788,
+            "estimated_reasoning_tokens": 0,
+            "effective_output_tokens": 1200,
+            "fits_estimate": false,
+            "meaning": "分批估算，不限制答案字段或认证完整性；思考预留只参考已返回用量，不是独立思考配额。"
+          }
+        }
+      ],
+      "formal_review_status": "not_reviewed",
+      "content_acceptance_passed": false
+    },
+    {
+      "case_id": "adaptive",
+      "job_id": "65f4e632440a4caaacb208ff0b0abf33",
+      "coverage": {
+        "generation": "69421b753e4d474586826ca2f0a94cb1",
+        "plan_sha256": "ef2fdee98302c12f355f3a4ca23a143c6a041177301f160732d79c0dc4f104b6",
+        "total_segments": 8,
+        "total_blocks": 8,
+        "total_characters": 180,
+        "files": [
+          {
+            "file_id": "a194c2ab3d366d320b5a7f0725b35183bfcfc3b9c3eeab72f85c3895f8852099",
+            "name": "pumps.csv",
+            "blocks": 8
+          }
+        ],
+        "meaning": "仅覆盖本版本已解析文字；未含OCR、未提取内容。送达不认证完整提取或语义正确。",
+        "protocol_version": 2,
+        "start_offset": 0,
+        "returned_until": 5,
+        "next_offset": 3,
+        "structured_segments": 3,
+        "remaining_segments": 5,
+        "unsent_segments": 3,
+        "input_coverage_complete": false,
+        "structured_coverage_complete": false,
+        "continuation_of": null,
+        "operation_end": 8,
+        "operation_remaining": 5,
+        "stop_reason": "invalid_or_truncated_output"
+      },
+      "calls": 2,
+      "known_tokens": 5531,
+      "valid_literal_object_fields": 4,
+      "expected_object_fields": 14,
+      "matching_fields": [
+        {
+          "subject": "HX-401",
+          "field": "flow_l_min",
+          "value": "0",
+          "status": "stated"
+        },
+        {
+          "subject": "HX-401",
+          "field": "power_w",
+          "value": "18",
+          "status": "stated"
+        },
+        {
+          "subject": "HX-402",
+          "field": "flow_l_min",
+          "value": "12",
+          "status": "stated"
+        },
+        {
+          "subject": "HX-402",
+          "field": "power_w",
+          "value": "0",
+          "status": "stated"
+        }
+      ],
+      "mismatched_fields": [],
+      "batches": [
+        {
+          "range": [
+            0,
+            3
+          ],
+          "finish_reason": "stop",
+          "output_cap": 1200,
+          "schema_usable": true,
+          "issues": [],
+          "input_tokens": 2037,
+          "output_tokens": 706,
+          "elapsed_seconds": 2.391239,
+          "sizing": {
+            "version": 1,
+            "mode": "adaptive",
+            "max_segments": 6,
+            "selected_segments": 3,
+            "expected_fields": 2,
+            "remaining_tokens": 18000,
+            "requested_output_tokens": 1200,
+            "reasoning_usage_unknown": false,
+            "trials": [
+              {
+                "segments": 6,
+                "input_tokens": 2766,
+                "estimated_body_tokens": 1788,
+                "estimated_reasoning_tokens": 0,
+                "effective_output_tokens": 1200,
+                "fits_estimate": false
+              },
+              {
+                "segments": 5,
+                "input_tokens": 2650,
+                "estimated_body_tokens": 1495,
+                "estimated_reasoning_tokens": 0,
+                "effective_output_tokens": 1200,
+                "fits_estimate": false
+              },
+              {
+                "segments": 4,
+                "input_tokens": 2536,
+                "estimated_body_tokens": 1207,
+                "estimated_reasoning_tokens": 0,
+                "effective_output_tokens": 1200,
+                "fits_estimate": false
+              },
+              {
+                "segments": 3,
+                "input_tokens": 2422,
+                "estimated_body_tokens": 918,
+                "estimated_reasoning_tokens": 0,
+                "effective_output_tokens": 1200,
+                "fits_estimate": true
+              }
+            ],
+            "segments": 3,
+            "input_tokens": 2422,
+            "estimated_body_tokens": 918,
+            "estimated_reasoning_tokens": 0,
+            "effective_output_tokens": 1200,
+            "fits_estimate": true,
+            "meaning": "分批估算，不限制答案字段或认证完整性；思考预留只参考已返回用量，不是独立思考配额。"
+          }
+        },
+        {
+          "range": [
+            3,
+            5
+          ],
+          "finish_reason": "stop",
+          "output_cap": 1200,
+          "schema_usable": false,
+          "issues": [
+            {
+              "code": "invented_missing_value",
+              "path": "comparison.0",
+              "message": "空白或未知值保持为空，不填写具体值或伪造值原句"
+            }
+          ],
+          "input_tokens": 2040,
+          "output_tokens": 748,
+          "elapsed_seconds": 2.642196,
+          "sizing": {
+            "version": 1,
+            "mode": "adaptive",
+            "max_segments": 5,
+            "selected_segments": 2,
+            "expected_fields": 2,
+            "remaining_tokens": 15257,
+            "requested_output_tokens": 1200,
+            "reasoning_usage_unknown": false,
+            "trials": [
+              {
+                "segments": 5,
+                "input_tokens": 2772,
+                "estimated_body_tokens": 1790,
+                "estimated_reasoning_tokens": 0,
+                "effective_output_tokens": 1200,
+                "fits_estimate": false
+              },
+              {
+                "segments": 4,
+                "input_tokens": 2657,
+                "estimated_body_tokens": 1499,
+                "estimated_reasoning_tokens": 0,
+                "effective_output_tokens": 1200,
+                "fits_estimate": false
+              },
+              {
+                "segments": 3,
+                "input_tokens": 2542,
+                "estimated_body_tokens": 1206,
+                "estimated_reasoning_tokens": 0,
+                "effective_output_tokens": 1200,
+                "fits_estimate": false
+              },
+              {
+                "segments": 2,
+                "input_tokens": 2427,
+                "estimated_body_tokens": 913,
+                "estimated_reasoning_tokens": 0,
+                "effective_output_tokens": 1200,
+                "fits_estimate": true
+              }
+            ],
+            "segments": 2,
+            "input_tokens": 2427,
+            "estimated_body_tokens": 913,
+            "estimated_reasoning_tokens": 0,
+            "effective_output_tokens": 1200,
+            "fits_estimate": true,
+            "meaning": "分批估算，不限制答案字段或认证完整性；思考预留只参考已返回用量，不是独立思考配额。"
+          }
+        }
+      ],
+      "formal_review_status": "not_reviewed",
+      "content_acceptance_passed": false
+    },
+    {
+      "case_id": "explicit-split",
+      "job_id": "9fc83097b82f4e1a9c361f6e07d5a0f8",
+      "coverage": {
+        "generation": "69421b753e4d474586826ca2f0a94cb1",
+        "plan_sha256": "ef2fdee98302c12f355f3a4ca23a143c6a041177301f160732d79c0dc4f104b6",
+        "total_segments": 8,
+        "total_blocks": 8,
+        "total_characters": 180,
+        "files": [
+          {
+            "file_id": "a194c2ab3d366d320b5a7f0725b35183bfcfc3b9c3eeab72f85c3895f8852099",
+            "name": "pumps.csv",
+            "blocks": 8
+          }
+        ],
+        "meaning": "仅覆盖本版本已解析文字；未含OCR、未提取内容。送达不认证完整提取或语义正确。",
+        "protocol_version": 2,
+        "start_offset": 0,
+        "returned_until": 6,
+        "next_offset": 6,
+        "structured_segments": 6,
+        "remaining_segments": 2,
+        "unsent_segments": 2,
+        "input_coverage_complete": false,
+        "structured_coverage_complete": false,
+        "continuation_of": "7217b68b52c346b2bc2470c8568e3a3e",
+        "operation_end": 6,
+        "operation_remaining": 0,
+        "stop_reason": "retry_range_finished"
+      },
+      "calls": 2,
+      "known_tokens": 5811,
+      "valid_literal_object_fields": 10,
+      "expected_object_fields": 14,
+      "matching_fields": [
+        {
+          "subject": "HX-401",
+          "field": "flow_l_min",
+          "value": "0",
+          "status": "stated"
+        },
+        {
+          "subject": "HX-401",
+          "field": "power_w",
+          "value": "18",
+          "status": "stated"
+        },
+        {
+          "subject": "HX-402",
+          "field": "flow_l_min",
+          "value": "12",
+          "status": "stated"
+        },
+        {
+          "subject": "HX-402",
+          "field": "power_w",
+          "value": "0",
+          "status": "stated"
+        },
+        {
+          "subject": "HX-403",
+          "field": "flow_l_min",
+          "value": null,
+          "status": "blank"
+        },
+        {
+          "subject": "HX-403",
+          "field": "power_w",
+          "value": "24",
+          "status": "stated"
+        },
+        {
+          "subject": "HX-404",
+          "field": "flow_l_min",
+          "value": "9",
+          "status": "stated"
+        },
+        {
+          "subject": "HX-404",
+          "field": "power_w",
+          "value": null,
+          "status": "blank"
+        },
+        {
+          "subject": "HX-405",
+          "field": "flow_l_min",
+          "value": "15",
+          "status": "stated"
+        },
+        {
+          "subject": "HX-405",
+          "field": "power_w",
+          "value": "31",
+          "status": "stated"
+        }
+      ],
+      "mismatched_fields": [],
+      "batches": [
+        {
+          "range": [
+            0,
+            3
+          ],
+          "finish_reason": "stop",
+          "output_cap": 2400,
+          "schema_usable": true,
+          "issues": [],
+          "input_tokens": 2037,
+          "output_tokens": 704,
+          "elapsed_seconds": 2.520687,
+          "sizing": {
+            "version": 1,
+            "mode": "adaptive",
+            "max_segments": 3,
+            "selected_segments": 3,
+            "expected_fields": 2,
+            "remaining_tokens": 18000,
+            "requested_output_tokens": 2400,
+            "reasoning_usage_unknown": false,
+            "trials": [
+              {
+                "segments": 3,
+                "input_tokens": 2422,
+                "estimated_body_tokens": 918,
+                "estimated_reasoning_tokens": 0,
+                "effective_output_tokens": 2400,
+                "fits_estimate": true
+              }
+            ],
+            "segments": 3,
+            "input_tokens": 2422,
+            "estimated_body_tokens": 918,
+            "estimated_reasoning_tokens": 0,
+            "effective_output_tokens": 2400,
+            "fits_estimate": true,
+            "meaning": "分批估算，不限制答案字段或认证完整性；思考预留只参考已返回用量，不是独立思考配额。"
+          }
+        },
+        {
+          "range": [
+            3,
+            6
+          ],
+          "finish_reason": "stop",
+          "output_cap": 2400,
+          "schema_usable": true,
+          "issues": [],
+          "input_tokens": 2175,
+          "output_tokens": 895,
+          "elapsed_seconds": 3.131189,
+          "sizing": {
+            "version": 1,
+            "mode": "adaptive",
+            "max_segments": 3,
+            "selected_segments": 3,
+            "expected_fields": 2,
+            "remaining_tokens": 15259,
+            "requested_output_tokens": 2400,
+            "reasoning_usage_unknown": false,
+            "trials": [
+              {
+                "segments": 3,
+                "input_tokens": 2542,
+                "estimated_body_tokens": 1206,
+                "estimated_reasoning_tokens": 0,
+                "effective_output_tokens": 2400,
+                "fits_estimate": true
+              }
+            ],
+            "segments": 3,
+            "input_tokens": 2542,
+            "estimated_body_tokens": 1206,
+            "estimated_reasoning_tokens": 0,
+            "effective_output_tokens": 2400,
+            "fits_estimate": true,
+            "meaning": "分批估算，不限制答案字段或认证完整性；思考预留只参考已返回用量，不是独立思考配额。"
+          }
+        }
+      ],
+      "formal_review_status": "not_reviewed",
+      "content_acceptance_passed": false
+    }
+  ],
+  "observations": [
+    "Fixed [0,6) returned length and invalid JSON, preserved without repair. Raw text is not counted as usable structured fields.",
+    "Adaptive [0,3) returned four literal object-field pairs including two zeros; [3,5) returned stop but blank rows included value_quote, violating unchanged v3. Cursor remains3; no automatic retry.",
+    "Explicit split is a separate 2400-cap task: two batches [0,3),[3,6) preserve ten literal object-field pairs, including two blanks. Original failure and cost retained; [6,8) never processed by this retry.",
+    "No mismatching literal pairs in usable structure, but field correspondence remains model-declared: prose questions header certainty while table assigns column names. No semantic certification or full-corpus extraction claim.",
+    "Paired conditions equal except batch mode. One new synthetic CSV, one run per case, order not randomized: no general/statistical improvement claim. Extra split output allowance differs and is not pooled with paired comparison.",
+    "No old answer, score, schema, segmentation, import cap or validation threshold changed after results. Reviewer coding_assistant, not independent/human. Stage12 remains unaccepted."
+  ],
+  "checks": {
+    "historical_artifact_files_unchanged": 416,
+    "new_export_csv_xlsx_equal": 3,
+    "runtime_unchanged_since_preregistration": true,
+    "source_unchanged": true,
+    "actual_project_keys_checked": 2,
+    "scanned_files": 393,
+    "secret_matches": 0
+  },
+  "artifact_sha256": {
+    "workspace/stage23-live-20261022/attempt.json": "c81fa72e60daf99f08a7a968e7453351c1a59807b72df60c234b2de3a5bf827b",
+    "workspace/stage23-live-20261022/run.log": "3b1e0773b76629d7764b4bd4baf7393ed0e0c03c4bc4d0075e1a563a52580818",
+    "workspace/stage23-live-20261022/documents/pumps.csv": "46c32d5028460c635bef578b41c9b87e5f25f03b8792485afdcf72129dbf06a2",
+    "workspace/stage23-live-20261022/runtime/agent/config.py": "30f8a3e63d4919113bdc09dc9954623440c18ee399448abd6e5da66ba7d2c60e",
+    "workspace/stage23-live-20261022/runtime/agent/context.py": "097c931099e9b28a5222a10f02b03085f76f8aec61b33a02eb57393f7361f76f",
+    "workspace/stage23-live-20261022/runtime/agent/llm.py": "bc58280e4c9663f4cc7f2fdf16041f11358e7b5b3e74b0fb4ce50b2232118867",
+    "workspace/stage23-live-20261022/runtime/agent/strength.py": "2dc6a5891255eb5e8da1c792e14acd3e39ab170bbd8493469432fd811035d1b1",
+    "workspace/stage23-live-20261022/runtime/folder_assistant/answers.py": "1060b986adfdcc0f9de32e73f6339d1d31b7a03e64700670b28ab2748b843094",
+    "workspace/stage23-live-20261022/runtime/folder_assistant/batching.py": "87936b69ccbb6b2d5e4c027de9f68265393e24c037fc57fa783b513bb97800a2",
+    "workspace/stage23-live-20261022/runtime/folder_assistant/contracts.py": "69e97e543ea571271452f01f3981587f937fb8414a36cf15b58d7d41cda5f2a3",
+    "workspace/stage23-live-20261022/runtime/folder_assistant/exhaustive.py": "16c6d1014da941bc8f40dc62551ff3489ca02a47010002fe2334f293ef15bdfc",
+    "workspace/stage23-live-20261022/runtime/folder_assistant/exports.py": "22b38213eeff9ef4ff674b20c74724f866318ca1dad1a6fd2a0e5302ccac4499",
+    "workspace/stage23-live-20261022/runtime/folder_assistant/index.py": "6c70d3975f5918bd76d2149f5938e5aaf6a369caff6af5feca3e5af7bc133db3",
+    "workspace/stage23-live-20261022/runtime/folder_assistant/jobs.py": "4b1f2aedadbbf4f5e255b59fc176aa346fd6592aad5c8edb41d37a67ed233113",
+    "workspace/stage23-live-20261022/runtime/folder_assistant/parse_worker.py": "e1603c813ea3ed124e4f744af7db7fabb13343c09ab570a651722338cbf49387",
+    "workspace/stage23-live-20261022/runtime/folder_assistant/parsing.py": "474dd43160b91025576f4bbd802f2fe3a1122818ce6a8536ba194564722a0acf",
+    "workspace/stage23-live-20261022/runtime/folder_assistant/reading.py": "54febef7b0313bd16517d4f5882c7054100c8e4b75e51c8310d9ec92b22d9b8f",
+    "workspace/stage23-live-20261022/runtime/folder_assistant/store.py": "27a5f165119ef621715db67cfcfcecd9d494272cd5cae3f5b6de828ab7d3390d",
+    "workspace/stage23-live-20261022/runtime/folder_assistant/usage.py": "bf86177a3397159586053bbc7e4431d45b37e3121678e04ad6ee42069db2d240",
+    "workspace/stage23-live-20261022/runtime/folder_assistant/__init__.py": "36656300506ebee15611b11a8eec4d2ba51af2278e92d74a5226fa32a1dd6277",
+    "workspace/stage23-live-20261022/runtime/folder_assistant/__main__.py": "6929b6ad19b7ad2cf67ddcf8b3a2ce2bf4802f97a6d6ff9384690427b9b1c46c",
+    "workspace/stage23-live-20261022/runtime/knowledge/documents.py": "4c2372f461f357cce017e9704392571c1d1bd1cf7e8f601867e6aa5eeb9305e2",
+    "workspace/stage23-live-20261022/runtime/knowledge/embedding.py": "7cfc277bf79b51205bff5c1447bb7165d73189a1773bfb7e013696349bdd2c43",
+    "workspace/stage23-live-20261022/runtime/knowledge/large_probe.py": "497c734fde900ff464eea06b736979fc52ccaa964bba28f21ebd3a1464c0c630",
+    "workspace/stage23-live-20261022/runtime/knowledge/locking.py": "c2f87541b323e39f8d080067aab7c15f7870f9a50b522ca9bcb596a4b89002ee",
+    "workspace/stage23-live-20261022/runtime/knowledge/long_probe.py": "824878c533475b0d48cca92f538fe00228108ede3274cf4bd43996ada91bb403",
+    "workspace/stage23-live-20261022/runtime/knowledge/probe.py": "564fc1190358d125bdd7d1c7d0fbe2bc1a998258e1dbe4f0b268585552e5666a",
+    "workspace/stage23-live-20261022/runtime/knowledge/recall_probe.py": "fb5657819c94b93083d3a11e6e546342345f3d35ac14fe70c662449f40143ca9",
+    "workspace/stage23-live-20261022/runtime/knowledge/report_probe.py": "486c955ce7368a5beb181b9def74546fc3b3ad9188c013105d643570102ac7df",
+    "workspace/stage23-live-20261022/runtime/knowledge/reranking.py": "8118a7613b87909571050ad1b6d6d3bee2a9beb8aa68b0dbc4ab60570cf384ec",
+    "workspace/stage23-live-20261022/runtime/knowledge/rerank_probe.py": "4c49f1e3a7f0e8dcd50edb647ba9beb521398ea05c01da538b25f1c99b9b75bc",
+    "workspace/stage23-live-20261022/runtime/knowledge/store.py": "3fc3b7c28d42baf9aee644f9edcd25ab12c547a5b8de37552ae399ce8d5d6837",
+    "workspace/stage23-live-20261022/runtime/knowledge/vectors.py": "520aff951c342401e1f1c4fcf5a532bd8f3ae859f6c01eb920414f8d2fdafd1b",
+    "workspace/stage23-live-20261022/runtime/knowledge/__init__.py": "5fcbc38c72e9f0e4c0938373622ff86daadbe7389238d3003d9a73d3acfb1533",
+    "workspace/stage23-live-20261022/runtime/knowledge/__main__.py": "fc231000c92128f2dacd50c8e4a2131c197130af52b5c13500673af31e4dec43",
+    "workspace/stage23-live-20261022/runtime/scripts/folder_quality_check.py": "aa12f18a195eddd38ec3546ebb9e46f78a59bb27bd6d54b49505fd1192ed0e84",
+    "workspace/stage23-live-20261022/state/.jobs-start.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage23-live-20261022/state/65f4e632440a4caaacb208ff0b0abf33.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage23-live-20261022/state/7217b68b52c346b2bc2470c8568e3a3e.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage23-live-20261022/state/9fc83097b82f4e1a9c361f6e07d5a0f8.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage23-live-20261022/state/catalog.sqlite3": "4bac5d8cc437b2de3fa40c68b069dcb3e0a8e9460158c5efd21e897065ddada9",
+    "workspace/stage23-live-20261022/state/indexes/f0454717bc294282af54abb7baea0f16/.build.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage23-live-20261022/state/indexes/f0454717bc294282af54abb7baea0f16/.sync.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage23-live-20261022/state/indexes/f0454717bc294282af54abb7baea0f16/.vectors.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage23-live-20261022/state/indexes/f0454717bc294282af54abb7baea0f16/knowledge.sqlite3": "7d4dce124c91e824972b27d772c321ae7f9b4f087ead36242129758000f51094",
+    "workspace/stage23-live-20261022/state/indexes/f0454717bc294282af54abb7baea0f16/vectors/69421b753e4d474586826ca2f0a94cb1.db/LOCK": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workspace/stage23-live-20261022/state/indexes/f0454717bc294282af54abb7baea0f16/vectors/69421b753e4d474586826ca2f0a94cb1.db/collections/chunks/manifest.json": "52effbe6a5d6d81f7bdd70094b8b1f3a59fbfd95e4dcb7d76dec87f75f55d141",
+    "workspace/stage23-live-20261022/state/indexes/f0454717bc294282af54abb7baea0f16/vectors/69421b753e4d474586826ca2f0a94cb1.db/collections/chunks/manifest.json.prev": "439bced4db104c9bc364e111da83cd0486ba478d9e84a87f4a8b6156ece9130c",
+    "workspace/stage23-live-20261022/state/indexes/f0454717bc294282af54abb7baea0f16/vectors/69421b753e4d474586826ca2f0a94cb1.db/collections/chunks/schema.json": "091a94653bffaee066311202f1db0c0e9850fe8749840a67e6189920344759ce",
+    "workspace/stage23-live-20261022/state/indexes/f0454717bc294282af54abb7baea0f16/vectors/69421b753e4d474586826ca2f0a94cb1.db/collections/chunks/partitions/_default/data/data_000001_000008.parquet": "60860e1c7cb554cfa26dd489b9e8c0a57614f72e80d40729ad5db72c87d65d38",
+    "workspace/stage23-live-20261022/state/indexes/f0454717bc294282af54abb7baea0f16/vectors/69421b753e4d474586826ca2f0a94cb1.db/collections/chunks/partitions/_default/indexes/data_000001_000008.vector.autoindex.idx": "ec63a1748d9fa4131c499935a32dc9ca0ab1c329195219743c24f7e69ee86b4a",
+    "workspace/stage23-live-20261022/state/outputs/65f4e632440a4caaacb208ff0b0abf33/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage23-live-20261022/state/outputs/65f4e632440a4caaacb208ff0b0abf33/comparison.csv": "0bdb76297d667f4b6c6a9b0db1b0e67920482749fe611ba3ef0cd6d070b30bf5",
+    "workspace/stage23-live-20261022/state/outputs/65f4e632440a4caaacb208ff0b0abf33/comparison.xlsx": "c3f42bb36530d586ccff87863d4c125cf765cc749b709640381421d39ba5792c",
+    "workspace/stage23-live-20261022/state/outputs/65f4e632440a4caaacb208ff0b0abf33/export.json": "a7bbbdfcf88127d2c59e035398a7959fcec13e7d2ca60ef4d9e24ff5c8057c1e",
+    "workspace/stage23-live-20261022/state/outputs/65f4e632440a4caaacb208ff0b0abf33/record.json": "f3a30414c000560a4d7d57cc257509c76ed1db6586a635d4d734fe159a7ab742",
+    "workspace/stage23-live-20261022/state/outputs/65f4e632440a4caaacb208ff0b0abf33/sources.csv": "cc60997b72569ea3a6fb7a0d20eac0e1cb9b49129127dd35463d45603aae5eaa",
+    "workspace/stage23-live-20261022/state/outputs/65f4e632440a4caaacb208ff0b0abf33/sources.json": "e607fda23fd0441bb206c64f173a5325c42200ef85bb96c79782d44489b8f49f",
+    "workspace/stage23-live-20261022/state/outputs/65f4e632440a4caaacb208ff0b0abf33/summary.md": "0bcbd7de590b4161a256319e139557fbd0053a4a655acc00b3f974af037e83af",
+    "workspace/stage23-live-20261022/state/outputs/7217b68b52c346b2bc2470c8568e3a3e/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage23-live-20261022/state/outputs/7217b68b52c346b2bc2470c8568e3a3e/comparison.csv": "8b26cf9f87eb5f5a04bde87e496609b0c1265660e3a23f3b363f3012ddadbea4",
+    "workspace/stage23-live-20261022/state/outputs/7217b68b52c346b2bc2470c8568e3a3e/comparison.xlsx": "51547ac140efba25d02e3adba5a63fd03a6b2de981180361f1a0d9d954a6c23a",
+    "workspace/stage23-live-20261022/state/outputs/7217b68b52c346b2bc2470c8568e3a3e/export.json": "b285451dd14405437beeea4d2d8c98868a3b19b719186fcd342f503579624b55",
+    "workspace/stage23-live-20261022/state/outputs/7217b68b52c346b2bc2470c8568e3a3e/record.json": "47e9cbe56f2fad308bf6153227f087e9d50ddc2f1b20376d4ca1163355fe2cf4",
+    "workspace/stage23-live-20261022/state/outputs/7217b68b52c346b2bc2470c8568e3a3e/sources.csv": "02771abc69858d08154ee7241ba64671e3a50c991a17333ada05e141c350ef9d",
+    "workspace/stage23-live-20261022/state/outputs/7217b68b52c346b2bc2470c8568e3a3e/sources.json": "3b6bd468960494ec341e8f722ff7c23b315bf4424e5cdbab06c8c0d0fedbe769",
+    "workspace/stage23-live-20261022/state/outputs/7217b68b52c346b2bc2470c8568e3a3e/summary.md": "2589468b4bc79a9a2175b43bb23776f684b7d2123db512e386366d9a513baec2",
+    "workspace/stage23-live-20261022/state/outputs/9fc83097b82f4e1a9c361f6e07d5a0f8/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage23-live-20261022/state/outputs/9fc83097b82f4e1a9c361f6e07d5a0f8/comparison.csv": "ba39dfc9d294dfd838945864d9268627f8dad25fc54d63cae53bbd010d6159e2",
+    "workspace/stage23-live-20261022/state/outputs/9fc83097b82f4e1a9c361f6e07d5a0f8/comparison.xlsx": "89ed558b9773512240ae1e87f94dcf6464bab60fbaefae174e42cae15d541297",
+    "workspace/stage23-live-20261022/state/outputs/9fc83097b82f4e1a9c361f6e07d5a0f8/export.json": "c437c698f6db1bf025ca715843facb17e30402b795c54a5f46b808b04ccd67d3",
+    "workspace/stage23-live-20261022/state/outputs/9fc83097b82f4e1a9c361f6e07d5a0f8/record.json": "f3a6e0c0610a0863e83cc2343a8875b4796c2530151a40b73fc9f67b3e2c8530",
+    "workspace/stage23-live-20261022/state/outputs/9fc83097b82f4e1a9c361f6e07d5a0f8/sources.csv": "52352f654113dbfb11affc54021918cc7ae9ab5dd3b4b45e916e3318d5440d6f",
+    "workspace/stage23-live-20261022/state/outputs/9fc83097b82f4e1a9c361f6e07d5a0f8/sources.json": "70af684348f8bdd4b61296aabddd08909d258d750dbecd19ec6422844939e1c4",
+    "workspace/stage23-live-20261022/state/outputs/9fc83097b82f4e1a9c361f6e07d5a0f8/summary.md": "e5a91269411d06cd157916e0013efeaf83a89559a04e50569a410c71e063b436",
+    "workspace/stage23-live-20261022/state/parsed/46c32d5028460c635bef578b41c9b87e5f25f03b8792485afdcf72129dbf06a2-1.csv.json": "205218529dbab3d6b88dd6754f8fb73175d85918b577c66c964fb50a90ee8e52",
+    "workspace/stage23-build-20261022.log": "fe024d4347b8a5eec9f1a7cbe88e6ca42f5eb18d17ebd8091e3e64e28f09cf26",
+    "workspace/stage23-build-final-20261022.log": "9857ce9b500b632638b7615604eed233b44cb0be881045436d39bb681374a3ec",
+    "workspace/stage23-folder-workflow-20261022.png": "657cd3217f24e34b9fa241959a0bdd42bdc7381afbf100c12ce73369e233f2ff",
+    "workspace/stage23-full-20261022.log": "d5d9d86c777dacc1ce854332ce20f4e07628d57cba0ed308041bc8a77c40b686",
+    "workspace/stage23-inspect-20261022.log": "fa1e18ebc5f4d6cf4bfc8148ed513da50098470e58ecfda30bdba58361f70a61",
+    "workspace/stage23-retry-20261022.png": "ed4c73727a09b407c4e412b5d23b7d88b7254493b82bbdfa2a0e6507fb88e4ff",
+    "workspace/stage23-settings-20261022.png": "bcc88ea3704d4e6acec8eddffbaf1615c45f1e55b2055ae96e49382e98cafb50",
+    "workspace/stage23-targeted-20261022.log": "9da139aa426d13546b4514b5c5cdd8266172fcfb9857c7feba8c5feaf107100c",
+    "workspace/stage23-targeted2-20261022.log": "b57beb7cc02ddf6a2d2f4d57a0d1627199e39eb78e6498cd16e6dacaa0db3dbf",
+    "workspace/stage23-ui-20261022.log": "7cf67920376cad788bc844955ee6f8305bdafa8249ef6f4c998521130ae97a6a",
+    "workspace/stage23-ui-final-20261022.log": "d78e603740bafdc5cd35e8731253324ebf90cf262a107cbfc3550a15ce6fad26",
+    "workspace/stage23-ui-final2-20261022.log": "f3b8ad7cce209145defd3805f4673f885ca48c03c373664db45d9b34d42596c8",
+    "workspace/stage23-ui2-20261022.log": "dab0a702eb7d14fe775bf43a8d586bfc002ffda8e71fbc8fa49f33858b1d1588"
+  },
+  "source_sha256": {
+    "README.md": "fbc58e9d972219930c38b0e982bfdb9a775d9b66506c82667a16bd587ce60cfc",
+    "ROADMAP.md": "41ef7d68d904894acedd53cb1a56221386221d2003f978f60d7e872e131cf8e0",
+    "desktop/scripts/folder-workflow-smoke.cjs": "91b0188af136db9cbd64615c2e10a13f4b8c7134739778c3841a7a743ea84fb3",
+    "desktop/src/folder-questions.tsx": "e3fa3ca814694c358c3ed72d5bfcebf75193169b74f709f27fa49cb00c8b371e",
+    "desktop_app/server.py": "e8af8cb0f2082ee91170d5d89f5f6427764cc9785e2c29c5726ebcb2efa45b1a",
+    "docs/folder-assistant.md": "9a987fe182067a25f5b9dfc81b25cf45f78e429638d9329fb44c1cd9217cd79a",
+    "folder_assistant/__main__.py": "6929b6ad19b7ad2cf67ddcf8b3a2ce2bf4802f97a6d6ff9384690427b9b1c46c",
+    "folder_assistant/answers.py": "1060b986adfdcc0f9de32e73f6339d1d31b7a03e64700670b28ab2748b843094",
+    "folder_assistant/exhaustive.py": "16c6d1014da941bc8f40dc62551ff3489ca02a47010002fe2334f293ef15bdfc",
+    "folder_assistant/exports.py": "22b38213eeff9ef4ff674b20c74724f866318ca1dad1a6fd2a0e5302ccac4499",
+    "folder_assistant/jobs.py": "4b1f2aedadbbf4f5e255b59fc176aa346fd6592aad5c8edb41d37a67ed233113",
+    "scripts/folder_quality_check.py": "aa12f18a195eddd38ec3546ebb9e46f78a59bb27bd6d54b49505fd1192ed0e84",
+    "tests/folder_workflow_server.py": "913850b48c965b8b4dcea3c3e225055b42a63ca654610745523d36abc482b246",
+    "tests/test_folder_reading.py": "1017cde2d40b3fdb149252247cb3bc46632e10df84011dbc42e8700a0a94b292",
+    "tests/test_folder_workflow_api.py": "c9504a4234d2886259a6d4112e1b9534344e8942861df76dd5d492aaf6d52498",
+    "folder_assistant/batching.py": "87936b69ccbb6b2d5e4c027de9f68265393e24c037fc57fa783b513bb97800a2",
+    "tests/test_folder_batching.py": "45e5ae9b8c9a3bc486d33987ca3d5bfbbf6ab90b0927048eb3088c448f9aefe9",
+    "docs/stage23-live-plan-20261022.json": "1ab526a269e663216ace87e70ae5bd483bb92e441e3a1707f9e7e6308dd724ab",
+    "docs/stage23-verification-20261022.md": "8dc010298ef5c80be570657b7adf6877b737f4387646344ed7a312dd395a2b8f"
+  }
+}
