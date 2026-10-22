@@ -1500,6 +1500,10 @@ small {
 .folder-scope-file { display: flex; gap: 8px; padding: 6px; }
 .folder-answer article { margin: 12px 0; padding: 10px; background: #ffffff06; border-radius: 6px; }
 .folder-answer table { width: 100%; border-collapse: collapse; }
+.folder-scope { margin: 12px 0; padding: 12px; border: 1px solid var(--border); border-radius: 8px; overflow-wrap: anywhere; }
+.folder-scope-table { overflow-x: auto; }
+.folder-scope button { margin: 4px; white-space: normal; }
+.folder-next-scope { border-top: 1px solid var(--border); margin-top: 12px; }
 .folder-answer td, .folder-answer th { padding: 8px; text-align: left; border-bottom: 1px solid var(--border); }
 .folder-answer pre, .folder-citation-preview pre { white-space: pre-wrap; overflow-wrap: anywhere; }
 .folder-citation { color: #99dcca; border: 1px solid #57978a; padding: 5px 8px; margin: 4px; border-radius: 5px; }

@@ -1,0 +1,164 @@
+{
+  "stage": 24,
+  "date": "2026-10-22",
+  "base_commit": "2195d8e",
+  "reviewer": "coding_assistant",
+  "engineering_passed": true,
+  "content_acceptance_passed": false,
+  "stage12_accepted": false,
+  "tests": {
+    "initial": "34 passed",
+    "scope": "10 passed",
+    "targeted": "22 passed",
+    "full": "1084 passed in 402.11s",
+    "build": true,
+    "electron_isolated_fakes": true,
+    "cli_scope_help": true
+  },
+  "paid_calls": 0,
+  "new_model_content_benchmark": false,
+  "new_data_and_historical_projection": {
+    "paid_calls": 0,
+    "provider_fakes": true,
+    "source_hashes": {
+      "notes.md": "9b00b43f7214123e01b780abb9619c7002be66a400670936bfd52dc12a5f499c",
+      "register.csv": "3f8f7691120ac82eb03249c4558046aa294b233bc35e7f96a43625b94b8ec048"
+    },
+    "new_data": {
+      "files": 2,
+      "segments": 67,
+      "counts": {
+        "not_sent": 55,
+        "delivery_unknown": 0,
+        "response_incomplete": 0,
+        "structure_checked": 12
+      },
+      "chain_length": 3,
+      "recovered_segments": 6,
+      "preview_matches_actual": true,
+      "readonly_calls_unchanged": true
+    },
+    "historical_readonly": [
+      {
+        "case_id": "fixed",
+        "counts": {
+          "not_sent": 2,
+          "delivery_unknown": 0,
+          "response_incomplete": 6,
+          "structure_checked": 0
+        },
+        "recovered_segments": 0,
+        "chain_length": 1,
+        "semantic_status": "not_certified"
+      },
+      {
+        "case_id": "adaptive",
+        "counts": {
+          "not_sent": 3,
+          "delivery_unknown": 0,
+          "response_incomplete": 2,
+          "structure_checked": 3
+        },
+        "recovered_segments": 0,
+        "chain_length": 1,
+        "semantic_status": "not_certified"
+      },
+      {
+        "case_id": "explicit-split",
+        "counts": {
+          "not_sent": 2,
+          "delivery_unknown": 0,
+          "response_incomplete": 0,
+          "structure_checked": 6
+        },
+        "recovered_segments": 6,
+        "chain_length": 2,
+        "semantic_status": "not_certified"
+      }
+    ],
+    "startup_rules_ast_unchanged": true,
+    "stage12_accepted": false
+  },
+  "checks": {
+    "historical_files_unchanged": 505,
+    "actual_project_keys_checked": 2,
+    "secret_matches": 0,
+    "scanned_files": 355,
+    "new_export_csv_xlsx_equal": true,
+    "scope_fixture_comparison_data_rows": 0,
+    "scope_snapshot_matches_view": true,
+    "original_startup_resolution_ast_unchanged": true,
+    "answer_contract_unchanged": true
+  },
+  "limits": [
+    "Status views use saved outcomes, never rerun validation or grade old answers.",
+    "Only selected task and ancestors, maximum200; missing history warned, no inferred delivery.",
+    "Preview is local, actual operation checks again. No increase in call budget or automatic retry.",
+    "Tests use explicit fakes, not a new content accuracy or generalization score."
+  ],
+  "source_sha256": {
+    "README.md": "e6634e673ba6e20a5b1b8b0504c59a5de95e94651471b5bddea4920a1ec08c94",
+    "ROADMAP.md": "52284b6db24c3dad7c9d4f60402f0cd46cf6c174dbf0e9a9296ce991d197f7b3",
+    "desktop/scripts/folder-workflow-smoke.cjs": "f0e9796814646b85bce65500ae0d431b76edc1df8e1c5029b82cd8448af603b9",
+    "desktop/src/folder-questions.tsx": "e0591eba274950da3f846b080b9f5c860d411276e6fe72f60fd3eea38408d60f",
+    "desktop/src/style.css": "c20f30371f06c6f0767984b34e589dc28114a18c25db7f0f3737a574f89a50b7",
+    "desktop_app/server.py": "7d1d8352ed772972191777d513c6199abddfac8b0c9fba6612fa61cc20735ae2",
+    "docs/folder-assistant.md": "0b964634e1439a536d83e79aa7ef96e57c09f35f70fe36ae855694b394ed99a1",
+    "folder_assistant/__main__.py": "590c31bef4728539747a3a02b16cf55df006a81938f3e6adb0e2324d7747f560",
+    "folder_assistant/exports.py": "12c5348067e7d9dd5f08903996ddbcd052cf8854b5548fc31dd8b5d9e90983f7",
+    "folder_assistant/jobs.py": "b8c0efab6530c70b619464e32f9ca9092fe08b3f6da722a99dd2900de0010b31",
+    "tests/test_folder_workflow_api.py": "d41a48f3ac3955a5977e9af7090d20e4b847930d124abc6d71ca12512f9b2d9c",
+    "folder_assistant/scope.py": "1180705f2cacf02fe068aef1a9a52adebfafe19b7e5baef06259405dd282887f",
+    "desktop/src/folder-scope.tsx": "bf555d4702412a2f0465880b09d1aec85123967a6167166215587874cd1aedba",
+    "tests/test_folder_scope.py": "5f5f5c97f743dfea5d13c605d52074ea5b1a202e76d8814f996ab9f38d9cb7f6",
+    "docs/stage24-verification-20261022.md": "60b77bf4d9b5ab7bba44caf826b46f3b4aa0f5479691e50be16629360ee72b35"
+  },
+  "artifact_sha256": {
+    "workspace/stage24-check-20261022/adaptive-historical-scope.json": "e7d68822a8387bff4a25fe10b7dc4c4498f1638203a05ce2f7027b6113306d8e",
+    "workspace/stage24-check-20261022/explicit-split-historical-scope.json": "2a9589336a91a1180b79d106c88958cb5f1e103f63b2b620a259e5b7b580df53",
+    "workspace/stage24-check-20261022/fixed-historical-scope.json": "d947637deebc68778f8deccfa31b26454cdc93f6b74ef76f56fc26415d8ac5db",
+    "workspace/stage24-check-20261022/initial-scope.json": "192d80c57191fd3c267c3268247401cca840d7423a7ee0f9b8ecc2a2d42ee2f2",
+    "workspace/stage24-check-20261022/preview.json": "b7a8d5565f90b654a5016c963e057803c3070a596dd8ed13a1398c7d0d21096a",
+    "workspace/stage24-check-20261022/result.json": "ca3e4143ad202590d0532ec55567ef05b2a081e39ef6479a7ee8a4584cf5c7e5",
+    "workspace/stage24-check-20261022/scope.json": "eff5ce4121c4f2a9ff8c2b2debf826d56628bedc635934385205f142ad454f8f",
+    "workspace/stage24-check-20261022/documents/notes.md": "9b00b43f7214123e01b780abb9619c7002be66a400670936bfd52dc12a5f499c",
+    "workspace/stage24-check-20261022/documents/register.csv": "3f8f7691120ac82eb03249c4558046aa294b233bc35e7f96a43625b94b8ec048",
+    "workspace/stage24-check-20261022/runtime/desktop/src/folder-scope.tsx": "bf555d4702412a2f0465880b09d1aec85123967a6167166215587874cd1aedba",
+    "workspace/stage24-check-20261022/runtime/folder_assistant/exports.py": "12c5348067e7d9dd5f08903996ddbcd052cf8854b5548fc31dd8b5d9e90983f7",
+    "workspace/stage24-check-20261022/runtime/folder_assistant/jobs.py": "b8c0efab6530c70b619464e32f9ca9092fe08b3f6da722a99dd2900de0010b31",
+    "workspace/stage24-check-20261022/runtime/folder_assistant/reading.py": "54febef7b0313bd16517d4f5882c7054100c8e4b75e51c8310d9ec92b22d9b8f",
+    "workspace/stage24-check-20261022/runtime/folder_assistant/scope.py": "1180705f2cacf02fe068aef1a9a52adebfafe19b7e5baef06259405dd282887f",
+    "workspace/stage24-check-20261022/runtime/tests/test_folder_scope.py": "5f5f5c97f743dfea5d13c605d52074ea5b1a202e76d8814f996ab9f38d9cb7f6",
+    "workspace/stage24-check-20261022/runtime/workspace/stage24_check.py": "494eb2b8885e89c318cc605aab28c5bb08e260c76fc9047144aab3c474125f9d",
+    "workspace/stage24-check-20261022/state/.jobs-start.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage24-check-20261022/state/82df4e1e301c460fa0a6b614b9460aab.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage24-check-20261022/state/catalog.sqlite3": "10a01e75fa43db8e7d4d971742e4e6b5b187becbcd7cf1b39435146957130ece",
+    "workspace/stage24-check-20261022/state/cd7b01deabd349af94f5637be9816b4a.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage24-check-20261022/state/d512ba336f0f414dbd20145df8087988.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage24-check-20261022/state/indexes/9197d18dd78f49a19b747f7fab6ddc8f/.build.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage24-check-20261022/state/indexes/9197d18dd78f49a19b747f7fab6ddc8f/.sync.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage24-check-20261022/state/indexes/9197d18dd78f49a19b747f7fab6ddc8f/knowledge.sqlite3": "f19d4c8957322c88edec47c14eabe7aa4e38588aaf19ec243d986b11596af73f",
+    "workspace/stage24-check-20261022/state/outputs/82df4e1e301c460fa0a6b614b9460aab/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage24-check-20261022/state/outputs/82df4e1e301c460fa0a6b614b9460aab/comparison.csv": "8b26cf9f87eb5f5a04bde87e496609b0c1265660e3a23f3b363f3012ddadbea4",
+    "workspace/stage24-check-20261022/state/outputs/82df4e1e301c460fa0a6b614b9460aab/comparison.xlsx": "1d9fcd479cbc1ca9bedde332a4b9ab414c0c681627dfffa9a141e2f7d424ce0f",
+    "workspace/stage24-check-20261022/state/outputs/82df4e1e301c460fa0a6b614b9460aab/export.json": "c518752e5883354523211baf14aefece3cd6eb568e0f26ba7ba0392632f0496e",
+    "workspace/stage24-check-20261022/state/outputs/82df4e1e301c460fa0a6b614b9460aab/record.json": "90a5763fe0695540fc0a299cc46cf090fd2d71b8e4df65324eabb10fc8273754",
+    "workspace/stage24-check-20261022/state/outputs/82df4e1e301c460fa0a6b614b9460aab/sources.csv": "80f9f2440534bcdfe2be894cdea35e16abb16e54ca8824f286e4a112315df8bb",
+    "workspace/stage24-check-20261022/state/outputs/82df4e1e301c460fa0a6b614b9460aab/sources.json": "0e6628bedfe18dc1824d3470505131f7a1f89541a97aa13fa4d58bf2f10762ca",
+    "workspace/stage24-check-20261022/state/outputs/82df4e1e301c460fa0a6b614b9460aab/summary.md": "3bb89c09a03864e30dcb2dd692935b902869cde1df894a29d1c511baa6e26d2f",
+    "workspace/stage24-check-20261022/state/parsed/3f8f7691120ac82eb03249c4558046aa294b233bc35e7f96a43625b94b8ec048-1.csv.json": "652ac105b20b080ad87e52b40c26677c2455abd4d0210edfbe7797f78b251baf",
+    "workspace/stage24-check-20261022/state/parsed/9b00b43f7214123e01b780abb9619c7002be66a400670936bfd52dc12a5f499c-1.md.json": "598ffcb9380d66ceaf3106457472cf0940ef7aa8da6f2fe08e2004dd1506abee",
+    "workspace/stage24-build-20261022.log": "39b10ce08f6a4fd0db582fafffafd9b286c1a336ac61b17b91e9c3855a71347f",
+    "workspace/stage24-build-final-20261022.log": "314c752ec3ea896fd7aa262f51d1361b5067c5f35dc4d1f8f9a71afea5b4da88",
+    "workspace/stage24-build-final2-20261022.log": "7989da5927f7463523091cf901b1a6d2fbc05c9cd7f31ecd43ebc87598cfa47e",
+    "workspace/stage24-folder-workflow-20261022.png": "966cee322efd8b28d36ae2af74be637ab2490c9513020e966307c00b04bac18d",
+    "workspace/stage24-full-20261022.log": "0112aa2d311fac1cee8123a5de503c0535a7128a19221257747ae0d740c6a7a4",
+    "workspace/stage24-initial-20261022.log": "e7778d111ad415132e4fc7b11b5df1af3ac571d0a44364beb2d214fea860bb26",
+    "workspace/stage24-offline-20261022.log": "5516a3b28ba9e68eadccb21b67b6a459188b68d78cd35f0643a8930720ba0c05",
+    "workspace/stage24-retry-20261022.png": "1b89cdfd41aca712065d0778e670fdbd7f03f7b4a2bfa1a006b0809d0ea64786",
+    "workspace/stage24-scope-20261022.log": "06905f0f10c5c6b555d61250394977e7a730034adbda751d66e43031c041f7af",
+    "workspace/stage24-settings-20261022.png": "06e94ec41b30a05162190486c1a172c6e4cf4a360cb7a61a94881614ff667e89",
+    "workspace/stage24-targeted-20261022.log": "0541babfcc1aeea1e8aa57b76a20d83984aea02bdec6456a903620065c577f9b",
+    "workspace/stage24-ui-20261022.log": "8f27ac93e06fbc4db9b700fb8746e36398ce059d205b9f0bc34ab2cbc095f95a"
+  }
+}

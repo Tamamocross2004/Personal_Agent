@@ -40,6 +40,11 @@ def test_native_grant_sync_answer_citation_export_revoke_and_read_only_history(t
         job=wait(client.post(base+'/questions',headers=headers,json={'query':'alpha'}).json()['id'])
         assert job['status']=='completed'
         url='/api/folder-jobs/'+job['id']
+        calls=(len(embedding.calls),len(chat.calls))
+        assert client.get(url+'/scope').status_code==401
+        assert client.get(url+'/scope',headers=headers).json()['mode']=='limited_retrieval'
+        assert client.get(url+'/scope?limit=101',headers=headers).status_code==400
+        assert (len(embedding.calls),len(chat.calls))==calls
         citation=client.get(url+'/citations/C1',headers=headers)
         assert citation.status_code==200 and citation.json()['delivered']['text']=='alpha original'
         assert client.get(url+'/citations/C999',headers=headers).status_code==404
@@ -52,6 +57,14 @@ def test_native_grant_sync_answer_citation_export_revoke_and_read_only_history(t
         assert exported.status_code==200 and len(exported.json()['files'])==6
         assert client.get(url+'/export/comparison.xlsx',headers=headers).content[:2]==b'PK'
         assert client.get(url+'/export/unknown.exe',headers=headers).status_code==404
+        sequential=wait(client.post(base+'/questions',headers=headers,json={'query':'alpha','strategy':'exhaustive'}).json()['id'])
+        assert sequential['status']=='completed'
+        scope_url='/api/folder-jobs/'+sequential['id']
+        calls=(len(embedding.calls),len(chat.calls))
+        assert client.get(scope_url+'/scope',headers=headers).json()['confirmed_segments']==1
+        assert client.post(scope_url+'/next-scope',headers=headers,json={'output_tokens':4097}).status_code==422
+        assert client.post(scope_url+'/next-scope',headers=headers,json={}).status_code==400
+        assert (len(embedding.calls),len(chat.calls))==calls
         client.delete(base,headers=headers)
         calls=(len(embedding.calls),len(chat.calls))
         assert client.get(base+'/index',headers=headers).status_code==400
@@ -60,6 +73,8 @@ def test_native_grant_sync_answer_citation_export_revoke_and_read_only_history(t
         assert client.get(base+'/jobs',headers=headers).status_code==200
         assert client.get(url+'/citations/C1',headers=headers).status_code==200
         assert client.get(url+'/citations/C1/neighbors',headers=headers).status_code==200
+        assert client.get(scope_url+'/scope',headers=headers).status_code==200
+        assert client.post(scope_url+'/next-scope',headers=headers,json={}).status_code==400
         assert client.post(base+'/reading',headers=headers,json={'generation':job['inputs']['generation']}).status_code==400
         assert client.post(url+'/export',headers=headers).json()['cached']
         assert (len(embedding.calls),len(chat.calls))==calls

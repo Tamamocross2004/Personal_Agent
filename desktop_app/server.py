@@ -57,21 +57,24 @@ class FolderSync(BaseModel):
     scan_id:str=Field(min_length=1,max_length=64)
 
 
-class FolderQuestion(BaseModel):
-    query:str=Field(min_length=1,max_length=1000)
-    mode:Literal['keyword','hybrid']='keyword'
+class FolderControls(BaseModel):
     budget:int=Field(default=10000,ge=256,le=50000)
-    file_ids:list[str]|None=Field(default=None,max_length=50)
-    generation:str|None=Field(default=None,max_length=64)
-    strategy:Literal['retrieval','exhaustive']='retrieval'
     max_batches:int=Field(default=3,ge=1,le=8)
-    resume_from:str|None=Field(default=None,max_length=64)
-    strength:ModelStrength='default'
     output_tokens:int=Field(default=1200,ge=128,le=4096)
     batch_mode:Literal['adaptive','fixed']='adaptive'
     batch_size:int=Field(default=6,ge=1,le=6)
     expected_fields:int=Field(default=1,ge=1,le=12)
     retry_split:bool=False
+
+
+class FolderQuestion(FolderControls):
+    query:str=Field(min_length=1,max_length=1000)
+    mode:Literal['keyword','hybrid']='keyword'
+    file_ids:list[str]|None=Field(default=None,max_length=50)
+    generation:str|None=Field(default=None,max_length=64)
+    strategy:Literal['retrieval','exhaustive']='retrieval'
+    resume_from:str|None=Field(default=None,max_length=64)
+    strength:ModelStrength='default'
 
 
 class FolderReading(BaseModel):
@@ -166,6 +169,14 @@ def create_app(manager:Manager,token:str,ui_dir:Path|None=None,*,folder_grant_to
     def folder_history(fid:str):return redact(folder_jobs.list(fid))
     @app.get('/api/folder-jobs/{jid}')
     def folder_job(jid:str):return redact(folder_jobs.get(jid))
+    @app.get('/api/folder-jobs/{jid}/scope')
+    def folder_scope(jid:str,offset:int=0,limit:int=50):
+        from folder_assistant.scope import scope_view
+        return redact(scope_view(folder_jobs,jid,offset,limit))
+    @app.post('/api/folder-jobs/{jid}/next-scope')
+    def folder_next_scope(jid:str,body:FolderControls):
+        from folder_assistant.scope import preview_next
+        return redact(preview_next(folder_jobs,jid,body.model_dump()))
     @app.post('/api/folder-jobs/{jid}/stop')
     def folder_job_stop(jid:str):return redact(folder_jobs.stop(jid))
     @app.post('/api/folders/{fid}/questions')

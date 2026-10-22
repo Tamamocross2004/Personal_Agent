@@ -69,6 +69,8 @@ def export_job(jobs,jid):
                 'scope_files':job['inputs']['source_snapshot'],'delivered_evidence':list(evidence.values()),
                 'retrieval':job.get('retrieval'),
                 'meaning':'范围文件不等于模型阅读全文；引用/定位仅认证保存来源，不认证结论正确。'}
+        from .scope import scope_view
+        source['scope_view']=scope_view(jobs,jid,compact=True)
         if 'coverage' in job:source['coverage']=job['coverage']
         if 'batch_decisions' in job:
             source['batch_decisions']=job['batch_decisions']
@@ -96,6 +98,18 @@ def export_job(jobs,jid):
                '未正式审稿；执行状态：'+job['status']+'；内容状态：'+(job.get('result') or {}).get('content_status','未形成答案'),
                '固定索引：'+source['generation'],'']
         if job.get('message'): lines.extend([md(job['message']),''])
+        view=source['scope_view']
+        lines.extend(['## 范围与任务链（只读记录快照）',md(view['meaning']),''])
+        if view['mode']=='sequential':
+            lines.extend(['按片段去重状态：'+md(json.dumps(view['counts'],ensure_ascii=False)),
+                          md(view['counts_meaning'])])
+            for span in view['runs']:
+                lines.append(md(f"[{span['start']}, {span['end']}) {span['name']}：{span['label']}"+('；保留此前失败尝试' if span['failed_before'] else '')))
+            for item in view['chain']:
+                lines.append(md(f"任务 {item['task_id']} · {item['operation']} · 已知Token {item['known_tokens']} · 未知用量事件 {item['unknown_usage_events']}"))
+        else:lines.append('局部检索，不能计算全文阅读率；确认返回的有限证据：'+str(view['confirmed_evidence'])+'段。')
+        for warning in view['warnings']:lines.append('范围记录不完整：'+md(warning))
+        lines.append('')
         if 'strength' in job['inputs']:lines.extend(['模型强度：'+md(job['inputs']['strength'])+'；实际effort：'+md((job['inputs'].get('model') or {}).get('reasoning_effort') or '默认'),''])
         if 'batch_decisions' in job:
             lines.extend(['输出与分批设置：'+md(json.dumps(source['output_policy'],ensure_ascii=False)),

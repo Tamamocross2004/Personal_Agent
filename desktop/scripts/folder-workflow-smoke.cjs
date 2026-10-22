@@ -15,6 +15,7 @@ if (process.argv.includes("--reading"))
   );
 fs.writeFileSync(path.join(docs, ".env"), "SENSITIVE=must-not-read");
 const batchingMode = process.argv.includes("--batching");
+const scopeMode = process.argv.includes("--scope");
 const parseMode = process.argv.includes("--parse");
 if (parseMode)
   require("node:child_process").execFileSync(
@@ -232,7 +233,12 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
       if (batchingMode) {
         await page.locator(".folder-budget-settings").scrollIntoViewIfNeeded();
         await page.screenshot({
-          path: path.join(project, "workspace/stage23-settings-20261022.png"),
+          path: path.join(
+            project,
+            scopeMode
+              ? "workspace/stage24-settings-20261022.png"
+              : "workspace/stage23-settings-20261022.png",
+          ),
         });
       }
       await page
@@ -270,6 +276,18 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         };
         const parent = (await getJobs()).find((j) => j.coverage);
         assert.equal(parent.coverage.next_offset, 0);
+        if (scopeMode) {
+          const scope = page.getByRole("region", {
+            name: "范围与任务链",
+            exact: true,
+          });
+          await scope.getByText(/已返回但响应未完成6段/).waitFor();
+          await scope.getByText(/拆小重做：本次待处理区间 \[0, 6\)/).waitFor();
+          assert.match(
+            await scope.innerText(),
+            /聊天模型；不调用检索嵌入或重排/,
+          );
+        }
         await page
           .getByRole("button", {
             name: "拆小重做未完成批次（新任务，重新计费）",
@@ -277,7 +295,12 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
           })
           .scrollIntoViewIfNeeded();
         await page.screenshot({
-          path: path.join(project, "workspace/stage23-retry-20261022.png"),
+          path: path.join(
+            project,
+            scopeMode
+              ? "workspace/stage24-retry-20261022.png"
+              : "workspace/stage23-retry-20261022.png",
+          ),
         });
         await page
           .getByRole("combobox", { name: "分批策略" })
@@ -308,6 +331,20 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         assert.ok(
           retry.batches.every((b) => b.next_offset - b.start_offset <= 3),
         );
+        if (scopeMode) {
+          const scope = page.getByRole("region", {
+            name: "范围与任务链",
+            exact: true,
+          });
+          await scope.getByText(/曾失败后有可用结构：6段/).waitFor();
+          await scope.getByText(/继续整理：本次待处理区间 \[6, 9\)/).waitFor();
+          await scope.getByText(/查看前序任务与失败尝试（2个任务）/).click();
+          assert.match(await scope.innerText(), /length/);
+          assert.deepEqual(
+            (await getJobs()).find((j) => j.id === parent.id),
+            parent,
+          );
+        }
       }
       await page
         .locator(".folder-coverage")
@@ -323,6 +360,17 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         .locator(".folder-coverage")
         .getByText(/剩余0段/)
         .waitFor();
+      if(scopeMode){
+        const scope=page.getByRole("region",{name:"范围与任务链",exact:true});
+        await scope.getByText(/有可用结构9段/).waitFor();
+        const latest=await page.getByRole("combobox",{name:"历史资料问答"}).inputValue();
+        const summary=scope.getByText(/查看前序任务与失败尝试（3个任务）/);
+        if(!await summary.locator("..").evaluate(el=>el.open))await summary.click();
+        await scope.getByRole("button",{name:/^原任务 /}).click();
+        await scope.getByText(/已返回但响应未完成6段/).waitFor();
+        await page.getByRole("combobox",{name:"历史资料问答"}).selectOption(latest);
+        await scope.getByText(/有可用结构9段/).waitFor();
+      }
       assert.match(
         await page.locator(".folder-coverage").innerText(),
         /该范围提取文字已全部送达/,
@@ -420,17 +468,19 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
       path: path.join(
         project,
         "workspace",
-        batchingMode
-          ? "stage23-folder-workflow-20261022.png"
-          : parseMode
-            ? "folder-workflow-current-multiformat.png"
-            : process.argv.includes("--strength")
-              ? "model-strength-folder-20261022.png"
-              : process.argv.includes("--reading")
-                ? "stage22-folder-workflow.png"
-                : process.argv.includes("--experience")
-                  ? "stage21-folder-workflow.png"
-                  : "folder-workflow-current.png",
+        scopeMode
+          ? "stage24-folder-workflow-20261022.png"
+          : batchingMode
+            ? "stage23-folder-workflow-20261022.png"
+            : parseMode
+              ? "folder-workflow-current-multiformat.png"
+              : process.argv.includes("--strength")
+                ? "model-strength-folder-20261022.png"
+                : process.argv.includes("--reading")
+                  ? "stage22-folder-workflow.png"
+                  : process.argv.includes("--experience")
+                    ? "stage21-folder-workflow.png"
+                    : "folder-workflow-current.png",
       ),
     });
     await page
@@ -495,6 +545,14 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         multi_format_preview: parseMode,
         fixture,
         checks: [
+          ...(scopeMode
+            ? [
+                "lineage-failure-visible",
+                "deduplicated-recovered-coverage",
+                "next-operation-services-and-bounds",
+                "read-only-scope",
+              ]
+            : []),
           ...(batchingMode
             ? [
                 "output-controls",

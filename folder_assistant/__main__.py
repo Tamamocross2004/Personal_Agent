@@ -25,20 +25,21 @@ def main():
     ask.add_argument('--retry-split',action='store_true')
     sub.add_parser('history').add_argument('folder_id')
     for command in ('job','stop','export'):sub.add_parser(command).add_argument('job_id')
+    coverage=sub.add_parser('scope');coverage.add_argument('job_id');coverage.add_argument('--offset',type=int,default=0);coverage.add_argument('--limit',type=int,default=50)
     args=p.parse_args();store=FolderStore(args.state_dir,excluded_roots=(PROJECT_ROOT/'workspace',))
     try:
         if args.command=='add':result=store.grant(args.path)
         elif args.command=='list':result=store.folders()
         elif args.command=='policy':result=store.policy()
         elif args.command=='preview':result=store.preview(args.folder_id,args.scan_id,args.file_id,offset=args.offset,limit=args.limit)
-        elif args.command in ('index','diff','sync','search','ask','history','job','stop','export'):
+        elif args.command in ('index','diff','sync','search','ask','history','job','stop','export','scope'):
             from agent.config import Settings
             from .index import FolderIndex
             index=FolderIndex(store,Settings())
             if args.command=='index':result=index.status(args.folder_id)
             elif args.command=='sync':result=index.sync(args.folder_id,args.scan_id)
             elif args.command=='search':result=index.search(args.folder_id,args.query,mode=args.mode)
-            elif args.command in ('ask','history','job','stop','export'):
+            elif args.command in ('ask','history','job','stop','export','scope'):
                 from .jobs import FolderJobs
                 jobs=FolderJobs(index)
                 try:
@@ -51,6 +52,9 @@ def main():
                     elif args.command=='history':result=jobs.list(args.folder_id)
                     elif args.command=='job':result=jobs.get(args.job_id)
                     elif args.command=='stop':result=jobs.stop(args.job_id)
+                    elif args.command=='scope':
+                        from .scope import scope_view
+                        result=scope_view(jobs,args.job_id,args.offset,args.limit)
                     else:
                         from .exports import export_job
                         result=export_job(jobs,args.job_id)

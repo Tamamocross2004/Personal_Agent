@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { locationLabel } from "./folder-location";
 import { FileFilter } from "./folder-files";
 import { ModelStrength, strengthLabel } from "./model-strength";
+import { FolderScope } from "./folder-scope";
 
 export function FolderQuestions({
   api,
@@ -459,8 +460,41 @@ export function FolderQuestions({
       {current && (
         <div className="folder-answer">
           <h4>回答 · 未正式审稿</h4>
+          <FolderScope
+            api={api}
+            saved={saved}
+            controls={{
+              budget,
+              max_batches: maxBatches,
+              output_tokens: outputTokens,
+              batch_mode: batchMode,
+              batch_size: batchSize,
+              expected_fields: expectedFields,
+            }}
+            valid={
+              !invalidLimits &&
+              Number.isInteger(budget) &&
+              budget >= 256 &&
+              budget <= 50000 &&
+              Number.isInteger(maxBatches) &&
+              maxBatches >= 1 &&
+              maxBatches <= 8
+            }
+            canSplit={canSplit}
+            onSelect={(id: string) =>
+              act(async () => {
+                const token = ++turn.current;
+                const value = await api(`/folder-jobs/${id}`);
+                if (alive.current && turn.current === token) {
+                  setView(value);
+                  setCitation(null);
+                }
+              })
+            }
+          />
           {saved?.coverage && (
             <aside className="folder-coverage">
+              <h4>当前任务保存的覆盖记录</h4>
               <p>
                 已确认送达输入范围 {saved.coverage.returned_until} /{" "}
                 {saved.coverage.total_segments}段；未完成整理剩余
@@ -520,7 +554,8 @@ export function FolderQuestions({
               <p>
                 本任务输出设置 {saved.inputs.output_tokens ?? 1200}
                 ；项目约束后上限{" "}
-                {saved.inputs.effective_output_cap ?? "旧记录未保存"}；分批策略{" "}
+                {saved.inputs.effective_output_cap ??
+                  "旧记录未保存"}；分批策略{" "}
                 {saved.inputs.batch_mode || "旧版固定"}
                 。下一次发送前还会检查剩余预算。
               </p>
