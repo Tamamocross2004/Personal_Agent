@@ -124,7 +124,7 @@ class KnowledgeStore:
                                (self.signature,sha(text),json.dumps(vector)))
         return [rows[sha(t)] for t in texts],events,hits
 
-    def build(self,uploads=(),*,mode='append',remove=()):
+    def build(self,uploads=(),*,mode='append',remove=(),prepared=(),before_activate=None):
         if mode not in ('append','replace','rebuild'): raise ValueError('索引操作无效')
         with lease(self.root/'.build.lock'):
             old=self.generation()
@@ -150,12 +150,19 @@ class KnowledgeStore:
                 with self.connect() as db:
                     db.execute('INSERT OR REPLACE INTO documents VALUES (?,?)',(doc_id,json.dumps(document,ensure_ascii=False)))
                 files.append(document)
+            # Internal callers may supply locally parsed Office blocks with real structural locations.
+            # This is not exposed by the upload API; each document retains its source identity.
+            files.extend(prepared)
+            if len({d['id'] for d in files})!=len(files): raise ValueError('文档身份重复')
             if len(files)>50 or sum(len(p['text']) for d in files for p in d['pages'])>2_000_000:
                 raise ValueError('首版知识库最多50份文档、200万提取字符')
             chunks=[]
             for document in files:
                 for chunk in split(document['pages'],self.settings.knowledge_chunk_size,self.settings.knowledge_chunk_overlap):
-                    chunks.append({**chunk,'doc_id':document['id'],'name':document['name'],
+                    source=document['pages'][chunk['page']-1]
+                    chunks.append({**chunk,**({'source_location':source['location'],'source_block_id':source['block']['id'],
+                                   'file_id':document['file_id']} if 'location' in source else {}),
+                                   'doc_id':document['id'],'name':document['name'],
                                    'file_sha256':document['file_sha256'],'page_sha256':sha(document['pages'][chunk['page']-1]['text'])})
             if len(chunks)>5000: raise ValueError('首版知识库最多5000片段')
             generation=uuid4().hex
@@ -172,6 +179,7 @@ class KnowledgeStore:
                         db.execute('INSERT INTO chunks VALUES (?,?,?)',(generation,index,json.dumps(chunk,ensure_ascii=False)))
                         db.execute('INSERT INTO chunks_fts VALUES (?,?,?)',(generation,index,' '.join(search_terms(chunk['text'],4000))))
                 data.update(cache_hits=hits,embedding_calls=len(events),input_tokens=sum(e['input_tokens'] for e in events))
+                if before_activate: before_activate()
                 self._save_generation(generation,'ready',data,activate=True)
                 return self.status()
             except Exception as exc:
@@ -207,7 +215,7 @@ class KnowledgeStore:
                 'SELECT idx,data FROM chunks WHERE generation=? AND idx IN ('+','.join('?' for _ in indices)+')',
                 [generation,*indices])}
 
-    def search(self,query,*,generation=None,mode='hybrid',k=4,budget=None,rerank=None):
+    def search(self,query,*,generation=None,mode='hybrid',k=4,budget=None,rerank=None,doc_ids=None):
         if mode not in ('keyword','vector','hybrid') or not query.strip() or len(query)>1000 or not 1<=k<=8:
             raise ValueError('检索参数无效；问题最多1000字符，k为1至8')
         if rerank is True and mode=='keyword': raise ValueError('关键词模式不执行云端重排；请选择hybrid或vector')
@@ -216,6 +224,13 @@ class KnowledgeStore:
         current=self.generation(generation)
         if not current or not current['chunks']: return {'generation':current['id'] if current else None,'hits':[],'usage':[],'mode':mode}
         if current['status']!='ready': raise ValueError('知识库版本未完成')
+        allowed=None
+        if doc_ids is not None:
+            if not set(doc_ids).issubset({d['id'] for d in current['files']}): raise ValueError('检索文档不属于固定版本')
+            with self.connect() as db:
+                allowed=[r['idx'] for r in db.execute('SELECT idx,data FROM chunks WHERE generation=?',(current['id'],))
+                         if json.loads(r['data'])['doc_id'] in doc_ids]
+            if not allowed: return {'generation':current['id'],'hits':[],'usage':[],'mode':mode}
         if mode!='keyword' and current['signature']!=self.signature:
             raise ValueError('嵌入模型配置已变更，请重建索引或显式选择关键词检索')
         with self.connect() as db:
@@ -223,13 +238,17 @@ class KnowledgeStore:
             lexical=[]
             if terms and mode!='vector':
                 expression=' OR '.join('"'+t.replace('"','""')+'"' for t in terms)
-                lexical=[int(r[0]) for r in db.execute('SELECT idx FROM chunks_fts WHERE chunks_fts MATCH ? AND generation=? ORDER BY bm25(chunks_fts),idx LIMIT ?',
-                                                     (expression,current['id'],self.settings.knowledge_lexical_candidates))]
+                scope=(' AND CAST(idx AS INTEGER) IN ('+','.join('?' for _ in allowed)+')') if allowed is not None else ''
+                lexical=[int(r[0]) for r in db.execute('SELECT idx FROM chunks_fts WHERE chunks_fts MATCH ? AND generation=?'+scope+' ORDER BY bm25(chunks_fts),idx LIMIT ?',
+                                                     [expression,current['id'],*(allowed or []),self.settings.knowledge_lexical_candidates])]
         dense=[]; events=[]
         if mode!='keyword':
             vectors,events,_=self._cached_vectors([query],'query:'+current['id'],budget)
             budget-=sum(e['input_tokens'] for e in events)
-            dense=self.vectors.search(self.root,current['id'],vectors[0],min(self.settings.knowledge_vector_candidates,current['chunks']))
+            limit=min(self.settings.knowledge_vector_candidates,current['chunks'])
+            dense=(self.vectors.search(self.root,current['id'],vectors[0],limit) if allowed is None else
+                   self.vectors.search(self.root,current['id'],vectors[0],limit,indices=allowed))
+            if allowed is not None and not set(dense).issubset(allowed): raise ValueError('向量索引返回越范围候选')
         scores={}
         for ranks in (lexical,dense):
             for rank,index in enumerate(ranks,1): scores[index]=scores.get(index,0)+1/(60+rank)

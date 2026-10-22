@@ -33,7 +33,7 @@ electron.app.disableHardwareAcceleration();electron.app.setPath('userData',${JSO
 const Native=electron.BrowserWindow;electron.BrowserWindow=class extends Native{constructor(o){super({...o,show:false,webPreferences:{...o.webPreferences,offscreen:true,backgroundThrottling:false}});}};
 electron.dialog.showOpenDialog=async()=>({canceled:false,filePaths:[${JSON.stringify(docs)}]});
 electron.dialog.showErrorBox=(title,message)=>console.error(title,message);
-const original=cp.spawn;cp.spawn=function(command,args,options){let log;if(args?.includes('desktop_app.server')){const parent=args[args.indexOf('--parent')+1];args=['-X','utf8',${JSON.stringify(path.join(project, "tests/folder_ui_server.py"))},${JSON.stringify(fixture)},'--parent',parent];log=fs.openSync(${JSON.stringify(path.join(fixture, "backend.log"))},'a');options={...options,stdio:['ignore','pipe',log]};}const child=original(command,args,options);if(log!==undefined)fs.closeSync(log);return child;};
+const original=cp.spawn;cp.spawn=function(command,args,options){let log;if(args?.includes('desktop_app.server')){const parent=args[args.indexOf('--parent')+1];args=['-X','utf8',${JSON.stringify(path.join(project, "tests/folder_workflow_server.py"))},${JSON.stringify(fixture)},'--parent',parent];log=fs.openSync(${JSON.stringify(path.join(fixture, "backend.log"))},'a');options={...options,stdio:['ignore','pipe',log]};}const child=original(command,args,options);if(log!==undefined)fs.closeSync(log);return child;};
 require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
 );
 (async () => {
@@ -59,6 +59,14 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
     await page.getByRole("cell", { name: "readme.txt", exact: true }).waitFor();
     await page.getByRole("cell", { name: ".env", exact: true }).waitFor();
     assert.match(await page.locator(".folder-file-list").innerText(), /已排除/);
+    if (process.argv.includes("--index")) {
+      await page.getByRole("button", {name: "同步资料索引（调用嵌入服务）", exact: true}).click();
+      await page.getByText(/操作状态：completed/).waitFor();
+      await page.getByRole("textbox", {name: "资料检索问题"}).fill("本地资料");
+      await page.getByRole("button", {name: "检索资料", exact:true}).click();
+      await page.locator(".folder-retrieval").getByText("本地资料原文。", {exact:true}).waitFor();
+      assert.match(await page.locator(".folder-index-panel").innerText(), /未变化 1/);
+    }
     const conn = await page.evaluate(() => window.desktop.connection());
     const denied = await fetch(conn.url + "/api/folders", {
       method: "POST",
@@ -136,8 +144,8 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         project,
         "workspace",
         parseMode
-          ? "folder-clarity-20261022-folder-ui-20261021.png"
-          : "folder-clarity-20261022-folder-ui-20261021.png",
+          ? "stage17-folder-workflow-20261022.png"
+          : "stage17-folder-workflow-20261022.png",
       ),
     });
     await page

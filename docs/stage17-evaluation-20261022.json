@@ -1,0 +1,22 @@
+{
+  "stage": 17,
+  "date": "2026-10-22",
+  "reviewer": "coding_assistant",
+  "stage12_accepted": false,
+  "live_provider_calls": 0,
+  "tests": {
+    "initial": "45 passed, 1 failed (platform newline assertion)",
+    "final_new_contracts": "6 passed",
+    "electron": "passed; paid providers and vector ranking fake",
+    "actual_milvus_scope": "passed"
+  },
+  "artifact_sha256": {
+    "workspace/stage17-tests-initial-20261022.log": "bf5c69fe5bd4e902f0ae414dc0f2a4102bfc3291ee07a9eb825c1f20d6acc5ff",
+    "workspace/stage17-tests-final-20261022.log": "9822b70f9e4a64095021a537a1f27b158ec27a5a8f302897a5ee9da54e6912ea",
+    "workspace/stage17-ui-20261022.log": "42d8fe628aed3d0766d3a1da14adfd96eb9dec37605bdf1036adbe25a28437b2",
+    "workspace/stage17-build-20261022.log": "c80849d88c6ef6cefd2387f2fd389a203d37c9d4dcdf28a89415648021ee15cf",
+    "workspace/stage17-folder-workflow-20261022.png": "96fa718cb81aa7d2e19a5211d8768256bb541b2abec2fd537d6acfe488199129",
+    "workspace/folder-clarity-build-20261022.log": "a8d23093ee8f880fb07015d4626ba9fbc2f508100653faac5c8776266a12ad49",
+    "workspace/folder-clarity-ui-20261022.log": "5f3f9c19f5cef6e97a37b53c28bd0899848dffd5edfbe400fcd8795e3055fa67"
+  }
+}

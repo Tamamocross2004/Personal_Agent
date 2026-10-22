@@ -51,12 +51,21 @@ class FolderGrant(BaseModel):
     path:str=Field(min_length=1,max_length=2048)
 
 
+class FolderSync(BaseModel):
+    scan_id:str=Field(min_length=1,max_length=64)
+
+
 def create_app(manager:Manager,token:str,ui_dir:Path|None=None,*,folder_grant_token:str|None=None):
     from folder_assistant.store import FolderStore
     folders=FolderStore(manager.root/'folders',excluded_roots=(manager.root,))
+    from folder_assistant.index import FolderIndex
+    from folder_assistant.jobs import FolderJobs
+    folder_index=FolderIndex(folders,manager.settings)
+    folder_jobs=FolderJobs(folder_index)
     @asynccontextmanager
     async def lifespan(app):
         yield
+        folder_jobs.close()
         manager.close()
     app=FastAPI(title='Personal Agent Desktop',docs_url=None,redoc_url=None,openapi_url=None,lifespan=lifespan)
     private_values=[str(getattr(manager.settings,k)) for k in type(manager.settings).model_fields
@@ -109,6 +118,18 @@ def create_app(manager:Manager,token:str,ui_dir:Path|None=None,*,folder_grant_to
     @app.get('/api/folders/{fid}/files/{file_id}')
     def folder_preview(fid:str,file_id:str,scan_id:str,offset:int=0,limit:int=50):
         return redact(folders.preview(fid,scan_id,file_id,offset=offset,limit=limit))
+    @app.get('/api/folders/{fid}/index')
+    def folder_index_status(fid:str):return redact(folder_index.status(fid))
+    @app.post('/api/folders/{fid}/sync')
+    def folder_sync(fid:str,body:FolderSync):return redact(folder_jobs.start(fid,'sync',body.model_dump()))
+    @app.post('/api/folders/{fid}/search')
+    def folder_search(fid:str,body:KnowledgeQuery):return redact(folder_index.search(fid,**body.model_dump()))
+    @app.get('/api/folders/{fid}/jobs')
+    def folder_history(fid:str):return redact(folder_jobs.list(fid))
+    @app.get('/api/folder-jobs/{jid}')
+    def folder_job(jid:str):return redact(folder_jobs.get(jid))
+    @app.post('/api/folder-jobs/{jid}/stop')
+    def folder_job_stop(jid:str):return redact(folder_jobs.stop(jid))
     @app.get('/api/knowledge')
     def knowledge():return redact(manager.knowledge_status())
     @app.post('/api/knowledge/import')

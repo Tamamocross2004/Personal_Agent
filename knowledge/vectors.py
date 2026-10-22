@@ -52,8 +52,10 @@ class MilvusVectors:
             if vectors:
                 assert client.search(collection_name='chunks',data=[vectors[0]],limit=1)
 
-    def search(self,root,generation,vector,limit):
+    def search(self,root,generation,vector,limit,indices=None):
         with client_for(root,generation) as client:
             client.load_collection('chunks')
-            rows=client.search(collection_name='chunks',data=[vector],limit=limit)[0]
+            if indices is not None and not indices: return []
+            scope={'filter':'id in ['+','.join(str(int(i)) for i in indices)+']'} if indices is not None else {}
+            rows=client.search(collection_name='chunks',data=[vector],limit=limit,**scope)[0]
             return [int(row['id']) for row in rows]

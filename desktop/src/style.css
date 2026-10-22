@@ -1489,3 +1489,9 @@ small {
 .folder-steps { padding: 12px; background: #284c4844; border-left: 3px solid #6fb5a4; }
 .folder-primary-actions button, .folder-file-list button { border: 1px solid #57978a; padding: 8px 12px; border-radius: 6px; background: #284c48; color: #e2fff5; }
 .folder-primary-actions button:disabled { opacity: .45; }
+.folder-index-panel { border: 1px solid var(--border); padding: 16px; margin-top: 16px; border-radius: 8px; }
+.folder-cta { background: #284c48; border: 1px solid #57978a; color: #e2fff5; padding: 10px 14px; border-radius: 6px; }
+.folder-cta:disabled { opacity: .45; }
+.folder-retrieval { max-height: 40vh; overflow: auto; }
+.folder-retrieval article { padding: 12px; border-bottom: 1px solid var(--border); }
+.folder-retrieval pre { white-space: pre-wrap; overflow-wrap: anywhere; }
