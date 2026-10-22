@@ -1,0 +1,19 @@
+{
+  "stage": 18,
+  "date": "2026-10-22",
+  "reviewer": "coding_assistant",
+  "stage12_accepted": false,
+  "live_provider_calls": 0,
+  "tests": {
+    "new": "9 passed",
+    "combined": "15 passed",
+    "electron": "passed with deterministic paid-provider substitutes"
+  },
+  "artifact_sha256": {
+    "workspace/stage18-tests-initial-20261022.log": "47862b2d82023414189e39cbe249092f2edbb5a8869d0a40d392e56ae5d92fcf",
+    "workspace/stage18-tests-final-20261022.log": "3ea2141a8f62a9dcf190be32c608fb6d1df32c2f535d9fd5e82f9abccb7eda31",
+    "workspace/stage18-build-20261022.log": "f7e50801fe02f11c28bcd8011da3da8de653646c62d16eb2f288e810da6c5909",
+    "workspace/stage18-ui-20261022.log": "ca18c3f0dfdfb232ae99618f00cc06750996105c34363bc5ec60a00248f09813",
+    "workspace/stage18-folder-workflow-20261022.png": "bf4573bd4accd4ca5a748d42e1af42d4a56022a567c85e59503b56f124ff1f84"
+  }
+}

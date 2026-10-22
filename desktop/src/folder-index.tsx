@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { FolderQuestions } from "./folder-questions";
 
 export function FolderIndexPanel({
   api,
@@ -209,6 +210,15 @@ export function FolderIndexPanel({
           ))}
         </div>
       )}
+      <FolderQuestions
+        api={api}
+        folderId={folderId}
+        index={index}
+        job={job}
+        setJob={setJob}
+        busy={busy || pending}
+        act={act}
+      />
       {error && (
         <p className="error" role="alert">
           {error}

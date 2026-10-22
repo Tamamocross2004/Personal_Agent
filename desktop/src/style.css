@@ -1495,3 +1495,12 @@ small {
 .folder-retrieval { max-height: 40vh; overflow: auto; }
 .folder-retrieval article { padding: 12px; border-bottom: 1px solid var(--border); }
 .folder-retrieval pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.folder-questions { border-top: 1px solid var(--border); margin-top: 20px; padding-top: 10px; }
+.folder-questions textarea { display: block; width: 100%; box-sizing: border-box; margin: 8px 0; padding: 12px; background: #162220; color: inherit; border: 1px solid #57978a; border-radius: 6px; }
+.folder-scope-file { display: flex; gap: 8px; padding: 6px; }
+.folder-answer article { margin: 12px 0; padding: 10px; background: #ffffff06; border-radius: 6px; }
+.folder-answer table { width: 100%; border-collapse: collapse; }
+.folder-answer td, .folder-answer th { padding: 8px; text-align: left; border-bottom: 1px solid var(--border); }
+.folder-answer pre, .folder-citation-preview pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.folder-citation { color: #99dcca; border: 1px solid #57978a; padding: 5px 8px; margin: 4px; border-radius: 5px; }
+.folder-citation-preview { margin-top: 16px; border: 1px solid #57978a; border-radius: 8px; padding: 14px; }

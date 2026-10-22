@@ -77,9 +77,10 @@ class FolderIndex:
             result=store.build(mode='replace',prepared=prepared,before_activate=validate)
             return {**result,'scan_id':scan_id,'parse_cache_hits':parse_hits,'diff':self.diff(fid,scan_id)}
 
-    def search(self,fid,query,*,generation=None,file_ids=None,**kwargs):
+    def search(self,fid,query,*,generation=None,file_ids=None,event_callback=None,**kwargs):
         self.folders.authorized(fid)
         store=self.store(fid)
+        store.event_callback=event_callback
         current=store.generation(generation)
         if not current: raise ValueError('请先同步资料索引')
         documents=current['files']

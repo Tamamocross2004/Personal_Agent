@@ -55,6 +55,14 @@ class FolderSync(BaseModel):
     scan_id:str=Field(min_length=1,max_length=64)
 
 
+class FolderQuestion(BaseModel):
+    query:str=Field(min_length=1,max_length=1000)
+    mode:Literal['keyword','hybrid']='keyword'
+    budget:int=Field(default=10000,ge=256,le=50000)
+    file_ids:list[str]|None=Field(default=None,max_length=50)
+    generation:str|None=Field(default=None,max_length=64)
+
+
 def create_app(manager:Manager,token:str,ui_dir:Path|None=None,*,folder_grant_token:str|None=None):
     from folder_assistant.store import FolderStore
     folders=FolderStore(manager.root/'folders',excluded_roots=(manager.root,))
@@ -130,6 +138,15 @@ def create_app(manager:Manager,token:str,ui_dir:Path|None=None,*,folder_grant_to
     def folder_job(jid:str):return redact(folder_jobs.get(jid))
     @app.post('/api/folder-jobs/{jid}/stop')
     def folder_job_stop(jid:str):return redact(folder_jobs.stop(jid))
+    @app.post('/api/folders/{fid}/questions')
+    def folder_question(fid:str,body:FolderQuestion):return redact(folder_jobs.start(fid,'answer',body.model_dump()))
+    @app.get('/api/folder-jobs/{jid}/citations/{cid}')
+    def folder_citation(jid:str,cid:str):
+        job=folder_jobs.get(jid)
+        evidence=next((e for e in job.get('evidence',[]) if e['citation_id']==cid),None)
+        if not evidence: raise KeyError('引用不属于本次实际送达的证据')
+        return redact({**folder_index.citation(job['folder_id'],job['inputs']['generation'],evidence['doc_id'],evidence['source_block_id']),
+                       'delivered':evidence})
     @app.get('/api/knowledge')
     def knowledge():return redact(manager.knowledge_status())
     @app.post('/api/knowledge/import')

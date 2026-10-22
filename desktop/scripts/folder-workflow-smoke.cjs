@@ -84,6 +84,28 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         /未变化 1/,
       );
     }
+    if (process.argv.includes("--questions")) {
+      await page
+        .getByRole("textbox", { name: "文件夹资料问题" })
+        .fill("本地资料是什么？");
+      await page
+        .getByRole("button", { name: "开始资料短答（调用模型）", exact: true })
+        .click();
+      await page
+        .locator(".folder-answer")
+        .getByText("测试替身仅验证引用协议", { exact: true })
+        .waitFor();
+      assert.match(
+        await page.locator(".folder-answer").innerText(),
+        /未正式审稿/,
+      );
+      await page.locator(".folder-answer .folder-citation").first().click();
+      await page
+        .locator(".folder-citation-preview")
+        .getByText("本地资料原文。", { exact: true })
+        .first()
+        .waitFor();
+    }
     const conn = await page.evaluate(() => window.desktop.connection());
     const denied = await fetch(conn.url + "/api/folders", {
       method: "POST",
@@ -161,8 +183,8 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         project,
         "workspace",
         parseMode
-          ? "stage17-folder-workflow-20261022.png"
-          : "stage17-folder-workflow-20261022.png",
+          ? "stage18-folder-workflow-20261022.png"
+          : "stage18-folder-workflow-20261022.png",
       ),
     });
     await page
