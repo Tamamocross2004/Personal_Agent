@@ -1,0 +1,1403 @@
+{
+  "stage": 20,
+  "date": "2026-10-22",
+  "runtime_commit": "a753f51",
+  "engineering_passed": true,
+  "content_acceptance_passed": false,
+  "reviewer": "coding_assistant",
+  "independent_review_performed": false,
+  "stage12_accepted": false,
+  "answer_contract_version": 3,
+  "tests": {
+    "targeted": "35 passed in 73.28s",
+    "full": "1034 passed in 484.51s",
+    "desktop_build": "passed",
+    "electron_workflow": "passed; providers are explicit substitutes",
+    "scope": "quote presence, literal spans and structural checks do not certify semantic entailment"
+  },
+  "rounds": [
+    {
+      "record": "docs/stage20-first-evaluation-20261022.json",
+      "questions": 8,
+      "formatted": 3,
+      "needs_verification": 5,
+      "preserved_unchanged": true
+    },
+    {
+      "record": "docs/stage20-schema-evaluation-20261022.json",
+      "questions": 6,
+      "formatted": 4,
+      "needs_verification": 2,
+      "preserved_unchanged": true
+    },
+    {
+      "record": "this record",
+      "questions": 3,
+      "formatted": 3,
+      "needs_verification": 0,
+      "review_status": "not_reviewed"
+    }
+  ],
+  "comparison_note": "Different fresh datasets; these counts are processing outcomes, not a paired improvement rate or answer accuracy.",
+  "all_stage20_usage": {
+    "llm_calls": 17,
+    "embedding_calls": 6,
+    "rerank_calls": 0,
+    "known_tokens": 30696,
+    "unknown_usage_calls": 0
+  },
+  "final_round_usage": {
+    "embedding_calls": 2,
+    "llm_calls": 3,
+    "rerank_calls": 0,
+    "known_tokens": 7232,
+    "unknown_usage_ids": []
+  },
+  "cny_total": null,
+  "remaining_limits": [
+    "Header-only search can omit later table rows; local retrieval is not full-table completion.",
+    "Exact text spans do not prove correct field association, complete extraction, causality or comparability.",
+    "Blank versus absent, semantic overgeneralization and model compliance still need verification."
+  ],
+  "cases": [
+    {
+      "case_id": "state_context",
+      "job_id": "4b0c125fbcd2475da21018839c17c125",
+      "query": "对照两份风机记录，说明相同时间和模式下的状态能否同时成立，列出对象和状态依据。",
+      "result": {
+        "answer": {
+          "schema_version": 3,
+          "findings": [
+            {
+              "statement": "风机FAN-K29在2027-01-09 08:00至08:20、固定模式X下，风机乙记录的状态为停机。",
+              "kind": "direct",
+              "citations": [
+                "C1"
+              ],
+              "support": [
+                {
+                  "citation_id": "C1",
+                  "quote": "风机FAN-K29，在2027-01-09 08:00至08:20、固定模式X下，状态为停机。"
+                }
+              ],
+              "assumptions": [],
+              "limitations": [],
+              "relation": null
+            },
+            {
+              "statement": "风机FAN-K29在2027-01-09 08:00至08:20、固定模式X下，风机甲记录的状态为运行。",
+              "kind": "direct",
+              "citations": [
+                "C2"
+              ],
+              "support": [
+                {
+                  "citation_id": "C2",
+                  "quote": "风机FAN-K29，在2027-01-09 08:00至08:20、固定模式X下，状态为运行。"
+                }
+              ],
+              "assumptions": [],
+              "limitations": [],
+              "relation": null
+            },
+            {
+              "statement": "两份记录针对同一对象（风机FAN-K29）、同一时间段（2027-01-09 08:00至08:20）和同一模式（固定模式X），分别记载“停机”与“运行”；这两个状态在同一条件下不能同时成立，构成冲突。",
+              "kind": "conflict",
+              "citations": [
+                "C1",
+                "C2"
+              ],
+              "support": [
+                {
+                  "citation_id": "C1",
+                  "quote": "风机FAN-K29，在2027-01-09 08:00至08:20、固定模式X下，状态为停机。"
+                },
+                {
+                  "citation_id": "C2",
+                  "quote": "风机FAN-K29，在2027-01-09 08:00至08:20、固定模式X下，状态为运行。"
+                }
+              ],
+              "assumptions": [],
+              "limitations": [],
+              "relation": {
+                "field": "状态",
+                "common_scope": "风机FAN-K29，2027-01-09 08:00至08:20，固定模式X",
+                "comparability": "established",
+                "reason": "两份记录的对象名称、时间段和模式均相同，状态取值分别为“停机”和“运行”，在同一条件下互斥，不能同时成立。"
+              }
+            }
+          ],
+          "unknowns": [
+            "两份记录为何出现状态不一致（如记录时点、数据来源或录入差异）无依据，无法确认。",
+            "哪一份记录反映实际状态无依据，无法确认。"
+          ],
+          "comparison": [
+            {
+              "subject": "风机FAN-K29",
+              "subject_type": "entity",
+              "subject_quote": {
+                "citation_id": "C1",
+                "quote": "风机FAN-K29，在2027-01-09 08:00至08:20、固定模式X下，状态为停机。"
+              },
+              "field": "状态",
+              "value": "停机",
+              "value_quote": {
+                "citation_id": "C1",
+                "quote": "状态为停机"
+              },
+              "status": "stated",
+              "citations": [
+                "C1"
+              ]
+            },
+            {
+              "subject": "风机FAN-K29",
+              "subject_type": "entity",
+              "subject_quote": {
+                "citation_id": "C2",
+                "quote": "风机FAN-K29，在2027-01-09 08:00至08:20、固定模式X下，状态为运行。"
+              },
+              "field": "状态",
+              "value": "运行",
+              "value_quote": {
+                "citation_id": "C2",
+                "quote": "状态为运行"
+              },
+              "status": "stated",
+              "citations": [
+                "C2"
+              ]
+            }
+          ]
+        },
+        "content_status": "unreviewed",
+        "answer_schema_version": 3,
+        "contract_checks": {
+          "version": 3,
+          "status": "structure_checked",
+          "meaning": "仅检查结构、引用与原句匹配，不认证语义蕴含、对象关系、业务状态或矛盾判断",
+          "warnings": [],
+          "quotes": [
+            {
+              "path": "findings.0.support.0",
+              "citation_id": "C1",
+              "quote": "风机FAN-K29，在2027-01-09 08:00至08:20、固定模式X下，状态为停机。",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 47
+                }
+              ]
+            },
+            {
+              "path": "findings.1.support.0",
+              "citation_id": "C2",
+              "quote": "风机FAN-K29，在2027-01-09 08:00至08:20、固定模式X下，状态为运行。",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 47
+                }
+              ]
+            },
+            {
+              "path": "findings.2.support.0",
+              "citation_id": "C1",
+              "quote": "风机FAN-K29，在2027-01-09 08:00至08:20、固定模式X下，状态为停机。",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 47
+                }
+              ]
+            },
+            {
+              "path": "findings.2.support.1",
+              "citation_id": "C2",
+              "quote": "风机FAN-K29，在2027-01-09 08:00至08:20、固定模式X下，状态为运行。",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 47
+                }
+              ]
+            },
+            {
+              "path": "comparison.0.subject_quote",
+              "citation_id": "C1",
+              "quote": "风机FAN-K29，在2027-01-09 08:00至08:20、固定模式X下，状态为停机。",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 47
+                }
+              ],
+              "extracted_value": "风机FAN-K29",
+              "value_matches": [
+                {
+                  "start": 0,
+                  "end": 9
+                }
+              ]
+            },
+            {
+              "path": "comparison.0.value_quote",
+              "citation_id": "C1",
+              "quote": "状态为停机",
+              "matches": [
+                {
+                  "start": 41,
+                  "end": 46
+                }
+              ],
+              "extracted_value": "停机",
+              "value_matches": [
+                {
+                  "start": 44,
+                  "end": 46
+                }
+              ]
+            },
+            {
+              "path": "comparison.1.subject_quote",
+              "citation_id": "C2",
+              "quote": "风机FAN-K29，在2027-01-09 08:00至08:20、固定模式X下，状态为运行。",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 47
+                }
+              ],
+              "extracted_value": "风机FAN-K29",
+              "value_matches": [
+                {
+                  "start": 0,
+                  "end": 9
+                }
+              ]
+            },
+            {
+              "path": "comparison.1.value_quote",
+              "citation_id": "C2",
+              "quote": "状态为运行",
+              "matches": [
+                {
+                  "start": 41,
+                  "end": 46
+                }
+              ],
+              "extracted_value": "运行",
+              "value_matches": [
+                {
+                  "start": 44,
+                  "end": 46
+                }
+              ]
+            }
+          ]
+        },
+        "review_status": "not_reviewed"
+      },
+      "model_output": "{\"schema_version\":3,\"findings\":[{\"statement\":\"风机FAN-K29在2027-01-09 08:00至08:20、固定模式X下，风机乙记录的状态为停机。\",\"kind\":\"direct\",\"citations\":[\"C1\"],\"support\":[{\"citation_id\":\"C1\",\"quote\":\"风机FAN-K29，在2027-01-09 08:00至08:20、固定模式X下，状态为停机。\"}]},{\"statement\":\"风机FAN-K29在2027-01-09 08:00至08:20、固定模式X下，风机甲记录的状态为运行。\",\"kind\":\"direct\",\"citations\":[\"C2\"],\"support\":[{\"citation_id\":\"C2\",\"quote\":\"风机FAN-K29，在2027-01-09 08:00至08:20、固定模式X下，状态为运行。\"}]},{\"statement\":\"两份记录针对同一对象（风机FAN-K29）、同一时间段（2027-01-09 08:00至08:20）和同一模式（固定模式X），分别记载“停机”与“运行”；这两个状态在同一条件下不能同时成立，构成冲突。\",\"kind\":\"conflict\",\"citations\":[\"C1\",\"C2\"],\"support\":[{\"citation_id\":\"C1\",\"quote\":\"风机FAN-K29，在2027-01-09 08:00至08:20、固定模式X下，状态为停机。\"},{\"citation_id\":\"C2\",\"quote\":\"风机FAN-K29，在2027-01-09 08:00至08:20、固定模式X下，状态为运行。\"}],\"relation\":{\"field\":\"状态\",\"common_scope\":\"风机FAN-K29，2027-01-09 08:00至08:20，固定模式X\",\"comparability\":\"established\",\"reason\":\"两份记录的对象名称、时间段和模式均相同，状态取值分别为“停机”和“运行”，在同一条件下互斥，不能同时成立。\"}}],\"unknowns\":[\"两份记录为何出现状态不一致（如记录时点、数据来源或录入差异）无依据，无法确认。\",\"哪一份记录反映实际状态无依据，无法确认。\"],\"comparison\":[{\"subject\":\"风机FAN-K29\",\"subject_type\":\"entity\",\"subject_quote\":{\"citation_id\":\"C1\",\"quote\":\"风机FAN-K29，在2027-01-09 08:00至08:20、固定模式X下，状态为停机。\"},\"field\":\"状态\",\"value\":\"停机\",\"value_quote\":{\"citation_id\":\"C1\",\"quote\":\"状态为停机\"},\"status\":\"stated\",\"citations\":[\"C1\"]},{\"subject\":\"风机FAN-K29\",\"subject_type\":\"entity\",\"subject_quote\":{\"citation_id\":\"C2\",\"quote\":\"风机FAN-K29，在2027-01-09 08:00至08:20、固定模式X下，状态为运行。\"},\"field\":\"状态\",\"value\":\"运行\",\"value_quote\":{\"citation_id\":\"C2\",\"quote\":\"状态为运行\"},\"status\":\"stated\",\"citations\":[\"C2\"]}]}",
+      "delivered_evidence": [
+        {
+          "citation_id": "C1",
+          "ordinal": 0,
+          "start": 0,
+          "end": 48,
+          "text": "风机FAN-K29，在2027-01-09 08:00至08:20、固定模式X下，状态为停机。\n",
+          "text_sha256": "b5966a4bded4619030faef1aac59c2bef1bf2d6bf143e87a01a11eb0d650aa17",
+          "source_location": {
+            "kind": "line",
+            "page": null,
+            "line": 1,
+            "start": 0,
+            "end": 48
+          },
+          "source_block_id": 1,
+          "file_id": "e20ef7f31896a10a21f14f4fdbe7f7d1c0b4a69ccb7991e3b4a9ba0c9b637a08",
+          "doc_id": "8257206fd86d14375d6252ecd2c4822203538120a2c1fab90973037cd19ba674",
+          "name": "风机乙.txt",
+          "file_sha256": "b5966a4bded4619030faef1aac59c2bef1bf2d6bf143e87a01a11eb0d650aa17",
+          "generation": "cae20015bebc4491ba51a5f0803f8a4b",
+          "chunk_id": 5,
+          "role": "direct",
+          "rank_score": 0.03252247488101534,
+          "rerank_score": null,
+          "partial": false,
+          "delivered_sha256": "b5966a4bded4619030faef1aac59c2bef1bf2d6bf143e87a01a11eb0d650aa17"
+        },
+        {
+          "citation_id": "C2",
+          "ordinal": 0,
+          "start": 0,
+          "end": 48,
+          "text": "风机FAN-K29，在2027-01-09 08:00至08:20、固定模式X下，状态为运行。\n",
+          "text_sha256": "54ca9fff75d2a0b90edcb3c39774454ac6471b352c8af72825020fc22fba911e",
+          "source_location": {
+            "kind": "line",
+            "page": null,
+            "line": 1,
+            "start": 0,
+            "end": 48
+          },
+          "source_block_id": 1,
+          "file_id": "300f2cc506aad8357fa19beb4d4a94ebeaacdb4c877c21d29d77b357a6b4ae53",
+          "doc_id": "126a32c6afe4f49f170940217e2d2288da674da2f5a8cc2b4c9f87c3e981aad2",
+          "name": "风机甲.txt",
+          "file_sha256": "54ca9fff75d2a0b90edcb3c39774454ac6471b352c8af72825020fc22fba911e",
+          "generation": "cae20015bebc4491ba51a5f0803f8a4b",
+          "chunk_id": 6,
+          "role": "direct",
+          "rank_score": 0.03252247488101534,
+          "rerank_score": null,
+          "partial": false,
+          "delivered_sha256": "54ca9fff75d2a0b90edcb3c39774454ac6471b352c8af72825020fc22fba911e"
+        }
+      ],
+      "usage_events": [
+        {
+          "id": "7737bc50bde84e478c649f2ba2fbf81e",
+          "purpose": "query:cae20015bebc4491ba51a5f0803f8a4b",
+          "provider": "siliconflow",
+          "model": "Pro/BAAI/bge-m3",
+          "status": "returned",
+          "input_tokens": 28,
+          "estimated_input_tokens": 31,
+          "request_attempts": 1,
+          "seconds": 0.169
+        },
+        {
+          "id": "4b0c125fbcd2475da21018839c17c125-answer",
+          "operation": "llm",
+          "status": "returned",
+          "provider": "deepseek",
+          "model": "deepseek-flash",
+          "input_tokens": 1784,
+          "output_tokens": 666,
+          "request_attempts": 1,
+          "started": "2026-10-22T03:37:14.256154+00:00",
+          "returned_model": "deepseek-flash",
+          "cached_tokens": 0,
+          "finished": "2026-10-22T03:37:17.132768+00:00"
+        }
+      ],
+      "coding_assistant_observations": [
+        "同对象、同时间窗和模式的运行/停机并列，明确说明同条件互斥，未猜哪份实际正确。",
+        "原句可含上下文，对象及取值的字符区间均与实际送达片段对应。"
+      ]
+    },
+    {
+      "case_id": "period_context",
+      "job_id": "e1986b0c5a754ad288cbed9ae4567bd8",
+      "query": "请对照两份资料的保养间隔，并说明这些记录是否足以认定互相矛盾。保留原值与依据。",
+      "result": {
+        "answer": {
+          "schema_version": 3,
+          "findings": [
+            {
+              "statement": "保养乙记载北园展厅的保养间隔为9个自然日，且未记载具体起算日期。",
+              "kind": "direct",
+              "citations": [
+                "C1"
+              ],
+              "support": [
+                {
+                  "citation_id": "C1",
+                  "quote": "北园展厅的保养间隔为9个自然日。未记载具体起算日期。"
+                }
+              ],
+              "assumptions": [],
+              "limitations": [],
+              "relation": null
+            },
+            {
+              "statement": "保养甲记载北园展厅的保养间隔为6个工作日，且未记载具体起算日期。",
+              "kind": "direct",
+              "citations": [
+                "C2"
+              ],
+              "support": [
+                {
+                  "citation_id": "C2",
+                  "quote": "北园展厅的保养间隔为6个工作日。未记载具体起算日期。"
+                }
+              ],
+              "assumptions": [],
+              "limitations": [],
+              "relation": null
+            },
+            {
+              "statement": "两份资料对同一对象“北园展厅”的保养间隔分别记为9个自然日和6个工作日，计量口径不同（自然日与工作日），原值应分别保留。",
+              "kind": "difference",
+              "citations": [
+                "C1",
+                "C2"
+              ],
+              "support": [
+                {
+                  "citation_id": "C1",
+                  "quote": "北园展厅的保养间隔为9个自然日。"
+                },
+                {
+                  "citation_id": "C2",
+                  "quote": "北园展厅的保养间隔为6个工作日。"
+                }
+              ],
+              "assumptions": [],
+              "limitations": [],
+              "relation": {
+                "field": "保养间隔",
+                "common_scope": "北园展厅的保养间隔",
+                "comparability": "not_established",
+                "reason": "两份记录分别使用“自然日”和“工作日”两种不同计量口径，且均未记载具体起算日期；在未换算、未明确适用条件的情况下，不能判定二者在同一条件下是否可同时成立。"
+              }
+            },
+            {
+              "statement": "现有记录不足以认定两份资料的保养间隔互相矛盾。",
+              "kind": "inference",
+              "citations": [
+                "C1",
+                "C2"
+              ],
+              "support": [
+                {
+                  "citation_id": "C1",
+                  "quote": "北园展厅的保养间隔为9个自然日。未记载具体起算日期。"
+                },
+                {
+                  "citation_id": "C2",
+                  "quote": "北园展厅的保养间隔为6个工作日。未记载具体起算日期。"
+                }
+              ],
+              "assumptions": [
+                "“自然日”与“工作日”是两种不同的计时口径，不能直接视为同一单位下的数值。"
+              ],
+              "limitations": [
+                "两份资料均未记载起算日期，也未说明两种口径之间的换算关系或适用条件，因此无法确认在同一条件下是否冲突。"
+              ],
+              "relation": null
+            }
+          ],
+          "unknowns": [
+            "两份资料中保养间隔的具体起算日期均未记载。",
+            "“自然日”与“工作日”之间是否存在约定的换算规则或适用条件，资料未记载。",
+            "两份资料是否针对同一时间段或同一保养周期，资料未记载。"
+          ],
+          "comparison": [
+            {
+              "subject": "北园展厅",
+              "subject_type": "entity",
+              "subject_quote": {
+                "citation_id": "C1",
+                "quote": "北园展厅的保养间隔为9个自然日。"
+              },
+              "field": "保养间隔",
+              "value": "9个自然日",
+              "value_quote": {
+                "citation_id": "C1",
+                "quote": "北园展厅的保养间隔为9个自然日。"
+              },
+              "status": "stated",
+              "citations": [
+                "C1"
+              ]
+            },
+            {
+              "subject": "北园展厅",
+              "subject_type": "entity",
+              "subject_quote": {
+                "citation_id": "C2",
+                "quote": "北园展厅的保养间隔为6个工作日。"
+              },
+              "field": "保养间隔",
+              "value": "6个工作日",
+              "value_quote": {
+                "citation_id": "C2",
+                "quote": "北园展厅的保养间隔为6个工作日。"
+              },
+              "status": "stated",
+              "citations": [
+                "C2"
+              ]
+            }
+          ]
+        },
+        "content_status": "unreviewed",
+        "answer_schema_version": 3,
+        "contract_checks": {
+          "version": 3,
+          "status": "structure_checked",
+          "meaning": "仅检查结构、引用与原句匹配，不认证语义蕴含、对象关系、业务状态或矛盾判断",
+          "warnings": [],
+          "quotes": [
+            {
+              "path": "findings.0.support.0",
+              "citation_id": "C1",
+              "quote": "北园展厅的保养间隔为9个自然日。未记载具体起算日期。",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 26
+                }
+              ]
+            },
+            {
+              "path": "findings.1.support.0",
+              "citation_id": "C2",
+              "quote": "北园展厅的保养间隔为6个工作日。未记载具体起算日期。",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 26
+                }
+              ]
+            },
+            {
+              "path": "findings.2.support.0",
+              "citation_id": "C1",
+              "quote": "北园展厅的保养间隔为9个自然日。",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 16
+                }
+              ]
+            },
+            {
+              "path": "findings.2.support.1",
+              "citation_id": "C2",
+              "quote": "北园展厅的保养间隔为6个工作日。",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 16
+                }
+              ]
+            },
+            {
+              "path": "findings.3.support.0",
+              "citation_id": "C1",
+              "quote": "北园展厅的保养间隔为9个自然日。未记载具体起算日期。",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 26
+                }
+              ]
+            },
+            {
+              "path": "findings.3.support.1",
+              "citation_id": "C2",
+              "quote": "北园展厅的保养间隔为6个工作日。未记载具体起算日期。",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 26
+                }
+              ]
+            },
+            {
+              "path": "comparison.0.subject_quote",
+              "citation_id": "C1",
+              "quote": "北园展厅的保养间隔为9个自然日。",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 16
+                }
+              ],
+              "extracted_value": "北园展厅",
+              "value_matches": [
+                {
+                  "start": 0,
+                  "end": 4
+                }
+              ]
+            },
+            {
+              "path": "comparison.0.value_quote",
+              "citation_id": "C1",
+              "quote": "北园展厅的保养间隔为9个自然日。",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 16
+                }
+              ],
+              "extracted_value": "9个自然日",
+              "value_matches": [
+                {
+                  "start": 10,
+                  "end": 15
+                }
+              ]
+            },
+            {
+              "path": "comparison.1.subject_quote",
+              "citation_id": "C2",
+              "quote": "北园展厅的保养间隔为6个工作日。",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 16
+                }
+              ],
+              "extracted_value": "北园展厅",
+              "value_matches": [
+                {
+                  "start": 0,
+                  "end": 4
+                }
+              ]
+            },
+            {
+              "path": "comparison.1.value_quote",
+              "citation_id": "C2",
+              "quote": "北园展厅的保养间隔为6个工作日。",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 16
+                }
+              ],
+              "extracted_value": "6个工作日",
+              "value_matches": [
+                {
+                  "start": 10,
+                  "end": 15
+                }
+              ]
+            }
+          ]
+        },
+        "review_status": "not_reviewed"
+      },
+      "model_output": "{\"schema_version\":3,\"findings\":[{\"statement\":\"保养乙记载北园展厅的保养间隔为9个自然日，且未记载具体起算日期。\",\"kind\":\"direct\",\"citations\":[\"C1\"],\"support\":[{\"citation_id\":\"C1\",\"quote\":\"北园展厅的保养间隔为9个自然日。未记载具体起算日期。\"}]},{\"statement\":\"保养甲记载北园展厅的保养间隔为6个工作日，且未记载具体起算日期。\",\"kind\":\"direct\",\"citations\":[\"C2\"],\"support\":[{\"citation_id\":\"C2\",\"quote\":\"北园展厅的保养间隔为6个工作日。未记载具体起算日期。\"}]},{\"statement\":\"两份资料对同一对象“北园展厅”的保养间隔分别记为9个自然日和6个工作日，计量口径不同（自然日与工作日），原值应分别保留。\",\"kind\":\"difference\",\"citations\":[\"C1\",\"C2\"],\"support\":[{\"citation_id\":\"C1\",\"quote\":\"北园展厅的保养间隔为9个自然日。\"},{\"citation_id\":\"C2\",\"quote\":\"北园展厅的保养间隔为6个工作日。\"}],\"relation\":{\"field\":\"保养间隔\",\"common_scope\":\"北园展厅的保养间隔\",\"comparability\":\"not_established\",\"reason\":\"两份记录分别使用“自然日”和“工作日”两种不同计量口径，且均未记载具体起算日期；在未换算、未明确适用条件的情况下，不能判定二者在同一条件下是否可同时成立。\"}},{\"statement\":\"现有记录不足以认定两份资料的保养间隔互相矛盾。\",\"kind\":\"inference\",\"citations\":[\"C1\",\"C2\"],\"support\":[{\"citation_id\":\"C1\",\"quote\":\"北园展厅的保养间隔为9个自然日。未记载具体起算日期。\"},{\"citation_id\":\"C2\",\"quote\":\"北园展厅的保养间隔为6个工作日。未记载具体起算日期。\"}],\"assumptions\":[\"“自然日”与“工作日”是两种不同的计时口径，不能直接视为同一单位下的数值。\"],\"limitations\":[\"两份资料均未记载起算日期，也未说明两种口径之间的换算关系或适用条件，因此无法确认在同一条件下是否冲突。\"]}],\"unknowns\":[\"两份资料中保养间隔的具体起算日期均未记载。\",\"“自然日”与“工作日”之间是否存在约定的换算规则或适用条件，资料未记载。\",\"两份资料是否针对同一时间段或同一保养周期，资料未记载。\"],\"comparison\":[{\"subject\":\"北园展厅\",\"subject_type\":\"entity\",\"subject_quote\":{\"citation_id\":\"C1\",\"quote\":\"北园展厅的保养间隔为9个自然日。\"},\"field\":\"保养间隔\",\"value\":\"9个自然日\",\"value_quote\":{\"citation_id\":\"C1\",\"quote\":\"北园展厅的保养间隔为9个自然日。\"},\"status\":\"stated\",\"citations\":[\"C1\"]},{\"subject\":\"北园展厅\",\"subject_type\":\"entity\",\"subject_quote\":{\"citation_id\":\"C2\",\"quote\":\"北园展厅的保养间隔为6个工作日。\"},\"field\":\"保养间隔\",\"value\":\"6个工作日\",\"value_quote\":{\"citation_id\":\"C2\",\"quote\":\"北园展厅的保养间隔为6个工作日。\"},\"status\":\"stated\",\"citations\":[\"C2\"]}]}",
+      "delivered_evidence": [
+        {
+          "citation_id": "C1",
+          "ordinal": 0,
+          "start": 0,
+          "end": 27,
+          "text": "北园展厅的保养间隔为9个自然日。未记载具体起算日期。\n",
+          "text_sha256": "f3360c7eee7730d6b765aa9180fb6e78d221c0fc93a19ee31491ced9e0513028",
+          "source_location": {
+            "kind": "line",
+            "page": null,
+            "line": 1,
+            "start": 0,
+            "end": 27
+          },
+          "source_block_id": 1,
+          "file_id": "532c587c03d737f4ed6b27789ddc88414dc07380447d361562c7ba2ddba20f3f",
+          "doc_id": "fcd113ffadc6863d495180b7db72177bbc523a64160370ad61e4d94953593cc4",
+          "name": "保养乙.txt",
+          "file_sha256": "f3360c7eee7730d6b765aa9180fb6e78d221c0fc93a19ee31491ced9e0513028",
+          "generation": "cae20015bebc4491ba51a5f0803f8a4b",
+          "chunk_id": 0,
+          "role": "direct",
+          "rank_score": 0.01639344262295082,
+          "rerank_score": null,
+          "partial": false,
+          "delivered_sha256": "f3360c7eee7730d6b765aa9180fb6e78d221c0fc93a19ee31491ced9e0513028"
+        },
+        {
+          "citation_id": "C2",
+          "ordinal": 0,
+          "start": 0,
+          "end": 27,
+          "text": "北园展厅的保养间隔为6个工作日。未记载具体起算日期。\n",
+          "text_sha256": "afbabf341588286d534dd03ae09fcdf2838967ae34581690941312f758619a32",
+          "source_location": {
+            "kind": "line",
+            "page": null,
+            "line": 1,
+            "start": 0,
+            "end": 27
+          },
+          "source_block_id": 1,
+          "file_id": "adbafaa3279e9a3c972d05897bbd2c61efe215172b30e162d9b862174053e7a1",
+          "doc_id": "8e669b0e9e6e15bd5607fd2f6028571ce1dc32776f62fa6d1e9730bc67e5db15",
+          "name": "保养甲.txt",
+          "file_sha256": "afbabf341588286d534dd03ae09fcdf2838967ae34581690941312f758619a32",
+          "generation": "cae20015bebc4491ba51a5f0803f8a4b",
+          "chunk_id": 1,
+          "role": "direct",
+          "rank_score": 0.016129032258064516,
+          "rerank_score": null,
+          "partial": false,
+          "delivered_sha256": "afbabf341588286d534dd03ae09fcdf2838967ae34581690941312f758619a32"
+        }
+      ],
+      "usage_events": [
+        {
+          "id": "e1986b0c5a754ad288cbed9ae4567bd8-answer",
+          "operation": "llm",
+          "status": "returned",
+          "provider": "deepseek",
+          "model": "deepseek-flash",
+          "input_tokens": 1751,
+          "output_tokens": 707,
+          "request_attempts": 1,
+          "started": "2026-10-22T03:37:19.642961+00:00",
+          "returned_model": "deepseek-flash",
+          "cached_tokens": 1280,
+          "finished": "2026-10-22T03:37:22.605750+00:00"
+        }
+      ],
+      "coding_assistant_observations": [
+        "保留6个工作日及9个自然日，按口径差异处理，可比条件未建立，不直接断言矛盾。",
+        "假设和限制可见，仍需核对模型对共同范围及适用条件的判断。"
+      ]
+    },
+    {
+      "case_id": "literal_units",
+      "job_id": "ddee82f4c7344be0bb80e8f182ca45ae",
+      "query": "按U-40和U-52列出设定值及原文依据，不换算单位。",
+      "result": {
+        "answer": {
+          "schema_version": 3,
+          "findings": [
+            {
+              "statement": "设定.csv中，测点U-40的设定值为12 kPa。",
+              "kind": "direct",
+              "citations": [
+                "C2"
+              ],
+              "support": [
+                {
+                  "citation_id": "C2",
+                  "quote": "[\"U-40\", \"12 kPa\"]"
+                }
+              ],
+              "assumptions": [],
+              "limitations": [],
+              "relation": null
+            },
+            {
+              "statement": "设定.csv中，测点U-52的设定值为18 kPa。",
+              "kind": "direct",
+              "citations": [
+                "C3"
+              ],
+              "support": [
+                {
+                  "citation_id": "C3",
+                  "quote": "[\"U-52\", \"18 kPa\"]"
+                }
+              ],
+              "assumptions": [],
+              "limitations": [],
+              "relation": null
+            }
+          ],
+          "unknowns": [],
+          "comparison": [
+            {
+              "subject": "U-40",
+              "subject_type": "entity",
+              "subject_quote": {
+                "citation_id": "C2",
+                "quote": "[\"U-40\", \"12 kPa\"]"
+              },
+              "field": "设定值",
+              "value": "12 kPa",
+              "value_quote": {
+                "citation_id": "C2",
+                "quote": "[\"U-40\", \"12 kPa\"]"
+              },
+              "status": "stated",
+              "citations": [
+                "C2"
+              ]
+            },
+            {
+              "subject": "U-52",
+              "subject_type": "entity",
+              "subject_quote": {
+                "citation_id": "C3",
+                "quote": "[\"U-52\", \"18 kPa\"]"
+              },
+              "field": "设定值",
+              "value": "18 kPa",
+              "value_quote": {
+                "citation_id": "C3",
+                "quote": "[\"U-52\", \"18 kPa\"]"
+              },
+              "status": "stated",
+              "citations": [
+                "C3"
+              ]
+            }
+          ]
+        },
+        "content_status": "unreviewed",
+        "answer_schema_version": 3,
+        "contract_checks": {
+          "version": 3,
+          "status": "structure_checked",
+          "meaning": "仅检查结构、引用与原句匹配，不认证语义蕴含、对象关系、业务状态或矛盾判断",
+          "warnings": [],
+          "quotes": [
+            {
+              "path": "findings.0.support.0",
+              "citation_id": "C2",
+              "quote": "[\"U-40\", \"12 kPa\"]",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 18
+                }
+              ]
+            },
+            {
+              "path": "findings.1.support.0",
+              "citation_id": "C3",
+              "quote": "[\"U-52\", \"18 kPa\"]",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 18
+                }
+              ]
+            },
+            {
+              "path": "comparison.0.subject_quote",
+              "citation_id": "C2",
+              "quote": "[\"U-40\", \"12 kPa\"]",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 18
+                }
+              ],
+              "extracted_value": "U-40",
+              "value_matches": [
+                {
+                  "start": 2,
+                  "end": 6
+                }
+              ]
+            },
+            {
+              "path": "comparison.0.value_quote",
+              "citation_id": "C2",
+              "quote": "[\"U-40\", \"12 kPa\"]",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 18
+                }
+              ],
+              "extracted_value": "12 kPa",
+              "value_matches": [
+                {
+                  "start": 10,
+                  "end": 16
+                }
+              ]
+            },
+            {
+              "path": "comparison.1.subject_quote",
+              "citation_id": "C3",
+              "quote": "[\"U-52\", \"18 kPa\"]",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 18
+                }
+              ],
+              "extracted_value": "U-52",
+              "value_matches": [
+                {
+                  "start": 2,
+                  "end": 6
+                }
+              ]
+            },
+            {
+              "path": "comparison.1.value_quote",
+              "citation_id": "C3",
+              "quote": "[\"U-52\", \"18 kPa\"]",
+              "matches": [
+                {
+                  "start": 0,
+                  "end": 18
+                }
+              ],
+              "extracted_value": "18 kPa",
+              "value_matches": [
+                {
+                  "start": 10,
+                  "end": 16
+                }
+              ]
+            }
+          ]
+        },
+        "review_status": "not_reviewed"
+      },
+      "model_output": "{\"schema_version\":3,\"findings\":[{\"statement\":\"设定.csv中，测点U-40的设定值为12 kPa。\",\"kind\":\"direct\",\"citations\":[\"C2\"],\"support\":[{\"citation_id\":\"C2\",\"quote\":\"[\\\"U-40\\\", \\\"12 kPa\\\"]\"}]},{\"statement\":\"设定.csv中，测点U-52的设定值为18 kPa。\",\"kind\":\"direct\",\"citations\":[\"C3\"],\"support\":[{\"citation_id\":\"C3\",\"quote\":\"[\\\"U-52\\\", \\\"18 kPa\\\"]\"}]}],\"unknowns\":[],\"comparison\":[{\"subject\":\"U-40\",\"subject_type\":\"entity\",\"subject_quote\":{\"citation_id\":\"C2\",\"quote\":\"[\\\"U-40\\\", \\\"12 kPa\\\"]\"},\"field\":\"设定值\",\"value\":\"12 kPa\",\"value_quote\":{\"citation_id\":\"C2\",\"quote\":\"[\\\"U-40\\\", \\\"12 kPa\\\"]\"},\"status\":\"stated\",\"citations\":[\"C2\"]},{\"subject\":\"U-52\",\"subject_type\":\"entity\",\"subject_quote\":{\"citation_id\":\"C3\",\"quote\":\"[\\\"U-52\\\", \\\"18 kPa\\\"]\"},\"field\":\"设定值\",\"value\":\"18 kPa\",\"value_quote\":{\"citation_id\":\"C3\",\"quote\":\"[\\\"U-52\\\", \\\"18 kPa\\\"]\"},\"status\":\"stated\",\"citations\":[\"C3\"]}]}",
+      "delivered_evidence": [
+        {
+          "citation_id": "C1",
+          "ordinal": 0,
+          "start": 0,
+          "end": 13,
+          "text": "[\"测点\", \"设定值\"]",
+          "text_sha256": "86ce0dfe57c63c4ecdbfed9c4abe385b89b55e4f2d25e391fc9de1b7b66a63ca",
+          "source_location": {
+            "kind": "csv_record",
+            "record": 1,
+            "physical_line_start": 1,
+            "physical_line_end": 1
+          },
+          "source_block_id": 1,
+          "file_id": "39380dd40dd38eac99b9af7f8943c8181752fa47e1e7216466298338a3305aff",
+          "doc_id": "24968c4f8ebba52ad7503d89ef76d27ba3b2e27e4018538d316c32a23b1fe7df",
+          "name": "设定.csv",
+          "file_sha256": "0144985d06a55f3ae78dce7452ace981cd7a6552d9e6736100ce7d1cdc1203e2",
+          "generation": "cae20015bebc4491ba51a5f0803f8a4b",
+          "chunk_id": 2,
+          "role": "direct",
+          "rank_score": 0.01639344262295082,
+          "rerank_score": null,
+          "partial": false,
+          "delivered_sha256": "86ce0dfe57c63c4ecdbfed9c4abe385b89b55e4f2d25e391fc9de1b7b66a63ca"
+        },
+        {
+          "citation_id": "C2",
+          "ordinal": 0,
+          "start": 0,
+          "end": 18,
+          "text": "[\"U-40\", \"12 kPa\"]",
+          "text_sha256": "d4c6a4106b08beca5047b546ea0824c96588289be4e0b091ab5abc0971656bb6",
+          "source_location": {
+            "kind": "csv_record",
+            "record": 2,
+            "physical_line_start": 2,
+            "physical_line_end": 2
+          },
+          "source_block_id": 2,
+          "file_id": "39380dd40dd38eac99b9af7f8943c8181752fa47e1e7216466298338a3305aff",
+          "doc_id": "24968c4f8ebba52ad7503d89ef76d27ba3b2e27e4018538d316c32a23b1fe7df",
+          "name": "设定.csv",
+          "file_sha256": "0144985d06a55f3ae78dce7452ace981cd7a6552d9e6736100ce7d1cdc1203e2",
+          "generation": "cae20015bebc4491ba51a5f0803f8a4b",
+          "chunk_id": 3,
+          "role": "direct",
+          "rank_score": 0.016129032258064516,
+          "rerank_score": null,
+          "partial": false,
+          "delivered_sha256": "d4c6a4106b08beca5047b546ea0824c96588289be4e0b091ab5abc0971656bb6"
+        },
+        {
+          "citation_id": "C3",
+          "ordinal": 0,
+          "start": 0,
+          "end": 18,
+          "text": "[\"U-52\", \"18 kPa\"]",
+          "text_sha256": "946030626625fd464790b598318433fa34a49cbefb6d9851e07d0ac9be03967d",
+          "source_location": {
+            "kind": "csv_record",
+            "record": 3,
+            "physical_line_start": 3,
+            "physical_line_end": 3
+          },
+          "source_block_id": 3,
+          "file_id": "39380dd40dd38eac99b9af7f8943c8181752fa47e1e7216466298338a3305aff",
+          "doc_id": "24968c4f8ebba52ad7503d89ef76d27ba3b2e27e4018538d316c32a23b1fe7df",
+          "name": "设定.csv",
+          "file_sha256": "0144985d06a55f3ae78dce7452ace981cd7a6552d9e6736100ce7d1cdc1203e2",
+          "generation": "cae20015bebc4491ba51a5f0803f8a4b",
+          "chunk_id": 4,
+          "role": "direct",
+          "rank_score": 0.015873015873015872,
+          "rerank_score": null,
+          "partial": false,
+          "delivered_sha256": "946030626625fd464790b598318433fa34a49cbefb6d9851e07d0ac9be03967d"
+        }
+      ],
+      "usage_events": [
+        {
+          "id": "ddee82f4c7344be0bb80e8f182ca45ae-answer",
+          "operation": "llm",
+          "status": "returned",
+          "provider": "deepseek",
+          "model": "deepseek-flash",
+          "input_tokens": 1848,
+          "output_tokens": 297,
+          "request_attempts": 1,
+          "started": "2026-10-22T03:37:23.090721+00:00",
+          "returned_model": "deepseek-flash",
+          "cached_tokens": 1280,
+          "finished": "2026-10-22T03:37:24.472990+00:00"
+        }
+      ],
+      "coding_assistant_observations": [
+        "U-40/U-52与12 kPa/18 kPa分别对应真实行，无单位换算或额外统计。",
+        "完整CSV记录作为引用上下文，提取片段位置验证通过。"
+      ]
+    }
+  ],
+  "plan_sha256": "c6b5e4e6234d22cbc492bdc5efd5afd5e325a182bf192d624bcf151dadee43ac",
+  "artifact_sha256": {
+    "workspace/stage20-before-schema-workflow-20261022.png": "78904841071f5cd4b08aa6636ae65538b889327812f4ff0f16cffd535f60ed90",
+    "workspace/stage20-before-span-display-20261022.png": "0f8cd59c1eb8a3735598f29758e8184b488ad259110ac0a3bedd6c5e068fe07a",
+    "workspace/stage20-before-span-workflow-20261022.png": "c9212bc4f306ebef2142559550411f94c61828d557267e90285f2be9730a2b8f",
+    "workspace/stage20-build-final-20261022.log": "b37ae262d2c3bd66e1d29affab90b65581d32306b1588a0a941d109f989fa181",
+    "workspace/stage20-build-initial-20261022.log": "459ca041baadc330111b99ef194e25a808d4a563c5d281dca91208224c324720",
+    "workspace/stage20-final-workflow-20261022.png": "ba0e930a40b15d76062dc8ab3a07808a9b20db63fe4f79d32b4a9e507190eea0",
+    "workspace/stage20-first-export-check-20261022.json": "6575a262fea7772aec8936468fe1be40c146b88c34eacc56a0cca303732d2055",
+    "workspace/stage20-folder-workflow-20261022.png": "c3b2d70c372e495bbc78fb4fb05c9ee44598928936b39347b2d9f232ef844a05",
+    "workspace/stage20-format-20261022.log": "822daa472677951d82eebd22fe5108c6c2d9a55b22defe4b5adcc101d3de78fe",
+    "workspace/stage20-full-tests-20261022.log": "813482c7ca24ea3d7cb3a9dba4f13b4c4733843907621f92ffefc43302b5ba73",
+    "workspace/stage20-history-integrity-20261022.json": "2da1eff58a65fa08c016f5bf2f2543a8d72f40f4dbe6b0dea5e9f676fd900521",
+    "workspace/stage20-live-20261022.log": "b671a14d2d1878d610ab9bd84f49a665952b6fb4914b912cd62cfd4dc7cea13a",
+    "workspace/stage20-roundtrip-20261022.json": "5cf28f2bcc9a6148dd5117ea9256d6b4e6a12c7814cafbd5b9f98bf995d50cf7",
+    "workspace/stage20-runtime-versions-20261022.json": "6846b1380061e1d7fc00162e1b1a72264f5d3eae3657eebb7b375a4a782bdb57",
+    "workspace/stage20-schema-full-tests-20261022.log": "538fee4c851ffa08a919b421a94ca0d3647c16a802df773d67f0a4de8be7776d",
+    "workspace/stage20-schema-live-20261022.log": "deadf6970d74783972d2b792f04dd13a91d8969c606930a67750016bd2b72b73",
+    "workspace/stage20-schema-tests-20261022.log": "153b8e91c064021b314391b414d89977fca053b2611848651b03bb7790588517",
+    "workspace/stage20-schema-ui-20261022.log": "902f2b9156ea0468d98a0e8228ab2629997ac69143afdd4f81a70dd64553db95",
+    "workspace/stage20-span-build-20261022.log": "3794d90145de47066f3d382f150f50b3365007f0b7fab7cb290cb72cc9d5dc56",
+    "workspace/stage20-span-build-final-20261022.log": "7efa1404d0a7c96f2306746e1e0bd271847b0bfca19e9e14f94fc560762df288",
+    "workspace/stage20-span-format-20261022.log": "000017abf9934395ef9a1bf9fdb5c0f56703643ae611a352e399b97d4255eed5",
+    "workspace/stage20-span-full-tests-20261022.log": "9a5c80f911aaeaae6bdad8932c084d8c895ff5909b834d98b6fb5c5574bb5cb1",
+    "workspace/stage20-span-live-20261022.log": "0c878361e10d8b8d98def4e9a583c6fa1b0704c4d83efd08f87c016ca06f2eb2",
+    "workspace/stage20-span-tests-20261022.log": "b7c2dacf5314285b8ad08ee9e7e5353e16a230a3e40ef8712b5c5e281068f364",
+    "workspace/stage20-span-ui-20261022.log": "160b29c2ad0ff3db12627da09d061e5c5b8986bf8f6884c19cd3d91acbcccc56",
+    "workspace/stage20-span-ui-final-20261022.log": "a770c430505bb4e2f6d130ae841bf4a51755625e081165ba5f796d1fb18f73d3",
+    "workspace/stage20-span-ui-format-20261022.log": "73aac4069fe0edcf0a65da6d77a19689404504b15f5d2d7338645c044ef23cd0",
+    "workspace/stage20-tests-contracts-20261022.log": "65f01fb6b383c19ec123994d95a279f6182bd81de01a9a103f6cd0d4d27a21ad",
+    "workspace/stage20-tests-final-20261022.log": "96a394ad22a50f969b5a2189aa9340252c822073f1ac71bba44bb0953c148c59",
+    "workspace/stage20-tests-initial-20261022.log": "789cd7f2a7b3cff3a1e9d899c5193a052ef8ee8213f65c34d012be850bbe463a",
+    "workspace/stage20-ui-final-20261022.log": "1a65f43333fc2fed0a55d75d07a4abd531f4a2f5b079da50d614e3a5be181bb8",
+    "workspace/stage20-ui-initial-20261022.log": "649398c4dd0600ca1c994f8221279ebcf16b19f6c8bd3176124c6c050f64b761",
+    "workspace/stage20-live-20261022/attempt.json": "baa14137217f1583e8962e588db5955ed6de1663725683e3ce543f02ab213ae8",
+    "workspace/stage20-live-20261022/documents/会场.txt": "05a121b1ade9cc8402b93be66e36c8309790a4d1167b5d098407920b07e4ea21",
+    "workspace/stage20-live-20261022/documents/周期一.txt": "f258a6d1f90063dad19604cadd21584d6687f5ae6ef1ef27d54fb410efa531ce",
+    "workspace/stage20-live-20261022/documents/周期二.txt": "df791e66d6316b3c15e473ead73d5233dae5bd5588ae00d5c3c630ee20be6b1a",
+    "workspace/stage20-live-20261022/documents/展厅.md": "4694353fd9a7d3f9a38735124f39985cd3cfd754865eef1d7a049e99311a3b7d",
+    "workspace/stage20-live-20261022/documents/批次.csv": "bbd9779518c168e1b50d067556dd7534236307c858eb491e211422bebd2032e2",
+    "workspace/stage20-live-20261022/documents/接口一.txt": "0ab1e82b139c0ce0f44eb8dd2293f32a4e29e25f1154ce8988fc43b0c65a7409",
+    "workspace/stage20-live-20261022/documents/接口二.txt": "e5511f3128a8b58b637f6e6e857e5fdfb48fb113c89291e251d64bffcae26071",
+    "workspace/stage20-live-20261022/documents/检测.txt": "b511b89c60313219eb3703142633124bb2564818e795311a1580366ccc0a5208",
+    "workspace/stage20-live-20261022/documents/试件.xlsx": "8f0af4a4b973ced1616f71acb68ce0be677055345cc2356799ec93fe11645f24",
+    "workspace/stage20-live-20261022/documents/资料柜.txt": "b0ced7697a0ef71488b572cf677e7edbcf7c4959425f179a49366dae890d33b0",
+    "workspace/stage20-live-20261022/runtime/agent/config.py": "5a398f74572d97545119f4abf55491302611272e0ff62387519d04f73ab88f00",
+    "workspace/stage20-live-20261022/runtime/agent/context.py": "36e90a9d217215b0f5ecafb5c8cb1ef4a4af66ab0f7139a4df6f2355b56b02e3",
+    "workspace/stage20-live-20261022/runtime/agent/llm.py": "703907d24e06ad2c37537f35f73b820cc4b099f4b96017152f49f7c3e729e1c8",
+    "workspace/stage20-live-20261022/runtime/folder_assistant/answers.py": "63f892cefb862da2116c19d8948a30d2d4d8f98410a9f7614047ca544ecd7fa5",
+    "workspace/stage20-live-20261022/runtime/folder_assistant/contracts.py": "44b2cc79de28b7237e62631e884f36f7536ccf753c609a28b60ddcfc74e3658d",
+    "workspace/stage20-live-20261022/runtime/folder_assistant/exports.py": "aea16dd74ec3169781b242c195b908d3d14e9dedd769f0856560aefbb40e7831",
+    "workspace/stage20-live-20261022/runtime/folder_assistant/index.py": "494c2b7a22299575a758286569437a932a3bd0c5d070f075569e3fdcee733b32",
+    "workspace/stage20-live-20261022/runtime/folder_assistant/jobs.py": "cbba0a3ce6f19a320ff6be4f81a18299512bd63149083c920431568b27f9556b",
+    "workspace/stage20-live-20261022/runtime/folder_assistant/parse_worker.py": "e1603c813ea3ed124e4f744af7db7fabb13343c09ab570a651722338cbf49387",
+    "workspace/stage20-live-20261022/runtime/folder_assistant/parsing.py": "474dd43160b91025576f4bbd802f2fe3a1122818ce6a8536ba194564722a0acf",
+    "workspace/stage20-live-20261022/runtime/folder_assistant/store.py": "05b64a41ab1f56fac02d6e804e6f8e44814354fd18a33de7a1d9437eca520490",
+    "workspace/stage20-live-20261022/runtime/folder_assistant/__init__.py": "36656300506ebee15611b11a8eec4d2ba51af2278e92d74a5226fa32a1dd6277",
+    "workspace/stage20-live-20261022/runtime/folder_assistant/__main__.py": "06a2e6220e729537fd6126dca60a03c1322581225ae8d8138df54b8784227c9a",
+    "workspace/stage20-live-20261022/runtime/knowledge/documents.py": "4c2372f461f357cce017e9704392571c1d1bd1cf7e8f601867e6aa5eeb9305e2",
+    "workspace/stage20-live-20261022/runtime/knowledge/embedding.py": "7cfc277bf79b51205bff5c1447bb7165d73189a1773bfb7e013696349bdd2c43",
+    "workspace/stage20-live-20261022/runtime/knowledge/large_probe.py": "497c734fde900ff464eea06b736979fc52ccaa964bba28f21ebd3a1464c0c630",
+    "workspace/stage20-live-20261022/runtime/knowledge/locking.py": "c2f87541b323e39f8d080067aab7c15f7870f9a50b522ca9bcb596a4b89002ee",
+    "workspace/stage20-live-20261022/runtime/knowledge/long_probe.py": "824878c533475b0d48cca92f538fe00228108ede3274cf4bd43996ada91bb403",
+    "workspace/stage20-live-20261022/runtime/knowledge/probe.py": "564fc1190358d125bdd7d1c7d0fbe2bc1a998258e1dbe4f0b268585552e5666a",
+    "workspace/stage20-live-20261022/runtime/knowledge/recall_probe.py": "fb5657819c94b93083d3a11e6e546342345f3d35ac14fe70c662449f40143ca9",
+    "workspace/stage20-live-20261022/runtime/knowledge/report_probe.py": "486c955ce7368a5beb181b9def74546fc3b3ad9188c013105d643570102ac7df",
+    "workspace/stage20-live-20261022/runtime/knowledge/reranking.py": "8118a7613b87909571050ad1b6d6d3bee2a9beb8aa68b0dbc4ab60570cf384ec",
+    "workspace/stage20-live-20261022/runtime/knowledge/rerank_probe.py": "4c49f1e3a7f0e8dcd50edb647ba9beb521398ea05c01da538b25f1c99b9b75bc",
+    "workspace/stage20-live-20261022/runtime/knowledge/store.py": "ea8c2c021bc2d1ad41bc2254aa8b4f80023d1daa421fb5cb49caa09f18db58ac",
+    "workspace/stage20-live-20261022/runtime/knowledge/vectors.py": "520aff951c342401e1f1c4fcf5a532bd8f3ae859f6c01eb920414f8d2fdafd1b",
+    "workspace/stage20-live-20261022/runtime/knowledge/__init__.py": "5fcbc38c72e9f0e4c0938373622ff86daadbe7389238d3003d9a73d3acfb1533",
+    "workspace/stage20-live-20261022/runtime/knowledge/__main__.py": "fc231000c92128f2dacd50c8e4a2131c197130af52b5c13500673af31e4dec43",
+    "workspace/stage20-live-20261022/runtime/scripts/folder_quality_check.py": "e78a0743e576ce6bbd33e5a1d193f0dd6335f2ea9328cdab77c8c584a5def86b",
+    "workspace/stage20-live-20261022/state/.jobs-start.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-live-20261022/state/076e6e9f51654a0889dbd64a7e7494ad.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-live-20261022/state/1a86c8e216ae4a658275d659416ba872.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-live-20261022/state/462deff9e0d34793b4887614d0f67ddb.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-live-20261022/state/7a75f3a03aa34def97c1494688be6094.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-live-20261022/state/825728f7d6a34d6abb44c1fb79add648.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-live-20261022/state/c41b5431fd1c488bb1e4640691fc3b1c.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-live-20261022/state/catalog.sqlite3": "3882d5b768960738fc8d33f80e44327e06a0195b4b44c0ec6b7bf39ebeabb0ee",
+    "workspace/stage20-live-20261022/state/ed01c56ed4f74aa4bc5fd06475ebf430.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-live-20261022/state/f8ed1bfebf364222aca9134c66887eff.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-live-20261022/state/indexes/b9b5233b35084a0f9f91e4cb09da148a/.build.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-live-20261022/state/indexes/b9b5233b35084a0f9f91e4cb09da148a/.sync.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-live-20261022/state/indexes/b9b5233b35084a0f9f91e4cb09da148a/.vectors.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-live-20261022/state/indexes/b9b5233b35084a0f9f91e4cb09da148a/knowledge.sqlite3": "be48178f83091d5bd640b470b93bf740d86b04a581577708db8a02fde86ec40d",
+    "workspace/stage20-live-20261022/state/indexes/b9b5233b35084a0f9f91e4cb09da148a/vectors/79af8360d8f84ea886fbff7e64f42343.db/LOCK": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workspace/stage20-live-20261022/state/indexes/b9b5233b35084a0f9f91e4cb09da148a/vectors/79af8360d8f84ea886fbff7e64f42343.db/collections/chunks/manifest.json": "3aeaaf96b97e244750eef2f64518766a89abfe55122e5d72cfab0b1046abc0f4",
+    "workspace/stage20-live-20261022/state/indexes/b9b5233b35084a0f9f91e4cb09da148a/vectors/79af8360d8f84ea886fbff7e64f42343.db/collections/chunks/manifest.json.prev": "439bced4db104c9bc364e111da83cd0486ba478d9e84a87f4a8b6156ece9130c",
+    "workspace/stage20-live-20261022/state/indexes/b9b5233b35084a0f9f91e4cb09da148a/vectors/79af8360d8f84ea886fbff7e64f42343.db/collections/chunks/schema.json": "091a94653bffaee066311202f1db0c0e9850fe8749840a67e6189920344759ce",
+    "workspace/stage20-live-20261022/state/indexes/b9b5233b35084a0f9f91e4cb09da148a/vectors/79af8360d8f84ea886fbff7e64f42343.db/collections/chunks/partitions/_default/data/data_000001_000015.parquet": "e77687485866d7c9f4e608f56c6da061f6f9716aa742fbf44851cbf70a1b3710",
+    "workspace/stage20-live-20261022/state/indexes/b9b5233b35084a0f9f91e4cb09da148a/vectors/79af8360d8f84ea886fbff7e64f42343.db/collections/chunks/partitions/_default/indexes/data_000001_000015.vector.autoindex.idx": "39fc345b717766bb153eaac371e16363c4b66cdf77d5303e8c80d762a800d8dc",
+    "workspace/stage20-live-20261022/state/outputs/076e6e9f51654a0889dbd64a7e7494ad/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-live-20261022/state/outputs/076e6e9f51654a0889dbd64a7e7494ad/comparison.csv": "cd8b7f8ff777da7e062759c5b5c6085182168a46ba424a560cb0fedb786859cb",
+    "workspace/stage20-live-20261022/state/outputs/076e6e9f51654a0889dbd64a7e7494ad/comparison.xlsx": "5e008cd6e4b18c57720760ac391edbb1b00643cb3dcbbace42e5993e34dcb5a8",
+    "workspace/stage20-live-20261022/state/outputs/076e6e9f51654a0889dbd64a7e7494ad/export.json": "4ff8ee82c2db3159125169b96efb4103bb0af4133611ae5559891f27edf2a068",
+    "workspace/stage20-live-20261022/state/outputs/076e6e9f51654a0889dbd64a7e7494ad/record.json": "315e31d0237a13037f729a50ba2c8dffc2ba9b3c2e44f3bf822d55d81e2f35a7",
+    "workspace/stage20-live-20261022/state/outputs/076e6e9f51654a0889dbd64a7e7494ad/sources.csv": "7c75217db64dcb8583458ef583c7b02f1e936bfd7a8d81545df4f9cb9c62b23d",
+    "workspace/stage20-live-20261022/state/outputs/076e6e9f51654a0889dbd64a7e7494ad/sources.json": "8eb3ddf3b82b164e90f7481a1ab037f82d9f92fe1702bb1e022143a2abc16b83",
+    "workspace/stage20-live-20261022/state/outputs/076e6e9f51654a0889dbd64a7e7494ad/summary.md": "199a194b338bf8ba744911b7ee41d185be3c67b333e86a9ddd14537d9bee346d",
+    "workspace/stage20-live-20261022/state/outputs/1a86c8e216ae4a658275d659416ba872/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-live-20261022/state/outputs/1a86c8e216ae4a658275d659416ba872/comparison.csv": "e725769e07f7bdb20c2ca66eea7ed53bf0a25e16c3999620628a5cac7652f752",
+    "workspace/stage20-live-20261022/state/outputs/1a86c8e216ae4a658275d659416ba872/comparison.xlsx": "d76fe5fb1d69ca8c1d59ceecc1f74c2c5d564279af0a12256986cc7d2c96f051",
+    "workspace/stage20-live-20261022/state/outputs/1a86c8e216ae4a658275d659416ba872/export.json": "20392b7f6c8d8df7d87ad7b0dd0588691f03469a22479bf91b8ca683a595d854",
+    "workspace/stage20-live-20261022/state/outputs/1a86c8e216ae4a658275d659416ba872/record.json": "cae25cc217471a4abd6551a3b14a4b9ea96705de2f91218f2622287bfe514d65",
+    "workspace/stage20-live-20261022/state/outputs/1a86c8e216ae4a658275d659416ba872/sources.csv": "767129c38aa3ac9fd1734093965f5df78e690e4e3870b6ef8e8638646dd45c78",
+    "workspace/stage20-live-20261022/state/outputs/1a86c8e216ae4a658275d659416ba872/sources.json": "74712b09068999306194fec1965b14e1f27128377e65f3b815f868a5f060e3b9",
+    "workspace/stage20-live-20261022/state/outputs/1a86c8e216ae4a658275d659416ba872/summary.md": "2ec4355af6381592c87f91d17e8cea19e32dafae7b63109045834feb0985cdeb",
+    "workspace/stage20-live-20261022/state/outputs/462deff9e0d34793b4887614d0f67ddb/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-live-20261022/state/outputs/462deff9e0d34793b4887614d0f67ddb/comparison.csv": "cd8b7f8ff777da7e062759c5b5c6085182168a46ba424a560cb0fedb786859cb",
+    "workspace/stage20-live-20261022/state/outputs/462deff9e0d34793b4887614d0f67ddb/comparison.xlsx": "ae01c3fc1dfa89fe1e4f75bd186f6b2622621ba02e0e79a0d31c3b091ec0576a",
+    "workspace/stage20-live-20261022/state/outputs/462deff9e0d34793b4887614d0f67ddb/export.json": "25ffb0f2b3862c99f5a1759767b3176b4005fb910496960143d1a29e95f1847a",
+    "workspace/stage20-live-20261022/state/outputs/462deff9e0d34793b4887614d0f67ddb/record.json": "bef9f856e73abf87cdb57674be282f8c00f5bac3755b4f75e218d7703c01c1b1",
+    "workspace/stage20-live-20261022/state/outputs/462deff9e0d34793b4887614d0f67ddb/sources.csv": "d90a43932b04a097c498eab8f418f228acb0f168fd0c614d14f3a4e1db1a3f0d",
+    "workspace/stage20-live-20261022/state/outputs/462deff9e0d34793b4887614d0f67ddb/sources.json": "f23361b01adfbf53e820aa321fba84b43b2dfd31c91bb623805f1d096f9a3436",
+    "workspace/stage20-live-20261022/state/outputs/462deff9e0d34793b4887614d0f67ddb/summary.md": "b220e840411828cf44ebb8e5046d18cd95be92faab40a808322a378caff3973a",
+    "workspace/stage20-live-20261022/state/outputs/7a75f3a03aa34def97c1494688be6094/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-live-20261022/state/outputs/7a75f3a03aa34def97c1494688be6094/comparison.csv": "e725769e07f7bdb20c2ca66eea7ed53bf0a25e16c3999620628a5cac7652f752",
+    "workspace/stage20-live-20261022/state/outputs/7a75f3a03aa34def97c1494688be6094/comparison.xlsx": "33ffe9fe8b7fa0b085dd60cc8f1ea25afb5cd17761f96b7b13bc731b82431d3b",
+    "workspace/stage20-live-20261022/state/outputs/7a75f3a03aa34def97c1494688be6094/export.json": "8e452ec3b6410dd6ac5b91b7345247c31e7205556d4eada9bc85953ad225b206",
+    "workspace/stage20-live-20261022/state/outputs/7a75f3a03aa34def97c1494688be6094/record.json": "22b299c2fbe34c4b31d54c907d52342975b6b1efa9d638d1445eadea54764580",
+    "workspace/stage20-live-20261022/state/outputs/7a75f3a03aa34def97c1494688be6094/sources.csv": "3e24da128fa069065a82c5b08b241a82a199c7aa16d01e3923e5498738a00bd2",
+    "workspace/stage20-live-20261022/state/outputs/7a75f3a03aa34def97c1494688be6094/sources.json": "80214f8edb740f337993d1074d7ebc8b31af0d7b8b819e03f626a6cf1dac8496",
+    "workspace/stage20-live-20261022/state/outputs/7a75f3a03aa34def97c1494688be6094/summary.md": "d9b35181c46ed632ae75965187b92d9a104183f351c2b6b63cd5f6bbe27d7a67",
+    "workspace/stage20-live-20261022/state/outputs/825728f7d6a34d6abb44c1fb79add648/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-live-20261022/state/outputs/825728f7d6a34d6abb44c1fb79add648/comparison.csv": "e725769e07f7bdb20c2ca66eea7ed53bf0a25e16c3999620628a5cac7652f752",
+    "workspace/stage20-live-20261022/state/outputs/825728f7d6a34d6abb44c1fb79add648/comparison.xlsx": "08278df21900707b8d487c5cf92b2dbc2900cf37a95d932f719b74e43f9c8c28",
+    "workspace/stage20-live-20261022/state/outputs/825728f7d6a34d6abb44c1fb79add648/export.json": "1a24343f5a6dd8febef4a4b27c20064890dff2467f5bc2f765288b26c7f9da96",
+    "workspace/stage20-live-20261022/state/outputs/825728f7d6a34d6abb44c1fb79add648/record.json": "fb71542e967a6cf63af26b03dbb929779300f2410549cd942b6a3a64a5907f53",
+    "workspace/stage20-live-20261022/state/outputs/825728f7d6a34d6abb44c1fb79add648/sources.csv": "249352c0bf6a01ec7eb75650ecf414be525d4cc79802c7b8b19c7f756ea6788d",
+    "workspace/stage20-live-20261022/state/outputs/825728f7d6a34d6abb44c1fb79add648/sources.json": "9bd99ef08a185f59be5db1144f4d82d7647b2044e699246fa59c8298bb3d4f23",
+    "workspace/stage20-live-20261022/state/outputs/825728f7d6a34d6abb44c1fb79add648/summary.md": "13468174486e5b74edbc7f3abaf85b1771fa46d585342b502ac514a511b58eb9",
+    "workspace/stage20-live-20261022/state/outputs/c41b5431fd1c488bb1e4640691fc3b1c/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-live-20261022/state/outputs/c41b5431fd1c488bb1e4640691fc3b1c/comparison.csv": "cd8b7f8ff777da7e062759c5b5c6085182168a46ba424a560cb0fedb786859cb",
+    "workspace/stage20-live-20261022/state/outputs/c41b5431fd1c488bb1e4640691fc3b1c/comparison.xlsx": "3f1a9c876c94d994130516f0e6efafe36aeef37488b996922c0d6cb1aa15fa9f",
+    "workspace/stage20-live-20261022/state/outputs/c41b5431fd1c488bb1e4640691fc3b1c/export.json": "7ffb22774eb50e354bc4a45c7c7eefd292629819b832618a76d111337fa55efa",
+    "workspace/stage20-live-20261022/state/outputs/c41b5431fd1c488bb1e4640691fc3b1c/record.json": "b60993b235b69301a42d682eaa893a8e05b4e8fceb737b276d8e1ebb60ec07be",
+    "workspace/stage20-live-20261022/state/outputs/c41b5431fd1c488bb1e4640691fc3b1c/sources.csv": "74bca1bdf9a72c99d7e5856e9dde63161525085fe223d0e5ead90afa82fc8acc",
+    "workspace/stage20-live-20261022/state/outputs/c41b5431fd1c488bb1e4640691fc3b1c/sources.json": "39ddce51447fce7855bfe037f4366427f77b72bfb08a58a81e04a67ff7fe7a22",
+    "workspace/stage20-live-20261022/state/outputs/c41b5431fd1c488bb1e4640691fc3b1c/summary.md": "a3a3c4189e6d671d9e25308ff6f4e2c82dbcb15f2a38b2bbd26f567644721e89",
+    "workspace/stage20-live-20261022/state/outputs/ed01c56ed4f74aa4bc5fd06475ebf430/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-live-20261022/state/outputs/ed01c56ed4f74aa4bc5fd06475ebf430/comparison.csv": "e725769e07f7bdb20c2ca66eea7ed53bf0a25e16c3999620628a5cac7652f752",
+    "workspace/stage20-live-20261022/state/outputs/ed01c56ed4f74aa4bc5fd06475ebf430/comparison.xlsx": "784b01db8db26fdaf199059da7ab1ab6d277998e6e3a17942608b21522250595",
+    "workspace/stage20-live-20261022/state/outputs/ed01c56ed4f74aa4bc5fd06475ebf430/export.json": "cf38ff1ad3769ae80388c8df2f9b83f430ffe24cf144cb763ea18edfdf365ef6",
+    "workspace/stage20-live-20261022/state/outputs/ed01c56ed4f74aa4bc5fd06475ebf430/record.json": "6eee8e973f66e4f02c23a75474c3a86ed82f618953cc4bdbf368dbe34499050e",
+    "workspace/stage20-live-20261022/state/outputs/ed01c56ed4f74aa4bc5fd06475ebf430/sources.csv": "89f09544687a7226dfa2a61b4c68b755df247dcf842070dc71612d49ffc81e3c",
+    "workspace/stage20-live-20261022/state/outputs/ed01c56ed4f74aa4bc5fd06475ebf430/sources.json": "cfbf810e10ff52dc2378ecb6cdb0cba5c4a4065684cb8bb03fb9ea3abeac49f5",
+    "workspace/stage20-live-20261022/state/outputs/ed01c56ed4f74aa4bc5fd06475ebf430/summary.md": "e2e5986bfc55c6191914bef251cdb15ba23d48d6b4f1841eed4f36d4507a89d9",
+    "workspace/stage20-live-20261022/state/outputs/f8ed1bfebf364222aca9134c66887eff/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-live-20261022/state/outputs/f8ed1bfebf364222aca9134c66887eff/comparison.csv": "e725769e07f7bdb20c2ca66eea7ed53bf0a25e16c3999620628a5cac7652f752",
+    "workspace/stage20-live-20261022/state/outputs/f8ed1bfebf364222aca9134c66887eff/comparison.xlsx": "95fd5be054c7b144c100c590626f0b879d96feba984f30b5074e4ce7f04c21ac",
+    "workspace/stage20-live-20261022/state/outputs/f8ed1bfebf364222aca9134c66887eff/export.json": "ddac0181fb8ac6631ed2a1ccabff6ef8b2cc23dc4fbc6d44052e431aaa852be6",
+    "workspace/stage20-live-20261022/state/outputs/f8ed1bfebf364222aca9134c66887eff/record.json": "ba2781ea5801b7cb91dbb7b42831a86cc98d195273ea5826393264acb41e1006",
+    "workspace/stage20-live-20261022/state/outputs/f8ed1bfebf364222aca9134c66887eff/sources.csv": "d266aa2bde1f1e57576cd828a3021aa30b1d1fd41fee4ba3880e8cea3013b099",
+    "workspace/stage20-live-20261022/state/outputs/f8ed1bfebf364222aca9134c66887eff/sources.json": "46c4f5167a3f0ce26c20974a5dc1991f18a4d425d41f63001680167b8723d424",
+    "workspace/stage20-live-20261022/state/outputs/f8ed1bfebf364222aca9134c66887eff/summary.md": "da0074ec4434848a2d022864f04900929835c22d554fb382b1f6bbe78a917104",
+    "workspace/stage20-live-20261022/state/parsed/05a121b1ade9cc8402b93be66e36c8309790a4d1167b5d098407920b07e4ea21-1.txt.json": "b5ede85922d1f74a8d64e1dad8521eaf40498910323561b5f7e8b14cf7d7280c",
+    "workspace/stage20-live-20261022/state/parsed/0ab1e82b139c0ce0f44eb8dd2293f32a4e29e25f1154ce8988fc43b0c65a7409-1.txt.json": "bb972e8532f5f035a16386fa7ccc13e698f0a1e5c82ced026b846fcdaf74139f",
+    "workspace/stage20-live-20261022/state/parsed/4694353fd9a7d3f9a38735124f39985cd3cfd754865eef1d7a049e99311a3b7d-1.md.json": "f61d82dffc51e1b1a2b27288b6ffa28fe9339a326df34b43ffed238658a64756",
+    "workspace/stage20-live-20261022/state/parsed/8f0af4a4b973ced1616f71acb68ce0be677055345cc2356799ec93fe11645f24-1.xlsx.json": "44c2e300561971c96790c59fa8cca7201296bd50cc41508287e796bc07671e04",
+    "workspace/stage20-live-20261022/state/parsed/b0ced7697a0ef71488b572cf677e7edbcf7c4959425f179a49366dae890d33b0-1.txt.json": "bb2cea239406acb3161d7cca11c1aa54331d52c03303757f783cadca05778340",
+    "workspace/stage20-live-20261022/state/parsed/b511b89c60313219eb3703142633124bb2564818e795311a1580366ccc0a5208-1.txt.json": "8a98fffd07c5921e7e8435d0fffa4730484725533cd7da18d46c11a3c6dceeac",
+    "workspace/stage20-live-20261022/state/parsed/bbd9779518c168e1b50d067556dd7534236307c858eb491e211422bebd2032e2-1.csv.json": "83e7925794c55f5aabfa381a66b51241a3a483984c309ab1a04dbc771106168c",
+    "workspace/stage20-live-20261022/state/parsed/df791e66d6316b3c15e473ead73d5233dae5bd5588ae00d5c3c630ee20be6b1a-1.txt.json": "90eb69a371a5ba9f16d5d9343563b37f5b16f03996a02ad6a5dcf8be5e41bfd6",
+    "workspace/stage20-live-20261022/state/parsed/e5511f3128a8b58b637f6e6e857e5fdfb48fb113c89291e251d64bffcae26071-1.txt.json": "897bc021fe04ba88054c278011d9606a90b4076f9db466d160a1681a9613392e",
+    "workspace/stage20-live-20261022/state/parsed/f258a6d1f90063dad19604cadd21584d6687f5ae6ef1ef27d54fb410efa531ce-1.txt.json": "e944cd9e4f535ca3e4c16fa5d70bb60b6b8aa3881a6604afc40ab0aec9aedf4e",
+    "workspace/stage20-schema-live-20261022/attempt.json": "a4062a5378a6430f654e81d6ed5e3db6d0e55a4941846f63faecc8ca543f8252",
+    "workspace/stage20-schema-live-20261022/documents/归档.txt": "18f1a6d6731e9d292ec859beeaad75f452d78f8dc077844d08cb4c9e5d712efa",
+    "workspace/stage20-schema-live-20261022/documents/清洁乙.txt": "bf7d7b740920125d4a5a723110364795a12528ce012009cd2244a5b0db273387",
+    "workspace/stage20-schema-live-20261022/documents/清洁甲.txt": "1455eceae9527eb4e35a50fe4232954a54d12f1ce1acd86b0859cecdf7ed85b3",
+    "workspace/stage20-schema-live-20261022/documents/灯光乙.txt": "0b9a2a9fb1d38b2a9cc1e44c9c182fd1ac642d39b37825030ed5716f4031dbb2",
+    "workspace/stage20-schema-live-20261022/documents/灯光甲.txt": "acaa41760980da4bb86011e8a86940b296b038a7fc79443adf48c7bc11a79b8e",
+    "workspace/stage20-schema-live-20261022/documents/装箱.csv": "bd43052aef5982d3f71ad6244cad5fba67a7fb0cbd6380d31ad31cf822afe2e1",
+    "workspace/stage20-schema-live-20261022/documents/议程.txt": "cd9ef9bb8b500503c0159ebdaf56b3dffb6d83b3a75d92876f235a025412ceda",
+    "workspace/stage20-schema-live-20261022/documents/采集.xlsx": "6f7e6a677b2949f40ddada9ab9842813e8a4b95ff51d8ada9a61b3b28682ac0b",
+    "workspace/stage20-schema-live-20261022/runtime/agent/config.py": "5a398f74572d97545119f4abf55491302611272e0ff62387519d04f73ab88f00",
+    "workspace/stage20-schema-live-20261022/runtime/agent/context.py": "36e90a9d217215b0f5ecafb5c8cb1ef4a4af66ab0f7139a4df6f2355b56b02e3",
+    "workspace/stage20-schema-live-20261022/runtime/agent/llm.py": "703907d24e06ad2c37537f35f73b820cc4b099f4b96017152f49f7c3e729e1c8",
+    "workspace/stage20-schema-live-20261022/runtime/folder_assistant/answers.py": "b785e6ce23fb3efdcb9c0408652a68a87d6ea8740ba0a99be80c61e48bc81414",
+    "workspace/stage20-schema-live-20261022/runtime/folder_assistant/contracts.py": "cf458c527399377fa8faa5de38ce0d9cc45828116c9079621fe2fcecf9ad03de",
+    "workspace/stage20-schema-live-20261022/runtime/folder_assistant/exports.py": "aea16dd74ec3169781b242c195b908d3d14e9dedd769f0856560aefbb40e7831",
+    "workspace/stage20-schema-live-20261022/runtime/folder_assistant/index.py": "494c2b7a22299575a758286569437a932a3bd0c5d070f075569e3fdcee733b32",
+    "workspace/stage20-schema-live-20261022/runtime/folder_assistant/jobs.py": "cbba0a3ce6f19a320ff6be4f81a18299512bd63149083c920431568b27f9556b",
+    "workspace/stage20-schema-live-20261022/runtime/folder_assistant/parse_worker.py": "e1603c813ea3ed124e4f744af7db7fabb13343c09ab570a651722338cbf49387",
+    "workspace/stage20-schema-live-20261022/runtime/folder_assistant/parsing.py": "474dd43160b91025576f4bbd802f2fe3a1122818ce6a8536ba194564722a0acf",
+    "workspace/stage20-schema-live-20261022/runtime/folder_assistant/store.py": "05b64a41ab1f56fac02d6e804e6f8e44814354fd18a33de7a1d9437eca520490",
+    "workspace/stage20-schema-live-20261022/runtime/folder_assistant/__init__.py": "36656300506ebee15611b11a8eec4d2ba51af2278e92d74a5226fa32a1dd6277",
+    "workspace/stage20-schema-live-20261022/runtime/folder_assistant/__main__.py": "06a2e6220e729537fd6126dca60a03c1322581225ae8d8138df54b8784227c9a",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/documents.py": "4c2372f461f357cce017e9704392571c1d1bd1cf7e8f601867e6aa5eeb9305e2",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/embedding.py": "7cfc277bf79b51205bff5c1447bb7165d73189a1773bfb7e013696349bdd2c43",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/large_probe.py": "497c734fde900ff464eea06b736979fc52ccaa964bba28f21ebd3a1464c0c630",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/locking.py": "c2f87541b323e39f8d080067aab7c15f7870f9a50b522ca9bcb596a4b89002ee",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/long_probe.py": "824878c533475b0d48cca92f538fe00228108ede3274cf4bd43996ada91bb403",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/probe.py": "564fc1190358d125bdd7d1c7d0fbe2bc1a998258e1dbe4f0b268585552e5666a",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/recall_probe.py": "fb5657819c94b93083d3a11e6e546342345f3d35ac14fe70c662449f40143ca9",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/report_probe.py": "486c955ce7368a5beb181b9def74546fc3b3ad9188c013105d643570102ac7df",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/reranking.py": "8118a7613b87909571050ad1b6d6d3bee2a9beb8aa68b0dbc4ab60570cf384ec",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/rerank_probe.py": "4c49f1e3a7f0e8dcd50edb647ba9beb521398ea05c01da538b25f1c99b9b75bc",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/store.py": "ea8c2c021bc2d1ad41bc2254aa8b4f80023d1daa421fb5cb49caa09f18db58ac",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/vectors.py": "520aff951c342401e1f1c4fcf5a532bd8f3ae859f6c01eb920414f8d2fdafd1b",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/__init__.py": "5fcbc38c72e9f0e4c0938373622ff86daadbe7389238d3003d9a73d3acfb1533",
+    "workspace/stage20-schema-live-20261022/runtime/knowledge/__main__.py": "fc231000c92128f2dacd50c8e4a2131c197130af52b5c13500673af31e4dec43",
+    "workspace/stage20-schema-live-20261022/runtime/scripts/folder_quality_check.py": "e78a0743e576ce6bbd33e5a1d193f0dd6335f2ea9328cdab77c8c584a5def86b",
+    "workspace/stage20-schema-live-20261022/state/.jobs-start.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/0596d96d2b7e488eaf2363af70c8bf9f.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/2c4ac98053464db5808340bd60dd1d08.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/4a51533ac4ef4242ab413ccf184611e1.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/ad327042d2934ce1ad8798dbc1def071.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/catalog.sqlite3": "fe867dc8c2e8d214c2b03bdddb14eca1dae7018fabbbbb44ae3ef0ca7ac3619b",
+    "workspace/stage20-schema-live-20261022/state/cc19566c089f4bf29c78677cd4481caf.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/eca5ae0dde544f7d95e0ec5467734a31.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/indexes/f0ea0736ba014db29d893328c17ce832/.build.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/indexes/f0ea0736ba014db29d893328c17ce832/.sync.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/indexes/f0ea0736ba014db29d893328c17ce832/.vectors.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/indexes/f0ea0736ba014db29d893328c17ce832/knowledge.sqlite3": "456c06509d85ef27f317bbce3c1d60f6af2453e3393a5d20f595333ce1939688",
+    "workspace/stage20-schema-live-20261022/state/indexes/f0ea0736ba014db29d893328c17ce832/vectors/fc0ae3ef3fe340a1926824299c80bc48.db/LOCK": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workspace/stage20-schema-live-20261022/state/indexes/f0ea0736ba014db29d893328c17ce832/vectors/fc0ae3ef3fe340a1926824299c80bc48.db/collections/chunks/manifest.json": "30c40147e1b7e382c40477e5719ab129ff2d81d87679a0afb59230b1f7abbd9a",
+    "workspace/stage20-schema-live-20261022/state/indexes/f0ea0736ba014db29d893328c17ce832/vectors/fc0ae3ef3fe340a1926824299c80bc48.db/collections/chunks/manifest.json.prev": "439bced4db104c9bc364e111da83cd0486ba478d9e84a87f4a8b6156ece9130c",
+    "workspace/stage20-schema-live-20261022/state/indexes/f0ea0736ba014db29d893328c17ce832/vectors/fc0ae3ef3fe340a1926824299c80bc48.db/collections/chunks/schema.json": "091a94653bffaee066311202f1db0c0e9850fe8749840a67e6189920344759ce",
+    "workspace/stage20-schema-live-20261022/state/indexes/f0ea0736ba014db29d893328c17ce832/vectors/fc0ae3ef3fe340a1926824299c80bc48.db/collections/chunks/partitions/_default/data/data_000001_000012.parquet": "382fac939afe2fc3e8307b0414857d794d06552df5b6ba86c37a923389f6bd51",
+    "workspace/stage20-schema-live-20261022/state/indexes/f0ea0736ba014db29d893328c17ce832/vectors/fc0ae3ef3fe340a1926824299c80bc48.db/collections/chunks/partitions/_default/indexes/data_000001_000012.vector.autoindex.idx": "7782f69966131a93a8972b685665c2907a5cca5b5f28519d2397b8c55eab9e22",
+    "workspace/stage20-schema-live-20261022/state/outputs/0596d96d2b7e488eaf2363af70c8bf9f/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/outputs/0596d96d2b7e488eaf2363af70c8bf9f/comparison.csv": "e725769e07f7bdb20c2ca66eea7ed53bf0a25e16c3999620628a5cac7652f752",
+    "workspace/stage20-schema-live-20261022/state/outputs/0596d96d2b7e488eaf2363af70c8bf9f/comparison.xlsx": "1a961def16cdd17bf1b12950825a6063f65810aae286d65f15192698190ba94f",
+    "workspace/stage20-schema-live-20261022/state/outputs/0596d96d2b7e488eaf2363af70c8bf9f/export.json": "b0e2a3099385b4ebf0ded6bec861f47b0bcfb5ca2917aa411f3e29e54f068ad0",
+    "workspace/stage20-schema-live-20261022/state/outputs/0596d96d2b7e488eaf2363af70c8bf9f/record.json": "ebcc2d61649964f54fe0914b4d1d282020e47461e32f54c9d57a985ce536a703",
+    "workspace/stage20-schema-live-20261022/state/outputs/0596d96d2b7e488eaf2363af70c8bf9f/sources.csv": "60482813fbc82c767a4cb890f70ac1435e1081108f35e2438d2c8d10cf3e5520",
+    "workspace/stage20-schema-live-20261022/state/outputs/0596d96d2b7e488eaf2363af70c8bf9f/sources.json": "f6d158a0f05fad969939a737f6580c64ae780257ceda11e56f71b51ff7b427e0",
+    "workspace/stage20-schema-live-20261022/state/outputs/0596d96d2b7e488eaf2363af70c8bf9f/summary.md": "8c9c5c9fbe9868ca88b897cfeb37b74030d9c657a6097c02489a900200cd16df",
+    "workspace/stage20-schema-live-20261022/state/outputs/2c4ac98053464db5808340bd60dd1d08/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/outputs/2c4ac98053464db5808340bd60dd1d08/comparison.csv": "cd8b7f8ff777da7e062759c5b5c6085182168a46ba424a560cb0fedb786859cb",
+    "workspace/stage20-schema-live-20261022/state/outputs/2c4ac98053464db5808340bd60dd1d08/comparison.xlsx": "8a2a40855b13b0fa025884c922755043a457d296866b8361d0cd2fe615ca6085",
+    "workspace/stage20-schema-live-20261022/state/outputs/2c4ac98053464db5808340bd60dd1d08/export.json": "212c7a0deaa4d3f6586e255e78042e19f946d293b7adc078707a098471733a71",
+    "workspace/stage20-schema-live-20261022/state/outputs/2c4ac98053464db5808340bd60dd1d08/record.json": "87b1d28688d6be4da187b50cc0222d6a0ff1e86aaa1b58e5a61b384d9d047524",
+    "workspace/stage20-schema-live-20261022/state/outputs/2c4ac98053464db5808340bd60dd1d08/sources.csv": "5c906a6509ab3a694dafe107393953d23e84641e636ab8178f9f8fda35712e63",
+    "workspace/stage20-schema-live-20261022/state/outputs/2c4ac98053464db5808340bd60dd1d08/sources.json": "fca43d561f9ffe02fceca0ebfb3291803e687bdde3d1900fe2adeea814a664fa",
+    "workspace/stage20-schema-live-20261022/state/outputs/2c4ac98053464db5808340bd60dd1d08/summary.md": "3751df1f7131360a3bbffcb58df585fbf30d4c22e44794f93864ae1b3c9ca92c",
+    "workspace/stage20-schema-live-20261022/state/outputs/4a51533ac4ef4242ab413ccf184611e1/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/outputs/4a51533ac4ef4242ab413ccf184611e1/comparison.csv": "595aa087f053cec5df4f932c254d0b5daf5e3b38d8f65d3f076a6659d3db1e7f",
+    "workspace/stage20-schema-live-20261022/state/outputs/4a51533ac4ef4242ab413ccf184611e1/comparison.xlsx": "008b6586233665bc0257c30a85e61ddaca1f620cc580f582fafc397a2566ee36",
+    "workspace/stage20-schema-live-20261022/state/outputs/4a51533ac4ef4242ab413ccf184611e1/export.json": "146576182ab15024edaf9af02e9071b1c392019c396234e28495c20d481ac7b5",
+    "workspace/stage20-schema-live-20261022/state/outputs/4a51533ac4ef4242ab413ccf184611e1/record.json": "eb494bce425d6e2500cd5a01979a69b1b2e20f95e7401fa28cf3aa7421a22e9a",
+    "workspace/stage20-schema-live-20261022/state/outputs/4a51533ac4ef4242ab413ccf184611e1/sources.csv": "24a29a12c355888692f33ee198bbd1ce7e8f99fac64b7775e80bb2e76d9c4154",
+    "workspace/stage20-schema-live-20261022/state/outputs/4a51533ac4ef4242ab413ccf184611e1/sources.json": "fd0f85ee835a7e359271831025a79acb7278d2930d065b6c5ac1e563c63a2cac",
+    "workspace/stage20-schema-live-20261022/state/outputs/4a51533ac4ef4242ab413ccf184611e1/summary.md": "3f2f51843e6941d707b28de2d1015b2fcadfec4ed5df71f9fc1f7c1206792ea2",
+    "workspace/stage20-schema-live-20261022/state/outputs/ad327042d2934ce1ad8798dbc1def071/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/outputs/ad327042d2934ce1ad8798dbc1def071/comparison.csv": "e725769e07f7bdb20c2ca66eea7ed53bf0a25e16c3999620628a5cac7652f752",
+    "workspace/stage20-schema-live-20261022/state/outputs/ad327042d2934ce1ad8798dbc1def071/comparison.xlsx": "55785d932fbb99acdaff07a6eb547ebb077599dfc0ff2be9b210f87e994b9671",
+    "workspace/stage20-schema-live-20261022/state/outputs/ad327042d2934ce1ad8798dbc1def071/export.json": "72d5dc90df70f34a7621436542e131928bbc2346a402bea01f71f30d11ef0e67",
+    "workspace/stage20-schema-live-20261022/state/outputs/ad327042d2934ce1ad8798dbc1def071/record.json": "b35a580a882f571f200fdb77c2090436d1847a1076120f76fe723fba6645db4b",
+    "workspace/stage20-schema-live-20261022/state/outputs/ad327042d2934ce1ad8798dbc1def071/sources.csv": "79413af36b3538edb38ce852415a980ae2e8eeb5917ac8bf17340ad24884e3aa",
+    "workspace/stage20-schema-live-20261022/state/outputs/ad327042d2934ce1ad8798dbc1def071/sources.json": "c7c5216f46c42f802f9fc305d30e6766bbea70c68f118162cad2df12c8d00aaf",
+    "workspace/stage20-schema-live-20261022/state/outputs/ad327042d2934ce1ad8798dbc1def071/summary.md": "818e60b233075ff96e2e2c04710f25cc1dfc4644321510e6e95afd743522ee06",
+    "workspace/stage20-schema-live-20261022/state/outputs/cc19566c089f4bf29c78677cd4481caf/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/outputs/cc19566c089f4bf29c78677cd4481caf/comparison.csv": "cd8b7f8ff777da7e062759c5b5c6085182168a46ba424a560cb0fedb786859cb",
+    "workspace/stage20-schema-live-20261022/state/outputs/cc19566c089f4bf29c78677cd4481caf/comparison.xlsx": "d308411ca31a4671537d3bd81a28465a90b1c1ba8d5dcdf66fb6046c1b074035",
+    "workspace/stage20-schema-live-20261022/state/outputs/cc19566c089f4bf29c78677cd4481caf/export.json": "37459c0aa673b38f17181ccca5fc44d12ad922196b08dbcf036b75eb12d23c32",
+    "workspace/stage20-schema-live-20261022/state/outputs/cc19566c089f4bf29c78677cd4481caf/record.json": "c4e19b159ae95efa06763ab5978fe1479d772f57335ce4353bf88567fbbd54a9",
+    "workspace/stage20-schema-live-20261022/state/outputs/cc19566c089f4bf29c78677cd4481caf/sources.csv": "2bfe5068da0c0631b9122e1c511924a6040b995c16bfa03a3743a68f0d7c92b4",
+    "workspace/stage20-schema-live-20261022/state/outputs/cc19566c089f4bf29c78677cd4481caf/sources.json": "b8f85bfadd4c9ba84a66fe3a9dda7778f43f5d3db9cd96eebb6c4008a8fc5f42",
+    "workspace/stage20-schema-live-20261022/state/outputs/cc19566c089f4bf29c78677cd4481caf/summary.md": "591f9f6e6e6c399750812f6af9058fe55669aeb15ab83726fcf57dda4878929d",
+    "workspace/stage20-schema-live-20261022/state/outputs/eca5ae0dde544f7d95e0ec5467734a31/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-schema-live-20261022/state/outputs/eca5ae0dde544f7d95e0ec5467734a31/comparison.csv": "24bc9003d1e058f7bdeb7e4ae18716bf6abef52212af06b15f1563c32bca5777",
+    "workspace/stage20-schema-live-20261022/state/outputs/eca5ae0dde544f7d95e0ec5467734a31/comparison.xlsx": "6a375a494bbd64445e293f755ee3744adbf3d6cedf90ac7b0604791f469218c2",
+    "workspace/stage20-schema-live-20261022/state/outputs/eca5ae0dde544f7d95e0ec5467734a31/export.json": "452373460c07ba1fa6cdfde5b313bc4b905afa5447cbc885f560d14a11c131bd",
+    "workspace/stage20-schema-live-20261022/state/outputs/eca5ae0dde544f7d95e0ec5467734a31/record.json": "3141abaf1e7afc2f637882951ef8e726d9fa096b42fc5cbec64af7e6f3d26fe8",
+    "workspace/stage20-schema-live-20261022/state/outputs/eca5ae0dde544f7d95e0ec5467734a31/sources.csv": "1b1124b4363b77e42fd49dc2645a26411c3cc3c9b261e44595fec63c0bde6cd8",
+    "workspace/stage20-schema-live-20261022/state/outputs/eca5ae0dde544f7d95e0ec5467734a31/sources.json": "bccafc094308c8728a9413f1bef43b4da1bba9f41c30f18cc1a9e65f2a1c430b",
+    "workspace/stage20-schema-live-20261022/state/outputs/eca5ae0dde544f7d95e0ec5467734a31/summary.md": "9327f0ad5c135a06de1ac818a3007ba63a8bc631b11ae9255e84ab7768b4e9a0",
+    "workspace/stage20-schema-live-20261022/state/parsed/0b9a2a9fb1d38b2a9cc1e44c9c182fd1ac642d39b37825030ed5716f4031dbb2-1.txt.json": "b4bd63f855d8587fd29f28da2f0bcfc91864c7d1c06d4bde37902933e433cf9b",
+    "workspace/stage20-schema-live-20261022/state/parsed/1455eceae9527eb4e35a50fe4232954a54d12f1ce1acd86b0859cecdf7ed85b3-1.txt.json": "8e24c7e4838abf53fd450ea27eedbc5935bf875c89cad8741f0b1724b1fa9333",
+    "workspace/stage20-schema-live-20261022/state/parsed/18f1a6d6731e9d292ec859beeaad75f452d78f8dc077844d08cb4c9e5d712efa-1.txt.json": "3110e1e8fcfdd69bb17f5cfaa0e0cc217b4be5fe2fef92cc596ffa63a6589878",
+    "workspace/stage20-schema-live-20261022/state/parsed/6f7e6a677b2949f40ddada9ab9842813e8a4b95ff51d8ada9a61b3b28682ac0b-1.xlsx.json": "be71fb103a5efc81c26e9e3e65612935c9dbecd16e0e87bf4291272c4865fef3",
+    "workspace/stage20-schema-live-20261022/state/parsed/acaa41760980da4bb86011e8a86940b296b038a7fc79443adf48c7bc11a79b8e-1.txt.json": "6da271e6cc2a4c7ca0716b84c5928db9767d5ae9a786c6df3f8eaaa79068eda8",
+    "workspace/stage20-schema-live-20261022/state/parsed/bd43052aef5982d3f71ad6244cad5fba67a7fb0cbd6380d31ad31cf822afe2e1-1.csv.json": "e0422eb65eb204846507951d5357506390c802044cc860499d62ad938bb8087f",
+    "workspace/stage20-schema-live-20261022/state/parsed/bf7d7b740920125d4a5a723110364795a12528ce012009cd2244a5b0db273387-1.txt.json": "10965e274d49c75232ba24df21d4ef4d5109283b7123487cb4facd2ad7e73a0b",
+    "workspace/stage20-schema-live-20261022/state/parsed/cd9ef9bb8b500503c0159ebdaf56b3dffb6d83b3a75d92876f235a025412ceda-1.txt.json": "391070b99494de2da48b927b296d574bab5453df27543d04609bc81969bc86f5",
+    "workspace/stage20-span-live-20261022/attempt.json": "b1de8d78fe0cb6185d357cbaaa7265badebe28e877d70e338133fd99359fd808",
+    "workspace/stage20-span-live-20261022/documents/保养乙.txt": "f3360c7eee7730d6b765aa9180fb6e78d221c0fc93a19ee31491ced9e0513028",
+    "workspace/stage20-span-live-20261022/documents/保养甲.txt": "afbabf341588286d534dd03ae09fcdf2838967ae34581690941312f758619a32",
+    "workspace/stage20-span-live-20261022/documents/设定.csv": "0144985d06a55f3ae78dce7452ace981cd7a6552d9e6736100ce7d1cdc1203e2",
+    "workspace/stage20-span-live-20261022/documents/风机乙.txt": "b5966a4bded4619030faef1aac59c2bef1bf2d6bf143e87a01a11eb0d650aa17",
+    "workspace/stage20-span-live-20261022/documents/风机甲.txt": "54ca9fff75d2a0b90edcb3c39774454ac6471b352c8af72825020fc22fba911e",
+    "workspace/stage20-span-live-20261022/state/.jobs-start.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-span-live-20261022/state/4b0c125fbcd2475da21018839c17c125.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-span-live-20261022/state/catalog.sqlite3": "49b6e2a0235c05eab6a85f9ee7b80042b16daeff451b50f60d2a20492109f23f",
+    "workspace/stage20-span-live-20261022/state/ddee82f4c7344be0bb80e8f182ca45ae.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-span-live-20261022/state/e1986b0c5a754ad288cbed9ae4567bd8.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-span-live-20261022/state/indexes/a8f275cf940044acb220e5e30ab93851/.build.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-span-live-20261022/state/indexes/a8f275cf940044acb220e5e30ab93851/.sync.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-span-live-20261022/state/indexes/a8f275cf940044acb220e5e30ab93851/.vectors.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-span-live-20261022/state/indexes/a8f275cf940044acb220e5e30ab93851/knowledge.sqlite3": "256ece5ac1735d34274018ff0d6566b0079ec143bfb9fd02b46128305fc5412c",
+    "workspace/stage20-span-live-20261022/state/indexes/a8f275cf940044acb220e5e30ab93851/vectors/cae20015bebc4491ba51a5f0803f8a4b.db/LOCK": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workspace/stage20-span-live-20261022/state/indexes/a8f275cf940044acb220e5e30ab93851/vectors/cae20015bebc4491ba51a5f0803f8a4b.db/collections/chunks/manifest.json": "e73644258ed0708808452edaf9a9dadd7df047d5d86a2f0f105a3b4179dc5306",
+    "workspace/stage20-span-live-20261022/state/indexes/a8f275cf940044acb220e5e30ab93851/vectors/cae20015bebc4491ba51a5f0803f8a4b.db/collections/chunks/manifest.json.prev": "439bced4db104c9bc364e111da83cd0486ba478d9e84a87f4a8b6156ece9130c",
+    "workspace/stage20-span-live-20261022/state/indexes/a8f275cf940044acb220e5e30ab93851/vectors/cae20015bebc4491ba51a5f0803f8a4b.db/collections/chunks/schema.json": "091a94653bffaee066311202f1db0c0e9850fe8749840a67e6189920344759ce",
+    "workspace/stage20-span-live-20261022/state/indexes/a8f275cf940044acb220e5e30ab93851/vectors/cae20015bebc4491ba51a5f0803f8a4b.db/collections/chunks/partitions/_default/data/data_000001_000007.parquet": "194773302a2c95420bac39369f0751b887768f8d0bca46a5ccf73cdc010ec813",
+    "workspace/stage20-span-live-20261022/state/indexes/a8f275cf940044acb220e5e30ab93851/vectors/cae20015bebc4491ba51a5f0803f8a4b.db/collections/chunks/partitions/_default/indexes/data_000001_000007.vector.autoindex.idx": "218fc683dc4b1bdb43a3dbc53a93dea7d72a96ed074e6c4f145fc911740a9ffc",
+    "workspace/stage20-span-live-20261022/state/outputs/4b0c125fbcd2475da21018839c17c125/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-span-live-20261022/state/outputs/4b0c125fbcd2475da21018839c17c125/comparison.csv": "dca3eaa10ad4a76c8a269e29c4ac0974007472603085c14417b0f662bc09c5b0",
+    "workspace/stage20-span-live-20261022/state/outputs/4b0c125fbcd2475da21018839c17c125/comparison.xlsx": "5cadbcd7905dd53c7e14aa648f02dcbb24e92a92829377b08de4b2db691267ee",
+    "workspace/stage20-span-live-20261022/state/outputs/4b0c125fbcd2475da21018839c17c125/export.json": "bde3b3f8407e6c7f7bd2da3b7134baa66259132546bb0d12ba277f1b42c9df52",
+    "workspace/stage20-span-live-20261022/state/outputs/4b0c125fbcd2475da21018839c17c125/record.json": "7df24c7bbbbbbd2b075a43c02abebe138614c92a7dd708d61377972f96d457b6",
+    "workspace/stage20-span-live-20261022/state/outputs/4b0c125fbcd2475da21018839c17c125/sources.csv": "a0edfc08c553cef121649b50d9d93d29e5e376a766b3601f95b37e6dfcd6d10e",
+    "workspace/stage20-span-live-20261022/state/outputs/4b0c125fbcd2475da21018839c17c125/sources.json": "f2ca9c0a89de304518871dc903062c46982dd5c5c5f86daeb406db83d02eb4bb",
+    "workspace/stage20-span-live-20261022/state/outputs/4b0c125fbcd2475da21018839c17c125/summary.md": "bdd6478bde0a287f42eb413b3ab4da0a3f6698a6c1b3a55dd94242ad6c812382",
+    "workspace/stage20-span-live-20261022/state/outputs/ddee82f4c7344be0bb80e8f182ca45ae/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-span-live-20261022/state/outputs/ddee82f4c7344be0bb80e8f182ca45ae/comparison.csv": "7f1809bb1c1956e52de58de033943257a2d03e740951608440892d0d7afea502",
+    "workspace/stage20-span-live-20261022/state/outputs/ddee82f4c7344be0bb80e8f182ca45ae/comparison.xlsx": "ab0a4df9b08601224d2cdde29873f9f69831cdb2e1962017d51e579b3acdc18c",
+    "workspace/stage20-span-live-20261022/state/outputs/ddee82f4c7344be0bb80e8f182ca45ae/export.json": "a55be9008a8037061cb95765d2864db5097866bd62e7aa22f04d7fb8cf044087",
+    "workspace/stage20-span-live-20261022/state/outputs/ddee82f4c7344be0bb80e8f182ca45ae/record.json": "8ffc466af77d28e2b8add75927a647739943763c12c464354350a052b65a0fae",
+    "workspace/stage20-span-live-20261022/state/outputs/ddee82f4c7344be0bb80e8f182ca45ae/sources.csv": "b2488670b000bb03151a96cff146cf995fc9116c60448bb87fce14d3b0fee3bb",
+    "workspace/stage20-span-live-20261022/state/outputs/ddee82f4c7344be0bb80e8f182ca45ae/sources.json": "b9e3eadbe5ade4e571d24d950205dddb062575dbfb3c0a8585925c093c93df53",
+    "workspace/stage20-span-live-20261022/state/outputs/ddee82f4c7344be0bb80e8f182ca45ae/summary.md": "2640c2612690430b3ec4d5d20867f454354b2020e2189b3412baae5af8b53a61",
+    "workspace/stage20-span-live-20261022/state/outputs/e1986b0c5a754ad288cbed9ae4567bd8/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage20-span-live-20261022/state/outputs/e1986b0c5a754ad288cbed9ae4567bd8/comparison.csv": "342779742dcc5289935871db391b1290979a2b0e6f3b0c2951b98b227548871c",
+    "workspace/stage20-span-live-20261022/state/outputs/e1986b0c5a754ad288cbed9ae4567bd8/comparison.xlsx": "9ab54fe6942f2c78e3be76b6b0d3dac1ed853616ccdd5ca07ffb5a74259202f4",
+    "workspace/stage20-span-live-20261022/state/outputs/e1986b0c5a754ad288cbed9ae4567bd8/export.json": "62cd19ca295ed2c3cd52045cf5481b6806278da71277e79682b243ca27e1bc60",
+    "workspace/stage20-span-live-20261022/state/outputs/e1986b0c5a754ad288cbed9ae4567bd8/record.json": "3f2752bc84fcc38e9cac71e48feca22f3a97f424f8d481e6ec31a33023d41935",
+    "workspace/stage20-span-live-20261022/state/outputs/e1986b0c5a754ad288cbed9ae4567bd8/sources.csv": "72469bde2f4d98eff85e70412fa1f6863906a5ba14f044ac80c12c9bbf956563",
+    "workspace/stage20-span-live-20261022/state/outputs/e1986b0c5a754ad288cbed9ae4567bd8/sources.json": "a9cfea0bc54e93ad81301692c0128777968f016fd87c974d5c56df6c48e6e57b",
+    "workspace/stage20-span-live-20261022/state/outputs/e1986b0c5a754ad288cbed9ae4567bd8/summary.md": "234c387288476c1a238a31f202a2508178c1f9bff6089f65569ea724af4387f3",
+    "workspace/stage20-span-live-20261022/state/parsed/0144985d06a55f3ae78dce7452ace981cd7a6552d9e6736100ce7d1cdc1203e2-1.csv.json": "2552300bfac556d707f4d381d3c058addf8aee2efd74f354d322f10ae818264c",
+    "workspace/stage20-span-live-20261022/state/parsed/54ca9fff75d2a0b90edcb3c39774454ac6471b352c8af72825020fc22fba911e-1.txt.json": "1a9594bcd8cb9eaab1033a14ca988566d85aff4a07d90e1142c6adef504c1959",
+    "workspace/stage20-span-live-20261022/state/parsed/afbabf341588286d534dd03ae09fcdf2838967ae34581690941312f758619a32-1.txt.json": "83988c48f778027240295adeedc481ca0b7207b2a443671bf618cd1814701698",
+    "workspace/stage20-span-live-20261022/state/parsed/b5966a4bded4619030faef1aac59c2bef1bf2d6bf143e87a01a11eb0d650aa17-1.txt.json": "1f0bcdf9766c683f7e9dd2f73d0e7a6ccb0e0f01d2b26d748cd58d264bb1717e",
+    "workspace/stage20-span-live-20261022/state/parsed/f3360c7eee7730d6b765aa9180fb6e78d221c0fc93a19ee31491ced9e0513028-1.txt.json": "77d983b41eb74d9d5d04d73e65c541b76f6e1be049212f6cfcb337cfde5e9af4",
+    "workspace/stage20-closeout-check-20261022.json": "745cee403932c404cddd2cd51eb08b848aafdd6e2652fc8d293b048685ce2dd4"
+  },
+  "source_sha256": {
+    "folder_assistant/answers.py": "b785e6ce23fb3efdcb9c0408652a68a87d6ea8740ba0a99be80c61e48bc81414",
+    "folder_assistant/contracts.py": "69e97e543ea571271452f01f3981587f937fb8414a36cf15b58d7d41cda5f2a3",
+    "folder_assistant/exports.py": "7c409585ef177c976f339163840a4db84a8fee25b4ddfa9b52fea2cabce470cf",
+    "folder_assistant/index.py": "494c2b7a22299575a758286569437a932a3bd0c5d070f075569e3fdcee733b32",
+    "folder_assistant/jobs.py": "cbba0a3ce6f19a320ff6be4f81a18299512bd63149083c920431568b27f9556b",
+    "folder_assistant/parse_worker.py": "e1603c813ea3ed124e4f744af7db7fabb13343c09ab570a651722338cbf49387",
+    "folder_assistant/parsing.py": "474dd43160b91025576f4bbd802f2fe3a1122818ce6a8536ba194564722a0acf",
+    "folder_assistant/store.py": "05b64a41ab1f56fac02d6e804e6f8e44814354fd18a33de7a1d9437eca520490",
+    "folder_assistant/__init__.py": "36656300506ebee15611b11a8eec4d2ba51af2278e92d74a5226fa32a1dd6277",
+    "folder_assistant/__main__.py": "06a2e6220e729537fd6126dca60a03c1322581225ae8d8138df54b8784227c9a",
+    "desktop/src/folder-questions.tsx": "2c9feeee2fcd3809570fe848337fcc3b975bd901a4baced417d5820e153b33aa",
+    "desktop/scripts/folder-quality-smoke.cjs": "44ccf52b22caf31808b9ee71733da3fb5a44f29fabfc134f81bb123d7340e1ac",
+    "desktop/scripts/folder-workflow-smoke.cjs": "21a6828c686907a9606987eec0846f01133f2c5a63781e8e3f9007ecd4467745",
+    "tests/test_folder_answers.py": "eb3157e9ae17bd162f8abe8fa60db197f1832e190ef47a49ea0f59cb34d7724c",
+    "tests/test_folder_exports.py": "2357ca7b9df975c2394aa08c652e7ba1c9049fb4b7439b1aa048ad103e9bd15d",
+    "tests/test_folder_contracts.py": "1929872661d78bd8b866615dea932be94e9ac382b33ef5890630247f78676286",
+    "tests/folder_quality_server.py": "e2587af06f8583f986f1078df38c3f67dd85af5c2f0a8b803fe828f1cac1526f",
+    "scripts/folder_quality_check.py": "e78a0743e576ce6bbd33e5a1d193f0dd6335f2ea9328cdab77c8c584a5def86b"
+  },
+  "checks": {
+    "files_checked": 637,
+    "project_key_matches": [],
+    "historical_artifact_hashes_verified": 1669,
+    "current_source_hashes_verified": 18,
+    "current_artifact_hashes_verified": 326,
+    "all_v3_frozen_runtime_hashes_match": true,
+    "previous_attempts_not_regraded": true
+  }
+}
