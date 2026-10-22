@@ -110,11 +110,15 @@ class LLMClient:
             params["max_tokens"] = self.config.max_tokens
         if tools:  # 有些厂商对 tools=[] 会报错，空时干脆不传
             params["tools"] = tools
+        if self.config.reasoning_effort is not None:
+            params.setdefault('reasoning_effort',self.config.reasoning_effort)
         if self.config.thinking is not None:
             extra = dict(params.get('extra_body') or {})
-            if 'thinking' not in extra and 'reasoning_effort' not in params:
+            if 'thinking' not in extra and ('reasoning_effort' not in params or self.config.reasoning_effort is not None):
                 extra['thinking'] = {'type': self.config.thinking}
             params['extra_body'] = extra
+        if self.config.provider=='deepseek' and params.get('extra_body',{}).get('thinking',{}).get('type')=='enabled':
+            params.pop('temperature',None)
 
         start = time.perf_counter()
         resp = self._chat_with_retry(**params)

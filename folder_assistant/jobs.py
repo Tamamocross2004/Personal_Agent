@@ -118,6 +118,7 @@ class FolderJobs:
                         next_offset=coverage.get('next_offset',unfinished)
                         if next_offset>=coverage['total_segments']:raise ValueError('已到提取范围末尾；没有剩余内容')
                         for key in ('generation','file_ids','query','mode'):inputs[key]=previous['inputs'][key]
+                        inputs['strength']=previous['inputs'].get('strength','default')
                         inputs.update(start_offset=next_offset,previous_structured_segments=coverage['structured_segments'],
                                       previous_returned_until=coverage['returned_until'])
                     else:inputs.update(start_offset=0,previous_structured_segments=0,previous_returned_until=0)
@@ -129,14 +130,16 @@ class FolderJobs:
                 files=inputs.get('file_ids')
                 if files is not None and (not files or not set(files).issubset({d['file_id'] for d in generation['files']})):
                     raise ValueError('请选择固定版本中的至少一份资料，或选择整个目录')
-                config=load_llm_config(settings=self.index.settings)
+                inputs.setdefault('strength',self.index.settings.llm_strength)
+                config=load_llm_config(settings=self.index.settings,strength=inputs['strength'])
                 inputs.update(generation=generation['id'],file_ids=files)
                 snapshot=[{k:v for k,v in d.items() if k!='pages'} for d in generation['files'] if files is None or d['file_id'] in files]
                 inputs['source_snapshot']=snapshot
                 if strategy=='exhaustive':
                     from .reading import ReadingPlan
                     inputs['reading_plan']=ReadingPlan(self.index,fid,generation['id'],files).signature
-                inputs['model']={'provider':config.provider,'model':config.model,'base_url':config.base_url,'retries':0}
+                inputs['model']={'provider':config.provider,'model':config.model,'base_url':config.base_url,'retries':0,
+                                 'thinking':config.thinking,'reasoning_effort':config.reasoning_effort}
                 if self.pricing:inputs['pricing']=self.pricing.get(config.provider,config.model)
             else: raise ValueError('操作类型无效')
             jid=uuid4().hex

@@ -87,6 +87,7 @@ class Manager:
         try:c=load_llm_config(settings=s); configured=True; model=c.model
         except ValueError:configured=False; model=s.llm_model or 'deepseek-flash'
         return {'provider':s.llm_provider,'model':model,'key_configured':configured,
+                'strength':s.llm_strength,
                 'max_steps':s.agent_max_steps,'budget':s.agent_token_budget,'memory':s.memory_enabled,
                 'knowledge':s.knowledge_enabled,
                 'rerank':s.knowledge_rerank_enabled,
@@ -121,10 +122,12 @@ class Manager:
             if self.closed.is_set():raise ValueError('本地任务服务已停止，请重启应用后再提交')
             if self.store.session(sid)['archived']:raise ValueError('请先取消归档再提交')
             # 先核对所选配置，配置错误不创建看似运行中的任务。
-            load_llm_config(provider=options['provider'],model=options['model'],settings=self.settings)
+            strength=options.get('strength',self.settings.llm_strength)
+            config=load_llm_config(provider=options['provider'],model=options['model'],settings=self.settings,strength=strength)
             path=new_task_dir(question,root=self.root)
             path.mkdir(parents=True)
-            options={**options,'pricing':self.pricing.get(options['provider'],options['model'])}
+            options={**options,'strength':strength,'model_parameters':{'thinking':config.thinking,'reasoning_effort':config.reasoning_effort},
+                     'pricing':self.pricing.get(options['provider'],options['model'])}
             row=self.store.add_run(sid,question,path,options)
             if self.store.session(sid)['title']=='新研究':self.store.update_session(sid,title=question[:28])
             return row

@@ -70,6 +70,8 @@ def export_job(jobs,jid):
                 'retrieval':job.get('retrieval'),
                 'meaning':'范围文件不等于模型阅读全文；引用/定位仅认证保存来源，不认证结论正确。'}
         if 'coverage' in job:source['coverage']=job['coverage']
+        if 'strength' in job['inputs']:
+            source.update(strength=job['inputs']['strength'],model=job['inputs'].get('model'))
         def refs(ids):
             return '; '.join(cid+' '+evidence[cid]['name']+' '+json.dumps(evidence[cid]['source_location'],ensure_ascii=False)+
                              ' SHA256 '+evidence[cid]['file_sha256'] for cid in ids)
@@ -91,6 +93,7 @@ def export_job(jobs,jid):
                '未正式审稿；执行状态：'+job['status']+'；内容状态：'+(job.get('result') or {}).get('content_status','未形成答案'),
                '固定索引：'+source['generation'],'']
         if job.get('message'): lines.extend([md(job['message']),''])
+        if 'strength' in job['inputs']:lines.extend(['模型强度：'+md(job['inputs']['strength'])+'；实际effort：'+md((job['inputs'].get('model') or {}).get('reasoning_effort') or '默认'),''])
         if 'coverage' in job:
             lines.extend(['顺序分批整理：以下结果按批次保留，未做跨批合并；续读的前次结果保留在原任务。',
                           '提取范围送达不认证完整抽取或语义正确。',md(json.dumps(job['coverage'],ensure_ascii=False)),''])

@@ -111,6 +111,16 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
       );
     }
     if (process.argv.includes("--questions")) {
+      if (process.argv.includes("--strength")) {
+        const control = page.getByRole("combobox", {
+          name: "模型强度",
+          exact: true,
+        });
+        await control
+          .locator('option[value="high"]:not([disabled])')
+          .waitFor({ state: "attached" });
+        await control.selectOption("high");
+      }
       if (process.argv.includes("--experience")) {
         await page
           .getByRole("combobox", { name: "问答文件范围" })
@@ -136,6 +146,19 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         await page.locator(".folder-answer").innerText(),
         /未正式审稿/,
       );
+      if (process.argv.includes("--strength")) {
+        assert.match(
+          await page.locator(".folder-answer").innerText(),
+          /本任务模型强度：高（max）/,
+        );
+        await page
+          .getByRole("combobox", { name: "模型强度", exact: true })
+          .selectOption("low");
+        assert.match(
+          await page.locator(".folder-answer").innerText(),
+          /本任务模型强度：高（max）/,
+        );
+      }
       await page.locator(".folder-answer .folder-citation").first().click();
       await page
         .locator(".folder-citation-preview")
@@ -305,11 +328,13 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         "workspace",
         parseMode
           ? "folder-workflow-current-multiformat.png"
-          : process.argv.includes("--reading")
-            ? "stage22-folder-workflow.png"
-            : process.argv.includes("--experience")
-              ? "stage21-folder-workflow.png"
-              : "folder-workflow-current.png",
+          : process.argv.includes("--strength")
+            ? "model-strength-folder-20261022.png"
+            : process.argv.includes("--reading")
+              ? "stage22-folder-workflow.png"
+              : process.argv.includes("--experience")
+                ? "stage21-folder-workflow.png"
+                : "folder-workflow-current.png",
       ),
     });
     await page

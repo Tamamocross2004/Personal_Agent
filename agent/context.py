@@ -49,6 +49,7 @@ def estimate_tokens(text: str) -> int:
 def estimate_message_tokens(m: dict[str, Any]) -> int:
     n = 4  # 每条消息的角色、分隔符等固定开销
     n += estimate_tokens(m.get("content") or "")
+    n += estimate_tokens(m.get('reasoning_content') or '')
     for c in m.get("tool_calls") or []:
         n += estimate_tokens(c["function"]["name"]) + estimate_tokens(c["function"]["arguments"]) + 8
     return n

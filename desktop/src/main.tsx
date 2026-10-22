@@ -31,6 +31,7 @@ import "./style.css";
 import { UsagePanel, PricingEditor, money } from "./usage";
 import { KnowledgeLibrary } from "./knowledge";
 import { FolderLibrary } from "./folders";
+import { ModelStrength, strengthLabel } from "./model-strength";
 
 declare global {
   interface Window {
@@ -159,6 +160,7 @@ function App() {
   const [options, setOptions] = useState<any>({
     provider: "deepseek",
     model: "deepseek-flash",
+    strength: "default",
     max_steps: 30,
     budget: 300000,
     memory: true,
@@ -217,6 +219,7 @@ function App() {
         setOptions({
           provider: c.provider,
           model: c.model,
+          strength: c.strength || "default",
           max_steps: c.max_steps,
           budget: c.budget,
           memory: c.memory,
@@ -633,7 +636,10 @@ function App() {
         >
           <BookOpen size={14} /> 原始资料知识库
         </button>
-        <button className="folder-assistant-entry" onClick={() => setFoldersOpen(true)}>
+        <button
+          className="folder-assistant-entry"
+          onClick={() => setFoldersOpen(true)}
+        >
           <FolderOpen size={18} /> 文件夹资料助手
         </button>
         <button className="settings-entry" onClick={() => setSettings(true)}>
@@ -915,6 +921,8 @@ function App() {
               >
                 <span className="model-dot" />
                 {options.model}
+                {options.strength !== "default" &&
+                  ` · 思考${strengthLabel(options.strength)}`}
                 <ChevronDown size={12} />
               </button>
               <label className="memory-toggle">
@@ -1318,6 +1326,16 @@ function App() {
                       <b>{detail.options.model || "历史配置见执行记录"}</b>
                     </div>
                     <div className="quality-row">
+                      <span>模型强度</span>
+                      <b>
+                        {detail.options.strength
+                          ? strengthLabel(detail.options.strength)
+                          : "旧记录未保存"}
+                        {detail.options.model_parameters?.reasoning_effort &&
+                          `（${detail.options.model_parameters.reasoning_effort}）`}
+                      </b>
+                    </div>
+                    <div className="quality-row">
                       <span>本轮上限</span>
                       <b>
                         {detail.options.max_steps
@@ -1496,6 +1514,7 @@ function App() {
             <label>
               模型厂商
               <select
+                aria-label="模型厂商"
                 value={options.provider}
                 onChange={(e) =>
                   setOptions({ ...options, provider: e.target.value })
@@ -1509,12 +1528,22 @@ function App() {
             <label>
               模型名称
               <input
+                aria-label="模型名称"
                 value={options.model}
                 onChange={(e) =>
                   setOptions({ ...options, model: e.target.value })
                 }
               />
             </label>
+            <ModelStrength
+              api={api}
+              provider={options.provider}
+              model={options.model}
+              value={options.strength}
+              onChange={(strength: string) =>
+                setOptions((old: any) => ({ ...old, strength }))
+              }
+            />
             <div className="settings-grid">
               <label>
                 最大步数

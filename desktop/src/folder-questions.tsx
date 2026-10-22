@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { locationLabel } from "./folder-location";
 import { FileFilter } from "./folder-files";
+import { ModelStrength, strengthLabel } from "./model-strength";
 
 export function FolderQuestions({
   api,
@@ -23,6 +24,7 @@ export function FolderQuestions({
     [view, setView] = useState<any>(null),
     [citation, setCitation] = useState<any>(null);
   const [exported, setExported] = useState<any>(null);
+  const [strength, setStrength] = useState("default");
   const [strategy, setStrategy] = useState("retrieval"),
     [maxBatches, setMaxBatches] = useState(3);
   const [reading, setReading] = useState<any>(null),
@@ -122,6 +124,7 @@ export function FolderQuestions({
       <p>
         局部问答只发送有限召回片段；全量整理按固定范围分批送达已解析文字。两种方式均调用语言模型，结果未正式审稿，请核对引用和条件。
       </p>
+      <ModelStrength api={api} value={strength} onChange={setStrength} />
       <label>
         问题
         <textarea
@@ -291,6 +294,7 @@ export function FolderQuestions({
                 file_ids: scope === "all" ? null : files,
                 generation: index.active.id,
                 strategy,
+                strength,
                 max_batches: maxBatches,
               }),
             });
@@ -420,6 +424,7 @@ export function FolderQuestions({
                         strategy: "exhaustive",
                         max_batches: maxBatches,
                         resume_from: saved.id,
+                        strength: saved.inputs.strength || "default",
                       }),
                     });
                     if (alive.current) {
@@ -465,6 +470,15 @@ export function FolderQuestions({
             执行状态 {current.status} · 内容状态{" "}
             {current.result?.content_status || "尚未形成答案"} · 固定索引{" "}
             {current.inputs.generation}
+          </p>
+          <p>
+            本任务模型强度：
+            {current.inputs.strength
+              ? strengthLabel(current.inputs.strength)
+              : "旧记录未保存"}
+            {current.inputs.model?.reasoning_effort &&
+              `（${current.inputs.model.reasoning_effort}）`}
+            ；续读继承原任务强度，上方选择只用于新问题。
           </p>
           {index?.active?.id !== current.inputs.generation && (
             <p className="muted">

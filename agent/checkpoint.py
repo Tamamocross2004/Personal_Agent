@@ -175,6 +175,7 @@ class CheckpointStore:
 def agent_identity(agent):
     config=getattr(agent.llm,'config',None)
     public={k:getattr(config,k,None) for k in ('provider','model','base_url','temperature','timeout','max_retries','max_tokens','thinking')}
+    if getattr(config,'reasoning_effort',None) is not None:public['reasoning_effort']=config.reasoning_effort
     return {'model':public,'options':{k:getattr(agent,k) for k in OPTION_FIELDS},
             'token_weights':asdict(agent.token_weights),'tools':agent.registry.schemas(),
             'compactor':({k:getattr(agent.compactor,k) for k in ('threshold','keep_recent_turns','min_chars','min_saving','rearm_ratio')} if agent.compactor else None)}

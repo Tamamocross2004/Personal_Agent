@@ -12,6 +12,7 @@ from typing import Any, Callable, Literal
 
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
 from pydantic import Field
+from agent.strength import ModelStrength,resolve_strength
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
@@ -65,6 +66,7 @@ class Settings(BaseSettings):
     llm_provider: ProviderName = "deepseek"
     llm_model: str | None = None
     llm_base_url: str | None = None
+    llm_strength: ModelStrength = 'default'
 
     deepseek_api_key: str = ""
     dashscope_api_key: str = ""
@@ -145,12 +147,23 @@ class LLMConfig:
     max_retries: int
     max_tokens: int | None = None
     thinking: Literal['enabled', 'disabled'] | None = None
+    reasoning_effort: Literal['low','high','max'] | None = None
+
+
+def model_identity(provider,model,settings):
+    name=provider or settings.llm_provider
+    if name not in PROVIDERS:raise ValueError(f"未知厂商 {name!r}，可选：{', '.join(PROVIDERS)}")
+    same=name==settings.llm_provider
+    final=model or (settings.llm_model if same else None) or PROVIDERS[name].default_model
+    if not final:raise ValueError('未指定模型名，请设置 LLM_MODEL 或使用 --model。')
+    return name,final,(settings.llm_base_url if same else None) or PROVIDERS[name].base_url
 
 
 def load_llm_config(
     provider: str | None = None,
     model: str | None = None,
     settings: Settings | None = None,
+    strength: ModelStrength | None = None,
 ) -> LLMConfig:
     """合并预设、Settings 和命令行覆盖；默认密钥仅由项目 .env 提供。"""
     s = settings or Settings()
@@ -164,24 +177,18 @@ def load_llm_config(
         env_name = preset.key_field.upper()
         raise ValueError(f"未配置项目 API Key {env_name}。请在本项目 .env 中填写（参考 .env.example）；不再使用全局环境变量中的 Key。")
 
-    # .env 里的 LLM_MODEL / LLM_BASE_URL 是针对 LLM_PROVIDER 写的；
-    # 如果命令行临时切换到别的厂商，就不再沿用它们，改用该厂商预设。
-    same_provider = name == s.llm_provider
-    env_model = s.llm_model if same_provider else None
-    env_base_url = s.llm_base_url if same_provider else None
-
-    final_model = model or env_model or preset.default_model
-    if not final_model:
-        raise ValueError("未指定模型名，请设置 LLM_MODEL 或使用 --model。")
+    name,final_model,base_url=model_identity(provider,model,s)
+    effort=resolve_strength(strength if strength is not None else s.llm_strength,name,final_model,base_url)
 
     return LLMConfig(
         provider=name,
-        base_url=env_base_url or preset.base_url,
+        base_url=base_url,
         api_key=api_key,
         model=final_model,
         temperature=s.llm_temperature,
         timeout=s.llm_timeout,
         max_retries=s.llm_max_retries,
         max_tokens=s.llm_max_tokens,
-        thinking='disabled' if name == 'deepseek' and final_model == 'deepseek-flash' else None,
+        thinking='enabled' if effort else ('disabled' if name == 'deepseek' and final_model == 'deepseek-flash' else None),
+        reasoning_effort=effort,
     )

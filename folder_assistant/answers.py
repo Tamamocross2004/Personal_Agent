@@ -85,10 +85,11 @@ def answer_evidence(jobs,jid,evidence,*,call_suffix='answer',reading_scope=None)
     max_output=min(1200,jobs.index.settings.agent_call_max_tokens,budget-used-input_estimate)
     if max_output<128: raise BudgetInsufficient('剩余预算不足以发送短答请求；未调用语言模型')
     jobs.patch(jid,request={'messages':messages,'estimated_input_tokens':input_estimate,'max_output_tokens':max_output,'answer_schema_version':VERSION})
-    config=replace(load_llm_config(settings=jobs.index.settings),max_retries=0)
+    config=replace(load_llm_config(settings=jobs.index.settings,strength=inputs.get('strength','default')),max_retries=0)
     client=jobs.llm_factory(config)
     jobs.check(jid)
     call={'id':jid+'-'+call_suffix,'operation':'llm','status':'started','provider':config.provider,'model':config.model,
+          'thinking':config.thinking,'reasoning_effort':config.reasoning_effort,
           'input_tokens':None,'output_tokens':None,'request_attempts':1,'started':now()}
     event(call)
     try:

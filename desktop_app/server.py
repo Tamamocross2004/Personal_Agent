@@ -20,6 +20,7 @@ from starlette.concurrency import run_in_threadpool
 from pydantic import BaseModel, Field
 
 from agent.config import PROJECT_ROOT,ProviderName
+from agent.strength import ModelStrength
 from desktop_app.manager import Manager,FINAL
 from desktop_app.usage import PriceProfile, flash_profile
 
@@ -33,6 +34,7 @@ class RunInput(BaseModel):
     question:str=Field(min_length=1,max_length=20000)
     provider:ProviderName='deepseek'
     model:str=Field(default='deepseek-flash',min_length=1,max_length=160)
+    strength:ModelStrength='default'
     max_steps:int=Field(default=30,ge=3,le=200)
     budget:int=Field(default=300000,ge=1000,le=2000000)
     memory:bool=True
@@ -64,6 +66,7 @@ class FolderQuestion(BaseModel):
     strategy:Literal['retrieval','exhaustive']='retrieval'
     max_batches:int=Field(default=3,ge=1,le=8)
     resume_from:str|None=Field(default=None,max_length=64)
+    strength:ModelStrength='default'
 
 
 class FolderReading(BaseModel):
@@ -120,6 +123,12 @@ def create_app(manager:Manager,token:str,ui_dir:Path|None=None,*,folder_grant_to
 
     @app.get('/api/config')
     def config():return manager.config()
+    @app.get('/api/model-strength')
+    def model_strength(provider:ProviderName|None=None,model:str|None=None):
+        from agent.config import model_identity
+        from agent.strength import capability
+        name,model_id,endpoint=model_identity(provider,model,manager.settings)
+        return capability(name,model_id,endpoint)
     @app.get('/api/folders')
     def folder_list():return {'folders':folders.folders(),'policy':folders.policy()}
     @app.post('/api/folders')

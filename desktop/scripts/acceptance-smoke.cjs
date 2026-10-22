@@ -215,6 +215,86 @@ async function verifyCrashCleanup() {
     }
     assert.equal((await fetch(connection.url + "/api/config")).status, 401);
     checks.push("native startup, preload and authenticated loopback API");
+    if (process.argv.includes("--strength-only")) {
+      await page.locator(".model-selector").click();
+      const strength = page.getByRole("combobox", {
+        name: "模型强度",
+        exact: true,
+      });
+      await until(
+        async () => (await strength.locator('option[value="high"]').getAttribute("disabled")) === null,
+        "strength capability",
+      );
+      for (const level of ["low", "medium", "high"]) {
+        await strength.selectOption(level);
+        assert.equal(await strength.inputValue(), level);
+      }
+      await page.getByLabel("模型厂商", { exact: true }).selectOption("qwen");
+      await until(
+        async () => (await strength.inputValue()) === "default",
+        "unsupported resets selection",
+      );
+      assert.notEqual(await strength.locator('option[value="high"]').getAttribute("disabled"),null);
+      await page
+        .getByLabel("模型厂商", { exact: true })
+        .selectOption("deepseek");
+      await until(
+        async () => (await strength.locator('option[value="high"]').getAttribute("disabled")) === null,
+        "supported again",
+      );
+      await strength.selectOption("high");
+      await page.getByRole("button", { name: "完成", exact: true }).click();
+      const session = await newTask(
+        "不联网，虚构资料：仅验证模型强度设置与调用记录。",
+      );
+      const run = await finished(session.id);
+      assert.equal(run.options.strength, "high");
+      assert.equal(run.options.model_parameters.reasoning_effort, "max");
+      const before = fs.readFileSync(
+        path.join(run.task_dir, "trace.jsonl"),
+        "utf8",
+      );
+      const calls = before
+        .trim()
+        .split("\n")
+        .map(JSON.parse)
+        .filter((e) => e.kind === "llm_call");
+      assert(
+        calls.length > 1 &&
+          calls.every(
+            (e) => e.reasoning_effort === "max" && e.thinking === "enabled",
+          ),
+      );
+      assert.equal(run.options.budget, 80000);
+      assert.equal(run.options.max_steps, 12);
+      await api(`/runs/${run.id}`);
+      await api(`/runs/${run.id}`);
+      assert.equal(
+        fs.readFileSync(path.join(run.task_dir, "trace.jsonl"), "utf8"),
+        before,
+      );
+      await page.locator(".model-selector").click();
+      await page.screenshot({
+        path: path.join(evidence, "model-strength-desktop-20261022.png"),
+      });
+      assert.deepEqual(errors, []);
+      console.log(
+        JSON.stringify({
+          passed: true,
+          fixture,
+          checks: [
+            "three-level-selection",
+            "unsupported-disabled",
+            "saved-run-strength",
+            "worker-event-parameters",
+            "original-budget",
+            "read-only-history",
+          ],
+          errors,
+        }),
+      );
+      return;
+    }
 
     await page
       .getByRole("button", { name: "原始资料知识库", exact: true })

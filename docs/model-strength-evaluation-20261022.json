@@ -1,0 +1,187 @@
+{
+  "date": "2026-10-22",
+  "feature": "desktop model thinking strength",
+  "engineering_passed": true,
+  "content_acceptance_passed": false,
+  "reviewer": "coding_assistant",
+  "stage12_accepted": false,
+  "mapping": {
+    "low": "low",
+    "medium": "high",
+    "high": "max"
+  },
+  "source": "https://api-docs.deepseek.com/guides/thinking_mode/",
+  "real_plan": {
+    "provider": "deepseek",
+    "model": "deepseek-flash",
+    "endpoint": "https://api.deepseek.com",
+    "levels": [
+      "low",
+      "medium",
+      "high"
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "仅回答2+2的数值。"
+      }
+    ],
+    "max_tokens_per_request": 256,
+    "timeout_seconds": 30,
+    "max_retries": 0,
+    "max_calls": 3,
+    "max_known_tokens": 3000,
+    "purpose": "参数接受与响应检查；不衡量强度导致的质量变化",
+    "runtime_sha256": {
+      "agent/config.py": "30f8a3e63d4919113bdc09dc9954623440c18ee399448abd6e5da66ba7d2c60e",
+      "agent/llm.py": "bc58280e4c9663f4cc7f2fdf16041f11358e7b5b3e74b0fb4ce50b2232118867",
+      "agent/strength.py": "2dc6a5891255eb5e8da1c792e14acd3e39ab170bbd8493469432fd811035d1b1",
+      "scripts/model_strength_check.py": "4d94a6835ab2403d8f6ee166028fca063512b60ee230836d1d40b70011912d0d"
+    }
+  },
+  "real_result": {
+    "status": "completed",
+    "calls": [
+      {
+        "strength": "low",
+        "reasoning_effort": "low",
+        "thinking": "enabled",
+        "status": "returned",
+        "request_attempts": 1,
+        "input_tokens": 38,
+        "output_tokens": 35,
+        "returned_model": "deepseek-flash",
+        "finish_reason": "stop",
+        "content": "4",
+        "reasoning_content_returned": true
+      },
+      {
+        "strength": "medium",
+        "reasoning_effort": "high",
+        "thinking": "enabled",
+        "status": "returned",
+        "request_attempts": 1,
+        "input_tokens": 38,
+        "output_tokens": 17,
+        "returned_model": "deepseek-flash",
+        "finish_reason": "stop",
+        "content": "4",
+        "reasoning_content_returned": true
+      },
+      {
+        "strength": "high",
+        "reasoning_effort": "max",
+        "thinking": "enabled",
+        "status": "returned",
+        "request_attempts": 1,
+        "input_tokens": 38,
+        "output_tokens": 35,
+        "returned_model": "deepseek-flash",
+        "finish_reason": "stop",
+        "content": "4",
+        "reasoning_content_returned": true
+      }
+    ],
+    "plan_sha256": "d16487680b0dfcc7a1533cb2a4b3ecc1dc67f4b9b9445ebf9f59c789dddabb6e",
+    "known_tokens": 201,
+    "cny_total": null
+  },
+  "semantics": "Real calls verify parameter acceptance only, not improved reasoning quality. No budget increase or answer-specific rules.",
+  "real_quality_benchmark": false,
+  "real_tool_roundtrip": false,
+  "offline_tool_protocol_test": true,
+  "tests": {
+    "protocol_specific": {
+      "passed": 13,
+      "seconds": 18.5
+    },
+    "research_ui": {
+      "passed": true,
+      "fixture": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\agent-stage14-P6mDG1",
+      "checks": [
+        "three-level-selection",
+        "unsupported-disabled",
+        "saved-run-strength",
+        "worker-event-parameters",
+        "original-budget",
+        "read-only-history"
+      ],
+      "errors": []
+    },
+    "folder_ui": {
+      "passed": true,
+      "multi_format_preview": false,
+      "fixture": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\agent-folders-rMygKB",
+      "checks": [
+        "native-picker-capability",
+        "scan",
+        "excluded-secret",
+        "renderer-cannot-grant",
+        "revoke",
+        "source-unchanged",
+        "sync",
+        "keyword-preview",
+        "answer",
+        "pinned-citation",
+        "export-roundtrip",
+        "revoked-history-read-only",
+        "file-filters",
+        "hidden-selection-preserved",
+        "local-neighbors",
+        "reading-plan",
+        "bounded-partial",
+        "explicit-continuation",
+        "full-input-coverage"
+      ],
+      "errors": []
+    },
+    "desktop_build": true,
+    "full": {
+      "passed": 1062,
+      "seconds": 505.43
+    }
+  },
+  "checks": {
+    "project_key_matches": 0,
+    "scanned_files": 30,
+    "old_artifact_hashes_verified": 404,
+    "frozen_real_runtime_verified": 4,
+    "old_results_regraded": false
+  },
+  "source_sha256": {
+    ".env.example": "ca625283d7121677ebd65cc142055557ea7dbfcbc6196f69c7979888d99c061f",
+    "agent/checkpoint.py": "f4ba8d89899a9fdb21e35b1a5aa66f1b02a75b711a466537dfd980be1a472dbc",
+    "agent/config.py": "30f8a3e63d4919113bdc09dc9954623440c18ee399448abd6e5da66ba7d2c60e",
+    "agent/context.py": "097c931099e9b28a5222a10f02b03085f76f8aec61b33a02eb57393f7361f76f",
+    "agent/llm.py": "bc58280e4c9663f4cc7f2fdf16041f11358e7b5b3e74b0fb4ce50b2232118867",
+    "agent/loop.py": "89e46b00a279490e4fe6c2bd84fe5fa4976fae447e4480347458db7cbb7a28ab",
+    "desktop/scripts/acceptance-smoke.cjs": "a6258a50cf9abee97c9cd8f26bb84d5ad7eccf5a6f75984e933b5ef798801006",
+    "desktop/scripts/folder-workflow-smoke.cjs": "6fdfef0a395f1d245179062a8c4e46ea5eee527379742313f3d31f597d787cbe",
+    "desktop/src/folder-questions.tsx": "68c54a248a33dcf70700da61317ec44606a8dfd195f27137770144c0b4ae8078",
+    "desktop/src/main.tsx": "fcb99a6787606977f4b6d61ea9e34f7d7836faa485fc20e17c7630891679ca16",
+    "desktop_app/manager.py": "59b1c0c243297333ede487b216602553295f366af0778b22f1df15ba6b92ddcb",
+    "desktop_app/server.py": "314e0a7d6e0e63783f3260747fe414a21892462d712cb86d625b3f151d95c091",
+    "desktop_app/worker.py": "32a88a3806214d1bea86ad8bf5f911a92725a08d1cfb606c0d2f76d4725d3594",
+    "folder_assistant/answers.py": "bcbc9f6da4c33e0234bce039d00fa119d1b45ce51c8d9d69a994a47a1e249165",
+    "folder_assistant/exports.py": "fdeffb3678ddccb575a4021b7a558d39628acf6996f1af417674237c05c90387",
+    "folder_assistant/jobs.py": "83f5cd9326465c69dafc249b52c50859c54a8d58227c5e3655191fa923ef650c",
+    "agent/strength.py": "2dc6a5891255eb5e8da1c792e14acd3e39ab170bbd8493469432fd811035d1b1",
+    "desktop/src/model-strength.tsx": "4b383bb00311b406c11885d90a9c032d14292add1b985be3d9f6e4ef8d7dced3",
+    "scripts/model_strength_check.py": "4d94a6835ab2403d8f6ee166028fca063512b60ee230836d1d40b70011912d0d",
+    "tests/test_model_strength.py": "1dd59939618fef4ecf779b15908c9f0f2fd097b96dff2f80550c21151799be06"
+  },
+  "artifact_sha256": {
+    "workspace/model-strength-live-20261022/high-response.json": "4bcc036a77a725c22cd6238fb9dddcf3b35415d972e193769cd99801942da228",
+    "workspace/model-strength-live-20261022/low-response.json": "e91f54324f060da51ea253f7b89f4512bd9d9ff0d678ed8bf7d267d10bd034a3",
+    "workspace/model-strength-live-20261022/medium-response.json": "90d0a5f0380f3788ed6e4209e34f25ab1a6a1ba6f4ed027c5d43d09037dbf763",
+    "workspace/model-strength-live-20261022/plan.json": "d16487680b0dfcc7a1533cb2a4b3ecc1dc67f4b9b9445ebf9f59c789dddabb6e",
+    "workspace/model-strength-live-20261022/result.json": "f08d80272156c9f342b0188d659331d698b4594df31ae74c61933a41f6a99545",
+    "workspace/model-strength-protocol-20261022.log": "d6261a2637ba9ceb370c6b814b024a54d55b88eecaaac124cb013e486d164ff5",
+    "workspace/model-strength-ui-verified-20261022.log": "87045202f16bd7ffade6bf3f21718939733ab20a95a1767c4c65c2b9185acdcf",
+    "workspace/model-strength-folder-ui-20261022.log": "1b5cf68afdf9b77a65abe014f28f1b40d1fae619cf44c80e3a3a58309e50e3be",
+    "workspace/model-strength-build-verified-20261022.log": "1788f95b4e632e1913f6964bb3c4b2ef7549cfed2071ac912780d458d66fb24a",
+    "workspace/model-strength-desktop-20261022.png": "ae405837ef046f648bf083c1093d31b551c2f008da80a85b35bc1f75ca5aef5b",
+    "workspace/model-strength-folder-20261022.png": "2a1532be19771b6b4424ce2d38ae5c72950d72a780e1238563ac3978b2b07354",
+    "workspace/model-strength-full-tests-20261022.log": "4185ea7aa3f3b8d306682d93068286c408a6d5333c413226531e482f9c0d6ffb"
+  }
+}

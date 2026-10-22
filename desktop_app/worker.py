@@ -19,6 +19,7 @@ def main():
     request=json.loads((args.task_dir/'.desktop-request.json').read_text(encoding='utf-8'))
     options=request['options']
     settings=Settings().model_copy(update={'memory_enabled':options['memory'],
+        'llm_strength':options.get('strength','default'),
         'knowledge_enabled':options.get('knowledge',False),
         'knowledge_path':Path(request.get('knowledge_path',Settings().knowledge_path))})
     if options.get('rerank') is not None:

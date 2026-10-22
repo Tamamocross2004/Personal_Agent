@@ -219,6 +219,9 @@ class Agent(CheckpointMixin):
     # 对外接口
     # ------------------------------------------------------------------
 
+    def _response_message(self,msg):
+        return _assistant_message_to_dict(msg,preserve_reasoning=getattr(getattr(self.llm,'config',None),'thinking',None)=='enabled')
+
     def run(self, question: str, *, resume_state: dict | None = None) -> AgentResult:
         self._segment_started=time.perf_counter()
         self._elapsed_before=0
@@ -437,7 +440,7 @@ class Agent(CheckpointMixin):
             if not msg.tool_calls:
                 text = msg.content or ""
                 if truncated:
-                    messages.append(_assistant_message_to_dict(msg))
+                    messages.append(self._response_message(msg))
                     messages.append({"role": "user", "content": CONTINUE_PROMPT})
                     pending_text.append(text)
                     self._emit("notice", text="回答因输出长度上限被截断，已要求模型接着写。")
@@ -451,7 +454,7 @@ class Agent(CheckpointMixin):
                     messages.append({"role": "user", "content": EMPTY_REPLY_PROMPT})
                     self._emit("notice", text="模型返回了空回复，已提醒它继续。")
                     continue
-                messages.append(_assistant_message_to_dict(msg))
+                messages.append(self._response_message(msg))
                 if step < self.max_steps and self._request_structure_repair(messages):
                     pending_text.clear()
                     empty_replies = 0
@@ -490,7 +493,7 @@ class Agent(CheckpointMixin):
         allowed：只允许调用这些工具（收尾阶段用）；其它调用不执行，返回说明。
         注意即使拒绝也必须回一条 tool 消息：每个 tool_call 都要有对应的结果，否则下次请求报 400。
         """
-        messages.append(_assistant_message_to_dict(msg))
+        messages.append(self._response_message(msg))
         self._save_checkpoint('tool_batch',pending={'kind':'tool_batch','reason':'批次尚未完整提交，不能重放已有副作用'})
         reports_written = {}
         length_rejected = False
@@ -865,7 +868,8 @@ class Agent(CheckpointMixin):
         started = time.perf_counter()
         self._len_at_last_call = len(messages)
         config = getattr(self.llm, 'config', None)
-        identity = {'provider':getattr(config,'provider',None),'requested_model':getattr(config,'model',None)}
+        identity = {'provider':getattr(config,'provider',None),'requested_model':getattr(config,'model',None),
+                    'thinking':getattr(config,'thinking',None),'reasoning_effort':getattr(config,'reasoning_effort',None)}
         attempts_before = getattr(self.llm, 'request_attempts', None)
         def attempts():
             after = getattr(self.llm, 'request_attempts', None)
@@ -1149,7 +1153,7 @@ class Agent(CheckpointMixin):
             choice = resp.choices[0]
             msg = choice.message
             if not msg.tool_calls:
-                messages.append(_assistant_message_to_dict(msg))
+                messages.append(self._response_message(msg))
                 answer = msg.content or ""
                 self._emit("final", text=answer, stop_reason=reason)
                 return reason, answer, None
@@ -1175,7 +1179,7 @@ class Agent(CheckpointMixin):
         except openai.APIError as e:
             return reason, "", f"收尾调用失败：{type(e).__name__}: {e}"
         msg = resp.choices[0].message.model_copy(update={"tool_calls": None})
-        messages.append(_assistant_message_to_dict(msg))
+        messages.append(self._response_message(msg))
         answer = msg.content or ""
         self._emit("final", text=answer, stop_reason=reason)
         return reason, answer, None
@@ -1233,14 +1237,15 @@ def _normalize_args(arguments: str) -> str:
         return arguments or ""
 
 
-def _assistant_message_to_dict(msg: ChatCompletionMessage) -> dict[str, Any]:
+def _assistant_message_to_dict(msg: ChatCompletionMessage,*,preserve_reasoning=False) -> dict[str, Any]:
     """把 SDK 返回的消息对象转成普通 dict 再放回历史。
 
     不直接 append 对象、也不用 model_dump() 全量导出，是为了只保留协议需要的字段：
-    有些厂商会返回额外字段（如 DeepSeek 推理模型的 reasoning_content），
-    原样回传可能导致下一次请求报错。
+    思考模式按协议回传reasoning_content；其他额外字段不回传。
     """
     out: dict[str, Any] = {"role": "assistant", "content": msg.content}
+    if preserve_reasoning and isinstance(getattr(msg,'reasoning_content',None),str):
+        out['reasoning_content']=msg.reasoning_content
     if msg.tool_calls:
         out["tool_calls"] = [
             {
