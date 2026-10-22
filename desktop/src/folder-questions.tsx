@@ -3,6 +3,7 @@ import { locationLabel } from "./folder-location";
 import { FileFilter } from "./folder-files";
 import { ModelStrength, strengthLabel } from "./model-strength";
 import { FolderScope } from "./folder-scope";
+import { FolderOutputDiagnostics } from "./folder-output-diagnostics";
 
 export function FolderQuestions({
   api,
@@ -61,6 +62,7 @@ export function FolderQuestions({
         result: batch.result || { content_status: "尚未形成该批答案" },
         model_output: batch.model_output,
         finish_reason: batch.finish_reason,
+        output_diagnostics: batch.output_diagnostics,
         evidence: batch.evidence,
       }
     : saved;
@@ -683,6 +685,7 @@ export function FolderQuestions({
             </p>
           )}
           <p>{current.message || current.result?.message}</p>
+          <FolderOutputDiagnostics value={current.output_diagnostics} />
           {current.result?.contract_checks && (
             <aside className="folder-contract-notice">
               <p>

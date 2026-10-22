@@ -120,6 +120,11 @@ def export_job(jobs,jid):
             for batch in batches:
                 if not (batch.get('result') or {}).get('answer'):
                     lines.append(f"第{batch['number']}批未形成可用结构化结果；原始响应见record.json。")
+        diagnostic_rows=[(f"第{b['number']}批",b.get('output_diagnostics')) for b in batches] if batches else [('',job.get('output_diagnostics'))]
+        for label,diagnostic in diagnostic_rows:
+            if diagnostic:
+                lines.extend([md(label+' 输出诊断：'+diagnostic['message']),md(diagnostic['suggestion']),
+                              '用量状态：'+md(diagnostic['usage_status'])+'；不认证语义正确性。',''])
         for finding in answer.get('findings',[]):
             if batches:lines.append('第'+str(finding['export_batch'])+'批：')
             lines.extend(['- '+md(finding['kind']+'：'+finding['statement'])+' '+md(' '.join('['+c+']' for c in finding['citations'])),''])

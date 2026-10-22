@@ -1,0 +1,845 @@
+{
+  "stage": 26,
+  "date": "2026-10-23",
+  "base_commit": "d6ea218",
+  "reviewer": "coding_assistant",
+  "independent_review": false,
+  "engineering_passed": true,
+  "content_acceptance_passed": false,
+  "stage12_accepted": false,
+  "tests": {
+    "targeted_before_last_added_case": "71 passed in 27.15s",
+    "full": "1121 passed in 208.89s",
+    "new_boundary_cases": 26,
+    "build": true,
+    "isolated_electron_runs_passed": 2,
+    "screenshot_visually_inspected": "workspace/stage26-output-limit-20261023.png"
+  },
+  "checks": {
+    "unchanged_acceptance_AST": [
+      "Record",
+      "Quote",
+      "Relation",
+      "Finding",
+      "Comparison",
+      "Answer",
+      "record_key",
+      "validate"
+    ],
+    "reading_and_batching_unchanged": true,
+    "historical_artifacts_unchanged": 649,
+    "runtime_unchanged_since_preregistration": true,
+    "project_keys_checked": 2,
+    "secret_matches": 0,
+    "files_scanned": 370
+  },
+  "live_plan_sha256": "289cdde636d1cf52b0270479c30c3af8e9220a0d58acfdd5d7a549c1aa292520",
+  "live_runtime_sha256": {
+    "folder_assistant/__init__.py": "36656300506ebee15611b11a8eec4d2ba51af2278e92d74a5226fa32a1dd6277",
+    "folder_assistant/__main__.py": "590c31bef4728539747a3a02b16cf55df006a81938f3e6adb0e2324d7747f560",
+    "folder_assistant/answers.py": "c5d0d5a7be74f579ee7f0be5f4ba1f22e10a4bd617fbfb447f7930185888a7ae",
+    "folder_assistant/batching.py": "87936b69ccbb6b2d5e4c027de9f68265393e24c037fc57fa783b513bb97800a2",
+    "folder_assistant/contracts.py": "76e4473ef92ab82fa2e3de2b12765b810c6b3deb6a4a03cfe8fc36c109fa75ec",
+    "folder_assistant/exhaustive.py": "1e4eb9e129e9f2cb46ceffd30289e6bfb8a8bfa453255dd5ed55edd2dc481f42",
+    "folder_assistant/exports.py": "8bbf219f7c1cc868b08f2470411f572d66f3ef9d07e00ed374a455235efc07f2",
+    "folder_assistant/index.py": "6c70d3975f5918bd76d2149f5938e5aaf6a369caff6af5feca3e5af7bc133db3",
+    "folder_assistant/jobs.py": "b8c0efab6530c70b619464e32f9ca9092fe08b3f6da722a99dd2900de0010b31",
+    "folder_assistant/output_diagnostics.py": "e4f8a66e5b14517a69e2fb45c37ac9153d0c920960ad1f37d70a7c93185ae08d",
+    "folder_assistant/parse_worker.py": "e1603c813ea3ed124e4f744af7db7fabb13343c09ab570a651722338cbf49387",
+    "folder_assistant/parsing.py": "474dd43160b91025576f4bbd802f2fe3a1122818ce6a8536ba194564722a0acf",
+    "folder_assistant/project_exports.py": "0f296a8f699722299d191acb00940d95267bd986cc94d49ae5e9c62c2109acbc",
+    "folder_assistant/projects.py": "626a37145e285226170983857afd1f1086eb4dd655fb91a02c7be9b7252f7320",
+    "folder_assistant/reading.py": "54febef7b0313bd16517d4f5882c7054100c8e4b75e51c8310d9ec92b22d9b8f",
+    "folder_assistant/scope.py": "1180705f2cacf02fe068aef1a9a52adebfafe19b7e5baef06259405dd282887f",
+    "folder_assistant/store.py": "27a5f165119ef621715db67cfcfcecd9d494272cd5cae3f5b6de828ab7d3390d",
+    "folder_assistant/usage.py": "bf86177a3397159586053bbc7e4431d45b37e3121678e04ad6ee42069db2d240",
+    "agent/config.py": "30f8a3e63d4919113bdc09dc9954623440c18ee399448abd6e5da66ba7d2c60e",
+    "agent/llm.py": "bc58280e4c9663f4cc7f2fdf16041f11358e7b5b3e74b0fb4ce50b2232118867",
+    "agent/context.py": "097c931099e9b28a5222a10f02b03085f76f8aec61b33a02eb57393f7361f76f",
+    "agent/strength.py": "2dc6a5891255eb5e8da1c792e14acd3e39ab170bbd8493469432fd811035d1b1",
+    "workspace/stage26_live.py": "de825c47dcc47225113f0f6adbb652ccdb8bcb09e83cf5b03fbe5aa7dff55fbe"
+  },
+  "live_usage": {
+    "llm_calls": 6,
+    "embedding_calls": 0,
+    "rerank_calls": 0,
+    "known_tokens": 18092,
+    "unknown_usage_events": 0,
+    "by_variant": {
+      "baseline": {
+        "input_tokens": 5612,
+        "output_tokens": 2278,
+        "calls": 3
+      },
+      "guide": {
+        "input_tokens": 7901,
+        "output_tokens": 2301,
+        "calls": 3
+      }
+    },
+    "cny_total": null
+  },
+  "paired_requests": [
+    {
+      "case": "storage",
+      "variant": "baseline",
+      "finish_reason": "stop",
+      "usable_structure": true,
+      "diagnostic": {
+        "version": 1,
+        "code": "structure_checked",
+        "finish_reason": "stop",
+        "message": "结构和依据原句检查已完成，未认证事实、完整抽取或语义正确性。",
+        "suggestion": "核对内容与范围；这不是正式审稿通过。",
+        "validation": "checked",
+        "issues": [],
+        "usage_status": "known",
+        "semantic_status": "not_certified"
+      },
+      "expected_literal_rows": [
+        [
+          "BX-81",
+          "存放温度",
+          "0 °C",
+          "stated"
+        ],
+        [
+          "BX-81",
+          "保存期",
+          "7 天",
+          "stated"
+        ],
+        [
+          "BX-82",
+          "存放温度",
+          null,
+          "blank"
+        ],
+        [
+          "BX-82",
+          "保存期",
+          null,
+          "unknown"
+        ]
+      ],
+      "actual_literal_rows": [
+        [
+          "BX-81",
+          "存放温度",
+          "0 °C",
+          "stated"
+        ],
+        [
+          "BX-81",
+          "保存期",
+          "7 天",
+          "stated"
+        ],
+        [
+          "BX-82",
+          "存放温度",
+          "",
+          "blank"
+        ],
+        [
+          "BX-82",
+          "保存期",
+          null,
+          "unknown"
+        ]
+      ],
+      "literal_exact_matches": 3,
+      "expected_rows": 4,
+      "returned_rows": 4,
+      "missing_or_different": [
+        [
+          "BX-82",
+          "存放温度",
+          null,
+          "blank"
+        ]
+      ],
+      "unplanned_rows_or_representation": [
+        [
+          "BX-82",
+          "存放温度",
+          "",
+          "blank"
+        ]
+      ],
+      "strict_exact_row_set_matched": false,
+      "usage": {
+        "input_tokens": 1731,
+        "output_tokens": 514
+      },
+      "review_status": "not_reviewed",
+      "semantic_status": "not_certified"
+    },
+    {
+      "case": "storage",
+      "variant": "guide",
+      "finish_reason": "stop",
+      "usable_structure": true,
+      "diagnostic": {
+        "version": 1,
+        "code": "structure_checked",
+        "finish_reason": "stop",
+        "message": "结构和依据原句检查已完成，未认证事实、完整抽取或语义正确性。",
+        "suggestion": "核对内容与范围；这不是正式审稿通过。",
+        "validation": "checked",
+        "issues": [],
+        "usage_status": "known",
+        "semantic_status": "not_certified"
+      },
+      "expected_literal_rows": [
+        [
+          "BX-81",
+          "存放温度",
+          "0 °C",
+          "stated"
+        ],
+        [
+          "BX-81",
+          "保存期",
+          "7 天",
+          "stated"
+        ],
+        [
+          "BX-82",
+          "存放温度",
+          null,
+          "blank"
+        ],
+        [
+          "BX-82",
+          "保存期",
+          null,
+          "unknown"
+        ]
+      ],
+      "actual_literal_rows": [
+        [
+          "BX-81",
+          "存放温度",
+          "0 °C",
+          "stated"
+        ],
+        [
+          "BX-81",
+          "保存期",
+          "7 天",
+          "stated"
+        ],
+        [
+          "BX-82",
+          "存放温度",
+          "",
+          "blank"
+        ],
+        [
+          "BX-82",
+          "保存期",
+          null,
+          "unknown"
+        ]
+      ],
+      "literal_exact_matches": 3,
+      "expected_rows": 4,
+      "returned_rows": 4,
+      "missing_or_different": [
+        [
+          "BX-82",
+          "存放温度",
+          null,
+          "blank"
+        ]
+      ],
+      "unplanned_rows_or_representation": [
+        [
+          "BX-82",
+          "存放温度",
+          "",
+          "blank"
+        ]
+      ],
+      "strict_exact_row_set_matched": false,
+      "usage": {
+        "input_tokens": 2494,
+        "output_tokens": 463
+      },
+      "review_status": "not_reviewed",
+      "semantic_status": "not_certified"
+    },
+    {
+      "case": "comparison",
+      "variant": "guide",
+      "finish_reason": "stop",
+      "usable_structure": true,
+      "diagnostic": {
+        "version": 1,
+        "code": "structure_checked",
+        "finish_reason": "stop",
+        "message": "结构和依据原句检查已完成，未认证事实、完整抽取或语义正确性。",
+        "suggestion": "核对内容与范围；这不是正式审稿通过。",
+        "validation": "checked",
+        "issues": [],
+        "usage_status": "known",
+        "semantic_status": "not_certified"
+      },
+      "expected_literal_rows": [
+        [
+          "东区阅览室",
+          "普通借阅期限",
+          "14 日",
+          "stated"
+        ],
+        [
+          "西区阅览室",
+          "普通借阅期限",
+          "21 日",
+          "stated"
+        ]
+      ],
+      "actual_literal_rows": [
+        [
+          "东区阅览室",
+          "普通借阅期限",
+          "14 日",
+          "stated"
+        ],
+        [
+          "西区阅览室",
+          "普通借阅期限",
+          "21 日",
+          "stated"
+        ],
+        [
+          "东区阅览室",
+          "适用读者类别",
+          null,
+          "unknown"
+        ],
+        [
+          "西区阅览室",
+          "适用读者类别",
+          null,
+          "unknown"
+        ]
+      ],
+      "literal_exact_matches": 2,
+      "expected_rows": 2,
+      "returned_rows": 4,
+      "missing_or_different": [],
+      "unplanned_rows_or_representation": [
+        [
+          "东区阅览室",
+          "适用读者类别",
+          null,
+          "unknown"
+        ],
+        [
+          "西区阅览室",
+          "适用读者类别",
+          null,
+          "unknown"
+        ]
+      ],
+      "strict_exact_row_set_matched": false,
+      "usage": {
+        "input_tokens": 2498,
+        "output_tokens": 708
+      },
+      "review_status": "not_reviewed",
+      "semantic_status": "not_certified"
+    },
+    {
+      "case": "comparison",
+      "variant": "baseline",
+      "finish_reason": "stop",
+      "usable_structure": true,
+      "diagnostic": {
+        "version": 1,
+        "code": "structure_checked",
+        "finish_reason": "stop",
+        "message": "结构和依据原句检查已完成，未认证事实、完整抽取或语义正确性。",
+        "suggestion": "核对内容与范围；这不是正式审稿通过。",
+        "validation": "checked",
+        "issues": [],
+        "usage_status": "known",
+        "semantic_status": "not_certified"
+      },
+      "expected_literal_rows": [
+        [
+          "东区阅览室",
+          "普通借阅期限",
+          "14 日",
+          "stated"
+        ],
+        [
+          "西区阅览室",
+          "普通借阅期限",
+          "21 日",
+          "stated"
+        ]
+      ],
+      "actual_literal_rows": [
+        [
+          "东区阅览室",
+          "普通借阅期限",
+          "14 日",
+          "stated"
+        ],
+        [
+          "西区阅览室",
+          "普通借阅期限",
+          "21 日",
+          "stated"
+        ]
+      ],
+      "literal_exact_matches": 2,
+      "expected_rows": 2,
+      "returned_rows": 2,
+      "missing_or_different": [],
+      "unplanned_rows_or_representation": [],
+      "strict_exact_row_set_matched": true,
+      "usage": {
+        "input_tokens": 1735,
+        "output_tokens": 564
+      },
+      "review_status": "not_reviewed",
+      "semantic_status": "not_certified"
+    },
+    {
+      "case": "larger",
+      "variant": "baseline",
+      "finish_reason": "length",
+      "usable_structure": false,
+      "diagnostic": {
+        "version": 1,
+        "code": "output_limit",
+        "finish_reason": "length",
+        "message": "服务报告输出达到上限，回答可能被截断；即使JSON完整也不计作该批完成。",
+        "suggestion": "可显式拆小未完成批次，或核对预算后为新请求设置输出上限；会另行计费。",
+        "validation": "invalid",
+        "issues": [
+          {
+            "code": "invalid_schema",
+            "path": "",
+            "message": "回答不符合本次约定的数据结构，未自动修补"
+          }
+        ],
+        "usage_status": "known",
+        "semantic_status": "not_certified"
+      },
+      "expected_literal_rows": [
+        [
+          "LG-71",
+          "采样间隔",
+          "0 ms",
+          "stated"
+        ],
+        [
+          "LG-71",
+          "存储容量",
+          "64 MB",
+          "stated"
+        ],
+        [
+          "LG-72",
+          "采样间隔",
+          "125 ms",
+          "stated"
+        ],
+        [
+          "LG-72",
+          "存储容量",
+          "128 MB",
+          "stated"
+        ],
+        [
+          "LG-73",
+          "采样间隔",
+          "250 ms",
+          "stated"
+        ],
+        [
+          "LG-73",
+          "存储容量",
+          "256 MB",
+          "stated"
+        ],
+        [
+          "LG-74",
+          "采样间隔",
+          "500 ms",
+          "stated"
+        ],
+        [
+          "LG-74",
+          "存储容量",
+          "512 MB",
+          "stated"
+        ],
+        [
+          "LG-75",
+          "采样间隔",
+          "750 ms",
+          "stated"
+        ],
+        [
+          "LG-75",
+          "存储容量",
+          "768 MB",
+          "stated"
+        ],
+        [
+          "LG-76",
+          "采样间隔",
+          "1000 ms",
+          "stated"
+        ],
+        [
+          "LG-76",
+          "存储容量",
+          "1024 MB",
+          "stated"
+        ]
+      ],
+      "actual_literal_rows": [],
+      "literal_exact_matches": 0,
+      "expected_rows": 12,
+      "returned_rows": 0,
+      "missing_or_different": [
+        [
+          "LG-71",
+          "采样间隔",
+          "0 ms",
+          "stated"
+        ],
+        [
+          "LG-71",
+          "存储容量",
+          "64 MB",
+          "stated"
+        ],
+        [
+          "LG-72",
+          "采样间隔",
+          "125 ms",
+          "stated"
+        ],
+        [
+          "LG-72",
+          "存储容量",
+          "128 MB",
+          "stated"
+        ],
+        [
+          "LG-73",
+          "采样间隔",
+          "250 ms",
+          "stated"
+        ],
+        [
+          "LG-73",
+          "存储容量",
+          "256 MB",
+          "stated"
+        ],
+        [
+          "LG-74",
+          "采样间隔",
+          "500 ms",
+          "stated"
+        ],
+        [
+          "LG-74",
+          "存储容量",
+          "512 MB",
+          "stated"
+        ],
+        [
+          "LG-75",
+          "采样间隔",
+          "750 ms",
+          "stated"
+        ],
+        [
+          "LG-75",
+          "存储容量",
+          "768 MB",
+          "stated"
+        ],
+        [
+          "LG-76",
+          "采样间隔",
+          "1000 ms",
+          "stated"
+        ],
+        [
+          "LG-76",
+          "存储容量",
+          "1024 MB",
+          "stated"
+        ]
+      ],
+      "unplanned_rows_or_representation": [],
+      "strict_exact_row_set_matched": false,
+      "usage": {
+        "input_tokens": 2146,
+        "output_tokens": 1200
+      },
+      "review_status": "not_reviewed",
+      "semantic_status": "not_certified"
+    },
+    {
+      "case": "larger",
+      "variant": "guide",
+      "finish_reason": "stop",
+      "usable_structure": true,
+      "diagnostic": {
+        "version": 1,
+        "code": "structure_checked",
+        "finish_reason": "stop",
+        "message": "结构和依据原句检查已完成，未认证事实、完整抽取或语义正确性。",
+        "suggestion": "核对内容与范围；这不是正式审稿通过。",
+        "validation": "checked",
+        "issues": [],
+        "usage_status": "known",
+        "semantic_status": "not_certified"
+      },
+      "expected_literal_rows": [
+        [
+          "LG-71",
+          "采样间隔",
+          "0 ms",
+          "stated"
+        ],
+        [
+          "LG-71",
+          "存储容量",
+          "64 MB",
+          "stated"
+        ],
+        [
+          "LG-72",
+          "采样间隔",
+          "125 ms",
+          "stated"
+        ],
+        [
+          "LG-72",
+          "存储容量",
+          "128 MB",
+          "stated"
+        ],
+        [
+          "LG-73",
+          "采样间隔",
+          "250 ms",
+          "stated"
+        ],
+        [
+          "LG-73",
+          "存储容量",
+          "256 MB",
+          "stated"
+        ],
+        [
+          "LG-74",
+          "采样间隔",
+          "500 ms",
+          "stated"
+        ],
+        [
+          "LG-74",
+          "存储容量",
+          "512 MB",
+          "stated"
+        ],
+        [
+          "LG-75",
+          "采样间隔",
+          "750 ms",
+          "stated"
+        ],
+        [
+          "LG-75",
+          "存储容量",
+          "768 MB",
+          "stated"
+        ],
+        [
+          "LG-76",
+          "采样间隔",
+          "1000 ms",
+          "stated"
+        ],
+        [
+          "LG-76",
+          "存储容量",
+          "1024 MB",
+          "stated"
+        ]
+      ],
+      "actual_literal_rows": [
+        [
+          "LG-71",
+          "采样间隔",
+          "0 ms",
+          "stated"
+        ],
+        [
+          "LG-71",
+          "存储容量",
+          "64 MB",
+          "stated"
+        ],
+        [
+          "LG-72",
+          "采样间隔",
+          "125 ms",
+          "stated"
+        ],
+        [
+          "LG-72",
+          "存储容量",
+          "128 MB",
+          "stated"
+        ],
+        [
+          "LG-73",
+          "采样间隔",
+          "250 ms",
+          "stated"
+        ],
+        [
+          "LG-73",
+          "存储容量",
+          "256 MB",
+          "stated"
+        ],
+        [
+          "LG-74",
+          "采样间隔",
+          "500 ms",
+          "stated"
+        ],
+        [
+          "LG-74",
+          "存储容量",
+          "512 MB",
+          "stated"
+        ],
+        [
+          "LG-75",
+          "采样间隔",
+          "750 ms",
+          "stated"
+        ],
+        [
+          "LG-75",
+          "存储容量",
+          "768 MB",
+          "stated"
+        ],
+        [
+          "LG-76",
+          "采样间隔",
+          "1000 ms",
+          "stated"
+        ],
+        [
+          "LG-76",
+          "存储容量",
+          "1024 MB",
+          "stated"
+        ]
+      ],
+      "literal_exact_matches": 12,
+      "expected_rows": 12,
+      "returned_rows": 12,
+      "missing_or_different": [],
+      "unplanned_rows_or_representation": [],
+      "strict_exact_row_set_matched": true,
+      "usage": {
+        "input_tokens": 2909,
+        "output_tokens": 1130
+      },
+      "review_status": "not_reviewed",
+      "semantic_status": "not_certified"
+    }
+  ],
+  "all_strict_exact_row_sets_matched": false,
+  "observations": [
+    "Three synthetic fixed-delivered-text pairs only; no parser, RAG recall, scale or general model quality claim.",
+    "Both storage outputs use empty string for blank; preregistered null exact representation fails in both. Existing contract permits empty string; expectations are not rewritten.",
+    "Comparison guide returns two unrequested reader-category fields. Kept visible rather than removed or counted as requested delivery.",
+    "Larger baseline returns length with invalid JSON; guide returns stop and all 12 literal rows under same 1200 cap. One pair does not establish generalized causal improvement.",
+    "Guide adds 763 input tokens per request; guide total10202 vs baseline7890. Not a cost reduction.",
+    "Stage25 historical context resend limitation remains. Existing failures and all responses retained; no answer repair or automatic paid retry."
+  ],
+  "source_sha256": {
+    "README.md": "f2cecec70e795e75c1626ccae5bff67e809d4c3ef9a9f58c44b3148a67ecfe1d",
+    "ROADMAP.md": "dc15df1140511d735e46b36190bd7a47fe8f6d8256840b41e12236e6d1851f81",
+    "desktop/scripts/folder-workflow-smoke.cjs": "f109f52019ce3ad4c7acbb635b3e1a878e4af771d2cb634cd1cb23054746d7ab",
+    "desktop/src/folder-questions.tsx": "d02b1bcdded4500bb543d5389c1f44871dd87b6642f316fecc298de0daae78b9",
+    "folder_assistant/answers.py": "c5d0d5a7be74f579ee7f0be5f4ba1f22e10a4bd617fbfb447f7930185888a7ae",
+    "folder_assistant/contracts.py": "76e4473ef92ab82fa2e3de2b12765b810c6b3deb6a4a03cfe8fc36c109fa75ec",
+    "folder_assistant/exhaustive.py": "1e4eb9e129e9f2cb46ceffd30289e6bfb8a8bfa453255dd5ed55edd2dc481f42",
+    "folder_assistant/exports.py": "8bbf219f7c1cc868b08f2470411f572d66f3ef9d07e00ed374a455235efc07f2",
+    "pyproject.toml": "7884b8a5a1df32e49c18853f29e7ae0a8af84d92de0068e90628505a283033d6",
+    "tests/test_folder_contracts.py": "5b854402498f963ecbe370c3335e3e8e9a1459854e4aa98b51e388b190610c3b",
+    "folder_assistant/output_diagnostics.py": "e4f8a66e5b14517a69e2fb45c37ac9153d0c920960ad1f37d70a7c93185ae08d",
+    "desktop/src/folder-output-diagnostics.tsx": "68e829cee78aae1a13fd992683a50347af97015e7a58ed5c32232685e772f0d2",
+    "tests/test_folder_output_guide.py": "ec8c0e92aca4fd38abcb48a104785cdffda2c1d52022f9530bce6cddcfb12dd8",
+    "docs/stage26-verification-20261023.md": "85e10bb6207291b2e62158eb30981c663c4757df327b15c75c34dd448a490391",
+    "docs/stage26-live-plan-20261023.json": "289cdde636d1cf52b0270479c30c3af8e9220a0d58acfdd5d7a549c1aa292520"
+  },
+  "artifact_sha256": {
+    "workspace/stage26-live-20261023/attempt.json": "c310e2ff3bf060d33f839df70925e0c1cd8a8e156f55e337e13e83b7ee0b39e5",
+    "workspace/stage26-live-20261023/baseline-contracts.py": "5ed8debad924871b1ea6a41dc03276d3d886161fd0030a974214e2be806ea8a2",
+    "workspace/stage26-live-20261023/runtime/agent/config.py": "30f8a3e63d4919113bdc09dc9954623440c18ee399448abd6e5da66ba7d2c60e",
+    "workspace/stage26-live-20261023/runtime/agent/context.py": "097c931099e9b28a5222a10f02b03085f76f8aec61b33a02eb57393f7361f76f",
+    "workspace/stage26-live-20261023/runtime/agent/llm.py": "bc58280e4c9663f4cc7f2fdf16041f11358e7b5b3e74b0fb4ce50b2232118867",
+    "workspace/stage26-live-20261023/runtime/agent/strength.py": "2dc6a5891255eb5e8da1c792e14acd3e39ab170bbd8493469432fd811035d1b1",
+    "workspace/stage26-live-20261023/runtime/folder_assistant/answers.py": "c5d0d5a7be74f579ee7f0be5f4ba1f22e10a4bd617fbfb447f7930185888a7ae",
+    "workspace/stage26-live-20261023/runtime/folder_assistant/batching.py": "87936b69ccbb6b2d5e4c027de9f68265393e24c037fc57fa783b513bb97800a2",
+    "workspace/stage26-live-20261023/runtime/folder_assistant/contracts.py": "76e4473ef92ab82fa2e3de2b12765b810c6b3deb6a4a03cfe8fc36c109fa75ec",
+    "workspace/stage26-live-20261023/runtime/folder_assistant/exhaustive.py": "1e4eb9e129e9f2cb46ceffd30289e6bfb8a8bfa453255dd5ed55edd2dc481f42",
+    "workspace/stage26-live-20261023/runtime/folder_assistant/exports.py": "8bbf219f7c1cc868b08f2470411f572d66f3ef9d07e00ed374a455235efc07f2",
+    "workspace/stage26-live-20261023/runtime/folder_assistant/index.py": "6c70d3975f5918bd76d2149f5938e5aaf6a369caff6af5feca3e5af7bc133db3",
+    "workspace/stage26-live-20261023/runtime/folder_assistant/jobs.py": "b8c0efab6530c70b619464e32f9ca9092fe08b3f6da722a99dd2900de0010b31",
+    "workspace/stage26-live-20261023/runtime/folder_assistant/output_diagnostics.py": "e4f8a66e5b14517a69e2fb45c37ac9153d0c920960ad1f37d70a7c93185ae08d",
+    "workspace/stage26-live-20261023/runtime/folder_assistant/parse_worker.py": "e1603c813ea3ed124e4f744af7db7fabb13343c09ab570a651722338cbf49387",
+    "workspace/stage26-live-20261023/runtime/folder_assistant/parsing.py": "474dd43160b91025576f4bbd802f2fe3a1122818ce6a8536ba194564722a0acf",
+    "workspace/stage26-live-20261023/runtime/folder_assistant/projects.py": "626a37145e285226170983857afd1f1086eb4dd655fb91a02c7be9b7252f7320",
+    "workspace/stage26-live-20261023/runtime/folder_assistant/project_exports.py": "0f296a8f699722299d191acb00940d95267bd986cc94d49ae5e9c62c2109acbc",
+    "workspace/stage26-live-20261023/runtime/folder_assistant/reading.py": "54febef7b0313bd16517d4f5882c7054100c8e4b75e51c8310d9ec92b22d9b8f",
+    "workspace/stage26-live-20261023/runtime/folder_assistant/scope.py": "1180705f2cacf02fe068aef1a9a52adebfafe19b7e5baef06259405dd282887f",
+    "workspace/stage26-live-20261023/runtime/folder_assistant/store.py": "27a5f165119ef621715db67cfcfcecd9d494272cd5cae3f5b6de828ab7d3390d",
+    "workspace/stage26-live-20261023/runtime/folder_assistant/usage.py": "bf86177a3397159586053bbc7e4431d45b37e3121678e04ad6ee42069db2d240",
+    "workspace/stage26-live-20261023/runtime/folder_assistant/__init__.py": "36656300506ebee15611b11a8eec4d2ba51af2278e92d74a5226fa32a1dd6277",
+    "workspace/stage26-live-20261023/runtime/folder_assistant/__main__.py": "590c31bef4728539747a3a02b16cf55df006a81938f3e6adb0e2324d7747f560",
+    "workspace/stage26-live-20261023/runtime/workspace/stage26_live.py": "de825c47dcc47225113f0f6adbb652ccdb8bcb09e83cf5b03fbe5aa7dff55fbe",
+    "workspace/stage26-live-20261023/sources/comparison/east.txt": "ea94d003016a40c8dde3af2684480b0bbf3c154fd305f778cfb45689f0858490",
+    "workspace/stage26-live-20261023/sources/comparison/west.txt": "4382f7375ee4326ef57d372a15a69f9d1c00560d67e345a9f190e3cffa555b66",
+    "workspace/stage26-live-20261023/sources/larger/recorders.txt": "2417fadcd12b9209f3c40c410b3b03ee3b8bcd81694a12db16e150d751a071ad",
+    "workspace/stage26-live-20261023/sources/storage/boxes.txt": "621bd47224f1f324d2b529391ac9c286c72a620944069cfa45a6c6d57556aef4",
+    "workspace/stage26-live-20261023/__pycache__/baseline-contracts.cpython-311.pyc": "2a0cde41d891ec750a5fd0665ce7be974e82d60ec4562c059f59de5afcc2079a",
+    "workspace/stage26-build-20261023.log": "327af6d63e5ed61cc5331cb3954d9904e0c70bb273a0d235125f4ec536edc4a7",
+    "workspace/stage26-checked-20261023.png": "d1c7431d0abc753433c6b1f69c2032b71274ecf7d36f002417275fac46b5dba8",
+    "workspace/stage26-folder-workflow-20261023.png": "dd2748e5b18f882f77923ffb4fc864e9f107ba896dc535f158c605c445c853dd",
+    "workspace/stage26-folder-workflow-first-20261023.png": "955ef2a5630183a39cae20e018eec09c8d27f13c86abc93edd5e81f5d38e8942",
+    "workspace/stage26-full-20261023.log": "f20c5c8c1a92a155e1915e4f20034a8e8fb4d930dda65f3bbea091afda8ccc6c",
+    "workspace/stage26-live-20261023.log": "9b1aa61f460884fed370b24019f6c86b3536803ac2cd138d65cd1f628779312e",
+    "workspace/stage26-output-limit-20261023.png": "cc6c72daf5fab0eb0211b6660182c024ed3a471baab6b8b2483712a4a7841c20",
+    "workspace/stage26-retry-20261023.png": "cc6c72daf5fab0eb0211b6660182c024ed3a471baab6b8b2483712a4a7841c20",
+    "workspace/stage26-retry-first-20261023.png": "7a2295cda95dc3c3172e888a23b3ecdeb0e98d3823a705d079257197285f8fbe",
+    "workspace/stage26-settings-20261023.png": "a0cc529f936e36e6886ab5d596cf36992cb5e6c1e5e99fdb9f4158607c45d9f7",
+    "workspace/stage26-settings-first-20261023.png": "de6fe5ca6e786c32356e8a02414cffa40825e9a2da9f495a5d300e4caab077c5",
+    "workspace/stage26-targeted-20261023.log": "57a47030a3fac19a60dab898499a565579a3920882a3064a2df0685795de20a8",
+    "workspace/stage26-ui-20261023.log": "e0f2f7c7696ab4a98ac42467b5a1ab68a840f5bcd566453e197c0d49c0b48d8a",
+    "workspace/stage26-ui2-20261023.log": "eca83e96da0993187dbaba3475c11beaf13f2cfda44e6320cd1ff88d7545fc45"
+  }
+}

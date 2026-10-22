@@ -165,10 +165,14 @@ def test_new_answer_export_preserves_object_quotes_and_inference_limits(library)
 
 
 def test_request_contains_actual_nested_schema_without_relaxing_types(library):
-    from folder_assistant.contracts import Answer,SCHEMA_MARKER
+    from folder_assistant.contracts import Answer,SCHEMA_MARKER,request_schema
     sync(library);jobs,chat=service(library);job=finished(jobs,ask(library,jobs))
     wire=json.loads(chat.calls[0][0][0]['content'].split(SCHEMA_MARKER)[1])
-    assert wire==Answer.model_json_schema()
+    assert wire==request_schema()
+    base=Answer.model_json_schema()
+    assert wire['properties']==base['properties']
+    for name,definition in base['$defs'].items():
+        assert {k:v for k,v in wire['$defs'][name].items() if k!='allOf'}==definition
     nested=wire['$defs']['Comparison']['properties']['subject_quote']['anyOf']
     assert {'$ref':'#/$defs/Quote'} in nested and {'type':'null'} in nested
     assert wire['properties']['comparison']['type']=='array'

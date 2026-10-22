@@ -17,6 +17,7 @@ fs.writeFileSync(path.join(docs, ".env"), "SENSITIVE=must-not-read");
 const batchingMode = process.argv.includes("--batching");
 const scopeMode = process.argv.includes("--scope");
 const projectMode = process.argv.includes("--projects");
+const diagnosticsMode = process.argv.includes("--diagnostics");
 const parseMode = process.argv.includes("--parse");
 if (parseMode)
   require("node:child_process").execFileSync(
@@ -329,6 +330,18 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         await page.locator(".folder-answer").innerText(),
         /未正式审稿/,
       );
+      if (diagnosticsMode) {
+        await page
+          .getByLabel("输出诊断", { exact: true })
+          .getByText("结构检查完成", { exact: true })
+          .waitFor();
+        await page
+          .getByLabel("输出诊断", { exact: true })
+          .scrollIntoViewIfNeeded();
+        await page.screenshot({
+          path: path.join(project, "workspace/stage26-checked-20261023.png"),
+        });
+      }
       if (process.argv.includes("--strength")) {
         assert.match(
           await page.locator(".folder-answer").innerText(),
@@ -373,6 +386,14 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         ),
         /本地资料原文/,
       );
+      if (diagnosticsMode)
+        assert.match(
+          fs.readFileSync(
+            path.join(outputRoot, tasks[0], "summary.md"),
+            "utf8",
+          ),
+          /输出诊断/,
+        );
     }
     if (process.argv.includes("--reading")) {
       await page
@@ -416,9 +437,11 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         await page.screenshot({
           path: path.join(
             project,
-            scopeMode
-              ? "workspace/stage24-settings-20261022.png"
-              : "workspace/stage23-settings-20261022.png",
+            diagnosticsMode
+              ? "workspace/stage26-settings-20261023.png"
+              : scopeMode
+                ? "workspace/stage24-settings-20261022.png"
+                : "workspace/stage23-settings-20261022.png",
           ),
         });
       }
@@ -457,6 +480,29 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         };
         const parent = (await getJobs()).find((j) => j.coverage);
         assert.equal(parent.coverage.next_offset, 0);
+        if (diagnosticsMode) {
+          await page
+            .getByLabel("输出诊断", { exact: true })
+            .getByText("输出达到上限", { exact: true })
+            .waitFor();
+          assert.equal(
+            parent.batches[0].output_diagnostics.code,
+            "output_limit",
+          );
+          assert.equal(
+            parent.batches[0].output_diagnostics.validation,
+            "checked",
+          );
+          await page
+            .getByLabel("输出诊断", { exact: true })
+            .scrollIntoViewIfNeeded();
+          await page.screenshot({
+            path: path.join(
+              project,
+              "workspace/stage26-output-limit-20261023.png",
+            ),
+          });
+        }
         if (scopeMode) {
           const scope = page.getByRole("region", {
             name: "范围与任务链",
@@ -478,9 +524,11 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         await page.screenshot({
           path: path.join(
             project,
-            scopeMode
-              ? "workspace/stage24-retry-20261022.png"
-              : "workspace/stage23-retry-20261022.png",
+            diagnosticsMode
+              ? "workspace/stage26-retry-20261023.png"
+              : scopeMode
+                ? "workspace/stage24-retry-20261022.png"
+                : "workspace/stage23-retry-20261022.png",
           ),
         });
         await page
@@ -657,21 +705,23 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
       path: path.join(
         project,
         "workspace",
-        projectMode
-          ? "stage25-folder-projects-20261022.png"
-          : scopeMode
-            ? "stage24-folder-workflow-20261022.png"
-            : batchingMode
-              ? "stage23-folder-workflow-20261022.png"
-              : parseMode
-                ? "folder-workflow-current-multiformat.png"
-                : process.argv.includes("--strength")
-                  ? "model-strength-folder-20261022.png"
-                  : process.argv.includes("--reading")
-                    ? "stage22-folder-workflow.png"
-                    : process.argv.includes("--experience")
-                      ? "stage21-folder-workflow.png"
-                      : "folder-workflow-current.png",
+        diagnosticsMode
+          ? "stage26-folder-workflow-20261023.png"
+          : projectMode
+            ? "stage25-folder-projects-20261022.png"
+            : scopeMode
+              ? "stage24-folder-workflow-20261022.png"
+              : batchingMode
+                ? "stage23-folder-workflow-20261022.png"
+                : parseMode
+                  ? "folder-workflow-current-multiformat.png"
+                  : process.argv.includes("--strength")
+                    ? "model-strength-folder-20261022.png"
+                    : process.argv.includes("--reading")
+                      ? "stage22-folder-workflow.png"
+                      : process.argv.includes("--experience")
+                        ? "stage21-folder-workflow.png"
+                        : "folder-workflow-current.png",
       ),
     });
     await page

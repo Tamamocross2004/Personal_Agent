@@ -44,6 +44,7 @@ def answer_exhaustive(jobs,jid):
             call=next((e for e in current.get('usage_events',[]) if e['id']==jid+f'-batch-{number+1}'),None)
             entry.update(status=call['status'] if call else 'not_sent',request=current.get('request') if call else None,
                          model_output=current.get('model_output') if call and call['status']=='returned' else None,
+                         output_diagnostics=current.get('output_diagnostics') if call and call['status']=='returned' else None,
                          finish_reason=current.get('finish_reason') if call and call['status']=='returned' else None)
             if call and call['status']=='returned':
                 coverage.update(returned_until=max(coverage['returned_until'],batch['next_offset']))
@@ -55,7 +56,8 @@ def answer_exhaustive(jobs,jid):
             jobs.patch(jid,batches=batches,coverage=coverage,evidence=confirmed)
             raise
         current=jobs.get(jid)
-        entry.update(request=current['request'],model_output=current['model_output'],finish_reason=current['finish_reason'])
+        entry.update(request=current['request'],model_output=current['model_output'],finish_reason=current['finish_reason'],
+                     output_diagnostics=current.get('output_diagnostics'))
         evidence+=hits
         usable=result.get('answer') and current['finish_reason']=='stop'
         if usable:structured+=batch['selected_segments'];offset=batch['next_offset']

@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 
 VERSION=3
+GUIDE_VERSION=1
 
 
 def record_key(evidence):
@@ -179,6 +180,43 @@ unknowns只列与问题相关的未知项；有限检索无依据不表示全目
 SCHEMA_MARKER='\n输出结构由程序实际验证模型生成。subject_quote/value_quote均为含citation_id和quote的对象或null，不是字符串；comparison必须是数组，不是null。严格遵守以下JSON Schema（包含双方条件的relation结构）：\n'
 
 
+def request_schema():
+    """Explain existing cross-field checks to the generator; never replace validate().
+
+    JSON Schema cannot check delivered quotes, source identity or semantic meaning.
+    These conditional hints are a subset of the unchanged v3 acceptance rules.
+    """
+    schema=Answer.model_json_schema()
+    nonempty={'type':'string','pattern':r'\S'}
+    quote={'$ref':'#/$defs/Quote'}
+    def when(key,values,properties):
+        return {'if':{'properties':{key:{'enum':values}},'required':[key]},
+                'then':{'properties':properties,'required':list(properties)}}
+    schema['$defs']['Comparison']['allOf']=[
+        when('status',['stated'],{'value':nonempty,'value_quote':quote,'citations':{'minItems':1}}),
+        when('status',['unknown','blank'],{'value':{'enum':[None,'']},'value_quote':{'type':'null'}}),
+        when('status',['blank'],{'citations':{'minItems':1}}),
+        when('subject_type',['entity'],{'subject':nonempty,'subject_quote':quote}),
+        when('subject_type',['source'],{'subject':{'type':'string'},'subject_quote':{'type':'null'}}),
+        when('subject_type',['unknown'],{'subject':{'type':'null'},'subject_quote':{'type':'null'}}),
+    ]
+    schema['$defs']['Finding']['allOf']=[
+        when('kind',['direct','inference','difference','conflict'],{'citations':{'minItems':1},'support':{'minItems':1}}),
+        when('kind',['inference'],{'assumptions':{'contains':nonempty},'limitations':{'contains':nonempty}}),
+        # v3 permits absent/empty/whitespace-only assumptions outside inference.
+        {'if':{'properties':{'kind':{'enum':['direct','difference','conflict','unknown']}},'required':['kind']},
+         'then':{'properties':{'assumptions':{'items':{'type':'string','pattern':r'^\s*$'}}}}},
+        when('kind',['difference','conflict'],{'support':{'minItems':2},
+             'relation':{'allOf':[{'$ref':'#/$defs/Relation'},{'properties':{'field':nonempty,'reason':nonempty}}]}}),
+        {'if':{'properties':{'kind':{'enum':['direct','inference','unknown']}},'required':['kind']},
+         'then':{'properties':{'relation':{'type':'null'}}}},
+        when('kind',['conflict'],{'relation':{'properties':{'comparability':{'const':'established'},'common_scope':nonempty}}}),
+    ]
+    # Distinctness, quote binding and source identity remain evidence-aware checks.
+    return schema
+
+
 def instruction():
-    """One source of truth for model and validator; no answer-specific examples or coercion."""
-    return SYSTEM+SCHEMA_MARKER+json.dumps(Answer.model_json_schema(),ensure_ascii=False,separators=(',',':'))
+    """Versioned generation guide, with no answer-specific examples or answer repair."""
+    concise='\n逐项字段放在comparison；findings简洁概述所问内容，避免逐行重复同一张对照表。完整闭合JSON，不以省略已有依据的字段来满足长度；空间不足由程序保留未完成状态。'
+    return SYSTEM+concise+SCHEMA_MARKER+json.dumps(request_schema(),ensure_ascii=False,separators=(',',':'))

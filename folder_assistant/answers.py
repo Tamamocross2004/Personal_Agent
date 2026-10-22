@@ -9,7 +9,8 @@ from agent.config import load_llm_config
 from agent.context import estimate_tokens
 from knowledge.documents import sha
 from knowledge.store import now
-from .contracts import VERSION, instruction, ContractError, validate as validate_v2
+from .contracts import VERSION, GUIDE_VERSION, instruction, ContractError, validate as validate_v2
+from .output_diagnostics import diagnose
 
 
 class Finding(BaseModel):
@@ -95,7 +96,9 @@ def answer_evidence(jobs,jid,evidence,*,call_suffix='answer',reading_scope=None)
     if max_output<128: raise BudgetInsufficient('剩余预算不足以发送短答请求；未调用语言模型')
     jobs.patch(jid,request={'messages':messages,'estimated_input_tokens':input_estimate,'max_output_tokens':max_output,
                           'requested_output_tokens':inputs.get('output_tokens',1200),'effective_output_cap':output_cap,
-                          'budget_limited':max_output<output_cap,'answer_schema_version':VERSION})
+                          'budget_limited':max_output<output_cap,'answer_schema_version':VERSION,
+                          'output_guide_version':GUIDE_VERSION,'system_sha256':sha(messages[0]['content'])},
+               output_diagnostics=None)
     config=replace(load_llm_config(settings=jobs.index.settings,strength=inputs.get('strength','default')),max_retries=0)
     client=jobs.llm_factory(config)
     jobs.check(jid)
@@ -116,7 +119,9 @@ def answer_evidence(jobs,jid,evidence,*,call_suffix='answer',reading_scope=None)
         call['reasoning_tokens']=reasoning if valid(reasoning) and valid(output) and reasoning<=output else None
         event(call)
         text=response.choices[0].message.content or ''
-        jobs.patch(jid,model_output=text,finish_reason=response.choices[0].finish_reason)
+        jobs.patch(jid,model_output=text,finish_reason=response.choices[0].finish_reason,
+                   output_diagnostics=diagnose(response.choices[0].finish_reason,
+                       usage_known=call['input_tokens'] is not None and call['output_tokens'] is not None))
     except Exception as exc:
         call.update(status='failed',error_type=type(exc).__name__,finished=now());event(call)
         raise ValueError('短答请求失败或响应无效：'+type(exc).__name__+'；用量可能未知，未自动重试') from None
@@ -126,9 +131,11 @@ def answer_evidence(jobs,jid,evidence,*,call_suffix='answer',reading_scope=None)
     try:
         answer,checks=validate_v2(text,evidence)
     except ContractError as exc:
+        jobs.patch(jid,output_diagnostics=diagnose(response.choices[0].finish_reason,issues=exc.issues))
         return {'answer':None,'content_status':'needs_verification','review_status':'not_reviewed',
                 'answer_schema_version':VERSION,'contract_checks':{'version':VERSION,'status':'invalid','issues':exc.issues},
                 'message':str(exc)+'；原始响应已保留，未自动重试或修补。'}
+    jobs.patch(jid,output_diagnostics=diagnose(response.choices[0].finish_reason,checked=True))
     partial=response.choices[0].finish_reason!='stop'
     status='budget_exceeded' if jobs.used_tokens(jid)>budget else ('partial' if partial else ('needs_verification' if checks['warnings'] else 'unreviewed'))
     return {'answer':answer,'content_status':status,'answer_schema_version':VERSION,'contract_checks':checks,
