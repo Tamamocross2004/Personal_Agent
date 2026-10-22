@@ -38,10 +38,11 @@ export function FolderQuestions({
   }, [folderId, job?.status]);
   const current = view || (job?.kind === "answer" ? job : history[0]);
   const labels: any = {
-    direct: "原文事实",
-    inference: "推断",
+    direct: "原文整理",
+    inference: "推断（基于假设，未证实）",
+    difference: "差异（不等于矛盾）",
     unknown: "未知",
-    conflict: "冲突",
+    conflict: "模型判断：明确矛盾（待核对）",
     stated: "有原文值",
     blank: "原文空白",
   };
@@ -232,10 +233,60 @@ export function FolderQuestions({
             </p>
           )}
           <p>{current.message || current.result?.message}</p>
+          {current.result?.contract_checks && (
+            <aside className="folder-contract-notice">
+              <p>
+                仅检查结构和依据原句是否匹配；不认证事实、对象关系或矛盾判断，仍未正式审稿。
+              </p>
+              {current.result.contract_checks.warnings?.map(
+                (w: any, i: number) => (
+                  <p key={i}>需核对：{w.message}</p>
+                ),
+              )}
+              {current.result.contract_checks.issues?.map(
+                (w: any, i: number) => (
+                  <p key={i}>
+                    未形成合格整理：{w.message}（{w.path}）
+                  </p>
+                ),
+              )}
+            </aside>
+          )}
           {current.result?.answer?.findings.map((f: any, i: number) => (
             <article key={i}>
               <strong>{labels[f.kind]}</strong>
               <p>{f.statement}</p>
+              {f.assumptions?.map((s: string, j: number) => (
+                <p key={"a" + j}>假设（未证实）：{s}</p>
+              ))}
+              {f.limitations?.map((s: string, j: number) => (
+                <p key={"l" + j}>判断限制：{s}</p>
+              ))}
+              {f.relation && (
+                <div>
+                  <p>
+                    比较字段：{f.relation.field}；共同范围：
+                    {f.relation.common_scope || "尚未明确"}
+                  </p>
+                  <p>
+                    可比条件
+                    {f.relation.comparability === "established"
+                      ? "由模型声明已明确，须核对"
+                      : "尚未明确"}
+                    ：{f.relation.reason}
+                  </p>
+                </div>
+              )}
+              {!!f.support?.length && (
+                <details>
+                  <summary>本项依据原句</summary>
+                  {f.support.map((q: any, j: number) => (
+                    <blockquote key={j}>
+                      [{q.citation_id}] {q.quote}
+                    </blockquote>
+                  ))}
+                </details>
+              )}
               {cites(f.citations)}
             </article>
           ))}
@@ -246,7 +297,12 @@ export function FolderQuestions({
             <table>
               <thead>
                 <tr>
-                  <th>对象/来源</th>
+                  <th>
+                    {current.result.answer.schema_version === 2
+                      ? "对象（来源另列）"
+                      : "对象/来源（旧版）"}
+                  </th>
+                  {current.result.answer.schema_version === 2 && <th>来源</th>}
                   <th>字段</th>
                   <th>值/状态</th>
                   <th>依据</th>
@@ -255,7 +311,34 @@ export function FolderQuestions({
               <tbody>
                 {current.result.answer.comparison.map((r: any, i: number) => (
                   <tr key={i}>
-                    <td>{r.subject}</td>
+                    <td>
+                      {r.subject ?? "对象未明确"}
+                      {r.subject_type && (
+                        <small>
+                          （
+                          {r.subject_type === "entity"
+                            ? "原文对象"
+                            : r.subject_type === "source"
+                              ? "来源级"
+                              : "需核对"}
+                          ）
+                        </small>
+                      )}
+                    </td>
+                    {current.result.answer.schema_version === 2 && (
+                      <td>
+                        {Array.from(
+                          new Set<string>(
+                            r.citations.map(
+                              (id: string) =>
+                                current.evidence?.find(
+                                  (e: any) => e.citation_id === id,
+                                )?.name || id,
+                            ),
+                          ),
+                        ).join("、")}
+                      </td>
+                    )}
                     <td>{r.field}</td>
                     <td>
                       {r.status === "unknown"
@@ -265,7 +348,21 @@ export function FolderQuestions({
                           : (r.value ?? "未知")}
                       （{labels[r.status]}）
                     </td>
-                    <td>{cites(r.citations)}</td>
+                    <td>
+                      {cites(r.citations)}
+                      {r.subject_quote && (
+                        <details>
+                          <summary>对象原文</summary>
+                          <blockquote>{r.subject_quote.quote}</blockquote>
+                        </details>
+                      )}
+                      {r.value_quote && (
+                        <details>
+                          <summary>值原文</summary>
+                          <blockquote>{r.value_quote.quote}</blockquote>
+                        </details>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>

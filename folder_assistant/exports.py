@@ -64,7 +64,12 @@ def export_job(jobs,jid):
             return '; '.join(cid+' '+evidence[cid]['name']+' '+json.dumps(evidence[cid]['source_location'],ensure_ascii=False)+
                              ' SHA256 '+evidence[cid]['file_sha256'] for cid in ids)
         comparison=[['subject','field','value','status','citations_and_source_versions']]
-        for row in answer.get('comparison',[]):comparison.append([row['subject'],row['field'],row['value'],row['status'],refs(row['citations'])])
+        v2=answer.get('schema_version')==2
+        if v2:comparison[0].extend(['subject_type','subject_quote','value_quote'])
+        for row in answer.get('comparison',[]):
+            values=[row['subject'],row['field'],row['value'],row['status'],refs(row['citations'])]
+            if v2:values.extend([row.get('subject_type','legacy'),json.dumps(row.get('subject_quote'),ensure_ascii=False),json.dumps(row.get('value_quote'),ensure_ascii=False)])
+            comparison.append(values)
         sources=[['relative_path','file_sha256','scan_id','generation','delivered_citations','meaning']]
         for doc in source['scope_files']:
             ids=[cid for cid,e in evidence.items() if e['doc_id']==doc['id']]
@@ -74,7 +79,18 @@ def export_job(jobs,jid):
                '未正式审稿；执行状态：'+job['status']+'；内容状态：'+(job.get('result') or {}).get('content_status','未形成答案'),
                '固定索引：'+source['generation'],'']
         if job.get('message'): lines.extend([md(job['message']),''])
-        for finding in answer.get('findings',[]):lines.extend(['- '+md(finding['kind']+'：'+finding['statement'])+' '+md(' '.join('['+c+']' for c in finding['citations'])),''])
+        for finding in answer.get('findings',[]):
+            lines.extend(['- '+md(finding['kind']+'：'+finding['statement'])+' '+md(' '.join('['+c+']' for c in finding['citations'])),''])
+            if v2:
+                for label,key in [('假设（未证实）','assumptions'),('判断限制','limitations')]:
+                    for value in finding.get(key,[]):lines.append('  - '+label+'：'+md(value))
+                if finding.get('relation'):
+                    r=finding['relation'];lines.append('  - 比较条件：'+md(json.dumps(r,ensure_ascii=False)))
+                for q in finding.get('support',[]):lines.append('  - 依据原句 '+md(q['citation_id']+'：'+q['quote']))
+        if v2:
+            lines.extend(['','结构/原句匹配不认证事实或矛盾判断。'])
+            for warning in (job.get('result') or {}).get('contract_checks',{}).get('warnings',[]):
+                lines.append('- 待核对：'+md(warning['message']))
         for unknown in answer.get('unknowns',[]):lines.append('- 待核对：'+md(unknown))
         lines.extend(['','## 实际送达证据',''])
         for cid,e in evidence.items():lines.extend([md('['+cid+'] '+e['name']+' '+json.dumps(e['source_location'],ensure_ascii=False)),

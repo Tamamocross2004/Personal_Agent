@@ -17,6 +17,13 @@ class Chat:
         if self.fail:raise RuntimeError('provider-private-secret')
         body={'findings':[{'statement':'测试替身仅验证引用协议','kind':'direct','citations':['C999' if self.bad else 'C1']}],
               'unknowns':[],'comparison':[{'subject':'测试资料','field':'摘录','value':'=danger','status':'stated','citations':['C1']}]}
+        if 'schema_version=2' in messages[0]['content']:
+            evidence=json.loads(messages[1]['content'])['evidence'][0]
+            q={'citation_id':'C1','quote':evidence['text']}
+            body['schema_version']=2
+            body['findings'][0]['support']=[q]
+            body['comparison']=[{'subject':None,'subject_type':'unknown','subject_quote':None,'field':'摘录',
+                                 'value':evidence['text'],'value_quote':q,'status':'stated','citations':['C1']}]
         return NS(model='test-model',usage=None if self.unknown else NS(prompt_tokens=80,completion_tokens=40),
                   choices=[NS(message=NS(content=json.dumps(body,ensure_ascii=False)),finish_reason='length' if self.partial else 'stop')])
 
@@ -46,7 +53,7 @@ def test_pinned_evidence_usage_and_history_never_calls_again(library):
     delivered=json.loads(chat.calls[0][0][1]['content'])['evidence']
     assert [e['text'] for e in delivered]==[e['text'] for e in job['evidence']]
     assert all('source_block' not in e for e in delivered)
-    assert job['result']['content_status']=='unreviewed'
+    assert job['result']['content_status']=='needs_verification'  # Object is explicitly unknown in this protocol fake.
     (docs/'a.txt').write_text('new replacement',encoding='utf-8');sync(library)
     evidence=job['evidence'][0]
     citation=index.citation(fid,old,evidence['doc_id'],evidence['source_block_id'])

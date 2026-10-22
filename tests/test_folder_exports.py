@@ -11,15 +11,16 @@ from test_folder_answers import service,ask,finished
 
 def test_export_roundtrip_formula_safety_and_unchanged_history(library):
     docs,folders,fid,index,embedding,_=library
+    (docs/'a.txt').write_bytes(b'=danger alpha')  # Literal source value tests formula safety with a valid quote anchor.
     sync(library);jobs,chat=service(library)
     value=finished(jobs,ask(library,jobs));jid=value['id'];calls=len(embedding.calls)
     result=export_job(jobs,jid);output=folders.root/'outputs'/jid
     assert result['directory']==str(output) and not result['cached']
     csv_rows=list(csv.reader(io.StringIO((output/'comparison.csv').read_text('utf-8-sig'))))
-    assert csv_rows[1][2]=="'=danger" and 'SHA256' in csv_rows[1][4]
+    assert csv_rows[1][2]=="'=danger alpha" and 'SHA256' in csv_rows[1][4]
     from openpyxl import load_workbook
     book=load_workbook(output/'comparison.xlsx',data_only=False)
-    assert book['comparison']['C2'].value=='=danger' and book['comparison']['C2'].data_type=='s'
+    assert book['comparison']['C2'].value=='=danger alpha' and book['comparison']['C2'].data_type=='s'
     book.close()
     source=json.loads((output/'sources.json').read_text('utf-8'))
     assert source['generation']==value['inputs']['generation'] and source['scope_files'][0]['file_sha256']

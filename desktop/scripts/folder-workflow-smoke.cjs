@@ -128,7 +128,7 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
           path.join(outputRoot, tasks[0], "comparison.csv"),
           "utf8",
         ),
-        /'=danger/,
+        /本地资料原文/,
       );
     }
     const conn = await page.evaluate(() => window.desktop.connection());
@@ -208,8 +208,8 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         project,
         "workspace",
         parseMode
-          ? "stage19-multiformat-20261022.png"
-          : "stage19-folder-workflow-20261022.png",
+          ? "folder-workflow-current-multiformat.png"
+          : "folder-workflow-current.png",
       ),
     });
     await page
