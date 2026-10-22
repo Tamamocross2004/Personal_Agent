@@ -1483,3 +1483,9 @@ small {
 .folder-preview-blocks { max-height: 42vh; overflow: auto; }
 .folder-preview-blocks article { padding: 12px; margin: 8px 0; background: #ffffff06; border-radius: 8px; }
 .folder-preview pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; }
+
+.folder-assistant-entry { margin: 8px 0; padding: 12px 9px; gap: 8px; justify-content: flex-start; background: #284c48; color: #e2fff5; border: 1px solid #57978a; border-radius: 8px; font-size: 13px; font-weight: 600; }
+.folder-assistant-entry:hover { background: #35645d; }
+.folder-steps { padding: 12px; background: #284c4844; border-left: 3px solid #6fb5a4; }
+.folder-primary-actions button, .folder-file-list button { border: 1px solid #57978a; padding: 8px 12px; border-radius: 6px; background: #284c48; color: #e2fff5; }
+.folder-primary-actions button:disabled { opacity: .45; }

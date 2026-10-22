@@ -99,12 +99,13 @@ export function FolderLibrary({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-header">
-          <h2>资料文件夹</h2>
+          <h2>文件夹资料助手</h2>
           <button onClick={onClose}>关闭</button>
         </div>
         <p className="muted">
           只读浏览用户选定的本地目录。不会调用模型、嵌入或重排；源文件不会被修改。问答与建库将在后续阶段接入。
         </p>
+        <p className="folder-steps">使用顺序：添加文件夹 → 扫描清单 → 点击文件右侧“打开内容预览”</p>
         {policy && (
           <details>
             <summary>扫描范围与排除规则</summary>
@@ -122,7 +123,7 @@ export function FolderLibrary({
             </p>
           </details>
         )}
-        <div className="knowledge-actions">
+        <div className="knowledge-actions folder-primary-actions">
           <button
             disabled={busy}
             onClick={() =>
@@ -140,7 +141,7 @@ export function FolderLibrary({
               })
             }
           >
-            选择资料目录
+            ① 添加资料文件夹
           </button>
           <select
             aria-label="资料目录"
@@ -176,7 +177,7 @@ export function FolderLibrary({
               })
             }
           >
-            {busy ? "处理中…" : "扫描目录"}
+            {busy ? "处理中…" : "② 扫描文件清单"}
           </button>
           <button
             disabled={busy || !selected}
@@ -275,7 +276,7 @@ export function FolderLibrary({
                             aria-label={"预览 " + f.relative_path}
                             onClick={() => action(() => openPreview(f))}
                           >
-                            解析预览
+                            打开内容预览
                           </button>
                         )}
                       </td>

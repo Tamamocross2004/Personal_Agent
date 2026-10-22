@@ -633,8 +633,8 @@ function App() {
         >
           <BookOpen size={14} /> 原始资料知识库
         </button>
-        <button className="import-history" onClick={() => setFoldersOpen(true)}>
-          <FolderOpen size={14} /> 资料文件夹
+        <button className="folder-assistant-entry" onClick={() => setFoldersOpen(true)}>
+          <FolderOpen size={18} /> 文件夹资料助手
         </button>
         <button className="settings-entry" onClick={() => setSettings(true)}>
           <div className="avatar">P</div>
