@@ -147,6 +147,16 @@ def create_app(manager:Manager,token:str,ui_dir:Path|None=None,*,folder_grant_to
         if not evidence: raise KeyError('引用不属于本次实际送达的证据')
         return redact({**folder_index.citation(job['folder_id'],job['inputs']['generation'],evidence['doc_id'],evidence['source_block_id']),
                        'delivered':evidence})
+    @app.post('/api/folder-jobs/{jid}/export')
+    def folder_export(jid:str):
+        from folder_assistant.exports import export_job
+        return redact(export_job(folder_jobs,jid))
+    @app.get('/api/folder-jobs/{jid}/export/{name}')
+    def folder_export_read(jid:str,name:str):
+        from folder_assistant.exports import export_job,NAMES
+        if name not in NAMES: raise KeyError('导出文件不存在')
+        result=export_job(folder_jobs,jid)
+        return FileResponse(Path(result['directory'])/name,filename=name)
     @app.get('/api/knowledge')
     def knowledge():return redact(manager.knowledge_status())
     @app.post('/api/knowledge/import')

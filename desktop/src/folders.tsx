@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FolderIndexPanel } from "./folder-index";
+import { locationLabel } from "./folder-location";
 
 export function FolderLibrary({
   api,
@@ -66,6 +67,7 @@ export function FolderLibrary({
     previewTurn.current++;
     setError("");
     try {
+      if (!folders.find((f) => f.id === id)?.active) return;
       const result = await api("/folders/" + id + "/scan");
       if (alive.current && turn === selection.current) setScan(result);
     } catch (e) {
@@ -107,7 +109,8 @@ export function FolderLibrary({
           只读浏览用户选定的本地目录，源文件不会被修改。扫描和内容预览均在本地；点击同步或混合检索才调用相应云端服务。
         </p>
         <p className="folder-steps">
-          使用顺序：① 添加文件夹 → ② 扫描/预览 → ③ 同步索引 → ④ 提问并核对引用
+          使用顺序：① 添加文件夹 → ② 扫描/预览 → ③ 同步索引 → ④ 提问并核对引用 →
+          ⑤ 导出结果
         </p>
         {policy && (
           <details>
@@ -155,16 +158,19 @@ export function FolderLibrary({
             <option value="" disabled>
               选择已授权目录
             </option>
-            {folders
-              .filter((f) => f.active)
-              .map((f) => (
-                <option key={f.id} value={f.id}>
-                  {f.path}
-                </option>
-              ))}
+            {folders.map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.path}
+                {f.active ? "" : "（已撤销，仅历史）"}
+              </option>
+            ))}
           </select>
           <button
-            disabled={busy || !selected}
+            disabled={
+              busy ||
+              !selected ||
+              !folders.some((f) => f.id === selected && f.active)
+            }
             onClick={() =>
               action(async () => {
                 const id = selected;
@@ -183,7 +189,12 @@ export function FolderLibrary({
             {busy ? "处理中…" : "② 扫描文件清单"}
           </button>
           <button
-            disabled={busy || !selected}
+            className="folder-revoke"
+            disabled={
+              busy ||
+              !selected ||
+              !folders.some((f) => f.id === selected && f.active)
+            }
             onClick={() =>
               action(async () => {
                 await api("/folders/" + selected, { method: "DELETE" });
@@ -422,18 +433,9 @@ export function FolderLibrary({
           </section>
         )}
         <p className="muted">
-          取消授权会禁止后续读取，但保留已有扫描清单；重新授权不会自动扫描。
+          取消授权会禁止后续读取和新问答，已保存问答与引用仍可从目录选择框查看；重新授权不会自动扫描。
         </p>
       </section>
     </div>
   );
-}
-
-function locationLabel(l: any): string {
-  if (l.kind === "paragraph") return `正文段落${l.paragraph}`;
-  if (l.kind === "table_cell") return `表格${l.table} 行${l.row} 列${l.column}`;
-  if (l.kind === "spreadsheet_cell") return `${l.sheet}!${l.cell}`;
-  if (l.kind === "csv_record")
-    return `记录${l.record} · 物理行${l.physical_line_start}—${l.physical_line_end}`;
-  return `${l.page ? "第" + l.page + "页 · " : ""}第${l.line}行 · 字符${l.start}—${l.end}`;
 }

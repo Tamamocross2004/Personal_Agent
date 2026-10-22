@@ -1504,3 +1504,5 @@ small {
 .folder-answer pre, .folder-citation-preview pre { white-space: pre-wrap; overflow-wrap: anywhere; }
 .folder-citation { color: #99dcca; border: 1px solid #57978a; padding: 5px 8px; margin: 4px; border-radius: 5px; }
 .folder-citation-preview { margin-top: 16px; border: 1px solid #57978a; border-radius: 8px; padding: 14px; }
+
+.folder-primary-actions .folder-revoke { background: transparent; border-color: #695856; color: #b99a96; }

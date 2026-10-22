@@ -15,19 +15,37 @@ def main():
     for command in ('index','diff'):sub.add_parser(command).add_argument('folder_id')
     sync=sub.add_parser('sync');sync.add_argument('folder_id');sync.add_argument('scan_id')
     search=sub.add_parser('search');search.add_argument('folder_id');search.add_argument('query');search.add_argument('--mode',choices=['keyword','hybrid'],default='keyword')
+    ask=sub.add_parser('ask');ask.add_argument('folder_id');ask.add_argument('query');ask.add_argument('--mode',choices=['keyword','hybrid'],default='keyword')
+    ask.add_argument('--budget',type=int,default=10000);ask.add_argument('--file-id',action='append',default=None)
+    sub.add_parser('history').add_argument('folder_id')
+    for command in ('job','stop','export'):sub.add_parser(command).add_argument('job_id')
     args=p.parse_args();store=FolderStore(args.state_dir,excluded_roots=(PROJECT_ROOT/'workspace',))
     try:
         if args.command=='add':result=store.grant(args.path)
         elif args.command=='list':result=store.folders()
         elif args.command=='policy':result=store.policy()
         elif args.command=='preview':result=store.preview(args.folder_id,args.scan_id,args.file_id,offset=args.offset,limit=args.limit)
-        elif args.command in ('index','diff','sync','search'):
+        elif args.command in ('index','diff','sync','search','ask','history','job','stop','export'):
             from agent.config import Settings
             from .index import FolderIndex
             index=FolderIndex(store,Settings())
             if args.command=='index':result=index.status(args.folder_id)
             elif args.command=='sync':result=index.sync(args.folder_id,args.scan_id)
             elif args.command=='search':result=index.search(args.folder_id,args.query,mode=args.mode)
+            elif args.command in ('ask','history','job','stop','export'):
+                from .jobs import FolderJobs
+                jobs=FolderJobs(index)
+                try:
+                    if args.command=='ask':
+                        job=jobs.start(args.folder_id,'answer',{'query':args.query,'mode':args.mode,'budget':args.budget,'file_ids':args.file_id})
+                        jobs.threads[job['id']].join();result=jobs.get(job['id'])
+                    elif args.command=='history':result=jobs.list(args.folder_id)
+                    elif args.command=='job':result=jobs.get(args.job_id)
+                    elif args.command=='stop':result=jobs.stop(args.job_id)
+                    else:
+                        from .exports import export_job
+                        result=export_job(jobs,args.job_id)
+                finally:jobs.close()
             else:result=index.diff(args.folder_id)
         else:result=getattr(store,{'show':'manifest'}.get(args.command,args.command))(args.folder_id)
         print(json.dumps(result,ensure_ascii=False,indent=2));return 0

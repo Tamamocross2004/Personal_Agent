@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { locationLabel } from "./folder-location";
 
 export function FolderQuestions({
   api,
@@ -17,6 +18,8 @@ export function FolderQuestions({
   const [history, setHistory] = useState<any[]>([]),
     [view, setView] = useState<any>(null),
     [citation, setCitation] = useState<any>(null);
+  const [exported, setExported] = useState<any>(null);
+  const [historyError, setHistoryError] = useState("");
   const alive = useRef(true),
     turn = useRef(0);
   useEffect(() => {
@@ -25,7 +28,9 @@ export function FolderQuestions({
       .then((rows: any[]) => {
         if (alive.current) setHistory(rows.filter((r) => r.kind === "answer"));
       })
-      .catch(() => {});
+      .catch((e: any) => {
+        if (alive.current) setHistoryError(String(e));
+      });
     return () => {
       alive.current = false;
       turn.current++;
@@ -62,6 +67,11 @@ export function FolderQuestions({
   return (
     <section className="folder-questions">
       <h3>④ 针对资料提问</h3>
+      {historyError && (
+        <p role="alert" className="error">
+          历史记录读取失败：{historyError}
+        </p>
+      )}
       <p>
         短答调用语言模型；混合检索还使用嵌入及配置的重排服务。仅发送实际召回的有限片段。结果未正式审稿，请核对引用和条件。
       </p>
@@ -185,6 +195,32 @@ export function FolderQuestions({
       {current && (
         <div className="folder-answer">
           <h4>回答 · 未正式审稿</h4>
+          <button
+            className="folder-cta"
+            disabled={busy || ["queued", "running"].includes(current.status)}
+            onClick={() =>
+              act(async () => {
+                const value = await api(`/folder-jobs/${current.id}/export`, {
+                  method: "POST",
+                });
+                if (alive.current)
+                  setExported({ ...value, task_id: current.id });
+              })
+            }
+          >
+            ⑤ 导出摘要 / 对照表 / 来源清单（本地）
+          </button>
+          {exported?.task_id === current.id && (
+            <p role="status">
+              已导出至 {exported.directory}（{exported.files.join("、")}）
+              <button
+                onClick={() => window.desktop.openTask(exported.directory)}
+              >
+                打开导出文件夹
+              </button>
+            </p>
+          )}
+
           <p>
             执行状态 {current.status} · 内容状态{" "}
             {current.result?.content_status || "尚未形成答案"} · 固定索引{" "}
@@ -249,7 +285,7 @@ export function FolderQuestions({
             </p>
             {current.evidence?.map((e: any) => (
               <article key={e.citation_id}>
-                [{e.citation_id}] {e.name} · {JSON.stringify(e.source_location)}
+                [{e.citation_id}] {e.name} · {locationLabel(e.source_location)}
                 <pre>{e.text}</pre>
                 <small>送达SHA256 {e.delivered_sha256}</small>
               </article>
@@ -276,7 +312,7 @@ export function FolderQuestions({
           <h4>引用原文 · 保存的提取版本</h4>
           <button onClick={() => setCitation(null)}>关闭引用</button>
           <p>
-            {citation.name} · {JSON.stringify(citation.block.location)} · SHA256{" "}
+            {citation.name} · {locationLabel(citation.block.location)} · SHA256{" "}
             {citation.file_sha256}
           </p>
           <p>本次实际送达片段：</p>

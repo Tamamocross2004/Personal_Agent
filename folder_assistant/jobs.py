@@ -26,7 +26,8 @@ class FolderJobs:
             if job['status'] in ('running','queued'):
                 try:
                     with lease(self.folders.root/(job['id']+'.job.lock')):
-                        self.save({**job,'status':'interrupted','message':'进程已结束；已保留记录，未自动重试。请核对用量后显式新建操作。'})
+                        self.edit(job['id'],lambda current: {**current,'status':'interrupted','message':'进程已结束；已保留记录，未自动重试。请核对用量后显式新建操作。'}
+                                  if current['status'] in ('running','queued') else current)
                 except ValueError: pass
 
     def save(self,job):
@@ -48,22 +49,32 @@ class FolderJobs:
         return [json.loads(r[0]) for r in rows]
 
     def stop(self,jid):
-        with self.lock:
-            job=self.get(jid)
+        def update(job):
             if job['status'] in ('queued','running'):
                 job['stop_requested']=True
                 job['message']='已请求停止；正在发送的请求不能撤回，返回后保留用量并停止后续步骤。'
-                self.save(job)
             return job
+        return self.edit(jid,update)
+
+    def edit(self,jid,update):
+        # One SQLite read-modify-write transaction, also safe when CLI and desktop coexist.
+        with self.lock,self.folders.connect() as db:
+            db.execute('BEGIN IMMEDIATE')
+            row=db.execute('SELECT data FROM folder_jobs WHERE id=?',(jid,)).fetchone()
+            if not row:raise KeyError('操作记录不存在')
+            value=update(json.loads(row[0]))
+            db.execute('UPDATE folder_jobs SET data=? WHERE id=?',(json.dumps(value,ensure_ascii=False),jid))
+            return value
 
     def patch(self,jid,**values):
-        with self.lock: return self.save({**self.get(jid),**values})
+        return self.edit(jid,lambda job:{**job,**values})
 
     def update_event(self,jid,event):
-        with self.lock:
-            job=self.get(jid);events={e['id']:e for e in job.get('usage_events',[])}
+        def update(job):
+            events={e['id']:e for e in job.get('usage_events',[])}
             events[event['id']]=event
-            self.save({**job,'usage_events':list(events.values())})
+            return {**job,'usage_events':list(events.values())}
+        self.edit(jid,update)
 
     def used_tokens(self,jid):
         events=self.get(jid).get('usage_events',[])
@@ -78,7 +89,7 @@ class FolderJobs:
 
     def start(self,fid,kind,inputs):
         self.folders.authorized(fid)
-        with self.lock:
+        with self.lock,lease(self.folders.root/'.jobs-start.lock',wait=5):
             if any(j['status'] in ('running','queued') for j in self.list(fid)): raise ValueError('该目录已有操作，请等待结束或停止')
             inputs=dict(inputs)
             if kind=='sync':
@@ -100,34 +111,35 @@ class FolderJobs:
                 inputs['model']={'provider':config.provider,'model':config.model,'base_url':config.base_url,'retries':0}
             else: raise ValueError('操作类型无效')
             jid=uuid4().hex
-            job=self.save({'id':jid,'folder_id':fid,'kind':kind,'inputs':inputs,'created':now(),
-                           'status':'queued','stop_requested':False,'review_status':'not_reviewed'})
-            thread=threading.Thread(target=self.run,args=(jid,),daemon=True)
-            self.threads[jid]=thread
-            thread.start()
+            holder=lease(self.folders.root/(jid+'.job.lock'));holder.__enter__()
+            try:
+                job=self.save({'id':jid,'folder_id':fid,'kind':kind,'inputs':inputs,'created':now(),
+                               'status':'queued','stop_requested':False,'review_status':'not_reviewed'})
+                thread=threading.Thread(target=self.run,args=(jid,holder),daemon=True)
+                self.threads[jid]=thread
+                thread.start()
+            except Exception:
+                holder.__exit__(None,None,None);raise
             return job
 
-    def run(self,jid):
-        with lease(self.folders.root/(jid+'.job.lock')):
-            with self.lock:
-                job=self.get(jid);job.update(status='running');self.save(job)
+    def run(self,jid,holder):
+        try:
+            job=self.patch(jid,status='running')
             try:
                 self.check(jid)
                 if job['kind']=='sync':
-                    result=self.index.sync(job['folder_id'],job['inputs']['scan_id'],check=lambda:self.check(jid))
+                    result=self.index.sync(job['folder_id'],job['inputs']['scan_id'],check=lambda:self.check(jid),
+                                           event_callback=lambda row:self.update_event(jid,row))
                 else:
                     from .answers import answer_once
                     result=answer_once(self,jid)
-                with self.lock:
-                    job=self.get(jid)
-                    self.save({**job,'status':'completed','result':result,'finished':now()})
+                self.patch(jid,status='completed',result=result,finished=now())
             except Exception as exc:
                 with self.lock:
-                    job=self.get(jid)
                     # Provider exceptions never expose headers, keys, or response internals.
                     message=str(exc) if isinstance(exc,ValueError) else '操作失败：'+type(exc).__name__
-                    self.save({**job,'status':'stopped' if isinstance(exc,Stopped) else 'failed',
-                               'message':message,'finished':now()})
+                    self.patch(jid,status='stopped' if isinstance(exc,Stopped) else 'failed',message=message,finished=now())
+        finally:holder.__exit__(None,None,None)
 
     def close(self):
         self.closed=True

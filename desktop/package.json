@@ -14,7 +14,8 @@
     "smoke": "node scripts/smoke.cjs",
     "smoke:acceptance": "node scripts/acceptance-smoke.cjs",
     "smoke:lifecycle": "node scripts/acceptance-smoke.cjs --lifecycle-only",
-    "format": "prettier --write src electron scripts package.json tsconfig.json index.html"
+    "format": "prettier --write src electron scripts package.json tsconfig.json index.html",
+    "smoke:folders": "node scripts/folder-workflow-smoke.cjs --index --questions --export"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FolderQuestions } from "./folder-questions";
+import { locationLabel } from "./folder-location";
 
 export function FolderIndexPanel({
   api,
@@ -201,7 +202,7 @@ export function FolderIndexPanel({
           {result.hits.map((h: any) => (
             <article key={h.chunk_id}>
               <strong>{h.name}</strong>
-              <p>{JSON.stringify(h.source_location)}</p>
+              <p>{locationLabel(h.source_location)}</p>
               <pre>{h.text}</pre>
               <small>
                 文件 SHA256 {h.file_sha256} · 片段 {h.chunk_id}

@@ -106,6 +106,31 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         .first()
         .waitFor();
     }
+    if (process.argv.includes("--export")) {
+      await page
+        .getByRole("button", {
+          name: "⑤ 导出摘要 / 对照表 / 来源清单（本地）",
+          exact: true,
+        })
+        .click();
+      await page.getByText(/已导出至 /).waitFor();
+      const outputRoot = path.join(fixture, "state", "folders", "outputs");
+      const tasks = fs.readdirSync(outputRoot);
+      assert.equal(tasks.length, 1);
+      assert.equal(
+        fs
+          .readdirSync(path.join(outputRoot, tasks[0]))
+          .filter((n) => !n.startsWith(".")).length,
+        7,
+      );
+      assert.match(
+        fs.readFileSync(
+          path.join(outputRoot, tasks[0], "comparison.csv"),
+          "utf8",
+        ),
+        /'=danger/,
+      );
+    }
     const conn = await page.evaluate(() => window.desktop.connection());
     const denied = await fetch(conn.url + "/api/folders", {
       method: "POST",
@@ -183,8 +208,8 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         project,
         "workspace",
         parseMode
-          ? "stage18-folder-workflow-20261022.png"
-          : "stage18-folder-workflow-20261022.png",
+          ? "stage19-multiformat-20261022.png"
+          : "stage19-folder-workflow-20261022.png",
       ),
     });
     await page
@@ -194,6 +219,34 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
       () =>
         document.querySelector('select[aria-label="资料目录"]').value === "",
     );
+    if (process.argv.includes("--export")) {
+      const response = await fetch(conn.url + "/api/folders", {
+        headers: { Authorization: "Bearer " + conn.token },
+      });
+      const folder = (await response.json()).folders[0];
+      await page
+        .getByRole("combobox", { name: "资料目录", exact: true })
+        .selectOption(folder.id);
+      await page
+        .locator(".folder-answer")
+        .getByText("测试替身仅验证引用协议", { exact: true })
+        .waitFor();
+      await page.locator(".folder-answer .folder-citation").first().click();
+      await page
+        .locator(".folder-citation-preview")
+        .getByText("本地资料原文。", { exact: true })
+        .first()
+        .waitFor();
+      assert.equal(
+        await page
+          .getByRole("button", {
+            name: "开始资料短答（调用模型）",
+            exact: true,
+          })
+          .isEnabled(),
+        false,
+      );
+    }
     assert.equal(
       fs.readFileSync(path.join(docs, "readme.txt"), "utf8"),
       "本地资料原文。",
@@ -223,6 +276,15 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
           "renderer-cannot-grant",
           "revoke",
           "source-unchanged",
+          ...(process.argv.includes("--index")
+            ? ["sync", "keyword-preview"]
+            : []),
+          ...(process.argv.includes("--questions")
+            ? ["answer", "pinned-citation"]
+            : []),
+          ...(process.argv.includes("--export")
+            ? ["export-roundtrip", "revoked-history-read-only"]
+            : []),
         ],
         errors,
       }),

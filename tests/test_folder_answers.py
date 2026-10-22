@@ -113,3 +113,16 @@ def test_document_instructions_are_only_user_data(library):
     assert attack not in messages[0]['content'] and attack in messages[1]['content']
     assert all('tools' not in options for _,options in chat.calls)
     assert value['review_status']=='not_reviewed'  # Prompt isolation is not a claim of universal injection resistance.
+
+
+def test_second_service_preserves_active_owner_and_stop_flag(library):
+    sync(library);jobs,chat=service(library)
+    entered=threading.Event();release=threading.Event()
+    def hold():entered.set();release.wait(10)
+    chat.hook=hold
+    job=ask(library,jobs);assert entered.wait(10)
+    other=FolderJobs(library[3])
+    assert other.get(job['id'])['status']=='running'
+    other.stop(job['id']);release.set()
+    value=finished(jobs,job)
+    assert value['status']=='stopped' and value['stop_requested'] and value['model_output']
