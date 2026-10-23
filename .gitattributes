@@ -2,3 +2,5 @@
 * text=auto eol=lf
 *.bat text eol=crlf
 *.ps1 text eol=crlf
+# Frozen diagnostic plans retain exact pre-call bytes for their SHA256 audit.
+docs/stage28-*-plan-20261023.json -text whitespace=cr-at-eol
