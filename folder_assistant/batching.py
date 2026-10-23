@@ -4,7 +4,7 @@ from agent.context import estimate_tokens
 from knowledge.documents import sha
 from .answers import prepare_messages
 
-VERSION=1
+VERSION=2
 
 
 def evidence_for(batch,number):
@@ -43,6 +43,10 @@ def select_batch(plan,inputs,offset,number,remaining,events,agent_cap):
     thinking=inputs.get('model',{}).get('thinking')!='disabled'
     reasoning=max(observed) if thinking and observed else 0
     unknown=thinking and not observed
+    # Validated intent can reveal more work than the user's rough estimate.
+    # Keep the original control intact; this lower bound affects sizing only.
+    planned=len(inputs.get('field_specs',[]))
+    fields=max(inputs['expected_fields'],planned)
     trials=[]
     for size in range(maximum,0,-1):
         batch=plan.batch(offset,size);hits=evidence_for(batch,number)
@@ -50,15 +54,16 @@ def select_batch(plan,inputs,offset,number,remaining,events,agent_cap):
         estimated_input=estimate_tokens(json.dumps(messages,ensure_ascii=False))
         cap=min(inputs['output_tokens'],agent_cap)
         available=min(cap,remaining-estimated_input)
-        estimated_output,records=output_estimate(hits,inputs['expected_fields'])
-        fit=available>=128 and estimated_output+reasoning<=available and records*inputs['expected_fields']<=40
+        estimated_output,records=output_estimate(hits,fields)
+        fit=available>=128 and estimated_output+reasoning<=available and records*fields<=40
         trial={'segments':batch['selected_segments'],'input_tokens':estimated_input,'estimated_body_tokens':estimated_output,
                'estimated_reasoning_tokens':reasoning if thinking and observed else (None if thinking else 0),
                'effective_output_tokens':max(0,available),'fits_estimate':fit}
         trials.append(trial)
         if inputs['batch_mode']=='fixed' or fit or size==1:
             decision={'version':VERSION,'mode':inputs['batch_mode'],'max_segments':maximum,'selected_segments':size,
-                      'expected_fields':inputs['expected_fields'],'remaining_tokens':remaining,'requested_output_tokens':inputs['output_tokens'],
+                      'expected_fields':fields,'requested_expected_fields':inputs['expected_fields'],'planned_fields':planned,
+                      'remaining_tokens':remaining,'requested_output_tokens':inputs['output_tokens'],
                       'reasoning_usage_unknown':unknown,'trials':trials,**trial,
                       'meaning':'分批估算，不限制答案字段或认证完整性；思考预留只参考已返回用量，不是独立思考配额。'}
             if inputs['batch_mode']=='adaptive' and not fit:

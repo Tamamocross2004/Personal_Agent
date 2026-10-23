@@ -1,0 +1,608 @@
+{
+  "stage": 32,
+  "base_commit": "72aa2b8",
+  "date": "2026-10-23",
+  "reviewer": "coding_assistant",
+  "independent_review": false,
+  "engineering_checks_passed": true,
+  "content_acceptance_passed": false,
+  "stage12_accepted": false,
+  "usage": {
+    "actual_chat_calls": 0,
+    "actual_embedding_calls": 0,
+    "actual_rerank_calls": 0,
+    "paid_provider_calls": 0
+  },
+  "tests": {
+    "full": "1196 passed in 220.60s",
+    "initial_targeted": "5 failed, 52 passed in 37.49s; incomplete synthetic locator fixture",
+    "corrected_targeted": "57 passed in 34.34s; sizing-version guard subsequently included in full run",
+    "build": true,
+    "build_warning": "main JS chunk exceeds 500 kB",
+    "isolated_ui": {
+      "passed": true,
+      "multi_format_preview": false,
+      "fixture": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\agent-folders-0QzByD",
+      "checks": [
+        "local-full-reading-preview",
+        "changed-controls-invalidate-preview",
+        "pinned-original-query-and-scope",
+        "explicit-new-paid-operation",
+        "original-answer-and-usage-unchanged",
+        "explicit-continuous-opt-in",
+        "fifteen-calls-one-budget",
+        "batch-limit-replaced-by-explicit-call-limit",
+        "source-and-old-answer-unchanged",
+        "query-only-field-planning",
+        "planning-counts-in-total-calls-and-budget",
+        "saved-intents-and-source-quotes",
+        "field-plan-not-evidence",
+        "native-picker-capability",
+        "scan",
+        "excluded-secret",
+        "renderer-cannot-grant",
+        "revoke",
+        "source-unchanged",
+        "sync",
+        "keyword-preview",
+        "answer",
+        "pinned-citation",
+        "export-roundtrip",
+        "revoked-history-read-only"
+      ],
+      "errors": []
+    },
+    "screenshots_visually_checked": true
+  },
+  "checks": {
+    "historical_artifacts_unchanged": 1914,
+    "export_roundtrips": 2,
+    "answer_contract_and_request_messages_unchanged": true,
+    "planner_generation_prompt_unchanged": true,
+    "default_budget_output_limits_unchanged": true,
+    "query_only_planning": true,
+    "project_keys_checked": 2,
+    "secret_matches": 0
+  },
+  "offline_resource_comparison": {
+    "purpose": "Offline resource and delivery control only; no semantic quality or real bill claims",
+    "baseline_commit": "72aa2b8",
+    "baseline_batching_sha256": "87936b69ccbb6b2d5e4c027de9f68265393e24c037fc57fa783b513bb97800a2",
+    "paired_sizing_cases": [
+      {
+        "planned_fields": 0,
+        "requested_fields": 1,
+        "old_decision": {
+          "version": 1,
+          "mode": "adaptive",
+          "max_segments": 6,
+          "selected_segments": 6,
+          "expected_fields": 1,
+          "remaining_tokens": 20000,
+          "requested_output_tokens": 1200,
+          "reasoning_usage_unknown": false,
+          "trials": [
+            {
+              "segments": 6,
+              "input_tokens": 3931,
+              "estimated_body_tokens": 935,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": true
+            }
+          ],
+          "segments": 6,
+          "input_tokens": 3931,
+          "estimated_body_tokens": 935,
+          "estimated_reasoning_tokens": 0,
+          "effective_output_tokens": 1200,
+          "fits_estimate": true,
+          "meaning": "分批估算，不限制答案字段或认证完整性；思考预留只参考已返回用量，不是独立思考配额。"
+        },
+        "new_decision": {
+          "version": 2,
+          "mode": "adaptive",
+          "max_segments": 6,
+          "selected_segments": 6,
+          "expected_fields": 1,
+          "requested_expected_fields": 1,
+          "planned_fields": 0,
+          "remaining_tokens": 20000,
+          "requested_output_tokens": 1200,
+          "reasoning_usage_unknown": false,
+          "trials": [
+            {
+              "segments": 6,
+              "input_tokens": 3931,
+              "estimated_body_tokens": 935,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": true
+            }
+          ],
+          "segments": 6,
+          "input_tokens": 3931,
+          "estimated_body_tokens": 935,
+          "estimated_reasoning_tokens": 0,
+          "effective_output_tokens": 1200,
+          "fits_estimate": true,
+          "meaning": "分批估算，不限制答案字段或认证完整性；思考预留只参考已返回用量，不是独立思考配额。"
+        }
+      },
+      {
+        "planned_fields": 2,
+        "requested_fields": 1,
+        "old_decision": {
+          "version": 1,
+          "mode": "adaptive",
+          "max_segments": 6,
+          "selected_segments": 6,
+          "expected_fields": 1,
+          "remaining_tokens": 20000,
+          "requested_output_tokens": 1200,
+          "reasoning_usage_unknown": false,
+          "trials": [
+            {
+              "segments": 6,
+              "input_tokens": 4159,
+              "estimated_body_tokens": 935,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": true
+            }
+          ],
+          "segments": 6,
+          "input_tokens": 4159,
+          "estimated_body_tokens": 935,
+          "estimated_reasoning_tokens": 0,
+          "effective_output_tokens": 1200,
+          "fits_estimate": true,
+          "meaning": "分批估算，不限制答案字段或认证完整性；思考预留只参考已返回用量，不是独立思考配额。"
+        },
+        "new_decision": {
+          "version": 2,
+          "mode": "adaptive",
+          "max_segments": 6,
+          "selected_segments": 4,
+          "expected_fields": 2,
+          "requested_expected_fields": 1,
+          "planned_fields": 2,
+          "remaining_tokens": 20000,
+          "requested_output_tokens": 1200,
+          "reasoning_usage_unknown": false,
+          "trials": [
+            {
+              "segments": 6,
+              "input_tokens": 4159,
+              "estimated_body_tokens": 1528,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": false
+            },
+            {
+              "segments": 5,
+              "input_tokens": 4079,
+              "estimated_body_tokens": 1277,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": false
+            },
+            {
+              "segments": 4,
+              "input_tokens": 4000,
+              "estimated_body_tokens": 1026,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": true
+            }
+          ],
+          "segments": 4,
+          "input_tokens": 4000,
+          "estimated_body_tokens": 1026,
+          "estimated_reasoning_tokens": 0,
+          "effective_output_tokens": 1200,
+          "fits_estimate": true,
+          "meaning": "分批估算，不限制答案字段或认证完整性；思考预留只参考已返回用量，不是独立思考配额。"
+        }
+      },
+      {
+        "planned_fields": 4,
+        "requested_fields": 1,
+        "old_decision": {
+          "version": 1,
+          "mode": "adaptive",
+          "max_segments": 6,
+          "selected_segments": 6,
+          "expected_fields": 1,
+          "remaining_tokens": 20000,
+          "requested_output_tokens": 1200,
+          "reasoning_usage_unknown": false,
+          "trials": [
+            {
+              "segments": 6,
+              "input_tokens": 4218,
+              "estimated_body_tokens": 935,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": true
+            }
+          ],
+          "segments": 6,
+          "input_tokens": 4218,
+          "estimated_body_tokens": 935,
+          "estimated_reasoning_tokens": 0,
+          "effective_output_tokens": 1200,
+          "fits_estimate": true,
+          "meaning": "分批估算，不限制答案字段或认证完整性；思考预留只参考已返回用量，不是独立思考配额。"
+        },
+        "new_decision": {
+          "version": 2,
+          "mode": "adaptive",
+          "max_segments": 6,
+          "selected_segments": 2,
+          "expected_fields": 4,
+          "requested_expected_fields": 1,
+          "planned_fields": 4,
+          "remaining_tokens": 20000,
+          "requested_output_tokens": 1200,
+          "reasoning_usage_unknown": false,
+          "trials": [
+            {
+              "segments": 6,
+              "input_tokens": 4218,
+              "estimated_body_tokens": 2714,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": false
+            },
+            {
+              "segments": 5,
+              "input_tokens": 4138,
+              "estimated_body_tokens": 2265,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": false
+            },
+            {
+              "segments": 4,
+              "input_tokens": 4058,
+              "estimated_body_tokens": 1816,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": false
+            },
+            {
+              "segments": 3,
+              "input_tokens": 3979,
+              "estimated_body_tokens": 1367,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": false
+            },
+            {
+              "segments": 2,
+              "input_tokens": 3899,
+              "estimated_body_tokens": 918,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": true
+            }
+          ],
+          "segments": 2,
+          "input_tokens": 3899,
+          "estimated_body_tokens": 918,
+          "estimated_reasoning_tokens": 0,
+          "effective_output_tokens": 1200,
+          "fits_estimate": true,
+          "meaning": "分批估算，不限制答案字段或认证完整性；思考预留只参考已返回用量，不是独立思考配额。"
+        }
+      },
+      {
+        "planned_fields": 6,
+        "requested_fields": 1,
+        "old_decision": {
+          "version": 1,
+          "mode": "adaptive",
+          "max_segments": 6,
+          "selected_segments": 6,
+          "expected_fields": 1,
+          "remaining_tokens": 20000,
+          "requested_output_tokens": 1200,
+          "reasoning_usage_unknown": false,
+          "trials": [
+            {
+              "segments": 6,
+              "input_tokens": 4277,
+              "estimated_body_tokens": 935,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": true
+            }
+          ],
+          "segments": 6,
+          "input_tokens": 4277,
+          "estimated_body_tokens": 935,
+          "estimated_reasoning_tokens": 0,
+          "effective_output_tokens": 1200,
+          "fits_estimate": true,
+          "meaning": "分批估算，不限制答案字段或认证完整性；思考预留只参考已返回用量，不是独立思考配额。"
+        },
+        "new_decision": {
+          "version": 2,
+          "mode": "adaptive",
+          "max_segments": 6,
+          "selected_segments": 1,
+          "expected_fields": 6,
+          "requested_expected_fields": 1,
+          "planned_fields": 6,
+          "remaining_tokens": 20000,
+          "requested_output_tokens": 1200,
+          "reasoning_usage_unknown": false,
+          "trials": [
+            {
+              "segments": 6,
+              "input_tokens": 4277,
+              "estimated_body_tokens": 3899,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": false
+            },
+            {
+              "segments": 5,
+              "input_tokens": 4197,
+              "estimated_body_tokens": 3253,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": false
+            },
+            {
+              "segments": 4,
+              "input_tokens": 4117,
+              "estimated_body_tokens": 2606,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": false
+            },
+            {
+              "segments": 3,
+              "input_tokens": 4038,
+              "estimated_body_tokens": 1960,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": false
+            },
+            {
+              "segments": 2,
+              "input_tokens": 3958,
+              "estimated_body_tokens": 1314,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": false
+            },
+            {
+              "segments": 1,
+              "input_tokens": 3878,
+              "estimated_body_tokens": 667,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": true
+            }
+          ],
+          "segments": 1,
+          "input_tokens": 3878,
+          "estimated_body_tokens": 667,
+          "estimated_reasoning_tokens": 0,
+          "effective_output_tokens": 1200,
+          "fits_estimate": true,
+          "meaning": "分批估算，不限制答案字段或认证完整性；思考预留只参考已返回用量，不是独立思考配额。"
+        }
+      },
+      {
+        "planned_fields": 12,
+        "requested_fields": 1,
+        "old_decision": {
+          "version": 1,
+          "mode": "adaptive",
+          "max_segments": 6,
+          "selected_segments": 6,
+          "expected_fields": 1,
+          "remaining_tokens": 20000,
+          "requested_output_tokens": 1200,
+          "reasoning_usage_unknown": false,
+          "trials": [
+            {
+              "segments": 6,
+              "input_tokens": 4455,
+              "estimated_body_tokens": 935,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": true
+            }
+          ],
+          "segments": 6,
+          "input_tokens": 4455,
+          "estimated_body_tokens": 935,
+          "estimated_reasoning_tokens": 0,
+          "effective_output_tokens": 1200,
+          "fits_estimate": true,
+          "meaning": "分批估算，不限制答案字段或认证完整性；思考预留只参考已返回用量，不是独立思考配额。"
+        },
+        "new_decision": {
+          "version": 2,
+          "mode": "adaptive",
+          "max_segments": 6,
+          "selected_segments": 1,
+          "expected_fields": 12,
+          "requested_expected_fields": 1,
+          "planned_fields": 12,
+          "remaining_tokens": 20000,
+          "requested_output_tokens": 1200,
+          "reasoning_usage_unknown": false,
+          "trials": [
+            {
+              "segments": 6,
+              "input_tokens": 4455,
+              "estimated_body_tokens": 7455,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": false
+            },
+            {
+              "segments": 5,
+              "input_tokens": 4375,
+              "estimated_body_tokens": 6216,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": false
+            },
+            {
+              "segments": 4,
+              "input_tokens": 4295,
+              "estimated_body_tokens": 4977,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": false
+            },
+            {
+              "segments": 3,
+              "input_tokens": 4216,
+              "estimated_body_tokens": 3738,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": false
+            },
+            {
+              "segments": 2,
+              "input_tokens": 4136,
+              "estimated_body_tokens": 2499,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": false
+            },
+            {
+              "segments": 1,
+              "input_tokens": 4056,
+              "estimated_body_tokens": 1260,
+              "estimated_reasoning_tokens": 0,
+              "effective_output_tokens": 1200,
+              "fits_estimate": false
+            }
+          ],
+          "segments": 1,
+          "input_tokens": 4056,
+          "estimated_body_tokens": 1260,
+          "estimated_reasoning_tokens": 0,
+          "effective_output_tokens": 1200,
+          "fits_estimate": false,
+          "meaning": "分批估算，不限制答案字段或认证完整性；思考预留只参考已返回用量，不是独立思考配额。",
+          "stop_reason": "output_space"
+        }
+      }
+    ],
+    "job_id": "939d5645da1f486d8e9c5288abdbfd52",
+    "data_calls": 6,
+    "planning_calls": 1,
+    "fake_known_tokens": 960,
+    "actual_provider_calls": 0,
+    "source_segments": 13,
+    "coverage": {
+      "generation": "529aeaa30f1e4fd082df325cfe14f18c",
+      "plan_sha256": "673c866ac16edaa8c044d6c708e102274e5487c120fab0770951fa0d1a1f6880",
+      "total_segments": 13,
+      "total_blocks": 13,
+      "total_characters": 319,
+      "files": [
+        {
+          "file_id": "bf5b449ed8c1850371f42808a186b5c5089edd0025700505a6b8f426cd54a6e4",
+          "name": "table.csv",
+          "blocks": 13
+        }
+      ],
+      "meaning": "仅覆盖本版本已解析文字；未含OCR、未提取内容。送达不认证完整提取或语义正确。",
+      "protocol_version": 2,
+      "start_offset": 0,
+      "returned_until": 13,
+      "next_offset": 13,
+      "structured_segments": 13,
+      "remaining_segments": 0,
+      "unsent_segments": 0,
+      "input_coverage_complete": true,
+      "structured_coverage_complete": true,
+      "continuation_of": null,
+      "operation_end": 13,
+      "operation_remaining": 0,
+      "read_to_end": true,
+      "batch_call_limit": 16,
+      "stop_reason": "end_of_extraction"
+    },
+    "export": {
+      "directory": "D:\\code\\personal_agent\\workspace\\stage32-offline-20261023\\fixture\\state\\outputs\\939d5645da1f486d8e9c5288abdbfd52",
+      "files": [
+        "summary.md",
+        "comparison.csv",
+        "sources.csv",
+        "sources.json",
+        "record.json",
+        "comparison.xlsx"
+      ],
+      "cached": false
+    }
+  },
+  "boundaries": [
+    "No real model quality experiment or cost-savings claim",
+    "Estimates can refuse a single segment; no automatic budget/output increase",
+    "Pending planning fees and field count are unknown; provisional data range only",
+    "Legacy failures and stage12 acceptance remain unchanged"
+  ],
+  "source_sha256": {
+    "README.md": "541f96dc3c88d6aabb7d0d5d9fff3a98b36745a9e0d6d76e5b78077524c89315",
+    "ROADMAP.md": "b289176ae7ce5cce338d14358df727e2008502ed4dde6b12ffd34926770deaea",
+    "desktop/scripts/folder-workflow-smoke.cjs": "f163b3badbf0a19d75f0f17401da94cf241da6002471e80cc76b7273a911193c",
+    "desktop/src/folder-field-plan.tsx": "e432e3f74a87b07b1358267276f764e28cd3f654c53e21b97f49f65bb83fbdcc",
+    "desktop/src/folder-full-reading.tsx": "ad0eab449bc2ccd7faa424c4151671aace6db116eb7213509b6e94d050dcfac8",
+    "desktop/src/folder-planning-preview.tsx": "d57f3b9cd74e60bfc39e00e932db00fbdf1644e9db9e854718c071ca08c59371",
+    "desktop/src/folder-questions.tsx": "6d0698c2fa0786fa1eded07dc563f3fce515c0580df05618fa185b581a54c459",
+    "desktop/src/folder-scope.tsx": "d41bc2d57008e3dfe3f3d2bf84b43b5d06d8b9b23826799e1b36f88d9b54273d",
+    "docs/folder-assistant.md": "22813a2776c3dd6207de12d675b431be0e250163d66ab6fb827e82a730dec90f",
+    "docs/stage32-verification-20261023.md": "a9dfa8542a977550bb2bf8510d9d81d9d818c9be4d198ce107a5dd9786c1e030",
+    "folder_assistant/batching.py": "04a3a32163beca3cb07596f00dae405ac3d5284f283842cd42647cbeaeb6b6e6",
+    "folder_assistant/field_plan.py": "be553118e4fbbefb1c48e5d4869f4fac07bca1b2d57819ab66ef52f01dfd63d8",
+    "folder_assistant/full_reading.py": "61a10f9599f08c7c952d36959d74ddc071d43d6afaf472d9c36ef8d44d51f787",
+    "folder_assistant/jobs.py": "6473981c1b9a644e2230c90ceea5a7e0a14117148b28ba4a50c1995b6d8f82c6",
+    "folder_assistant/reading_preview.py": "350a6f0cf2109e499dca42247c1726e0f6ec67167d118b0c7797440c06de85dc",
+    "folder_assistant/scope.py": "494a3cfda3b2a7744c4c541cda6a4b52f96e2125a02777c02fc6b46ab9a4a265",
+    "tests/test_folder_resource_planning.py": "464f8fca0c3e149e90a1cdbb8a71fa26e08dddc5b71abded6432794e6e2c8cb8"
+  },
+  "artifact_sha256": {
+    "workspace/stage32-offline-20261023/job.json": "1deff58b8e3b8fb9284513362b8f7d6551c2eabe0c7506a1ed078b444f7af178",
+    "workspace/stage32-offline-20261023/report.json": "28fc3bcce13b72478540d3b65781d248115b69dd0f06f581a7ed7857159701a8",
+    "workspace/stage32-offline-20261023/fixture/docs/table.csv": "4fd7c0438d354842f0f3b6f609ac984c1aa032f95bb51f7be63013c30bade4ea",
+    "workspace/stage32-offline-20261023/fixture/state/.jobs-start.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage32-offline-20261023/fixture/state/939d5645da1f486d8e9c5288abdbfd52.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage32-offline-20261023/fixture/state/catalog.sqlite3": "ab18f0a06e8f3453330b12de250e4d590266d480e331956a5057d3c395692d6f",
+    "workspace/stage32-offline-20261023/fixture/state/indexes/9ebb6db442454fa193ce518015f19094/.build.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage32-offline-20261023/fixture/state/indexes/9ebb6db442454fa193ce518015f19094/.sync.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage32-offline-20261023/fixture/state/indexes/9ebb6db442454fa193ce518015f19094/knowledge.sqlite3": "5ae59078c55ea3cf5ce02eae93f41d4d086853fdb4d69ed4ba15908bad88aa54",
+    "workspace/stage32-offline-20261023/fixture/state/outputs/939d5645da1f486d8e9c5288abdbfd52/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage32-offline-20261023/fixture/state/outputs/939d5645da1f486d8e9c5288abdbfd52/comparison.csv": "8b26cf9f87eb5f5a04bde87e496609b0c1265660e3a23f3b363f3012ddadbea4",
+    "workspace/stage32-offline-20261023/fixture/state/outputs/939d5645da1f486d8e9c5288abdbfd52/comparison.xlsx": "5d9fa70560ee4869996bcefae6815f1bc5ef5ed3157cd2909545c7889759f2f7",
+    "workspace/stage32-offline-20261023/fixture/state/outputs/939d5645da1f486d8e9c5288abdbfd52/export.json": "838f13516a8cd74a4a9c60880458208205c65c4cac26abf8068d425f4e937f6d",
+    "workspace/stage32-offline-20261023/fixture/state/outputs/939d5645da1f486d8e9c5288abdbfd52/record.json": "41e8ec43a7e312dbdd5f62ff60ea920ee08dc3cc226db356f79964ce8d122494",
+    "workspace/stage32-offline-20261023/fixture/state/outputs/939d5645da1f486d8e9c5288abdbfd52/sources.csv": "49b3eb8097212d2e0bb0b7c0e13994a7888eaa261837bf95fcda165e6a40a6a3",
+    "workspace/stage32-offline-20261023/fixture/state/outputs/939d5645da1f486d8e9c5288abdbfd52/sources.json": "a0ba2112088c6ddce39714247cdaf427f726d02efeb4b9495cc6a0b2f71d0d41",
+    "workspace/stage32-offline-20261023/fixture/state/outputs/939d5645da1f486d8e9c5288abdbfd52/summary.md": "7365c911d923368cb47a4b11fffd39a51c6486a86cbee5c5494439b79213fcaf",
+    "workspace/stage32-offline-20261023/fixture/state/parsed/4fd7c0438d354842f0f3b6f609ac984c1aa032f95bb51f7be63013c30bade4ea-1.csv.json": "976f9bf11bfb4b4bcaece0debf092e50f85676e01d5ce5ddecc146e2b9f78c10",
+    "workspace/stage32-build-attempt1-20261023.log": "c1faa106c4fd9cf5591794d88dcde4ca1f45fe5b7d85a63d70a5310095e1c7d0",
+    "workspace/stage32-folder-workflow-20261023.png": "8d2b014e57426fc6b2e6c198fa80c926c92484cfc241048b600d0bdc3b081357",
+    "workspace/stage32-full-20261023.log": "d3cdb3ac3aa7ef74dd039994b88f9e2094dd6b52af756b67da0e8df05299da67",
+    "workspace/stage32-full-reading-preview-20261023.png": "3af447159e5ddc9425c994ef3cdac23386a7dae2b28391b8a03718d6ac3a320d",
+    "workspace/stage32-offline-20261023.log": "8c512b551a36b252d1db8885c16514114b62e0badac436848644178e163d6b8b",
+    "workspace/stage32-planner-only-preview-20261023.png": "1051351102935454788fd0390054c64a07b41433165b092446cb3804905368e5",
+    "workspace/stage32-targeted-attempt1-20261023.log": "cd6db65e04cb6e88d84d46e7af956d0a411a74c904ae4b24914c24a0f5931446",
+    "workspace/stage32-targeted-attempt2-20261023.log": "25332aa20bb30fb79b62021719e0e51f2b245af6b4ace433fd04e947015169e3",
+    "workspace/stage32-ui-attempt1-20261023.log": "6aba911bd46318403ee197417e851e50d5eaae2812a8ce0496a34280328e7730",
+    "workspace/stage32-ui-records-20261023.json": "c757ba8fa9103daf10ca3ee9c377334a951be9055c0a6b70a07d2002174870d0",
+    "workspace/stage32_audit.py": "f89f3d49059edf74da241971439021266a7e4ab2c393a787012550767e158c45",
+    "workspace/stage32_offline.py": "f588ec64460df0898939467a66b6bab0c9a22db7e4d6627ad8428b5c33108ae9"
+  }
+}

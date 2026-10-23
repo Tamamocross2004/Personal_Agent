@@ -649,6 +649,14 @@ export function FolderQuestions({
                     {d.estimated_body_tokens} Token，实际可用输出上限
                     {d.effective_output_tokens}
                   </summary>
+                  {d.requested_expected_fields != null && (
+                    <p>
+                      用户预估{d.requested_expected_fields}个字段，规划识别
+                      {d.planned_fields}个；本批按{d.expected_fields}
+                      个字段估算。
+                      仅用于分批，不限制实际答案字段或增加输出额度。
+                    </p>
+                  )}
                   <p>
                     思考参考用量：
                     {d.reasoning_usage_unknown

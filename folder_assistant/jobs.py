@@ -177,6 +177,8 @@ class FolderJobs:
             inputs['reading_plan']=plan.signature
             if not inputs['retry_split']:inputs['range_end']=len(plan.segments)
             inputs['batch_call_limit']=inputs['max_calls'] if inputs['read_to_end'] else inputs['max_batches']
+            from .batching import VERSION as BATCHING_VERSION
+            inputs['batching_version']=BATCHING_VERSION
             if inputs['plan_fields']:
                 from .field_plan import VERSION as PLAN_VERSION,instruction as plan_instruction
                 from knowledge.documents import sha

@@ -47,6 +47,13 @@ def validate(text,query):
     return fields
 
 
+def prepare_request(query,output_tokens,agent_cap,remaining):
+    messages=[{'role':'system','content':instruction()},{'role':'user','content':json.dumps({'question':query},ensure_ascii=False)}]
+    estimate=estimate_tokens(json.dumps(messages,ensure_ascii=False))
+    return {'messages':messages,'max_output_tokens':max(0,min(output_tokens,agent_cap,1024,remaining-estimate)),
+            'estimated_input_tokens':estimate,'system_sha256':sha(messages[0]['content'])}
+
+
 def plan_fields(jobs,jid):
     job=jobs.get(jid);inputs=job['inputs'];query=inputs['query'];jobs.check(jid)
     if 'field_specs' in inputs:
@@ -55,17 +62,24 @@ def plan_fields(jobs,jid):
         jobs.patch(jid,field_plan={'version':VERSION,'status':'inherited','source_job_id':inputs.get('field_plan_source_job_id'),
                                   'fields':fields,'meaning':'只继承同问题的字段意图，不发送旧答案或新增规划请求。'})
         return fields
-    messages=[{'role':'system','content':instruction()},{'role':'user','content':json.dumps({'question':query},ensure_ascii=False)}]
-    estimate=estimate_tokens(json.dumps(messages,ensure_ascii=False))
-    cap=min(inputs['output_tokens'],jobs.index.settings.agent_call_max_tokens,1024,inputs['budget']-jobs.used_tokens(jid)-estimate)
-    if cap<128:raise ValueError('剩余预算不足以规划字段；未调用模型')
-    saved={'version':VERSION,'status':'prepared','request':{'messages':messages,'max_output_tokens':cap,'estimated_input_tokens':estimate,
-                                                        'system_sha256':sha(messages[0]['content'])},
+    request=prepare_request(query,inputs['output_tokens'],jobs.index.settings.agent_call_max_tokens,inputs['budget']-jobs.used_tokens(jid))
+    messages=request['messages'];cap=request['max_output_tokens']
+    saved={'version':VERSION,'status':'prepared','request':request,
            'meaning':'仅从用户问题规划字段意图，不含资料或答案；此调用计入同一个预算和调用上限。'}
+    if cap<128:
+        jobs.patch(jid,field_plan={**saved,'status':'budget_insufficient'})
+        raise ValueError('剩余预算不足以规划字段；未调用模型')
     jobs.patch(jid,field_plan=saved)
-    config=replace(load_llm_config(settings=jobs.index.settings,strength=inputs.get('strength','default')),max_retries=0)
-    client=jobs.llm_factory(config)
-    jobs.check(jid)
+    try:
+        config=replace(load_llm_config(settings=jobs.index.settings,strength=inputs.get('strength','default')),max_retries=0)
+        client=jobs.llm_factory(config)
+        jobs.check(jid)
+    except Exception as exc:
+        from .jobs import Stopped
+        # Separate local setup failures from cancellation; neither is a paid event.
+        jobs.patch(jid,field_plan={**saved,'status':'stopped' if isinstance(exc,Stopped) else 'setup_failed'})
+        if isinstance(exc,Stopped):raise
+        raise ValueError('字段规划调用准备失败：'+type(exc).__name__+'；未发送请求') from None
     event={'id':jid+'-field-plan','operation':'llm','purpose':'field_plan','status':'started','provider':config.provider,'model':config.model,
            'thinking':config.thinking,'reasoning_effort':config.reasoning_effort,'input_tokens':None,'output_tokens':None,'request_attempts':1,'started':now()}
     jobs.update_event(jid,event)
@@ -94,7 +108,9 @@ def plan_fields(jobs,jid):
     if saved['finish_reason']!='stop':
         jobs.patch(jid,field_plan={**saved,'status':'unfinished'})
         raise ValueError('字段规划响应未完整结束；停止整理，未自动重试')
-    if jobs.used_tokens(jid)>inputs['budget']:raise ValueError('字段规划已超过总预算，停止后续请求')
+    if jobs.used_tokens(jid)>inputs['budget']:
+        jobs.patch(jid,field_plan={**saved,'status':'budget_exceeded'})
+        raise ValueError('字段规划已超过总预算，停止后续请求')
     try:fields=validate(saved['model_output'],query)
     except ValueError:
         jobs.patch(jid,field_plan={**saved,'status':'invalid'});raise

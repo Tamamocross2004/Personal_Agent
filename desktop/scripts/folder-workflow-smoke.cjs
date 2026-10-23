@@ -8,7 +8,8 @@ const project = path.resolve(__dirname, "../.."),
 const docs = path.join(fixture, "资料 空间");
 fs.mkdirSync(docs);
 fs.writeFileSync(path.join(docs, "readme.txt"), "本地资料原文。");
-const fieldPlanMode = process.argv.includes("--field-plan");
+const resourceMode = process.argv.includes("--resource-estimates");
+const fieldPlanMode = process.argv.includes("--field-plan") || resourceMode;
 const completionMode = process.argv.includes("--completion") || fieldPlanMode;
 if (completionMode)
   fs.appendFileSync(
@@ -531,6 +532,28 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
               exact: true,
             })
             .fill("20");
+          if (resourceMode) {
+            const limit = region.getByRole("spinbutton", {
+              name: "原范围持续整理调用上限",
+              exact: true,
+            });
+            await limit.fill("1");
+            await previewButton.click();
+            await region
+              .getByRole("alert")
+              .filter({ hasText: "调用上限仅够字段规划" })
+              .waitFor();
+            assert.match(await region.innerText(), /首次只发送用户问题/);
+            assert.match(await region.innerText(), /首批预计送达\s*0段/);
+            assert.deepEqual(await get("/folder-jobs/" + parentId), parent);
+            await region.screenshot({
+              path: path.join(
+                project,
+                "workspace/stage32-planner-only-preview-20261023.png",
+              ),
+            });
+            await limit.fill("20");
+          }
         }
         await previewButton.click();
         await startButton.waitFor();
@@ -543,11 +566,13 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         await region.screenshot({
           path: path.join(
             project,
-            fieldPlanMode
-              ? "workspace/stage31-full-reading-preview-20261023.png"
-              : completionMode
-                ? "workspace/stage30-full-reading-preview-20261023.png"
-                : "workspace/stage29-full-reading-preview-20261023.png",
+            resourceMode
+              ? "workspace/stage32-full-reading-preview-20261023.png"
+              : fieldPlanMode
+                ? "workspace/stage31-full-reading-preview-20261023.png"
+                : completionMode
+                  ? "workspace/stage30-full-reading-preview-20261023.png"
+                  : "workspace/stage29-full-reading-preview-20261023.png",
           ),
         });
         await startButton.click();
@@ -953,31 +978,33 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
       path: path.join(
         project,
         "workspace",
-        fieldPlanMode
-          ? "stage31-folder-workflow-20261023.png"
-          : completionMode
-            ? "stage30-folder-workflow-20261023.png"
-            : fullReadingMode
-              ? "stage29-folder-workflow-20261023.png"
-              : contextMode
-                ? "stage27-folder-projects-20261023.png"
-                : diagnosticsMode
-                  ? "stage26-folder-workflow-20261023.png"
-                  : projectMode
-                    ? "stage25-folder-projects-20261022.png"
-                    : scopeMode
-                      ? "stage24-folder-workflow-20261022.png"
-                      : batchingMode
-                        ? "stage23-folder-workflow-20261022.png"
-                        : parseMode
-                          ? "folder-workflow-current-multiformat.png"
-                          : process.argv.includes("--strength")
-                            ? "model-strength-folder-20261022.png"
-                            : process.argv.includes("--reading")
-                              ? "stage22-folder-workflow.png"
-                              : process.argv.includes("--experience")
-                                ? "stage21-folder-workflow.png"
-                                : "folder-workflow-current.png",
+        resourceMode
+          ? "stage32-folder-workflow-20261023.png"
+          : fieldPlanMode
+            ? "stage31-folder-workflow-20261023.png"
+            : completionMode
+              ? "stage30-folder-workflow-20261023.png"
+              : fullReadingMode
+                ? "stage29-folder-workflow-20261023.png"
+                : contextMode
+                  ? "stage27-folder-projects-20261023.png"
+                  : diagnosticsMode
+                    ? "stage26-folder-workflow-20261023.png"
+                    : projectMode
+                      ? "stage25-folder-projects-20261022.png"
+                      : scopeMode
+                        ? "stage24-folder-workflow-20261022.png"
+                        : batchingMode
+                          ? "stage23-folder-workflow-20261022.png"
+                          : parseMode
+                            ? "folder-workflow-current-multiformat.png"
+                            : process.argv.includes("--strength")
+                              ? "model-strength-folder-20261022.png"
+                              : process.argv.includes("--reading")
+                                ? "stage22-folder-workflow.png"
+                                : process.argv.includes("--experience")
+                                  ? "stage21-folder-workflow.png"
+                                  : "folder-workflow-current.png",
       ),
     });
     await page

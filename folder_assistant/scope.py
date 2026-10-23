@@ -1,7 +1,6 @@
 """Read-only interpretation of saved operations, never regrading or repairing answers."""
 from collections import Counter
 from .reading import ReadingPlan
-from .batching import select_batch
 
 VERSION=1
 MEANING='只覆盖固定版本已解析文字，不含OCR或未提取内容；送达、结构可用与事实完整正确分别判断。仅汇总当前任务及前序，不混入其他分支，不改写原结果。'
@@ -98,14 +97,13 @@ def preview_next(jobs,jid,controls):
                                                'strategy':'exhaustive','resume_from':jid})
     plan=ReadingPlan(jobs.index,job['folder_id'],inputs['generation'],inputs['file_ids'])
     start=inputs['start_offset'];end=inputs['range_end']
-    batch,decision=select_batch(plan,inputs,start,1,inputs['budget'],[],jobs.index.settings.agent_call_max_tokens)
-    if decision['effective_output_tokens']<128:
-        batch=None;decision={**decision,'stop_reason':'token_budget'}
+    from .reading_preview import preview_first
+    batch,decision,preflight=preview_first(plan,inputs,start,jobs.index.settings.agent_call_max_tokens)
     return {'cloud_calls':False,'generation':inputs['generation'],'parent_id':jid,'operation_start':start,'operation_end':end,
             'first_batch_end':batch['next_offset'] if batch else start,'max_batches':inputs['max_batches'],
             'read_to_end':inputs['read_to_end'],'batch_call_limit':inputs['batch_call_limit'],
             'plan_fields':inputs['plan_fields'],
             'budget':inputs['budget'],'output_tokens':inputs['output_tokens'],'strength':inputs['strength'],
-            'retry_split':inputs['retry_split'],'decision':decision,'services':['llm'] if batch else [],
+            'retry_split':inputs['retry_split'],'decision':decision,**preflight,
             'model':inputs['model'],'first_batch':[ {k:h[k] for k in ('segment','name','source_location','start','end','role')} for h in (batch or {}).get('hits',[])],
             'meaning':'本地估算，未发送模型；启动时重新检查授权、任务状态、预算和分批。后续批次大小取决于实际返回，不保证处理完区间。原失败和费用保留。'}

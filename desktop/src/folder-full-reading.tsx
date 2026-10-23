@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { locationLabel } from "./folder-location";
 import { FolderCompletion } from "./folder-completion";
+import { FolderPlanningPreview } from "./folder-planning-preview";
 
 export function FolderFullReading({
   api,
@@ -79,11 +80,7 @@ export function FolderFullReading({
       {current && (
         <div>
           <p>原问题：{current.query}</p>
-          {current.plan_fields && (
-            <p>
-              先规划字段意图：增加一次调用，计入本次上限和总预算；若规划失败则不发送资料。首批范围会在规划后重新估算。
-            </p>
-          )}
+          <FolderPlanningPreview preview={current} />
           <p>
             运行方式：{current.read_to_end ? "持续整理" : "普通分批"} · 本次最多{" "}
             {current.batch_call_limit} 次模型调用 · 总预算 {current.budget}{" "}

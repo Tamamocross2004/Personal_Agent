@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { locationLabel } from "./folder-location";
+import { FolderPlanningPreview } from "./folder-planning-preview";
 
 export function FolderScope({
   api,
@@ -236,11 +237,7 @@ export function FolderScope({
                   次模型调用；首批预计 [{p.operation_start}, {p.first_batch_end}
                   )。
                 </p>
-                {p.plan_fields && (
-                  <p>
-                    使用字段意图规划；已有规划会复用，首次规划计入调用上限和同一预算，随后重新估算资料批次。
-                  </p>
-                )}
+                <FolderPlanningPreview preview={p} />
                 <p>
                   服务：
                   {p.services.length

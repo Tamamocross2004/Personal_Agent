@@ -2,7 +2,7 @@
 import json
 
 from knowledge.documents import sha
-from .batching import select_batch
+from .reading_preview import preview_first
 from .contracts import GUIDE_VERSION,instruction
 from .reading import ReadingPlan
 
@@ -26,13 +26,9 @@ def preview_full_reading(jobs,jid,controls):
     source=jobs.get(jid)
     inputs=jobs.prepare_answer(source['folder_id'],_inputs(jid,controls))
     plan=ReadingPlan(jobs.index,source['folder_id'],inputs['generation'],inputs['file_ids'])
-    batch=None;decision={'stop_reason':'empty_scope'}
-    if plan.segments:
-        batch,decision=select_batch(plan,inputs,0,1,inputs['budget'],[],jobs.index.settings.agent_call_max_tokens)
-        if decision['effective_output_tokens']<128:
-            batch=None;decision={**decision,'stop_reason':'token_budget'}
+    batch,decision,preflight=preview_first(plan,inputs,0,jobs.index.settings.agent_call_max_tokens)
     return {**plan.summary(),'source_job_id':jid,'query':inputs['query'],'strength':inputs['strength'],
-            'plan_hash':plan_hash(inputs),'cloud_calls':False,'services':['llm'] if batch else [],
+            'plan_hash':plan_hash(inputs),'cloud_calls':False,**preflight,
             'budget':inputs['budget'],'max_batches':inputs['max_batches'],'output_tokens':inputs['output_tokens'],
             'read_to_end':inputs['read_to_end'],'batch_call_limit':inputs['batch_call_limit'],
             'plan_fields':inputs['plan_fields'],

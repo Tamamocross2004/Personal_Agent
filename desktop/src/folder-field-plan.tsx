@@ -16,6 +16,9 @@ export function FolderFieldPlan({ plan }: any) {
             usage_unknown: "用量未知",
             failed: "请求失败",
             stopped: "已停止后续处理",
+            budget_insufficient: "预算不足，未调用",
+            budget_exceeded: "返回用量已超过预算，停止后续处理",
+            setup_failed: "调用准备失败，未发送请求",
           } as any
         )[plan.status] || plan.status}
       </summary>
