@@ -113,6 +113,9 @@ class ProjectFollowup(BaseModel):
     budget:int=Field(default=10000,ge=256,le=50000)
     output_tokens:int=Field(default=1200,ge=128,le=4096)
     strength:ModelStrength='default'
+    include_results:bool=True
+    include_dialogue:bool=False
+    plan_hash:str|None=Field(default=None,min_length=64,max_length=64)
 
 
 def create_app(manager:Manager,token:str,ui_dir:Path|None=None,*,folder_grant_token:str|None=None):
@@ -216,6 +219,10 @@ def create_app(manager:Manager,token:str,ui_dir:Path|None=None,*,folder_grant_to
     def project_followup(pid:str,body:ProjectFollowup):
         values=body.model_dump();vid=values.pop('version_id');query=values.pop('query')
         return redact(projects.followup(pid,vid,query,values))
+    @app.post('/api/folder-projects/{pid}/followups/preview')
+    def project_followup_preview(pid:str,body:ProjectFollowup):
+        values=body.model_dump();vid=values.pop('version_id');query=values.pop('query')
+        return redact(projects.preview_followup(pid,vid,query,values))
     @app.get('/api/folder-project-versions/{vid}')
     def project_version(vid:str,offset:int=0,limit:int=10):return redact(projects.version(vid,offset,limit))
     @app.post('/api/folder-project-versions/{vid}/export')

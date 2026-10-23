@@ -39,7 +39,13 @@ def test_project_http_lifecycle_validation_and_readonly_exports(tmp_path,monkeyp
         p=c.get(url,headers=h).json();assert p['head'] and not p['pending']
         version_url='/api/folder-project-versions/'+p['head']
         v=c.get(version_url,headers=h).json();assert v['status']=='structured'
-        follow=c.post(url+'/followups',headers=h,json={'version_id':p['head'],'query':'alpha'}).json()
+        follow_body={'version_id':p['head'],'query':'alpha'};before=(len(chat.calls),len(embedding.calls))
+        assert c.post(url+'/followups/preview',json=follow_body).status_code==401
+        preview_follow=c.post(url+'/followups/preview',headers=h,json=follow_body).json()
+        assert not preview_follow['cloud_calls'] and (len(chat.calls),len(embedding.calls))==before
+        assert preview_follow['transmission']['project_history']['selected_groups']
+        assert c.post(url+'/followups',headers=h,json={**follow_body,'plan_hash':'0'*64}).status_code==400
+        follow=c.post(url+'/followups',headers=h,json={**follow_body,'plan_hash':preview_follow['plan_hash']}).json()
         assert wait_job(follow['id'])['status']=='completed'
         assert c.get(url,headers=h).json()['head']==p['head']
         assert c.post(url+'/followups',headers=h,json={'version_id':'a'*32,'query':'x'}).status_code==404
@@ -51,5 +57,6 @@ def test_project_http_lifecycle_validation_and_readonly_exports(tmp_path,monkeyp
         assert c.get(url,headers=h).status_code==200 and c.get(version_url,headers=h).status_code==200
         assert c.post(version_url+'/export',headers=h).json()['cached']
         assert c.post(url+'/preview',headers=h,json={**req,'expected_head':p['head']}).status_code==400
+        assert c.post(url+'/followups/preview',headers=h,json=follow_body).status_code==400
         assert c.patch(url,headers=h,json={**config,'revision':1}).status_code==400
         assert (len(chat.calls),len(embedding.calls))==calls

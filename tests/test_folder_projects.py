@@ -40,7 +40,7 @@ def test_initial_edition_followup_and_revision_preserve_other_results(library):
     sent=json.loads(chat.calls[-1][0][1]['content'])
     assert sent['project_context']['previous_version']==v['id']
     assert sent['project_context']['fields']==['摘录'] and sent['project_context']['previous_result_snippets']
-    again=projects.followup(p['id'],v['id'],'beta',{'budget':10000});jobs.threads[again['id']].join(15)
+    again=projects.followup(p['id'],v['id'],'beta',{'budget':10000,'include_dialogue':True});jobs.threads[again['id']].join(15)
     assert json.loads(chat.calls[-1][0][1]['content'])['project_context']['prior_dialogue'][0]['question']=='alpha'
     a=next(d['file_id'] for d in v['files'] if d['name']=='a.txt')
     p,new,_=run(projects,jobs,p,action='revise',file_ids=[a],instruction='只重新整理选定文件的原文')

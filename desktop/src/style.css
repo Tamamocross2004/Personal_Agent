@@ -1506,6 +1506,10 @@ small {
 .folder-next-scope { border-top: 1px solid var(--border); margin-top: 12px; }
 .folder-projects { border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin: 14px 0; }
 .folder-projects label { display: block; margin: 8px 0; }
+.folder-projects .project-context-option { display: flex; flex-direction: row; justify-content: flex-start; align-items: center; gap: 8px; }
+.folder-projects .project-context-option input { width: auto; flex: 0 0 auto; margin: 0; }
+.folder-transmission { margin: 12px 0; padding: 12px; border: 1px solid var(--border); border-radius: 8px; overflow-wrap: anywhere; }
+.folder-transmission summary { cursor: pointer; }
 .folder-projects textarea { width: 100%; min-height: 70px; }
 .folder-projects button { white-space: normal; margin: 4px; }
 .project-version, .project-preview { border-top: 1px solid var(--border); margin-top: 12px; padding-top: 8px; }

@@ -125,6 +125,12 @@ def export_job(jobs,jid):
             if diagnostic:
                 lines.extend([md(label+' 输出诊断：'+diagnostic['message']),md(diagnostic['suggestion']),
                               '用量状态：'+md(diagnostic['usage_status'])+'；不认证语义正确性。',''])
+        requests=[(f"第{b['number']}批",b.get('request',{})) for b in batches] if batches else [('',job.get('request',{}))]
+        for label,request in requests:
+            sent=(request or {}).get('transmission')
+            if sent:
+                lines.extend([md(label+' 发送构成（本地估算）：'+json.dumps(sent,ensure_ascii=False)),
+                              '各部分Token不是独立账单；实际messages、原响应及供应商总用量见record.json。',''])
         for finding in answer.get('findings',[]):
             if batches:lines.append('第'+str(finding['export_batch'])+'批：')
             lines.extend(['- '+md(finding['kind']+'：'+finding['statement'])+' '+md(' '.join('['+c+']' for c in finding['citations'])),''])

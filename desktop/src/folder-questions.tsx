@@ -4,6 +4,7 @@ import { FileFilter } from "./folder-files";
 import { ModelStrength, strengthLabel } from "./model-strength";
 import { FolderScope } from "./folder-scope";
 import { FolderOutputDiagnostics } from "./folder-output-diagnostics";
+import { FolderTransmission } from "./folder-transmission";
 
 export function FolderQuestions({
   api,
@@ -63,6 +64,7 @@ export function FolderQuestions({
         model_output: batch.model_output,
         finish_reason: batch.finish_reason,
         output_diagnostics: batch.output_diagnostics,
+        request: batch.request,
         evidence: batch.evidence,
       }
     : saved;
@@ -686,6 +688,10 @@ export function FolderQuestions({
           )}
           <p>{current.message || current.result?.message}</p>
           <FolderOutputDiagnostics value={current.output_diagnostics} />
+          <FolderTransmission
+            value={current.request?.transmission}
+            label="实际保存的发送构成"
+          />
           {current.result?.contract_checks && (
             <aside className="folder-contract-notice">
               <p>

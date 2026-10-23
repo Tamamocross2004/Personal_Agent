@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ModelStrength } from "./model-strength";
 import { locationLabel } from "./folder-location";
+import { FolderTransmission } from "./folder-transmission";
 
 function ProjectGroup({ group, cite }: any) {
   const labels: any = {
@@ -121,6 +122,9 @@ export function FolderProjects({
   const [response, setResponse] = useState<any>(null),
     [citation, setCitation] = useState<any>(null),
     [exported, setExported] = useState<any>(null);
+  const [includeResults, setIncludeResults] = useState(true),
+    [includeDialogue, setIncludeDialogue] = useState(false);
+  const [followPreview, setFollowPreview] = useState<any>(null);
   const alive = useRef(true),
     requestTurn = useRef(0);
   useEffect(() => {
@@ -220,6 +224,38 @@ export function FolderProjects({
     strength,
   };
   const key = JSON.stringify(payload);
+  const followKey = JSON.stringify({
+    version_id: vid,
+    query: question,
+    budget,
+    output_tokens: output,
+    strength,
+    include_results: includeResults,
+    include_dialogue: includeDialogue,
+  });
+  useEffect(() => {
+    let current = true;
+    setFollowPreview(null);
+    if (!pid || !vid || !question.trim() || !valid) return;
+    const timer = setTimeout(
+      () =>
+        api(`/folder-projects/${pid}/followups/preview`, {
+          method: "POST",
+          body: followKey,
+        })
+          .then((v: any) => {
+            if (current) setFollowPreview({ ...v, key: followKey });
+          })
+          .catch((e: any) => {
+            if (current) setFollowPreview({ error: String(e), key: followKey });
+          }),
+      300,
+    );
+    return () => {
+      current = false;
+      clearTimeout(timer);
+    };
+  }, [pid, followKey, valid, project?.messages.length]);
   useEffect(() => {
     let current = true;
     setPreview(null);
@@ -457,6 +493,10 @@ export function FolderProjects({
                     。固定索引 {preview.generation}。
                   </p>
                   <p>{preview.meaning}</p>
+                  <FolderTransmission
+                    value={preview.first_request_transmission}
+                    label="首批发送预览"
+                  />
                 </aside>
               ))}
             <button
@@ -625,18 +665,53 @@ export function FolderProjects({
                 <p>
                   追问会重新检索本版固定来源，历史结果仅作为背景，不当作证据。不会修改本版结果。
                 </p>
+                <label className="project-context-option">
+                  <input
+                    type="checkbox"
+                    checked={includeResults}
+                    onChange={(e) => setIncludeResults(e.target.checked)}
+                  />
+                  带上与本次原文完全匹配的旧结果
+                </label>
+                <label className="project-context-option">
+                  <input
+                    type="checkbox"
+                    checked={includeDialogue}
+                    onChange={(e) => setIncludeDialogue(e.target.checked)}
+                  />
+                  带上最近两轮对话（会重发历史文字）
+                </label>
+                {followPreview?.key === followKey &&
+                  (followPreview.error ? (
+                    <p>{followPreview.error}</p>
+                  ) : (
+                    <>
+                      <p>
+                        {followPreview.meaning}
+                        {!followPreview.will_call_model &&
+                          " 当前无命中证据，不发送聊天请求。"}
+                      </p>
+                      <FolderTransmission
+                        value={followPreview.transmission}
+                        label="追问发送预览"
+                      />
+                    </>
+                  ))}
                 <button
-                  disabled={busy || !valid || !question.trim()}
+                  disabled={
+                    busy ||
+                    !valid ||
+                    !question.trim() ||
+                    followPreview?.key !== followKey ||
+                    !followPreview?.plan_hash
+                  }
                   onClick={() =>
                     act(async () => {
                       const j = await api(`/folder-projects/${pid}/followups`, {
                         method: "POST",
                         body: JSON.stringify({
-                          version_id: vid,
-                          query: question,
-                          budget,
-                          output_tokens: output,
-                          strength,
+                          ...JSON.parse(followKey),
+                          plan_hash: followPreview.plan_hash,
                         }),
                       });
                       setJob(j);
@@ -671,6 +746,10 @@ export function FolderProjects({
                       {response.result?.content_status || response.status} ·
                       未正式审稿
                     </p>
+                    <FolderTransmission
+                      value={response.request?.transmission}
+                      label="追问实际发送构成"
+                    />
                     {response.result?.answer ? (
                       <ProjectGroup
                         group={{

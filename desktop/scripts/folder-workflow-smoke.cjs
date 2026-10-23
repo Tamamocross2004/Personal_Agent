@@ -18,6 +18,7 @@ const batchingMode = process.argv.includes("--batching");
 const scopeMode = process.argv.includes("--scope");
 const projectMode = process.argv.includes("--projects");
 const diagnosticsMode = process.argv.includes("--diagnostics");
+const contextMode = process.argv.includes("--context");
 const parseMode = process.argv.includes("--parse");
 if (parseMode)
   require("node:child_process").execFileSync(
@@ -192,6 +193,27 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
       await region
         .getByRole("textbox", { name: "项目追问", exact: true })
         .fill("本地资料原文");
+      if (contextMode) {
+        const preview = region.getByLabel("追问发送预览", { exact: true });
+        await preview.locator("summary").click();
+        await preview.getByText(/最近对话：0轮（未开启）/).waitFor();
+        assert.equal(
+          await region
+            .getByRole("checkbox", {
+              name: "带上最近两轮对话（会重发历史文字）",
+              exact: true,
+            })
+            .isChecked(),
+          false,
+        );
+        await preview.scrollIntoViewIfNeeded();
+        await page.screenshot({
+          path: path.join(
+            project,
+            "workspace/stage27-followup-preview-20261023.png",
+          ),
+        });
+      }
       await region
         .getByRole("button", {
           name: "追问当前版本（调用模型，不改结果）",
@@ -202,6 +224,31 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         .getByRole("button", { name: /本地资料原文.*completed/ })
         .click();
       await region.getByText(/保存的追问：/).waitFor();
+      if (contextMode) {
+        const sent = region.getByLabel("追问实际发送构成", { exact: true });
+        await sent.locator("summary").click();
+        await sent.getByText(/原结果背景：1批/).waitFor();
+        await region
+          .getByRole("textbox", { name: "项目追问", exact: true })
+          .fill("本地资料");
+        await region
+          .getByRole("checkbox", {
+            name: "带上最近两轮对话（会重发历史文字）",
+            exact: true,
+          })
+          .check();
+        const preview = region.getByLabel("追问发送预览", { exact: true });
+        await preview.locator("summary").click();
+        await preview.getByText(/最近对话：1轮（已显式开启）/).waitFor();
+        await region
+          .getByRole("checkbox", {
+            name: "带上最近两轮对话（会重发历史文字）",
+            exact: true,
+          })
+          .uncheck();
+        await preview.locator("summary").click();
+        await preview.getByText(/最近对话：0轮（未开启）/).waitFor();
+      }
       assert.equal((await get("/folder-projects/" + pid)).head, revision.head);
       // Only the test harness edits its synthetic source; the application stays read-only.
       assert.equal(
@@ -247,6 +294,44 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
       const updated = await settled(revision.head);
       await region.getByText(/可用结构覆盖2\/2段/).waitFor();
       const latest = await get("/folder-project-versions/" + updated.head);
+      if (contextMode) {
+        const job = await get("/folder-jobs/" + latest.job_id);
+        assert.ok(
+          job.batches.every(
+            (b) =>
+              b.request.transmission.project_history.history_characters === 0,
+          ),
+        );
+        const preview = region.getByLabel("首批发送预览", { exact: true });
+        // Completed update now has no new work; inspect the saved actual requests.
+        assert.ok(
+          job.batches.every(
+            (b) =>
+              JSON.parse(b.request.messages[1].content).project_context
+                .previous_result_snippets.length === 0,
+          ),
+        );
+        await region
+          .getByRole("combobox", { name: "项目操作", exact: true })
+          .selectOption("revise");
+        await region
+          .getByRole("checkbox", { name: "readme.txt", exact: true })
+          .check();
+        await region
+          .getByRole("textbox", { name: "项目修订要求", exact: true })
+          .fill("重新摘录原文");
+        await preview.locator("summary").click();
+        await preview.scrollIntoViewIfNeeded();
+        await page.screenshot({
+          path: path.join(
+            project,
+            "workspace/stage27-operation-preview-20261023.png",
+          ),
+        });
+        await region
+          .getByRole("combobox", { name: "项目操作", exact: true })
+          .selectOption("update");
+      }
       assert.equal(latest.parent_id, revision.head);
       assert.deepEqual(
         await get("/folder-project-versions/" + first.head),
@@ -705,23 +790,25 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
       path: path.join(
         project,
         "workspace",
-        diagnosticsMode
-          ? "stage26-folder-workflow-20261023.png"
-          : projectMode
-            ? "stage25-folder-projects-20261022.png"
-            : scopeMode
-              ? "stage24-folder-workflow-20261022.png"
-              : batchingMode
-                ? "stage23-folder-workflow-20261022.png"
-                : parseMode
-                  ? "folder-workflow-current-multiformat.png"
-                  : process.argv.includes("--strength")
-                    ? "model-strength-folder-20261022.png"
-                    : process.argv.includes("--reading")
-                      ? "stage22-folder-workflow.png"
-                      : process.argv.includes("--experience")
-                        ? "stage21-folder-workflow.png"
-                        : "folder-workflow-current.png",
+        contextMode
+          ? "stage27-folder-projects-20261023.png"
+          : diagnosticsMode
+            ? "stage26-folder-workflow-20261023.png"
+            : projectMode
+              ? "stage25-folder-projects-20261022.png"
+              : scopeMode
+                ? "stage24-folder-workflow-20261022.png"
+                : batchingMode
+                  ? "stage23-folder-workflow-20261022.png"
+                  : parseMode
+                    ? "folder-workflow-current-multiformat.png"
+                    : process.argv.includes("--strength")
+                      ? "model-strength-folder-20261022.png"
+                      : process.argv.includes("--reading")
+                        ? "stage22-folder-workflow.png"
+                        : process.argv.includes("--experience")
+                          ? "stage21-folder-workflow.png"
+                          : "folder-workflow-current.png",
       ),
     });
     await page
@@ -811,6 +898,14 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
                 "explicit-split-bounded-range",
                 "parent-and-fees-preserved",
                 "continue-after-split",
+              ]
+            : []),
+          ...(contextMode
+            ? [
+                "transmission-preview",
+                "explicit-dialogue-opt-in",
+                "update-no-history",
+                "saved-request-manifest",
               ]
             : []),
           "native-picker-capability",

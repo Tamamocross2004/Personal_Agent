@@ -1,0 +1,691 @@
+{
+  "stage": 27,
+  "date": "2026-10-23",
+  "base_commit": "13ae7a6",
+  "reviewer": "coding_assistant",
+  "independent_review": false,
+  "engineering_passed": true,
+  "content_acceptance_passed": false,
+  "stage12_accepted": false,
+  "tests": {
+    "targeted": "59 passed in 204.08s",
+    "full": "1131 passed in 713.28s",
+    "new_context_boundary_cases": 10,
+    "build_delivery": true,
+    "electron_initial_wait_failed_preserved": true,
+    "electron_later_runs_passed": 3,
+    "final_screenshot_visually_inspected": "workspace/stage27-followup-preview-20261023.png"
+  },
+  "checks": {
+    "unchanged_source_contract_budget_files": [
+      "folder_assistant/contracts.py",
+      "folder_assistant/reading.py",
+      "folder_assistant/batching.py",
+      "folder_assistant/exhaustive.py",
+      "folder_assistant/jobs.py"
+    ],
+    "historical_artifacts_unchanged": 693,
+    "frozen_runtime_unchanged": true,
+    "project_keys_checked": 2,
+    "secret_matches": 0,
+    "files_scanned": 445
+  },
+  "live_plan_sha256": "ad0a4e6ab0ccc4b7b1f58fe2bc06431391c5f0c2cf4d025f4de9f00799b7fd77",
+  "live_runtime_sha256": {
+    "folder_assistant/__init__.py": "36656300506ebee15611b11a8eec4d2ba51af2278e92d74a5226fa32a1dd6277",
+    "folder_assistant/__main__.py": "590c31bef4728539747a3a02b16cf55df006a81938f3e6adb0e2324d7747f560",
+    "folder_assistant/answers.py": "40e8994604467d7cb69cee1b071c63e3659cac9a426ddcbadf884a2cf4ec9b77",
+    "folder_assistant/batching.py": "87936b69ccbb6b2d5e4c027de9f68265393e24c037fc57fa783b513bb97800a2",
+    "folder_assistant/contracts.py": "76e4473ef92ab82fa2e3de2b12765b810c6b3deb6a4a03cfe8fc36c109fa75ec",
+    "folder_assistant/exhaustive.py": "1e4eb9e129e9f2cb46ceffd30289e6bfb8a8bfa453255dd5ed55edd2dc481f42",
+    "folder_assistant/exports.py": "5ee3b1005fd92807ca035cfd485e2878abc244b0760a8bf85dec57c14f93fb63",
+    "folder_assistant/index.py": "6c70d3975f5918bd76d2149f5938e5aaf6a369caff6af5feca3e5af7bc133db3",
+    "folder_assistant/jobs.py": "b8c0efab6530c70b619464e32f9ca9092fe08b3f6da722a99dd2900de0010b31",
+    "folder_assistant/output_diagnostics.py": "e4f8a66e5b14517a69e2fb45c37ac9153d0c920960ad1f37d70a7c93185ae08d",
+    "folder_assistant/parse_worker.py": "e1603c813ea3ed124e4f744af7db7fabb13343c09ab570a651722338cbf49387",
+    "folder_assistant/parsing.py": "474dd43160b91025576f4bbd802f2fe3a1122818ce6a8536ba194564722a0acf",
+    "folder_assistant/project_context.py": "adb947ccd27de18d873c046117f5a83ea325a480dc2868894a1d2c6ef94fdc4d",
+    "folder_assistant/project_exports.py": "0f296a8f699722299d191acb00940d95267bd986cc94d49ae5e9c62c2109acbc",
+    "folder_assistant/projects.py": "172d3af54f498bea2489c47e5291804fe0144544cdd5e891f5455b87ae0af374",
+    "folder_assistant/reading.py": "54febef7b0313bd16517d4f5882c7054100c8e4b75e51c8310d9ec92b22d9b8f",
+    "folder_assistant/scope.py": "1180705f2cacf02fe068aef1a9a52adebfafe19b7e5baef06259405dd282887f",
+    "folder_assistant/store.py": "27a5f165119ef621715db67cfcfcecd9d494272cd5cae3f5b6de828ab7d3390d",
+    "folder_assistant/usage.py": "bf86177a3397159586053bbc7e4431d45b37e3121678e04ad6ee42069db2d240",
+    "knowledge/__init__.py": "5fcbc38c72e9f0e4c0938373622ff86daadbe7389238d3003d9a73d3acfb1533",
+    "knowledge/__main__.py": "fc231000c92128f2dacd50c8e4a2131c197130af52b5c13500673af31e4dec43",
+    "knowledge/documents.py": "4c2372f461f357cce017e9704392571c1d1bd1cf7e8f601867e6aa5eeb9305e2",
+    "knowledge/embedding.py": "7cfc277bf79b51205bff5c1447bb7165d73189a1773bfb7e013696349bdd2c43",
+    "knowledge/large_probe.py": "497c734fde900ff464eea06b736979fc52ccaa964bba28f21ebd3a1464c0c630",
+    "knowledge/locking.py": "c2f87541b323e39f8d080067aab7c15f7870f9a50b522ca9bcb596a4b89002ee",
+    "knowledge/long_probe.py": "824878c533475b0d48cca92f538fe00228108ede3274cf4bd43996ada91bb403",
+    "knowledge/probe.py": "564fc1190358d125bdd7d1c7d0fbe2bc1a998258e1dbe4f0b268585552e5666a",
+    "knowledge/recall_probe.py": "fb5657819c94b93083d3a11e6e546342345f3d35ac14fe70c662449f40143ca9",
+    "knowledge/report_probe.py": "486c955ce7368a5beb181b9def74546fc3b3ad9188c013105d643570102ac7df",
+    "knowledge/rerank_probe.py": "4c49f1e3a7f0e8dcd50edb647ba9beb521398ea05c01da538b25f1c99b9b75bc",
+    "knowledge/reranking.py": "8118a7613b87909571050ad1b6d6d3bee2a9beb8aa68b0dbc4ab60570cf384ec",
+    "knowledge/store.py": "3fc3b7c28d42baf9aee644f9edcd25ab12c547a5b8de37552ae399ce8d5d6837",
+    "knowledge/vectors.py": "520aff951c342401e1f1c4fcf5a532bd8f3ae859f6c01eb920414f8d2fdafd1b",
+    "agent/config.py": "30f8a3e63d4919113bdc09dc9954623440c18ee399448abd6e5da66ba7d2c60e",
+    "agent/llm.py": "bc58280e4c9663f4cc7f2fdf16041f11358e7b5b3e74b0fb4ce50b2232118867",
+    "agent/context.py": "097c931099e9b28a5222a10f02b03085f76f8aec61b33a02eb57393f7361f76f",
+    "agent/strength.py": "2dc6a5891255eb5e8da1c792e14acd3e39ab170bbd8493469432fd811035d1b1",
+    "workspace/stage27_live.py": "80a985b8f070d8f2a4e0a6264ed976d685f86324d65395adc84062a9411287d3"
+  },
+  "live_usage": {
+    "llm_calls": 6,
+    "embedding_calls": 2,
+    "rerank_calls": 0,
+    "known_tokens": 19572
+  },
+  "cny_total": null,
+  "live_editions": [
+    {
+      "name": "initial",
+      "version_id": "6e517877da284dd284440112220ee15e",
+      "status": "structured",
+      "parent_id": null,
+      "actual_rows": [
+        [
+          "Borealis",
+          "打印速度",
+          "75 mm/s"
+        ],
+        [
+          "Borealis",
+          "分辨率",
+          "300 dpi"
+        ],
+        [
+          "Lyra",
+          "打印速度",
+          "0 mm/s"
+        ],
+        [
+          "Lyra",
+          "分辨率",
+          "203 dpi"
+        ]
+      ],
+      "expected_rows": [
+        [
+          "Lyra",
+          "打印速度",
+          "0 mm/s"
+        ],
+        [
+          "Lyra",
+          "分辨率",
+          "203 dpi"
+        ],
+        [
+          "Borealis",
+          "打印速度",
+          "75 mm/s"
+        ],
+        [
+          "Borealis",
+          "分辨率",
+          "300 dpi"
+        ]
+      ],
+      "strict_literal_rows_matched": true,
+      "groups": [
+        {
+          "job_id": "41b720446498499dafc57472ae7ffc04",
+          "batch": 1,
+          "generation": "136728c6fabb4d3ebbca6dcd94d826b8"
+        },
+        {
+          "job_id": "41b720446498499dafc57472ae7ffc04",
+          "batch": 2,
+          "generation": "136728c6fabb4d3ebbca6dcd94d826b8"
+        }
+      ],
+      "review_status": "not_reviewed",
+      "semantic_status": "not_certified",
+      "csv_xlsx_roundtrip": true
+    },
+    {
+      "name": "new-update",
+      "version_id": "d8b2072dd75a43ba9e408f2e03795529",
+      "status": "structured",
+      "parent_id": "6e517877da284dd284440112220ee15e",
+      "actual_rows": [
+        [
+          "Lyra",
+          "打印速度",
+          "0 mm/s"
+        ],
+        [
+          "Lyra",
+          "分辨率",
+          "203 dpi"
+        ],
+        [
+          "Borealis",
+          "打印速度",
+          "80 mm/s"
+        ],
+        [
+          "Borealis",
+          "分辨率",
+          "300 dpi"
+        ]
+      ],
+      "expected_rows": [
+        [
+          "Lyra",
+          "打印速度",
+          "0 mm/s"
+        ],
+        [
+          "Lyra",
+          "分辨率",
+          "203 dpi"
+        ],
+        [
+          "Borealis",
+          "打印速度",
+          "80 mm/s"
+        ],
+        [
+          "Borealis",
+          "分辨率",
+          "300 dpi"
+        ]
+      ],
+      "strict_literal_rows_matched": true,
+      "groups": [
+        {
+          "job_id": "41b720446498499dafc57472ae7ffc04",
+          "batch": 2,
+          "generation": "136728c6fabb4d3ebbca6dcd94d826b8"
+        },
+        {
+          "job_id": "c047af0d294a4a4cbd4f6b64efe3adca",
+          "batch": 1,
+          "generation": "64f03c2a0f27497bb1939faa142b5dfd"
+        }
+      ],
+      "review_status": "not_reviewed",
+      "semantic_status": "not_certified",
+      "csv_xlsx_roundtrip": true
+    }
+  ],
+  "live_pairs": [
+    {
+      "operation": "update",
+      "same_question_evidence_scope": true,
+      "same_system": true,
+      "variants": {
+        "baseline": {
+          "job_id": "9fa8a8d6412a4b23933a5634b5e9bf7c",
+          "finish_reason": "stop",
+          "usable_structure": true,
+          "input_tokens": 3429,
+          "output_tokens": 323,
+          "cached_tokens": 2176,
+          "estimated_input_tokens": 4209,
+          "contains_Lyra_in_messages": true,
+          "history_characters": 1809,
+          "transmission": {
+            "version": 1,
+            "estimated_input_tokens": 4209,
+            "sections": [
+              {
+                "name": "system",
+                "characters": 7213,
+                "estimated_tokens": 2583
+              },
+              {
+                "name": "question",
+                "characters": 31,
+                "estimated_tokens": 24
+              },
+              {
+                "name": "reading_scope",
+                "characters": 245,
+                "estimated_tokens": 100
+              },
+              {
+                "name": "evidence",
+                "characters": 324,
+                "estimated_tokens": 105
+              },
+              {
+                "name": "project_context",
+                "characters": 2415,
+                "estimated_tokens": 851
+              }
+            ],
+            "evidence": [
+              {
+                "citation_id": "B1C1",
+                "name": "borealis.txt",
+                "file_sha256": "611e66604e24ba63e7c92b24fdf4265c338b7b2c17de0c1a1716792f92e18a6e",
+                "source_block_id": 1,
+                "text_sha256": "611e66604e24ba63e7c92b24fdf4265c338b7b2c17de0c1a1716792f92e18a6e",
+                "characters": 38
+              }
+            ],
+            "project_history": null,
+            "meaning": "实际请求构成的本地估算；各部分Token不能相加当账单，供应商只返回本次总用量。清单本身不发送给模型，未认证内容正确性。"
+          },
+          "rows": [
+            [
+              "Borealis",
+              "打印速度",
+              "80 mm/s"
+            ],
+            [
+              "Borealis",
+              "分辨率",
+              "300 dpi"
+            ]
+          ],
+          "review_status": "not_reviewed"
+        },
+        "new": {
+          "job_id": "c047af0d294a4a4cbd4f6b64efe3adca",
+          "finish_reason": "stop",
+          "usable_structure": true,
+          "input_tokens": 2670,
+          "output_tokens": 321,
+          "cached_tokens": 2432,
+          "estimated_input_tokens": 3356,
+          "contains_Lyra_in_messages": false,
+          "history_characters": 0,
+          "transmission": {
+            "version": 1,
+            "estimated_input_tokens": 3356,
+            "sections": [
+              {
+                "name": "system",
+                "characters": 7213,
+                "estimated_tokens": 2583
+              },
+              {
+                "name": "question",
+                "characters": 31,
+                "estimated_tokens": 24
+              },
+              {
+                "name": "reading_scope",
+                "characters": 245,
+                "estimated_tokens": 100
+              },
+              {
+                "name": "evidence",
+                "characters": 324,
+                "estimated_tokens": 105
+              },
+              {
+                "name": "project_context",
+                "characters": 348,
+                "estimated_tokens": 152
+              }
+            ],
+            "evidence": [
+              {
+                "citation_id": "B1C1",
+                "name": "borealis.txt",
+                "file_sha256": "611e66604e24ba63e7c92b24fdf4265c338b7b2c17de0c1a1716792f92e18a6e",
+                "source_block_id": 1,
+                "text_sha256": "611e66604e24ba63e7c92b24fdf4265c338b7b2c17de0c1a1716792f92e18a6e",
+                "characters": 38
+              }
+            ],
+            "project_history": {
+              "version": 1,
+              "action": "update",
+              "result_background_enabled": false,
+              "recent_dialogue_enabled": false,
+              "selected_groups": [],
+              "excluded_groups_not_delivered": 0,
+              "omitted_groups_before_selection": 2,
+              "selected_dialogue_jobs": [],
+              "omitted_recent_messages": 0,
+              "history_characters": 0,
+              "meaning": "按来源文件、SHA、提取块及送达文字哈希精确匹配，非语义相关性判断。最近对话仅显式选择后发送；背景不是新证据。"
+            },
+            "meaning": "实际请求构成的本地估算；各部分Token不能相加当账单，供应商只返回本次总用量。清单本身不发送给模型，未认证内容正确性。"
+          },
+          "rows": [
+            [
+              "Borealis",
+              "打印速度",
+              "80 mm/s"
+            ],
+            [
+              "Borealis",
+              "分辨率",
+              "300 dpi"
+            ]
+          ],
+          "review_status": "not_reviewed"
+        }
+      },
+      "input_tokens_reduced": 759,
+      "input_reduction_percent": 22.13,
+      "strict_no_unrelated_Lyra_in_new_messages": true
+    },
+    {
+      "operation": "followup",
+      "same_question_evidence_scope": true,
+      "same_system": true,
+      "variants": {
+        "baseline": {
+          "job_id": "86703ebdf7ef44f5960b0ee5cc783f98",
+          "finish_reason": "stop",
+          "usable_structure": true,
+          "input_tokens": 3299,
+          "output_tokens": 281,
+          "cached_tokens": 2048,
+          "estimated_input_tokens": 4055,
+          "contains_Lyra_in_messages": true,
+          "history_characters": 1817,
+          "transmission": {
+            "version": 1,
+            "estimated_input_tokens": 4055,
+            "sections": [
+              {
+                "name": "system",
+                "characters": 7213,
+                "estimated_tokens": 2583
+              },
+              {
+                "name": "question",
+                "characters": 8,
+                "estimated_tokens": 3
+              },
+              {
+                "name": "evidence",
+                "characters": 265,
+                "estimated_tokens": 87
+              },
+              {
+                "name": "project_context",
+                "characters": 2423,
+                "estimated_tokens": 850
+              }
+            ],
+            "evidence": [
+              {
+                "citation_id": "C1",
+                "name": "borealis.txt",
+                "file_sha256": "611e66604e24ba63e7c92b24fdf4265c338b7b2c17de0c1a1716792f92e18a6e",
+                "source_block_id": 1,
+                "text_sha256": "611e66604e24ba63e7c92b24fdf4265c338b7b2c17de0c1a1716792f92e18a6e",
+                "characters": 38
+              }
+            ],
+            "project_history": null,
+            "meaning": "实际请求构成的本地估算；各部分Token不能相加当账单，供应商只返回本次总用量。清单本身不发送给模型，未认证内容正确性。"
+          },
+          "rows": [
+            [
+              "Borealis",
+              "打印速度",
+              "80 mm/s"
+            ],
+            [
+              "Borealis",
+              "分辨率",
+              "300 dpi"
+            ]
+          ],
+          "review_status": "not_reviewed"
+        },
+        "new": {
+          "job_id": "16d39622b3e547e4a5d5b60dceb3b894",
+          "finish_reason": "stop",
+          "usable_structure": true,
+          "input_tokens": 2972,
+          "output_tokens": 316,
+          "cached_tokens": 2304,
+          "estimated_input_tokens": 3698,
+          "contains_Lyra_in_messages": false,
+          "history_characters": 1027,
+          "transmission": {
+            "version": 1,
+            "estimated_input_tokens": 3698,
+            "sections": [
+              {
+                "name": "system",
+                "characters": 7213,
+                "estimated_tokens": 2583
+              },
+              {
+                "name": "question",
+                "characters": 8,
+                "estimated_tokens": 3
+              },
+              {
+                "name": "evidence",
+                "characters": 265,
+                "estimated_tokens": 87
+              },
+              {
+                "name": "project_context",
+                "characters": 1509,
+                "estimated_tokens": 567
+              }
+            ],
+            "evidence": [
+              {
+                "citation_id": "C1",
+                "name": "borealis.txt",
+                "file_sha256": "611e66604e24ba63e7c92b24fdf4265c338b7b2c17de0c1a1716792f92e18a6e",
+                "source_block_id": 1,
+                "text_sha256": "611e66604e24ba63e7c92b24fdf4265c338b7b2c17de0c1a1716792f92e18a6e",
+                "characters": 38
+              }
+            ],
+            "project_history": {
+              "version": 1,
+              "action": "followup",
+              "result_background_enabled": true,
+              "recent_dialogue_enabled": false,
+              "selected_groups": [
+                {
+                  "job_id": "c047af0d294a4a4cbd4f6b64efe3adca",
+                  "batch": 1,
+                  "sources": [
+                    {
+                      "name": "borealis.txt",
+                      "identity": [
+                        "4cb98b682591556bc0026413618cd1d27293f0a0def11e6392d8f87a6da93b52",
+                        "611e66604e24ba63e7c92b24fdf4265c338b7b2c17de0c1a1716792f92e18a6e",
+                        1,
+                        "611e66604e24ba63e7c92b24fdf4265c338b7b2c17de0c1a1716792f92e18a6e"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "excluded_groups_not_delivered": 1,
+              "omitted_groups_before_selection": 0,
+              "selected_dialogue_jobs": [],
+              "omitted_recent_messages": 0,
+              "history_characters": 1027,
+              "meaning": "按来源文件、SHA、提取块及送达文字哈希精确匹配，非语义相关性判断。最近对话仅显式选择后发送；背景不是新证据。"
+            },
+            "meaning": "实际请求构成的本地估算；各部分Token不能相加当账单，供应商只返回本次总用量。清单本身不发送给模型，未认证内容正确性。"
+          },
+          "rows": [
+            [
+              "Borealis",
+              "打印速度",
+              "80 mm/s"
+            ],
+            [
+              "Borealis",
+              "分辨率",
+              "300 dpi"
+            ]
+          ],
+          "review_status": "not_reviewed"
+        }
+      },
+      "input_tokens_reduced": 327,
+      "input_reduction_percent": 9.91,
+      "strict_no_unrelated_Lyra_in_new_messages": true
+    }
+  ],
+  "live_preregistered_checks": {
+    "original_version_unchanged": true,
+    "baseline_control_did_not_change_project_head": true,
+    "followup_did_not_change_project_head": true,
+    "strict_no_Lyra_in_new_messages": true,
+    "lower_input_in_both_pairs": true,
+    "initial_and_updated_literal_rows": true,
+    "fresh_borealis_only_followup_evidence": true,
+    "new_followup_history_matches_delivered_source": true,
+    "new_update_no_history": true,
+    "saved_previews_match_actual_transmissions": true
+  },
+  "all_reported_live_checks_passed": true,
+  "observations": [
+    "Two synthetic TXT files and two one-shot context pairs only; no generalized cost or semantic-quality acceptance claim.",
+    "Current evidence and system guide are identical within each pair. Update omits old answers; followup selects only exact delivered provenance; recent dialogue is explicit opt-in.",
+    "Candidate snapshots share original 6000-character bound; dialogue at most two and 2000 characters. Eligible history can be omitted; omission never proves absence.",
+    "Input reductions observed, but output tokens increase across pairs and cache hits differ; RMB bill reduction is not established.",
+    "Source evidence, strict v3 checks, default1200 output and production capacity unchanged. Old Stage25 failed criterion remains unmodified.",
+    "Old files and all real/desktop attempts preserved; no automatic paid retries, answer patching or question-specific production rules."
+  ],
+  "source_sha256": {
+    "README.md": "bb5b9a831cf87575fd1b4e8975cb466f11ff1b5981e932ce5238ca220d4c8b02",
+    "ROADMAP.md": "1a119d8e201f321fdbe69470bddeb594fec6c2e58ba1a53f8a91ee0cf593f4aa",
+    "desktop/scripts/folder-workflow-smoke.cjs": "0bdba97fec810f78d3a13ac36150178cd53c90d608ade229424e2a9dd172712a",
+    "desktop/src/folder-projects.tsx": "44fee1b53599721a00906125879e8b20c5ef6f717afa79c29e34b4700ea1689c",
+    "desktop/src/folder-questions.tsx": "e9a23dd5bb3be32e345717bf8cb199c557d3ee327d791aae43ab0b41b8005d16",
+    "desktop/src/style.css": "e08915fa43b676bcd866a6aa1bce697add883710bbc1f9ef53dda7c476fd949c",
+    "desktop_app/server.py": "cd3d14d22b8ed9eb57afdce407bf13ff3e1da4717dc52451fff27130c53a5985",
+    "docs/folder-projects.md": "51904cb74fb9c7a3077e532765891997a780d31c768c5816d5dff30b21292459",
+    "folder_assistant/answers.py": "40e8994604467d7cb69cee1b071c63e3659cac9a426ddcbadf884a2cf4ec9b77",
+    "folder_assistant/exports.py": "5ee3b1005fd92807ca035cfd485e2878abc244b0760a8bf85dec57c14f93fb63",
+    "folder_assistant/projects.py": "172d3af54f498bea2489c47e5291804fe0144544cdd5e891f5455b87ae0af374",
+    "tests/test_folder_projects.py": "129727b5700d2ca1e6ee69baea025a4b650e20e1e858569dfed56bccddad0a2d",
+    "tests/test_folder_projects_api.py": "f58b5939735b3feda2876828ea1231a9e48037ab7bac0b5860aa44bc8175835f",
+    "folder_assistant/project_context.py": "adb947ccd27de18d873c046117f5a83ea325a480dc2868894a1d2c6ef94fdc4d",
+    "desktop/src/folder-transmission.tsx": "d29c4acb0e511080fe3d78f591ffd99c1b5268fa5db4f9e3a7458972f7b8cbbf",
+    "tests/test_project_context.py": "0649f9d66f2d483abd8217c92fbc4932299e498e8836b226ee97e4b22a215d4b",
+    "docs/stage27-verification-20261023.md": "3a431fd92a8cc349e62e164669e5a76d1d38b835b5b3c4281abd090af77aaafd",
+    "docs/stage27-live-plan-20261023.json": "ad0a4e6ab0ccc4b7b1f58fe2bc06431391c5f0c2cf4d025f4de9f00799b7fd77"
+  },
+  "artifact_sha256": {
+    "workspace/stage27-live-20261023/attempt.json": "33327682a44f49d11bccd24f4d90b4617440da76cdaafcbf95ee8ec092bd5578",
+    "workspace/stage27-live-20261023/baseline-followup.json": "5a4fddfa44d5d90c2b85c82314ccdc68429481ec5a1c48ed66c23270a5e6fa75",
+    "workspace/stage27-live-20261023/baseline-projects.py": "626a37145e285226170983857afd1f1086eb4dd655fb91a02c7be9b7252f7320",
+    "workspace/stage27-live-20261023/baseline-update.json": "83829dc912b0851cb7bab90d0301dcb109259517907c648ad8e17e5249db74f6",
+    "workspace/stage27-live-20261023/initial.json": "fe0bdb846ea685ba92cf254d1cb4dd2d2d61992054a552d20fe6be54521701c6",
+    "workspace/stage27-live-20261023/new-followup.json": "9ad1dd0d0ac3d1e48ea6533a089b7fcad7c0c10f7d233380e62ebfd2ae507c2a",
+    "workspace/stage27-live-20261023/new-update.json": "f87756e1a674eb5e7bd11d7d3b11218e1ca86f7c362d50afa64618f8c83faf64",
+    "workspace/stage27-live-20261023/documents/borealis.txt": "611e66604e24ba63e7c92b24fdf4265c338b7b2c17de0c1a1716792f92e18a6e",
+    "workspace/stage27-live-20261023/documents/lyra.txt": "5bc2aad75ce744309a9cff0b51df441a24ca2c33d7a358a304c33512a89298c7",
+    "workspace/stage27-live-20261023/initial-documents/borealis.txt": "48363d14e127950d73332122e70be9fa85deaa60133e0d1ea978af6e294aa2fd",
+    "workspace/stage27-live-20261023/initial-documents/lyra.txt": "5bc2aad75ce744309a9cff0b51df441a24ca2c33d7a358a304c33512a89298c7",
+    "workspace/stage27-live-20261023/runtime/agent/config.py": "30f8a3e63d4919113bdc09dc9954623440c18ee399448abd6e5da66ba7d2c60e",
+    "workspace/stage27-live-20261023/runtime/agent/context.py": "097c931099e9b28a5222a10f02b03085f76f8aec61b33a02eb57393f7361f76f",
+    "workspace/stage27-live-20261023/runtime/agent/llm.py": "bc58280e4c9663f4cc7f2fdf16041f11358e7b5b3e74b0fb4ce50b2232118867",
+    "workspace/stage27-live-20261023/runtime/agent/strength.py": "2dc6a5891255eb5e8da1c792e14acd3e39ab170bbd8493469432fd811035d1b1",
+    "workspace/stage27-live-20261023/runtime/folder_assistant/answers.py": "40e8994604467d7cb69cee1b071c63e3659cac9a426ddcbadf884a2cf4ec9b77",
+    "workspace/stage27-live-20261023/runtime/folder_assistant/batching.py": "87936b69ccbb6b2d5e4c027de9f68265393e24c037fc57fa783b513bb97800a2",
+    "workspace/stage27-live-20261023/runtime/folder_assistant/contracts.py": "76e4473ef92ab82fa2e3de2b12765b810c6b3deb6a4a03cfe8fc36c109fa75ec",
+    "workspace/stage27-live-20261023/runtime/folder_assistant/exhaustive.py": "1e4eb9e129e9f2cb46ceffd30289e6bfb8a8bfa453255dd5ed55edd2dc481f42",
+    "workspace/stage27-live-20261023/runtime/folder_assistant/exports.py": "5ee3b1005fd92807ca035cfd485e2878abc244b0760a8bf85dec57c14f93fb63",
+    "workspace/stage27-live-20261023/runtime/folder_assistant/index.py": "6c70d3975f5918bd76d2149f5938e5aaf6a369caff6af5feca3e5af7bc133db3",
+    "workspace/stage27-live-20261023/runtime/folder_assistant/jobs.py": "b8c0efab6530c70b619464e32f9ca9092fe08b3f6da722a99dd2900de0010b31",
+    "workspace/stage27-live-20261023/runtime/folder_assistant/output_diagnostics.py": "e4f8a66e5b14517a69e2fb45c37ac9153d0c920960ad1f37d70a7c93185ae08d",
+    "workspace/stage27-live-20261023/runtime/folder_assistant/parse_worker.py": "e1603c813ea3ed124e4f744af7db7fabb13343c09ab570a651722338cbf49387",
+    "workspace/stage27-live-20261023/runtime/folder_assistant/parsing.py": "474dd43160b91025576f4bbd802f2fe3a1122818ce6a8536ba194564722a0acf",
+    "workspace/stage27-live-20261023/runtime/folder_assistant/projects.py": "172d3af54f498bea2489c47e5291804fe0144544cdd5e891f5455b87ae0af374",
+    "workspace/stage27-live-20261023/runtime/folder_assistant/project_context.py": "adb947ccd27de18d873c046117f5a83ea325a480dc2868894a1d2c6ef94fdc4d",
+    "workspace/stage27-live-20261023/runtime/folder_assistant/project_exports.py": "0f296a8f699722299d191acb00940d95267bd986cc94d49ae5e9c62c2109acbc",
+    "workspace/stage27-live-20261023/runtime/folder_assistant/reading.py": "54febef7b0313bd16517d4f5882c7054100c8e4b75e51c8310d9ec92b22d9b8f",
+    "workspace/stage27-live-20261023/runtime/folder_assistant/scope.py": "1180705f2cacf02fe068aef1a9a52adebfafe19b7e5baef06259405dd282887f",
+    "workspace/stage27-live-20261023/runtime/folder_assistant/store.py": "27a5f165119ef621715db67cfcfcecd9d494272cd5cae3f5b6de828ab7d3390d",
+    "workspace/stage27-live-20261023/runtime/folder_assistant/usage.py": "bf86177a3397159586053bbc7e4431d45b37e3121678e04ad6ee42069db2d240",
+    "workspace/stage27-live-20261023/runtime/folder_assistant/__init__.py": "36656300506ebee15611b11a8eec4d2ba51af2278e92d74a5226fa32a1dd6277",
+    "workspace/stage27-live-20261023/runtime/folder_assistant/__main__.py": "590c31bef4728539747a3a02b16cf55df006a81938f3e6adb0e2324d7747f560",
+    "workspace/stage27-live-20261023/runtime/knowledge/documents.py": "4c2372f461f357cce017e9704392571c1d1bd1cf7e8f601867e6aa5eeb9305e2",
+    "workspace/stage27-live-20261023/runtime/knowledge/embedding.py": "7cfc277bf79b51205bff5c1447bb7165d73189a1773bfb7e013696349bdd2c43",
+    "workspace/stage27-live-20261023/runtime/knowledge/large_probe.py": "497c734fde900ff464eea06b736979fc52ccaa964bba28f21ebd3a1464c0c630",
+    "workspace/stage27-live-20261023/runtime/knowledge/locking.py": "c2f87541b323e39f8d080067aab7c15f7870f9a50b522ca9bcb596a4b89002ee",
+    "workspace/stage27-live-20261023/runtime/knowledge/long_probe.py": "824878c533475b0d48cca92f538fe00228108ede3274cf4bd43996ada91bb403",
+    "workspace/stage27-live-20261023/runtime/knowledge/probe.py": "564fc1190358d125bdd7d1c7d0fbe2bc1a998258e1dbe4f0b268585552e5666a",
+    "workspace/stage27-live-20261023/runtime/knowledge/recall_probe.py": "fb5657819c94b93083d3a11e6e546342345f3d35ac14fe70c662449f40143ca9",
+    "workspace/stage27-live-20261023/runtime/knowledge/report_probe.py": "486c955ce7368a5beb181b9def74546fc3b3ad9188c013105d643570102ac7df",
+    "workspace/stage27-live-20261023/runtime/knowledge/reranking.py": "8118a7613b87909571050ad1b6d6d3bee2a9beb8aa68b0dbc4ab60570cf384ec",
+    "workspace/stage27-live-20261023/runtime/knowledge/rerank_probe.py": "4c49f1e3a7f0e8dcd50edb647ba9beb521398ea05c01da538b25f1c99b9b75bc",
+    "workspace/stage27-live-20261023/runtime/knowledge/store.py": "3fc3b7c28d42baf9aee644f9edcd25ab12c547a5b8de37552ae399ce8d5d6837",
+    "workspace/stage27-live-20261023/runtime/knowledge/vectors.py": "520aff951c342401e1f1c4fcf5a532bd8f3ae859f6c01eb920414f8d2fdafd1b",
+    "workspace/stage27-live-20261023/runtime/knowledge/__init__.py": "5fcbc38c72e9f0e4c0938373622ff86daadbe7389238d3003d9a73d3acfb1533",
+    "workspace/stage27-live-20261023/runtime/knowledge/__main__.py": "fc231000c92128f2dacd50c8e4a2131c197130af52b5c13500673af31e4dec43",
+    "workspace/stage27-live-20261023/runtime/workspace/stage27_live.py": "80a985b8f070d8f2a4e0a6264ed976d685f86324d65395adc84062a9411287d3",
+    "workspace/stage27-live-20261023/state/.jobs-start.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage27-live-20261023/state/16d39622b3e547e4a5d5b60dceb3b894.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage27-live-20261023/state/2c1040a7685e43c5bb327f0d94eb0237.project.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage27-live-20261023/state/41b720446498499dafc57472ae7ffc04.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage27-live-20261023/state/86703ebdf7ef44f5960b0ee5cc783f98.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage27-live-20261023/state/9fa8a8d6412a4b23933a5634b5e9bf7c.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage27-live-20261023/state/c047af0d294a4a4cbd4f6b64efe3adca.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage27-live-20261023/state/catalog.sqlite3": "ef876de31ab48cd3d0ad9c784301a4c5466eeacba9f6ff7f09fc3c6e80632bdd",
+    "workspace/stage27-live-20261023/state/indexes/54d50cd7c9b94ff8b075c69f9feed3a2/.build.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage27-live-20261023/state/indexes/54d50cd7c9b94ff8b075c69f9feed3a2/.sync.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage27-live-20261023/state/indexes/54d50cd7c9b94ff8b075c69f9feed3a2/.vectors.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage27-live-20261023/state/indexes/54d50cd7c9b94ff8b075c69f9feed3a2/knowledge.sqlite3": "116bd56f06a8f2b06b10a9bf4450144a55d52079a4fee1da73a49b115ffa2acc",
+    "workspace/stage27-live-20261023/state/indexes/54d50cd7c9b94ff8b075c69f9feed3a2/vectors/136728c6fabb4d3ebbca6dcd94d826b8.db/LOCK": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workspace/stage27-live-20261023/state/indexes/54d50cd7c9b94ff8b075c69f9feed3a2/vectors/136728c6fabb4d3ebbca6dcd94d826b8.db/collections/chunks/manifest.json": "093bddb84472feda74c202679303cd62251952f1467f8b96f2c2f0d4e0d7614c",
+    "workspace/stage27-live-20261023/state/indexes/54d50cd7c9b94ff8b075c69f9feed3a2/vectors/136728c6fabb4d3ebbca6dcd94d826b8.db/collections/chunks/manifest.json.prev": "439bced4db104c9bc364e111da83cd0486ba478d9e84a87f4a8b6156ece9130c",
+    "workspace/stage27-live-20261023/state/indexes/54d50cd7c9b94ff8b075c69f9feed3a2/vectors/136728c6fabb4d3ebbca6dcd94d826b8.db/collections/chunks/schema.json": "091a94653bffaee066311202f1db0c0e9850fe8749840a67e6189920344759ce",
+    "workspace/stage27-live-20261023/state/indexes/54d50cd7c9b94ff8b075c69f9feed3a2/vectors/136728c6fabb4d3ebbca6dcd94d826b8.db/collections/chunks/partitions/_default/data/data_000001_000002.parquet": "cd5820030e88dfe0869dded0302b8e86e1453fb086ee96fa777cdb87ddd156f6",
+    "workspace/stage27-live-20261023/state/indexes/54d50cd7c9b94ff8b075c69f9feed3a2/vectors/136728c6fabb4d3ebbca6dcd94d826b8.db/collections/chunks/partitions/_default/indexes/data_000001_000002.vector.autoindex.idx": "b9d89e3358ba33b31f0fadf2f5039ceeb0676e4cb4ed902645a36afefee51136",
+    "workspace/stage27-live-20261023/state/indexes/54d50cd7c9b94ff8b075c69f9feed3a2/vectors/64f03c2a0f27497bb1939faa142b5dfd.db/LOCK": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workspace/stage27-live-20261023/state/indexes/54d50cd7c9b94ff8b075c69f9feed3a2/vectors/64f03c2a0f27497bb1939faa142b5dfd.db/collections/chunks/manifest.json": "093bddb84472feda74c202679303cd62251952f1467f8b96f2c2f0d4e0d7614c",
+    "workspace/stage27-live-20261023/state/indexes/54d50cd7c9b94ff8b075c69f9feed3a2/vectors/64f03c2a0f27497bb1939faa142b5dfd.db/collections/chunks/manifest.json.prev": "439bced4db104c9bc364e111da83cd0486ba478d9e84a87f4a8b6156ece9130c",
+    "workspace/stage27-live-20261023/state/indexes/54d50cd7c9b94ff8b075c69f9feed3a2/vectors/64f03c2a0f27497bb1939faa142b5dfd.db/collections/chunks/schema.json": "091a94653bffaee066311202f1db0c0e9850fe8749840a67e6189920344759ce",
+    "workspace/stage27-live-20261023/state/indexes/54d50cd7c9b94ff8b075c69f9feed3a2/vectors/64f03c2a0f27497bb1939faa142b5dfd.db/collections/chunks/partitions/_default/data/data_000001_000002.parquet": "9317539a09c93355f4c2f0d609c63ad9982b102b995386ab94c7135b1b4d3e74",
+    "workspace/stage27-live-20261023/state/indexes/54d50cd7c9b94ff8b075c69f9feed3a2/vectors/64f03c2a0f27497bb1939faa142b5dfd.db/collections/chunks/partitions/_default/indexes/data_000001_000002.vector.autoindex.idx": "1fd48d6c6000a2297f3c5dfaea912b7c106a1e0f7c8ce6350745aee89b009c06",
+    "workspace/stage27-live-20261023/state/parsed/48363d14e127950d73332122e70be9fa85deaa60133e0d1ea978af6e294aa2fd-1.txt.json": "0f2fe88bb6a115701c41271e074141b2118aa640dbfe228d2f89083c5ab0fb8a",
+    "workspace/stage27-live-20261023/state/parsed/5bc2aad75ce744309a9cff0b51df441a24ca2c33d7a358a304c33512a89298c7-1.txt.json": "369907658ff3899b5389dd2654f08ab6859aad9cde1be40d8bdbe9c2f8c1c20f",
+    "workspace/stage27-live-20261023/state/parsed/611e66604e24ba63e7c92b24fdf4265c338b7b2c17de0c1a1716792f92e18a6e-1.txt.json": "e901bc250fb4259942f71651dca0390349956a2cb5b22c38203a203841d4c582",
+    "workspace/stage27-live-20261023/state/project-outputs/6e517877da284dd284440112220ee15e/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage27-live-20261023/state/project-outputs/6e517877da284dd284440112220ee15e/comparison.csv": "57e9743d9ac508188194ae962f98cd22208e123e9ea6e5973d6bf629dbf5b76f",
+    "workspace/stage27-live-20261023/state/project-outputs/6e517877da284dd284440112220ee15e/comparison.xlsx": "68a8225202688be08ba6cda6a32c6a6486b2c2c5153405ca6a8dff2eb18a443d",
+    "workspace/stage27-live-20261023/state/project-outputs/6e517877da284dd284440112220ee15e/export.json": "30421766fc715c951f8ad48f50e414e3f1afa5686c2500390cd09f9c887da095",
+    "workspace/stage27-live-20261023/state/project-outputs/6e517877da284dd284440112220ee15e/record.json": "754e4e1ef58f5e9d42cc078b7471078c1e5b4ffaa85bc93f28ceedaa9d82c038",
+    "workspace/stage27-live-20261023/state/project-outputs/6e517877da284dd284440112220ee15e/sources.csv": "5debab0fe31c8a7ed4d12d2bd9a6e490450823aa8cec45fe1cc07bf766f2f31e",
+    "workspace/stage27-live-20261023/state/project-outputs/6e517877da284dd284440112220ee15e/sources.json": "ef741331e0b0724f86a27455dbf57e93fa13fe143dff991815eac71cdcd66dba",
+    "workspace/stage27-live-20261023/state/project-outputs/6e517877da284dd284440112220ee15e/summary.md": "2276206c3a8af67d45bb244e8b9a5510197ef008e1291995c5ab5b3207a9cc23",
+    "workspace/stage27-live-20261023/state/project-outputs/d8b2072dd75a43ba9e408f2e03795529/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage27-live-20261023/state/project-outputs/d8b2072dd75a43ba9e408f2e03795529/comparison.csv": "fcf79756610939c189d2b94c19dcec2f953ac32ff9a959fe8e282cc0cbfd3965",
+    "workspace/stage27-live-20261023/state/project-outputs/d8b2072dd75a43ba9e408f2e03795529/comparison.xlsx": "a2fc4851832ff2a4425925ce02c40efb69e9a7565bf5a4923ffa0928e895e5c4",
+    "workspace/stage27-live-20261023/state/project-outputs/d8b2072dd75a43ba9e408f2e03795529/export.json": "d4c787c6131cd6b0b7648f6b086734cff1c669594f6f660300258cadb09befc7",
+    "workspace/stage27-live-20261023/state/project-outputs/d8b2072dd75a43ba9e408f2e03795529/record.json": "06598bcc75be768c4ce315e827ac11c427136c436c5b224644e3810aae97ce30",
+    "workspace/stage27-live-20261023/state/project-outputs/d8b2072dd75a43ba9e408f2e03795529/sources.csv": "451efc3bbeecdc9d0b9d4c5592e7c12d04ca25a6609eb9b1fa17f01ce43648af",
+    "workspace/stage27-live-20261023/state/project-outputs/d8b2072dd75a43ba9e408f2e03795529/sources.json": "69fe2e00527fcf7859145a8018d478afa4dc4e4368b5f0b42c36810b43b2f330",
+    "workspace/stage27-live-20261023/state/project-outputs/d8b2072dd75a43ba9e408f2e03795529/summary.md": "6c84bd0e1b2bb254154ea92f2a016debb67aaffec3c39af3147f2958fde434b6",
+    "workspace/stage27-live-20261023/__pycache__/baseline-projects.cpython-311.pyc": "3da8266c6a89877150d3dd625da25544f98915763cfaf09e7c98eddef5b814d8",
+    "workspace/stage27-build-20261023.log": "bf656638064dda66bea0cda7bb0c07d8f8a795867de19dc96d4fbf4566758d1c",
+    "workspace/stage27-build-delivery-20261023.log": "4dd495de5f6f1ea2aeb03bd4d2538889748582bdd0e796ba5734e333b1407a43",
+    "workspace/stage27-build-final-20261023.log": "97db43e81f3ec0546ec797ce548b8c5fe2c303b46e0cb15f7f55c7b5f1f6e7f2",
+    "workspace/stage27-folder-projects-20261023.png": "e072d3da1d0ccd830589e60f347db239d4b0e4ddd77574cc301bf124c39198f7",
+    "workspace/stage27-folder-projects-ui2-20261023.png": "b8ebed864062e66a2c5307f72f8768233868c05bed04ef6458dc4aff3c091d86",
+    "workspace/stage27-folder-projects-ui3-20261023.png": "b5eab54a3bb34fdf2e0a800641c4f30fd9300421ff8996cdf67440e4176cc957",
+    "workspace/stage27-followup-preview-20261023.png": "4556a51a32b05c622093e8acb3dd6987fa12bcadab64bc69b594d03b6a054694",
+    "workspace/stage27-followup-preview-first-20261023.png": "41b84bef1de19a99833e5fdbae39bed026d112ec45ef3595da7ac707b9448cdf",
+    "workspace/stage27-followup-preview-ui2-20261023.png": "47a599eff1c002e051fd16388bfa69abea4f3a8c5c893c575d2a8b1ba991fa0f",
+    "workspace/stage27-followup-preview-ui3-20261023.png": "7e9878ce51da1f3fb7edd43a515dcda16f749c81a8f8d1940588e1eaa6610492",
+    "workspace/stage27-full-20261023.log": "5c1c33041e2e9f761052894055ea2bcb77b91ddf609b932515d4214666e85e81",
+    "workspace/stage27-live-20261023.log": "bd0c56a619701c4ca8de26d2bdf5966ea151fcf15c34ec777ead456acee090e7",
+    "workspace/stage27-operation-preview-20261023.png": "4adb96047e436ee9861ba27aabc5f7ef40de308ee42e4719a9e61aeb4a30a13e",
+    "workspace/stage27-operation-preview-ui2-20261023.png": "f81c00db1d6b81b38086e9306b0090bd4d4e4d8615fe0da8287cb760780b5c6c",
+    "workspace/stage27-operation-preview-ui3-20261023.png": "e9d70493c15d01000d275bf6af42f6b96f92407a03b6125c16ced53a3bf51b4f",
+    "workspace/stage27-targeted-20261023.log": "85bf90af466efded605d05911d1bb24c9e24f4a13f43fa4485e1d0497170113f",
+    "workspace/stage27-ui-20261023.log": "588db764c27afb520cc09571b667ff9e360bfdc379b07c5b19188e2cd3386912",
+    "workspace/stage27-ui2-20261023.log": "a6a23696fb769485b37a1fa565442619cef93bd321d656c21c4e3656791e689f",
+    "workspace/stage27-ui3-20261023.log": "49c9ceeb5338011609ee701dacbfada1f8bf52be7e1fc951f6d0aee907926e6a",
+    "workspace/stage27-ui4-20261023.log": "259f13e0abd21db0bbf951281525c94560bffe0841ad1a7fe539eaf91f1401e6"
+  }
+}

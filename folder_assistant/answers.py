@@ -11,6 +11,7 @@ from knowledge.documents import sha
 from knowledge.store import now
 from .contracts import VERSION, GUIDE_VERSION, instruction, ContractError, validate as validate_v2
 from .output_diagnostics import diagnose
+from .project_context import select as select_project_context, transmission
 
 
 class Finding(BaseModel):
@@ -74,7 +75,7 @@ def prepare_messages(inputs,evidence,reading_scope=None):
     if reading_scope is not None:
         messages[1]['content']=json.dumps({'question':inputs['query'],'reading_scope':reading_scope,'evidence':supplied},ensure_ascii=False)
     if inputs.get('project_context') is not None:
-        content=json.loads(messages[1]['content']);content['project_context']=inputs['project_context']
+        content=json.loads(messages[1]['content']);content['project_context']=select_project_context(inputs['project_context'],evidence)[0]
         messages[1]['content']=json.dumps(content,ensure_ascii=False)
     return messages
 
@@ -97,7 +98,8 @@ def answer_evidence(jobs,jid,evidence,*,call_suffix='answer',reading_scope=None)
     jobs.patch(jid,request={'messages':messages,'estimated_input_tokens':input_estimate,'max_output_tokens':max_output,
                           'requested_output_tokens':inputs.get('output_tokens',1200),'effective_output_cap':output_cap,
                           'budget_limited':max_output<output_cap,'answer_schema_version':VERSION,
-                          'output_guide_version':GUIDE_VERSION,'system_sha256':sha(messages[0]['content'])},
+                          'output_guide_version':GUIDE_VERSION,'system_sha256':sha(messages[0]['content']),
+                          'transmission':transmission(inputs,evidence,messages)},
                output_diagnostics=None)
     config=replace(load_llm_config(settings=jobs.index.settings,strength=inputs.get('strength','default')),max_retries=0)
     client=jobs.llm_factory(config)
