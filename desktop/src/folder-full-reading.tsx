@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { locationLabel } from "./folder-location";
+import { FolderCompletion } from "./folder-completion";
 
 export function FolderFullReading({
   api,
@@ -10,6 +11,8 @@ export function FolderFullReading({
   act,
   onStarted,
   setMaxBatches,
+  setReadToEnd,
+  setMaxCalls,
 }: any) {
   const [preview, setPreview] = useState<any>(null);
   const turn = useRef(0);
@@ -35,10 +38,18 @@ export function FolderFullReading({
           type="number"
           min={1}
           max={8}
+          disabled={controls.read_to_end}
           value={controls.max_batches}
           onChange={(e) => setMaxBatches(Number(e.target.value))}
         />
       </label>
+      <FolderCompletion
+        enabled={controls.read_to_end || false}
+        onChange={setReadToEnd}
+        maxCalls={controls.max_calls || 16}
+        setMaxCalls={setMaxCalls}
+        prefix="原范围"
+      />
       <p>
         使用上方预算与输出设置：预算 {controls.budget} Token，每次输出上限{" "}
         {controls.output_tokens}{" "}
@@ -65,6 +76,11 @@ export function FolderFullReading({
       {current && (
         <div>
           <p>原问题：{current.query}</p>
+          <p>
+            运行方式：{current.read_to_end ? "持续整理" : "普通分批"} · 本次最多{" "}
+            {current.batch_call_limit} 次模型调用 · 总预算 {current.budget}{" "}
+            Token（逐批扣减）。
+          </p>
           <p>
             固定索引 {current.generation} · {current.files.length}份文件 ·{" "}
             {current.total_segments}个主片段 · 首批预计送达{" "}

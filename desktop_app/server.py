@@ -67,7 +67,12 @@ class FolderControls(BaseModel):
     retry_split:bool=False
 
 
-class FolderQuestion(FolderControls):
+class FolderReadingControls(FolderControls):
+    read_to_end:bool=False
+    max_calls:int=Field(default=16,ge=1,le=64)
+
+
+class FolderQuestion(FolderReadingControls):
     query:str=Field(min_length=1,max_length=1000)
     mode:Literal['keyword','hybrid']='keyword'
     file_ids:list[str]|None=Field(default=None,max_length=50)
@@ -77,7 +82,7 @@ class FolderQuestion(FolderControls):
     strength:ModelStrength='default'
 
 
-class FullReadingStart(FolderControls):
+class FullReadingStart(FolderReadingControls):
     plan_hash:str=Field(min_length=64,max_length=64)
 
 
@@ -246,13 +251,13 @@ def create_app(manager:Manager,token:str,ui_dir:Path|None=None,*,folder_grant_to
         from folder_assistant.scope import scope_view
         return redact(scope_view(folder_jobs,jid,offset,limit))
     @app.post('/api/folder-jobs/{jid}/next-scope')
-    def folder_next_scope(jid:str,body:FolderControls):
+    def folder_next_scope(jid:str,body:FolderReadingControls):
         from folder_assistant.scope import preview_next
         return redact(preview_next(folder_jobs,jid,body.model_dump()))
     @app.post('/api/folder-jobs/{jid}/stop')
     def folder_job_stop(jid:str):return redact(folder_jobs.stop(jid))
     @app.post('/api/folder-jobs/{jid}/full-reading-preview')
-    def folder_full_reading_preview(jid:str,body:FolderControls):
+    def folder_full_reading_preview(jid:str,body:FolderReadingControls):
         from folder_assistant.full_reading import preview_full_reading
         return redact(preview_full_reading(folder_jobs,jid,body.model_dump()))
     @app.post('/api/folder-jobs/{jid}/full-reading')

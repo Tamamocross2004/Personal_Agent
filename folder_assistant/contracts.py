@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 
 VERSION=3
-GUIDE_VERSION=1
+GUIDE_VERSION=3
 
 
 def record_key(evidence):
@@ -168,12 +168,14 @@ findings每项：statement、kind(direct/inference/difference/conflict/unknown)�
 support每项为{"citation_id":"C1","quote":"实际送达文本中的连续原句"}，不可改写或补未送达内容。
 direct是对有依据原文的整理，不能从记录的字段值推出未记载的过程、原因、完成状态或其他业务事实。
 默认不添加用户未要求的推断。必要的inference还须写assumptions和limitations两个字符串数组，说明额外假设及不能确认的部分；不要把假设写成已证实事实。依据不足写unknown。
-不同值、不同口径或缺条件先按difference保留，不能直接称conflict。两类都须双方原句和relation：{"field":"比较字段","common_scope":"共同对象/时间/适用条件，未知则null","comparability":"established或not_established","reason":"可比性及判断理由"}。
-只有共同范围与必要条件已明确，两个陈述在同一条件下不能同时成立，才可用conflict；不擅自换算单位、补日期、设优先顺序。程序不替你判语义，不能把引用存在理解为判断成立。
+比较时分别核对对象、所问字段、时间及适用条件，再判断双方陈述是否能同时成立。缺少必要条件或口径不同，按difference保留并说明不能确认可比性的原因；条件相同也不能仅因数值或文字不同就判矛盾。
+共同范围与必要条件均有原文依据，双方对同一字段作出不能同时成立的断言时，应标conflict，不能仅写difference而回避已经成立的互斥关系。若两者可以同时成立，仍为difference；不能为了判冲突添加假设。两类都须双方原句和relation：{"field":"比较字段","common_scope":"共同对象/时间/适用条件，未知则null","comparability":"established或not_established","reason":"哪些条件已明确、双方能否同时成立及判断理由"}。
+不擅自换算单位、补日期、设优先顺序；不把可比条件成立等同于必然矛盾。程序不替你判语义，不能把引用存在理解为判断成立。
 comparison只有用户要求对照或字段整理才填写，逐来源保留原值，不做额外统计。每行：subject、subject_type(entity/source/unknown)、subject_quote、field、value、value_quote、status(stated/unknown/blank)、citations。
 比较业务记录时subject必须是原文对象名称，subject_type=entity，subject须逐字出现在subject_quote的quote中；来源文件名另由引用显示，不能用它代替业务对象。只有比较整份来源的条款等来源级内容，才用source，此时subject为真实相对路径、subject_quote=null。找不到对象则unknown，subject和subject_quote都为null。
 stated的value须逐字出现在value_quote的quote中，保持原文单位和写法；引用可包含必要上下文，不要求引用整句与取值等长。两个quote都须属于本行citations，并是实际送达原文的连续非空字符串。允许字段名按问题整理，但不编对象或值。
 unknown或blank的value保留null或空字符串，value_quote=null；blank须有对应依据。保留空白、零、未知的差别，不能从缺失推出否定。公式无缓存则未知，不计算。
+逐个字段独立判断用户要的是属性事实还是文字摘录。同一记录中，一个字段要求原样摘录标签，不会使其他属性字段也变成文字摘录。stated表示所问属性的具体值有依据，不只是原单元格非空。原文表示属性值尚未确定、未测得或信息缺失时，状态为unknown，value留null或空字符串、value_quote=null；原文的缺失说明可在unknowns连同引用标记保留，不能填成stated的属性值。blank仅用于有依据的实际空白，零是具体值。只有被明确要求摘录文字本身的那个字段才保留字面内容，不因其中出现不确定性措辞就机械改成unknown。
 unknowns只列与问题相关的未知项；有限检索无依据不表示全目录不存在。仅输出JSON，不输出HTML或可执行代码。'''
 
 
@@ -219,4 +221,5 @@ def request_schema():
 def instruction():
     """Versioned generation guide, with no answer-specific examples or answer repair."""
     concise='\n逐项字段放在comparison；findings简洁概述所问内容，避免逐行重复同一张对照表。完整闭合JSON，不以省略已有依据的字段来满足长度；空间不足由程序保留未完成状态。'
-    return SYSTEM+concise+SCHEMA_MARKER+json.dumps(request_schema(),ensure_ascii=False,separators=(',',':'))
+    consistency='\n输出前逐项核对同一来源、同一对象、同一字段的状态：若摘要或unknowns说明其具体属性值尚不明确，comparison也须表达unknown，不能同时把缺失说明作为stated的值。文字摘录例外只作用于用户要求摘录的字段；不同来源的值和状态分别保留。核对不添加原文事实、改写原值或放宽任何Schema/引用要求。仅输出本次最终JSON。'
+    return SYSTEM+concise+consistency+SCHEMA_MARKER+json.dumps(request_schema(),ensure_ascii=False,separators=(',',':'))

@@ -23,12 +23,15 @@ def main():
     ask.add_argument('--batch-mode',choices=['adaptive','fixed'],default='adaptive')
     ask.add_argument('--batch-size',type=int,default=6);ask.add_argument('--expected-fields',type=int,default=1)
     ask.add_argument('--retry-split',action='store_true')
+    ask.add_argument('--read-to-end',action='store_true',help='在同一总预算内持续顺序整理，遇到失败仍停止')
+    ask.add_argument('--max-calls',type=int,default=16)
     full=sub.add_parser('full-reading',help='预览原局部问答的全量整理；提供预览哈希才开始新模型任务')
     full.add_argument('job_id');full.add_argument('--plan-hash')
     full.add_argument('--budget',type=int,default=10000);full.add_argument('--max-batches',type=int,default=3)
     full.add_argument('--output-tokens',type=int,default=1200)
     full.add_argument('--batch-mode',choices=['adaptive','fixed'],default='adaptive')
     full.add_argument('--batch-size',type=int,default=6);full.add_argument('--expected-fields',type=int,default=1)
+    full.add_argument('--read-to-end',action='store_true');full.add_argument('--max-calls',type=int,default=16)
     sub.add_parser('history').add_argument('folder_id')
     for command in ('job','stop','export'):sub.add_parser(command).add_argument('job_id')
     coverage=sub.add_parser('scope');coverage.add_argument('job_id');coverage.add_argument('--offset',type=int,default=0);coverage.add_argument('--limit',type=int,default=50)
@@ -53,11 +56,12 @@ def main():
                         job=jobs.start(args.folder_id,'answer',{'query':args.query,'mode':args.mode,'budget':args.budget,'file_ids':args.file_id,
                                                               'strategy':args.strategy,'max_batches':args.max_batches,'resume_from':args.resume_from,
                                                               'output_tokens':args.output_tokens,'batch_mode':args.batch_mode,'batch_size':args.batch_size,
-                                                              'expected_fields':args.expected_fields,'retry_split':args.retry_split})
+                                                              'expected_fields':args.expected_fields,'retry_split':args.retry_split,
+                                                              'read_to_end':args.read_to_end,'max_calls':args.max_calls})
                         jobs.threads[job['id']].join();result=jobs.get(job['id'])
                     elif args.command=='full-reading':
                         from .full_reading import preview_full_reading,start_full_reading
-                        controls={k:getattr(args,k) for k in ('budget','max_batches','output_tokens','batch_mode','batch_size','expected_fields')}
+                        controls={k:getattr(args,k) for k in ('budget','max_batches','output_tokens','batch_mode','batch_size','expected_fields','read_to_end','max_calls')}
                         if args.plan_hash:
                             job=start_full_reading(jobs,args.job_id,controls,args.plan_hash)
                             jobs.threads[job['id']].join();result=jobs.get(job['id'])

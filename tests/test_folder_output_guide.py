@@ -88,7 +88,8 @@ def test_job_preserves_raw_one_call_diagnostic_and_no_automatic_retry(library,mo
     assert value['output_diagnostics']['code']==mode
     assert value['output_diagnostics']['semantic_status']=='not_certified'
     assert value['request']['system_sha256']==sha(chat.calls[0][0][0]['content'])
-    assert value['request']['output_guide_version']==1
+    from folder_assistant.contracts import GUIDE_VERSION
+    assert value['request']['output_guide_version']==GUIDE_VERSION
     if mode in ('invalid_structure','output_limit','contract_violation'):
         assert value['result']['answer'] is None and value['output_diagnostics']['issues']
     if mode=='output_limit':

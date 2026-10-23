@@ -231,7 +231,8 @@ export function FolderScope({
               <div key={String(p.retry_split)}>
                 <p>
                   {p.retry_split ? "拆小重做" : "继续整理"}：本次待处理区间 [
-                  {p.operation_start}, {p.operation_end})，最多{p.max_batches}
+                  {p.operation_start}, {p.operation_end})，最多
+                  {p.batch_call_limit ?? p.max_batches}
                   批；首批预计 [{p.operation_start}, {p.first_batch_end})。
                 </p>
                 <p>

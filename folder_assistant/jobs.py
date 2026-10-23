@@ -107,6 +107,10 @@ class FolderJobs:
             inputs['strength']=source['inputs'].get('strength','default')
         strategy=inputs.setdefault('strategy','retrieval')
         if strategy not in ('retrieval','exhaustive'):raise ValueError('读取策略无效')
+        if type(inputs.setdefault('read_to_end',False)) is not bool:raise ValueError('read_to_end须为布尔值')
+        limit=inputs.setdefault('max_calls',16)
+        if type(limit) is not int or not 1<=limit<=64:raise ValueError('持续整理最多调用须为1至64的整数')
+        if inputs['read_to_end'] and strategy!='exhaustive':raise ValueError('持续整理仅用于显式全量读取')
         for key,default,low,high in [('output_tokens',1200,128,4096),('batch_size',6,1,6),('expected_fields',1,1,12)]:
             value=inputs.setdefault(key,default)
             if type(value) is not int or not low<=value<=high:raise ValueError(f'{key}须为{low}至{high}的整数')
@@ -167,6 +171,7 @@ class FolderJobs:
             plan=ReadingPlan(self.index,fid,generation['id'],files)
             inputs['reading_plan']=plan.signature
             if not inputs['retry_split']:inputs['range_end']=len(plan.segments)
+            inputs['batch_call_limit']=inputs['max_calls'] if inputs['read_to_end'] else inputs['max_batches']
         inputs['model']={'provider':config.provider,'model':config.model,'base_url':config.base_url,'retries':0,
                          'thinking':config.thinking,'reasoning_effort':config.reasoning_effort}
         if self.pricing:inputs['pricing']=self.pricing.get(config.provider,config.model)

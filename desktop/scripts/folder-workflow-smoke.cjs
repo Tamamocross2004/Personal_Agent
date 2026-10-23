@@ -8,6 +8,13 @@ const project = path.resolve(__dirname, "../.."),
 const docs = path.join(fixture, "资料 空间");
 fs.mkdirSync(docs);
 fs.writeFileSync(path.join(docs, "readme.txt"), "本地资料原文。");
+const completionMode = process.argv.includes("--completion");
+if (completionMode)
+  fs.appendFileSync(
+    path.join(docs, "readme.txt"),
+    "\n" +
+      Array.from({ length: 14 }, (_, i) => `持续读取记录${i + 1}。`).join("\n"),
+  );
 if (process.argv.includes("--reading"))
   fs.appendFileSync(
     path.join(docs, "readme.txt"),
@@ -19,7 +26,8 @@ const scopeMode = process.argv.includes("--scope");
 const projectMode = process.argv.includes("--projects");
 const diagnosticsMode = process.argv.includes("--diagnostics");
 const contextMode = process.argv.includes("--context");
-const fullReadingMode = process.argv.includes("--full-reading");
+const fullReadingMode =
+  process.argv.includes("--full-reading") || completionMode;
 const parseMode = process.argv.includes("--parse");
 if (parseMode)
   require("node:child_process").execFileSync(
@@ -489,6 +497,29 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         await page
           .getByRole("textbox", { name: "文件夹资料问题" })
           .fill("新草稿不替换保存的原问题");
+        if (completionMode) {
+          await page
+            .getByRole("combobox", { name: "资料处理方式" })
+            .selectOption("exhaustive");
+          await page
+            .getByRole("combobox", { name: "分批策略" })
+            .selectOption("fixed");
+          await page
+            .getByRole("spinbutton", { name: "每批片段上限", exact: true })
+            .fill("1");
+          await region
+            .getByRole("checkbox", {
+              name: "原范围持续整理至末尾",
+              exact: true,
+            })
+            .check();
+          await region
+            .getByRole("spinbutton", {
+              name: "原范围持续整理调用上限",
+              exact: true,
+            })
+            .fill("20");
+        }
         await previewButton.click();
         await startButton.waitFor();
         await region.getByText(/固定索引/).waitFor();
@@ -500,7 +531,9 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         await region.screenshot({
           path: path.join(
             project,
-            "workspace/stage29-full-reading-preview-20261023.png",
+            completionMode
+              ? "workspace/stage30-full-reading-preview-20261023.png"
+              : "workspace/stage29-full-reading-preview-20261023.png",
           ),
         });
         await startButton.click();
@@ -526,8 +559,15 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         assert.equal(next.inputs.budget, 10000);
         assert.equal(
           next.usage_events.filter((e) => e.operation === "llm").length,
-          1,
+          completionMode ? 15 : 1,
         );
+        if (completionMode) {
+          assert.equal(next.inputs.read_to_end, true);
+          assert.equal(next.inputs.batch_call_limit, 20);
+          assert.equal(next.coverage.stop_reason, "end_of_extraction");
+          assert.equal(next.coverage.next_offset, 15);
+          assert.equal(next.inputs.budget, 10000);
+        }
         assert.deepEqual(await get("/folder-jobs/" + parentId), parent);
         fs.writeFileSync(
           path.join(fixture, "full-reading-records.json"),
@@ -879,27 +919,29 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
       path: path.join(
         project,
         "workspace",
-        fullReadingMode
-          ? "stage29-folder-workflow-20261023.png"
-          : contextMode
-            ? "stage27-folder-projects-20261023.png"
-            : diagnosticsMode
-              ? "stage26-folder-workflow-20261023.png"
-              : projectMode
-                ? "stage25-folder-projects-20261022.png"
-                : scopeMode
-                  ? "stage24-folder-workflow-20261022.png"
-                  : batchingMode
-                    ? "stage23-folder-workflow-20261022.png"
-                    : parseMode
-                      ? "folder-workflow-current-multiformat.png"
-                      : process.argv.includes("--strength")
-                        ? "model-strength-folder-20261022.png"
-                        : process.argv.includes("--reading")
-                          ? "stage22-folder-workflow.png"
-                          : process.argv.includes("--experience")
-                            ? "stage21-folder-workflow.png"
-                            : "folder-workflow-current.png",
+        completionMode
+          ? "stage30-folder-workflow-20261023.png"
+          : fullReadingMode
+            ? "stage29-folder-workflow-20261023.png"
+            : contextMode
+              ? "stage27-folder-projects-20261023.png"
+              : diagnosticsMode
+                ? "stage26-folder-workflow-20261023.png"
+                : projectMode
+                  ? "stage25-folder-projects-20261022.png"
+                  : scopeMode
+                    ? "stage24-folder-workflow-20261022.png"
+                    : batchingMode
+                      ? "stage23-folder-workflow-20261022.png"
+                      : parseMode
+                        ? "folder-workflow-current-multiformat.png"
+                        : process.argv.includes("--strength")
+                          ? "model-strength-folder-20261022.png"
+                          : process.argv.includes("--reading")
+                            ? "stage22-folder-workflow.png"
+                            : process.argv.includes("--experience")
+                              ? "stage21-folder-workflow.png"
+                              : "folder-workflow-current.png",
       ),
     });
     await page
@@ -940,7 +982,7 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         false,
       );
     }
-    if (!process.argv.includes("--reading") && !projectMode)
+    if (!process.argv.includes("--reading") && !projectMode && !completionMode)
       assert.equal(
         fs.readFileSync(path.join(docs, "readme.txt"), "utf8"),
         "本地资料原文。",
@@ -1006,6 +1048,14 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
                 "pinned-original-query-and-scope",
                 "explicit-new-paid-operation",
                 "original-answer-and-usage-unchanged",
+              ]
+            : []),
+          ...(completionMode
+            ? [
+                "explicit-continuous-opt-in",
+                "fifteen-calls-one-budget",
+                "batch-limit-replaced-by-explicit-call-limit",
+                "source-and-old-answer-unchanged",
               ]
             : []),
           "native-picker-capability",

@@ -6,6 +6,7 @@ import { FolderScope } from "./folder-scope";
 import { FolderOutputDiagnostics } from "./folder-output-diagnostics";
 import { FolderTransmission } from "./folder-transmission";
 import { FolderFullReading } from "./folder-full-reading";
+import { FolderCompletion } from "./folder-completion";
 
 export function FolderQuestions({
   api,
@@ -35,6 +36,8 @@ export function FolderQuestions({
     [expectedFields, setExpectedFields] = useState(1);
   const [strategy, setStrategy] = useState("retrieval"),
     [maxBatches, setMaxBatches] = useState(3);
+  const [readToEnd, setReadToEnd] = useState(false),
+    [maxCalls, setMaxCalls] = useState(16);
   const [reading, setReading] = useState<any>(null),
     [neighbors, setNeighbors] = useState<any>(null),
     [batchNumber, setBatchNumber] = useState(0);
@@ -93,7 +96,9 @@ export function FolderQuestions({
     batchSize > 6 ||
     !Number.isInteger(expectedFields) ||
     expectedFields < 1 ||
-    expectedFields > 12;
+    expectedFields > 12 ||
+    (readToEnd &&
+      (!Number.isInteger(maxCalls) || maxCalls < 1 || maxCalls > 64));
   const resume = (split = false) =>
     act(async () => {
       const value = await api(`/folders/${folderId}/questions`, {
@@ -104,6 +109,8 @@ export function FolderQuestions({
           budget,
           strategy: "exhaustive",
           max_batches: maxBatches,
+          read_to_end: readToEnd,
+          max_calls: readToEnd ? maxCalls : 16,
           resume_from: saved.id,
           strength: saved.inputs.strength || "default",
           output_tokens: outputTokens,
@@ -200,7 +207,10 @@ export function FolderQuestions({
         <select
           aria-label="资料处理方式"
           value={strategy}
-          onChange={(e) => setStrategy(e.target.value)}
+          onChange={(e) => {
+            setStrategy(e.target.value);
+            if (e.target.value === "retrieval") setReadToEnd(false);
+          }}
         >
           <option value="retrieval">局部检索问答</option>
           <option value="exhaustive">
@@ -215,6 +225,7 @@ export function FolderQuestions({
               type="number"
               min={1}
               max={8}
+              disabled={readToEnd}
               value={maxBatches}
               onChange={(e) => setMaxBatches(Number(e.target.value))}
             />
@@ -249,6 +260,14 @@ export function FolderQuestions({
           />
         </label>
       </div>
+      {strategy === "exhaustive" && (
+        <FolderCompletion
+          enabled={readToEnd}
+          onChange={setReadToEnd}
+          maxCalls={maxCalls}
+          setMaxCalls={setMaxCalls}
+        />
+      )}
       <details
         className="folder-budget-settings"
         open={strategy === "exhaustive"}
@@ -413,6 +432,8 @@ export function FolderQuestions({
                 strategy,
                 strength,
                 max_batches: maxBatches,
+                read_to_end: strategy === "exhaustive" && readToEnd,
+                max_calls: strategy === "exhaustive" && readToEnd ? maxCalls : 16,
                 output_tokens: outputTokens,
                 batch_mode: batchMode,
                 batch_size: batchSize,
@@ -479,6 +500,8 @@ export function FolderQuestions({
                 controls={{
                   budget,
                   max_batches: maxBatches,
+                  read_to_end: readToEnd,
+                  max_calls: readToEnd ? maxCalls : 16,
                   output_tokens: outputTokens,
                   batch_mode: batchMode,
                   batch_size: batchSize,
@@ -496,6 +519,8 @@ export function FolderQuestions({
                 busy={busy}
                 act={act}
                 setMaxBatches={setMaxBatches}
+                setReadToEnd={setReadToEnd}
+                setMaxCalls={setMaxCalls}
                 onStarted={(value: any) => {
                   setView(null);
                   setCitation(null);
@@ -510,6 +535,8 @@ export function FolderQuestions({
             controls={{
               budget,
               max_batches: maxBatches,
+              read_to_end: readToEnd,
+              max_calls: readToEnd ? maxCalls : 16,
               output_tokens: outputTokens,
               batch_mode: batchMode,
               batch_size: batchSize,

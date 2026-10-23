@@ -12,14 +12,17 @@ def answer_exhaustive(jobs,jid):
     batches=[];evidence=[];structured=inputs.get('previous_structured_segments',0)
     returned=inputs.get('previous_returned_until',offset)
     end=inputs['range_end']
+    call_limit=inputs.get('batch_call_limit',inputs['max_batches'])
+    limit_reason='call_limit' if inputs.get('read_to_end') else 'batch_limit'
     coverage={**plan.summary(),'protocol_version':2,'start_offset':start,'returned_until':returned,'next_offset':offset,'structured_segments':structured,
               'remaining_segments':len(plan.segments)-offset,'unsent_segments':len(plan.segments)-returned,'input_coverage_complete':returned==len(plan.segments),
               'structured_coverage_complete':False,'continuation_of':inputs.get('resume_from'),
-              'operation_end':end,'operation_remaining':end-offset}
+              'operation_end':end,'operation_remaining':end-offset,
+              'read_to_end':inputs.get('read_to_end',False),'batch_call_limit':call_limit}
     jobs.patch(jid,coverage=coverage,batches=[],batch_decisions=[])
     decisions=[]
-    reason='batch_limit'
-    for number in range(inputs['max_batches']):
+    reason=limit_reason
+    for number in range(call_limit):
         jobs.check(jid)
         if offset==end:reason='end_of_extraction' if end==len(plan.segments) else 'retry_range_finished';break
         batch,decision=select_batch(plan,inputs,offset,number+1,inputs['budget']-jobs.used_tokens(jid),
@@ -69,8 +72,8 @@ def answer_exhaustive(jobs,jid):
         jobs.patch(jid,batches=batches,evidence=evidence,coverage=coverage)
         if result.get('answer') is None or current['finish_reason']!='stop':reason='invalid_or_truncated_output';break
         if jobs.used_tokens(jid)>inputs['budget']:reason='provider_reported_budget_exceeded';break
-    if offset==len(plan.segments) and reason=='batch_limit':reason='end_of_extraction'
-    elif offset==end and reason=='batch_limit':reason='retry_range_finished'
+    if offset==len(plan.segments) and reason==limit_reason:reason='end_of_extraction'
+    elif offset==end and reason==limit_reason:reason='retry_range_finished'
     coverage['stop_reason']=reason
     jobs.patch(jid,coverage=coverage,progress={'phase':'reading','completed':offset,'total':len(plan.segments),'current':'本次分批处理结束；请核对送达范围与内容质量'})
     return {'answer':None,'answer_schema_version':3,'content_status':'unreviewed' if coverage['structured_coverage_complete'] else 'partial',

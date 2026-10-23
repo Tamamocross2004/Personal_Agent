@@ -1,0 +1,2644 @@
+{
+  "stage": 30,
+  "date": "2026-10-23",
+  "base_commit": "cb6b150",
+  "cases": [
+    {
+      "id": "states-old",
+      "files": [
+        "gauges.csv"
+      ],
+      "query": "逐项整理全部传感器的读数和分类标签。读数按物理测量值整理；分类标签要求摘录标签文字本身。字段名分别用读数、分类标签。保留原文、零、空白、不确定性和引用，不添加字段。",
+      "expected_rows": [
+        {
+          "id": "0-reading",
+          "subject": "Gauge-Willow",
+          "field": "读数",
+          "values": [
+            "0 Pa"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 2
+            }
+          },
+          "required_literals": [
+            "Gauge-Willow",
+            "0 Pa"
+          ]
+        },
+        {
+          "id": "0-label",
+          "subject": "Gauge-Willow",
+          "field": "分类标签",
+          "values": [
+            "未知"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 2
+            }
+          },
+          "required_literals": [
+            "Gauge-Willow",
+            "未知"
+          ]
+        },
+        {
+          "id": "1-reading",
+          "subject": "Gauge-Maple",
+          "field": "读数",
+          "values": [
+            null,
+            ""
+          ],
+          "status": "unknown",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 3
+            }
+          },
+          "required_literals": [
+            "Gauge-Maple",
+            "未测得"
+          ]
+        },
+        {
+          "id": "1-label",
+          "subject": "Gauge-Maple",
+          "field": "分类标签",
+          "values": [
+            "待核"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 3
+            }
+          },
+          "required_literals": [
+            "Gauge-Maple",
+            "待核"
+          ]
+        },
+        {
+          "id": "2-reading",
+          "subject": "Gauge-Spruce",
+          "field": "读数",
+          "values": [
+            null,
+            ""
+          ],
+          "status": "unknown",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 4
+            }
+          },
+          "required_literals": [
+            "Gauge-Spruce",
+            "不详"
+          ]
+        },
+        {
+          "id": "2-label",
+          "subject": "Gauge-Spruce",
+          "field": "分类标签",
+          "values": [
+            "正常"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 4
+            }
+          },
+          "required_literals": [
+            "Gauge-Spruce",
+            "正常"
+          ]
+        },
+        {
+          "id": "3-reading",
+          "subject": "Gauge-Hazel",
+          "field": "读数",
+          "values": [
+            null,
+            ""
+          ],
+          "status": "blank",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 5
+            }
+          },
+          "required_literals": [
+            "Gauge-Hazel"
+          ]
+        },
+        {
+          "id": "3-label",
+          "subject": "Gauge-Hazel",
+          "field": "分类标签",
+          "values": [
+            "待录"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 5
+            }
+          },
+          "required_literals": [
+            "Gauge-Hazel",
+            "待录"
+          ]
+        },
+        {
+          "id": "4-reading",
+          "subject": "Gauge-Fir",
+          "field": "读数",
+          "values": [
+            "7 Pa"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 6
+            }
+          },
+          "required_literals": [
+            "Gauge-Fir",
+            "7 Pa"
+          ]
+        },
+        {
+          "id": "4-label",
+          "subject": "Gauge-Fir",
+          "field": "分类标签",
+          "values": [
+            "未定"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 6
+            }
+          },
+          "required_literals": [
+            "Gauge-Fir",
+            "未定"
+          ]
+        }
+      ],
+      "strategy": "exhaustive",
+      "batch_mode": "fixed",
+      "batch_size": 3,
+      "output_tokens": 2400,
+      "expected_fields": 2,
+      "paired": true,
+      "arm": "old"
+    },
+    {
+      "id": "states-new",
+      "files": [
+        "gauges.csv"
+      ],
+      "query": "逐项整理全部传感器的读数和分类标签。读数按物理测量值整理；分类标签要求摘录标签文字本身。字段名分别用读数、分类标签。保留原文、零、空白、不确定性和引用，不添加字段。",
+      "expected_rows": [
+        {
+          "id": "0-reading",
+          "subject": "Gauge-Willow",
+          "field": "读数",
+          "values": [
+            "0 Pa"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 2
+            }
+          },
+          "required_literals": [
+            "Gauge-Willow",
+            "0 Pa"
+          ]
+        },
+        {
+          "id": "0-label",
+          "subject": "Gauge-Willow",
+          "field": "分类标签",
+          "values": [
+            "未知"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 2
+            }
+          },
+          "required_literals": [
+            "Gauge-Willow",
+            "未知"
+          ]
+        },
+        {
+          "id": "1-reading",
+          "subject": "Gauge-Maple",
+          "field": "读数",
+          "values": [
+            null,
+            ""
+          ],
+          "status": "unknown",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 3
+            }
+          },
+          "required_literals": [
+            "Gauge-Maple",
+            "未测得"
+          ]
+        },
+        {
+          "id": "1-label",
+          "subject": "Gauge-Maple",
+          "field": "分类标签",
+          "values": [
+            "待核"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 3
+            }
+          },
+          "required_literals": [
+            "Gauge-Maple",
+            "待核"
+          ]
+        },
+        {
+          "id": "2-reading",
+          "subject": "Gauge-Spruce",
+          "field": "读数",
+          "values": [
+            null,
+            ""
+          ],
+          "status": "unknown",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 4
+            }
+          },
+          "required_literals": [
+            "Gauge-Spruce",
+            "不详"
+          ]
+        },
+        {
+          "id": "2-label",
+          "subject": "Gauge-Spruce",
+          "field": "分类标签",
+          "values": [
+            "正常"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 4
+            }
+          },
+          "required_literals": [
+            "Gauge-Spruce",
+            "正常"
+          ]
+        },
+        {
+          "id": "3-reading",
+          "subject": "Gauge-Hazel",
+          "field": "读数",
+          "values": [
+            null,
+            ""
+          ],
+          "status": "blank",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 5
+            }
+          },
+          "required_literals": [
+            "Gauge-Hazel"
+          ]
+        },
+        {
+          "id": "3-label",
+          "subject": "Gauge-Hazel",
+          "field": "分类标签",
+          "values": [
+            "待录"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 5
+            }
+          },
+          "required_literals": [
+            "Gauge-Hazel",
+            "待录"
+          ]
+        },
+        {
+          "id": "4-reading",
+          "subject": "Gauge-Fir",
+          "field": "读数",
+          "values": [
+            "7 Pa"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 6
+            }
+          },
+          "required_literals": [
+            "Gauge-Fir",
+            "7 Pa"
+          ]
+        },
+        {
+          "id": "4-label",
+          "subject": "Gauge-Fir",
+          "field": "分类标签",
+          "values": [
+            "未定"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 6
+            }
+          },
+          "required_literals": [
+            "Gauge-Fir",
+            "未定"
+          ]
+        }
+      ],
+      "strategy": "exhaustive",
+      "batch_mode": "fixed",
+      "batch_size": 3,
+      "output_tokens": 2400,
+      "expected_fields": 2,
+      "paired": true,
+      "arm": "new"
+    },
+    {
+      "id": "exclusive-old",
+      "files": [
+        "exclusive-0.txt",
+        "exclusive-1.txt"
+      ],
+      "query": "比较两份资料中Relay-Cypress的使能状态。逐来源列出使能状态原值，说明共同条件、可比性及双方能否同时成立；不要添加缺失条件。对照字段名用使能状态。",
+      "expected_rows": [
+        {
+          "id": "0",
+          "subject": "Relay-Cypress",
+          "field": "使能状态",
+          "values": [
+            "启用"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "exclusive-0.txt",
+            "file_sha256": "528b1e1c77b6e52009626844666dc2e6f65c02e93d673c520e131fd59db6c5dc",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Relay-Cypress",
+            "启用"
+          ]
+        },
+        {
+          "id": "1",
+          "subject": "Relay-Cypress",
+          "field": "使能状态",
+          "values": [
+            "禁用"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "exclusive-1.txt",
+            "file_sha256": "7fe7ee770a383dbff339cd314d2560263d95bc13fb23df60204f3b40642f3db1",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Relay-Cypress",
+            "禁用"
+          ]
+        }
+      ],
+      "strategy": "retrieval",
+      "output_tokens": 1200,
+      "paired": true,
+      "relation_expectation_not_sent": {
+        "kind": "conflict",
+        "comparability": "established",
+        "reason": "两份记录对同一时刻同一设备的同一个二值状态作出互斥断言。"
+      },
+      "arm": "old"
+    },
+    {
+      "id": "exclusive-new",
+      "files": [
+        "exclusive-0.txt",
+        "exclusive-1.txt"
+      ],
+      "query": "比较两份资料中Relay-Cypress的使能状态。逐来源列出使能状态原值，说明共同条件、可比性及双方能否同时成立；不要添加缺失条件。对照字段名用使能状态。",
+      "expected_rows": [
+        {
+          "id": "0",
+          "subject": "Relay-Cypress",
+          "field": "使能状态",
+          "values": [
+            "启用"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "exclusive-0.txt",
+            "file_sha256": "528b1e1c77b6e52009626844666dc2e6f65c02e93d673c520e131fd59db6c5dc",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Relay-Cypress",
+            "启用"
+          ]
+        },
+        {
+          "id": "1",
+          "subject": "Relay-Cypress",
+          "field": "使能状态",
+          "values": [
+            "禁用"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "exclusive-1.txt",
+            "file_sha256": "7fe7ee770a383dbff339cd314d2560263d95bc13fb23df60204f3b40642f3db1",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Relay-Cypress",
+            "禁用"
+          ]
+        }
+      ],
+      "strategy": "retrieval",
+      "output_tokens": 1200,
+      "paired": true,
+      "relation_expectation_not_sent": {
+        "kind": "conflict",
+        "comparability": "established",
+        "reason": "两份记录对同一时刻同一设备的同一个二值状态作出互斥断言。"
+      },
+      "arm": "new"
+    },
+    {
+      "id": "measurement-old",
+      "files": [
+        "measurement-0.txt",
+        "measurement-1.txt"
+      ],
+      "query": "比较两份资料中Cell-Ember的内阻。逐来源列出内阻原值，说明共同条件、可比性及双方能否同时成立；不要添加缺失条件。对照字段名用内阻。",
+      "expected_rows": [
+        {
+          "id": "0",
+          "subject": "Cell-Ember",
+          "field": "内阻",
+          "values": [
+            "8 Ω"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "measurement-0.txt",
+            "file_sha256": "efbbb520338ba7cb2de1bb829e611f2efb1bc43243903e53f1dc18b1342f070a",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Cell-Ember",
+            "8 Ω"
+          ]
+        },
+        {
+          "id": "1",
+          "subject": "Cell-Ember",
+          "field": "内阻",
+          "values": [
+            "11 Ω"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "measurement-1.txt",
+            "file_sha256": "01991dab26cf47834557d55c49faeea65c4f399266212def0feae7d109cbca68",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Cell-Ember",
+            "11 Ω"
+          ]
+        }
+      ],
+      "strategy": "retrieval",
+      "output_tokens": 1200,
+      "paired": true,
+      "relation_expectation_not_sent": {
+        "kind": "conflict",
+        "comparability": "established",
+        "reason": "同一测量编号、时刻和条件的单一读数不可能同时取这两个不同值。"
+      },
+      "arm": "old"
+    },
+    {
+      "id": "measurement-new",
+      "files": [
+        "measurement-0.txt",
+        "measurement-1.txt"
+      ],
+      "query": "比较两份资料中Cell-Ember的内阻。逐来源列出内阻原值，说明共同条件、可比性及双方能否同时成立；不要添加缺失条件。对照字段名用内阻。",
+      "expected_rows": [
+        {
+          "id": "0",
+          "subject": "Cell-Ember",
+          "field": "内阻",
+          "values": [
+            "8 Ω"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "measurement-0.txt",
+            "file_sha256": "efbbb520338ba7cb2de1bb829e611f2efb1bc43243903e53f1dc18b1342f070a",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Cell-Ember",
+            "8 Ω"
+          ]
+        },
+        {
+          "id": "1",
+          "subject": "Cell-Ember",
+          "field": "内阻",
+          "values": [
+            "11 Ω"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "measurement-1.txt",
+            "file_sha256": "01991dab26cf47834557d55c49faeea65c4f399266212def0feae7d109cbca68",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Cell-Ember",
+            "11 Ω"
+          ]
+        }
+      ],
+      "strategy": "retrieval",
+      "output_tokens": 1200,
+      "paired": true,
+      "relation_expectation_not_sent": {
+        "kind": "conflict",
+        "comparability": "established",
+        "reason": "同一测量编号、时刻和条件的单一读数不可能同时取这两个不同值。"
+      },
+      "arm": "new"
+    },
+    {
+      "id": "dates-old",
+      "files": [
+        "dates-0.txt",
+        "dates-1.txt"
+      ],
+      "query": "比较两份资料中Tank-Alder的压力。逐来源列出压力原值，说明共同条件、可比性及双方能否同时成立；不要添加缺失条件。对照字段名用压力。",
+      "expected_rows": [
+        {
+          "id": "0",
+          "subject": "Tank-Alder",
+          "field": "压力",
+          "values": [
+            "7 kPa"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "dates-0.txt",
+            "file_sha256": "d97138e5fa1fd76f22696b8cbe735a5b252ae4751b5785e633f93f693dc92863",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Tank-Alder",
+            "7 kPa"
+          ]
+        },
+        {
+          "id": "1",
+          "subject": "Tank-Alder",
+          "field": "压力",
+          "values": [
+            "9 kPa"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "dates-1.txt",
+            "file_sha256": "b4fd9ac549ea3bd620d45dc2f78a8291599a48a1577f5b1265385bf02f32b6c9",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Tank-Alder",
+            "9 kPa"
+          ]
+        }
+      ],
+      "strategy": "retrieval",
+      "output_tokens": 1200,
+      "paired": true,
+      "relation_expectation_not_sent": {
+        "kind": "difference",
+        "comparability": "not_established",
+        "reason": "采样日期不同，不确认同一时刻矛盾。"
+      },
+      "arm": "old"
+    },
+    {
+      "id": "dates-new",
+      "files": [
+        "dates-0.txt",
+        "dates-1.txt"
+      ],
+      "query": "比较两份资料中Tank-Alder的压力。逐来源列出压力原值，说明共同条件、可比性及双方能否同时成立；不要添加缺失条件。对照字段名用压力。",
+      "expected_rows": [
+        {
+          "id": "0",
+          "subject": "Tank-Alder",
+          "field": "压力",
+          "values": [
+            "7 kPa"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "dates-0.txt",
+            "file_sha256": "d97138e5fa1fd76f22696b8cbe735a5b252ae4751b5785e633f93f693dc92863",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Tank-Alder",
+            "7 kPa"
+          ]
+        },
+        {
+          "id": "1",
+          "subject": "Tank-Alder",
+          "field": "压力",
+          "values": [
+            "9 kPa"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "dates-1.txt",
+            "file_sha256": "b4fd9ac549ea3bd620d45dc2f78a8291599a48a1577f5b1265385bf02f32b6c9",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Tank-Alder",
+            "9 kPa"
+          ]
+        }
+      ],
+      "strategy": "retrieval",
+      "output_tokens": 1200,
+      "paired": true,
+      "relation_expectation_not_sent": {
+        "kind": "difference",
+        "comparability": "not_established",
+        "reason": "采样日期不同，不确认同一时刻矛盾。"
+      },
+      "arm": "new"
+    },
+    {
+      "id": "conditions-old",
+      "files": [
+        "conditions-0.txt",
+        "conditions-1.txt"
+      ],
+      "query": "比较两份资料中Motor-Birch的速度。逐来源列出速度原值，说明共同条件、可比性及双方能否同时成立；不要添加缺失条件。对照字段名用速度。",
+      "expected_rows": [
+        {
+          "id": "0",
+          "subject": "Motor-Birch",
+          "field": "速度",
+          "values": [
+            "5 m/s"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "conditions-0.txt",
+            "file_sha256": "1a123442993e9b9e7c566a06663c4a6d42d2cb22c5ba252db504ff8642876640",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Motor-Birch",
+            "5 m/s"
+          ]
+        },
+        {
+          "id": "1",
+          "subject": "Motor-Birch",
+          "field": "速度",
+          "values": [
+            "8 m/s"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "conditions-1.txt",
+            "file_sha256": "85c9ea771607357df48d935113b24a812a5f7cdc8c193d6f4f41be4a51aceb5c",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Motor-Birch",
+            "8 m/s"
+          ]
+        }
+      ],
+      "strategy": "retrieval",
+      "output_tokens": 1200,
+      "paired": true,
+      "relation_expectation_not_sent": {
+        "kind": "difference",
+        "comparability": "not_established",
+        "reason": "运行模式不同，两值可同时作为各模式的记录。"
+      },
+      "arm": "old"
+    },
+    {
+      "id": "conditions-new",
+      "files": [
+        "conditions-0.txt",
+        "conditions-1.txt"
+      ],
+      "query": "比较两份资料中Motor-Birch的速度。逐来源列出速度原值，说明共同条件、可比性及双方能否同时成立；不要添加缺失条件。对照字段名用速度。",
+      "expected_rows": [
+        {
+          "id": "0",
+          "subject": "Motor-Birch",
+          "field": "速度",
+          "values": [
+            "5 m/s"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "conditions-0.txt",
+            "file_sha256": "1a123442993e9b9e7c566a06663c4a6d42d2cb22c5ba252db504ff8642876640",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Motor-Birch",
+            "5 m/s"
+          ]
+        },
+        {
+          "id": "1",
+          "subject": "Motor-Birch",
+          "field": "速度",
+          "values": [
+            "8 m/s"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "conditions-1.txt",
+            "file_sha256": "85c9ea771607357df48d935113b24a812a5f7cdc8c193d6f4f41be4a51aceb5c",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Motor-Birch",
+            "8 m/s"
+          ]
+        }
+      ],
+      "strategy": "retrieval",
+      "output_tokens": 1200,
+      "paired": true,
+      "relation_expectation_not_sent": {
+        "kind": "difference",
+        "comparability": "not_established",
+        "reason": "运行模式不同，两值可同时作为各模式的记录。"
+      },
+      "arm": "new"
+    },
+    {
+      "id": "compatible-old",
+      "files": [
+        "compatible-0.txt",
+        "compatible-1.txt"
+      ],
+      "query": "比较两份资料中Hub-Clover的支持协议。逐来源列出支持协议原值，说明共同条件、可比性及双方能否同时成立；不要添加缺失条件。对照字段名用支持协议。",
+      "expected_rows": [
+        {
+          "id": "0",
+          "subject": "Hub-Clover",
+          "field": "支持协议",
+          "values": [
+            "TCP"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "compatible-0.txt",
+            "file_sha256": "bb84fa51ad9070af899706c5adb287db11424b7e9e93d4d00bf9e2ac5952c94e",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Hub-Clover",
+            "TCP"
+          ]
+        },
+        {
+          "id": "1",
+          "subject": "Hub-Clover",
+          "field": "支持协议",
+          "values": [
+            "UDP"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "compatible-1.txt",
+            "file_sha256": "f471af926113f355554d546ab23ba5019ea15bb048a5f785ee30a5f97d217449",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Hub-Clover",
+            "UDP"
+          ]
+        }
+      ],
+      "strategy": "retrieval",
+      "output_tokens": 1200,
+      "paired": true,
+      "relation_expectation_not_sent": {
+        "kind": "difference",
+        "comparability": "established",
+        "reason": "同一设备可同时支持两协议，部分列举不是排他断言。"
+      },
+      "arm": "old"
+    },
+    {
+      "id": "compatible-new",
+      "files": [
+        "compatible-0.txt",
+        "compatible-1.txt"
+      ],
+      "query": "比较两份资料中Hub-Clover的支持协议。逐来源列出支持协议原值，说明共同条件、可比性及双方能否同时成立；不要添加缺失条件。对照字段名用支持协议。",
+      "expected_rows": [
+        {
+          "id": "0",
+          "subject": "Hub-Clover",
+          "field": "支持协议",
+          "values": [
+            "TCP"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "compatible-0.txt",
+            "file_sha256": "bb84fa51ad9070af899706c5adb287db11424b7e9e93d4d00bf9e2ac5952c94e",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Hub-Clover",
+            "TCP"
+          ]
+        },
+        {
+          "id": "1",
+          "subject": "Hub-Clover",
+          "field": "支持协议",
+          "values": [
+            "UDP"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "compatible-1.txt",
+            "file_sha256": "f471af926113f355554d546ab23ba5019ea15bb048a5f785ee30a5f97d217449",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Hub-Clover",
+            "UDP"
+          ]
+        }
+      ],
+      "strategy": "retrieval",
+      "output_tokens": 1200,
+      "paired": true,
+      "relation_expectation_not_sent": {
+        "kind": "difference",
+        "comparability": "established",
+        "reason": "同一设备可同时支持两协议，部分列举不是排他断言。"
+      },
+      "arm": "new"
+    },
+    {
+      "id": "missing_scope-old",
+      "files": [
+        "missing_scope-0.txt",
+        "missing_scope-1.txt"
+      ],
+      "query": "比较两份资料中Pack-Dahlia的容量。逐来源列出容量原值，说明共同条件、可比性及双方能否同时成立；不要添加缺失条件。对照字段名用容量。",
+      "expected_rows": [
+        {
+          "id": "0",
+          "subject": "Pack-Dahlia",
+          "field": "容量",
+          "values": [
+            "20 Ah"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "missing_scope-0.txt",
+            "file_sha256": "e553fdca7b5f614b1ba3d91f76b42244e5f2e176850be332c46b4a0c9056be14",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Pack-Dahlia",
+            "20 Ah"
+          ]
+        },
+        {
+          "id": "1",
+          "subject": "Pack-Dahlia",
+          "field": "容量",
+          "values": [
+            "25 Ah"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "missing_scope-1.txt",
+            "file_sha256": "838ac709768ccf1a809720efd67c3f213d3c9ba5571bef4e4e00890d346f6ca3",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Pack-Dahlia",
+            "25 Ah"
+          ]
+        }
+      ],
+      "strategy": "retrieval",
+      "output_tokens": 1200,
+      "paired": true,
+      "relation_expectation_not_sent": {
+        "kind": "difference",
+        "comparability": "not_established",
+        "reason": "未给出时间和测试条件，不能添加共同条件来判断互斥。"
+      },
+      "arm": "old"
+    },
+    {
+      "id": "missing_scope-new",
+      "files": [
+        "missing_scope-0.txt",
+        "missing_scope-1.txt"
+      ],
+      "query": "比较两份资料中Pack-Dahlia的容量。逐来源列出容量原值，说明共同条件、可比性及双方能否同时成立；不要添加缺失条件。对照字段名用容量。",
+      "expected_rows": [
+        {
+          "id": "0",
+          "subject": "Pack-Dahlia",
+          "field": "容量",
+          "values": [
+            "20 Ah"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "missing_scope-0.txt",
+            "file_sha256": "e553fdca7b5f614b1ba3d91f76b42244e5f2e176850be332c46b4a0c9056be14",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Pack-Dahlia",
+            "20 Ah"
+          ]
+        },
+        {
+          "id": "1",
+          "subject": "Pack-Dahlia",
+          "field": "容量",
+          "values": [
+            "25 Ah"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "missing_scope-1.txt",
+            "file_sha256": "838ac709768ccf1a809720efd67c3f213d3c9ba5571bef4e4e00890d346f6ca3",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Pack-Dahlia",
+            "25 Ah"
+          ]
+        }
+      ],
+      "strategy": "retrieval",
+      "output_tokens": 1200,
+      "paired": true,
+      "relation_expectation_not_sent": {
+        "kind": "difference",
+        "comparability": "not_established",
+        "reason": "未给出时间和测试条件，不能添加共同条件来判断互斥。"
+      },
+      "arm": "new"
+    },
+    {
+      "id": "long_table-new",
+      "files": [
+        "rotors.csv"
+      ],
+      "query": "整理这份表中全部转子的转速、扭矩，字段名用转速、扭矩；逐项保留对象、原值、单位、零值、空白、不确定性及引用。首行为字段名，不作为业务对象。",
+      "expected_rows": [
+        {
+          "id": "0-转速",
+          "subject": "Rotor-901",
+          "field": "转速",
+          "values": [
+            "10 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 2
+            }
+          },
+          "required_literals": [
+            "Rotor-901",
+            "10 rpm"
+          ]
+        },
+        {
+          "id": "0-扭矩",
+          "subject": "Rotor-901",
+          "field": "扭矩",
+          "values": [
+            "0 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 2
+            }
+          },
+          "required_literals": [
+            "Rotor-901",
+            "0 Nm"
+          ]
+        },
+        {
+          "id": "1-转速",
+          "subject": "Rotor-902",
+          "field": "转速",
+          "values": [
+            "11 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 3
+            }
+          },
+          "required_literals": [
+            "Rotor-902",
+            "11 rpm"
+          ]
+        },
+        {
+          "id": "1-扭矩",
+          "subject": "Rotor-902",
+          "field": "扭矩",
+          "values": [
+            "2 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 3
+            }
+          },
+          "required_literals": [
+            "Rotor-902",
+            "2 Nm"
+          ]
+        },
+        {
+          "id": "2-转速",
+          "subject": "Rotor-903",
+          "field": "转速",
+          "values": [
+            "12 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 4
+            }
+          },
+          "required_literals": [
+            "Rotor-903",
+            "12 rpm"
+          ]
+        },
+        {
+          "id": "2-扭矩",
+          "subject": "Rotor-903",
+          "field": "扭矩",
+          "values": [
+            "4 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 4
+            }
+          },
+          "required_literals": [
+            "Rotor-903",
+            "4 Nm"
+          ]
+        },
+        {
+          "id": "3-转速",
+          "subject": "Rotor-904",
+          "field": "转速",
+          "values": [
+            "13 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 5
+            }
+          },
+          "required_literals": [
+            "Rotor-904",
+            "13 rpm"
+          ]
+        },
+        {
+          "id": "3-扭矩",
+          "subject": "Rotor-904",
+          "field": "扭矩",
+          "values": [
+            "6 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 5
+            }
+          },
+          "required_literals": [
+            "Rotor-904",
+            "6 Nm"
+          ]
+        },
+        {
+          "id": "4-转速",
+          "subject": "Rotor-905",
+          "field": "转速",
+          "values": [
+            "14 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 6
+            }
+          },
+          "required_literals": [
+            "Rotor-905",
+            "14 rpm"
+          ]
+        },
+        {
+          "id": "4-扭矩",
+          "subject": "Rotor-905",
+          "field": "扭矩",
+          "values": [
+            "8 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 6
+            }
+          },
+          "required_literals": [
+            "Rotor-905",
+            "8 Nm"
+          ]
+        },
+        {
+          "id": "5-转速",
+          "subject": "Rotor-906",
+          "field": "转速",
+          "values": [
+            "15 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 7
+            }
+          },
+          "required_literals": [
+            "Rotor-906",
+            "15 rpm"
+          ]
+        },
+        {
+          "id": "5-扭矩",
+          "subject": "Rotor-906",
+          "field": "扭矩",
+          "values": [
+            "10 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 7
+            }
+          },
+          "required_literals": [
+            "Rotor-906",
+            "10 Nm"
+          ]
+        },
+        {
+          "id": "6-转速",
+          "subject": "Rotor-907",
+          "field": "转速",
+          "values": [
+            "16 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 8
+            }
+          },
+          "required_literals": [
+            "Rotor-907",
+            "16 rpm"
+          ]
+        },
+        {
+          "id": "6-扭矩",
+          "subject": "Rotor-907",
+          "field": "扭矩",
+          "values": [
+            "12 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 8
+            }
+          },
+          "required_literals": [
+            "Rotor-907",
+            "12 Nm"
+          ]
+        },
+        {
+          "id": "7-转速",
+          "subject": "Rotor-908",
+          "field": "转速",
+          "values": [
+            "17 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 9
+            }
+          },
+          "required_literals": [
+            "Rotor-908",
+            "17 rpm"
+          ]
+        },
+        {
+          "id": "7-扭矩",
+          "subject": "Rotor-908",
+          "field": "扭矩",
+          "values": [
+            null,
+            ""
+          ],
+          "status": "unknown",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 9
+            }
+          },
+          "required_literals": [
+            "Rotor-908",
+            "未测得"
+          ]
+        },
+        {
+          "id": "8-转速",
+          "subject": "Rotor-909",
+          "field": "转速",
+          "values": [
+            "18 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 10
+            }
+          },
+          "required_literals": [
+            "Rotor-909",
+            "18 rpm"
+          ]
+        },
+        {
+          "id": "8-扭矩",
+          "subject": "Rotor-909",
+          "field": "扭矩",
+          "values": [
+            "16 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 10
+            }
+          },
+          "required_literals": [
+            "Rotor-909",
+            "16 Nm"
+          ]
+        },
+        {
+          "id": "9-转速",
+          "subject": "Rotor-910",
+          "field": "转速",
+          "values": [
+            "19 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 11
+            }
+          },
+          "required_literals": [
+            "Rotor-910",
+            "19 rpm"
+          ]
+        },
+        {
+          "id": "9-扭矩",
+          "subject": "Rotor-910",
+          "field": "扭矩",
+          "values": [
+            "18 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 11
+            }
+          },
+          "required_literals": [
+            "Rotor-910",
+            "18 Nm"
+          ]
+        },
+        {
+          "id": "10-转速",
+          "subject": "Rotor-911",
+          "field": "转速",
+          "values": [
+            "20 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 12
+            }
+          },
+          "required_literals": [
+            "Rotor-911",
+            "20 rpm"
+          ]
+        },
+        {
+          "id": "10-扭矩",
+          "subject": "Rotor-911",
+          "field": "扭矩",
+          "values": [
+            "20 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 12
+            }
+          },
+          "required_literals": [
+            "Rotor-911",
+            "20 Nm"
+          ]
+        },
+        {
+          "id": "11-转速",
+          "subject": "Rotor-912",
+          "field": "转速",
+          "values": [
+            "21 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 13
+            }
+          },
+          "required_literals": [
+            "Rotor-912",
+            "21 rpm"
+          ]
+        },
+        {
+          "id": "11-扭矩",
+          "subject": "Rotor-912",
+          "field": "扭矩",
+          "values": [
+            "22 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 13
+            }
+          },
+          "required_literals": [
+            "Rotor-912",
+            "22 Nm"
+          ]
+        },
+        {
+          "id": "12-转速",
+          "subject": "Rotor-913",
+          "field": "转速",
+          "values": [
+            "22 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 14
+            }
+          },
+          "required_literals": [
+            "Rotor-913",
+            "22 rpm"
+          ]
+        },
+        {
+          "id": "12-扭矩",
+          "subject": "Rotor-913",
+          "field": "扭矩",
+          "values": [
+            null,
+            ""
+          ],
+          "status": "blank",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 14
+            }
+          },
+          "required_literals": [
+            "Rotor-913"
+          ]
+        },
+        {
+          "id": "13-转速",
+          "subject": "Rotor-914",
+          "field": "转速",
+          "values": [
+            "23 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 15
+            }
+          },
+          "required_literals": [
+            "Rotor-914",
+            "23 rpm"
+          ]
+        },
+        {
+          "id": "13-扭矩",
+          "subject": "Rotor-914",
+          "field": "扭矩",
+          "values": [
+            "26 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 15
+            }
+          },
+          "required_literals": [
+            "Rotor-914",
+            "26 Nm"
+          ]
+        },
+        {
+          "id": "14-转速",
+          "subject": "Rotor-915",
+          "field": "转速",
+          "values": [
+            "24 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 16
+            }
+          },
+          "required_literals": [
+            "Rotor-915",
+            "24 rpm"
+          ]
+        },
+        {
+          "id": "14-扭矩",
+          "subject": "Rotor-915",
+          "field": "扭矩",
+          "values": [
+            "28 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 16
+            }
+          },
+          "required_literals": [
+            "Rotor-915",
+            "28 Nm"
+          ]
+        },
+        {
+          "id": "15-转速",
+          "subject": "Rotor-916",
+          "field": "转速",
+          "values": [
+            "25 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 17
+            }
+          },
+          "required_literals": [
+            "Rotor-916",
+            "25 rpm"
+          ]
+        },
+        {
+          "id": "15-扭矩",
+          "subject": "Rotor-916",
+          "field": "扭矩",
+          "values": [
+            "30 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 17
+            }
+          },
+          "required_literals": [
+            "Rotor-916",
+            "30 Nm"
+          ]
+        },
+        {
+          "id": "16-转速",
+          "subject": "Rotor-917",
+          "field": "转速",
+          "values": [
+            "26 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 18
+            }
+          },
+          "required_literals": [
+            "Rotor-917",
+            "26 rpm"
+          ]
+        },
+        {
+          "id": "16-扭矩",
+          "subject": "Rotor-917",
+          "field": "扭矩",
+          "values": [
+            "32 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 18
+            }
+          },
+          "required_literals": [
+            "Rotor-917",
+            "32 Nm"
+          ]
+        },
+        {
+          "id": "17-转速",
+          "subject": "Rotor-918",
+          "field": "转速",
+          "values": [
+            "27 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 19
+            }
+          },
+          "required_literals": [
+            "Rotor-918",
+            "27 rpm"
+          ]
+        },
+        {
+          "id": "17-扭矩",
+          "subject": "Rotor-918",
+          "field": "扭矩",
+          "values": [
+            "34 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 19
+            }
+          },
+          "required_literals": [
+            "Rotor-918",
+            "34 Nm"
+          ]
+        },
+        {
+          "id": "18-转速",
+          "subject": "Rotor-919",
+          "field": "转速",
+          "values": [
+            "28 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 20
+            }
+          },
+          "required_literals": [
+            "Rotor-919",
+            "28 rpm"
+          ]
+        },
+        {
+          "id": "18-扭矩",
+          "subject": "Rotor-919",
+          "field": "扭矩",
+          "values": [
+            "36 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 20
+            }
+          },
+          "required_literals": [
+            "Rotor-919",
+            "36 Nm"
+          ]
+        },
+        {
+          "id": "19-转速",
+          "subject": "Rotor-920",
+          "field": "转速",
+          "values": [
+            "29 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 21
+            }
+          },
+          "required_literals": [
+            "Rotor-920",
+            "29 rpm"
+          ]
+        },
+        {
+          "id": "19-扭矩",
+          "subject": "Rotor-920",
+          "field": "扭矩",
+          "values": [
+            "38 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 21
+            }
+          },
+          "required_literals": [
+            "Rotor-920",
+            "38 Nm"
+          ]
+        },
+        {
+          "id": "20-转速",
+          "subject": "Rotor-921",
+          "field": "转速",
+          "values": [
+            "30 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 22
+            }
+          },
+          "required_literals": [
+            "Rotor-921",
+            "30 rpm"
+          ]
+        },
+        {
+          "id": "20-扭矩",
+          "subject": "Rotor-921",
+          "field": "扭矩",
+          "values": [
+            "40 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 22
+            }
+          },
+          "required_literals": [
+            "Rotor-921",
+            "40 Nm"
+          ]
+        },
+        {
+          "id": "21-转速",
+          "subject": "Rotor-922",
+          "field": "转速",
+          "values": [
+            "31 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 23
+            }
+          },
+          "required_literals": [
+            "Rotor-922",
+            "31 rpm"
+          ]
+        },
+        {
+          "id": "21-扭矩",
+          "subject": "Rotor-922",
+          "field": "扭矩",
+          "values": [
+            "42 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 23
+            }
+          },
+          "required_literals": [
+            "Rotor-922",
+            "42 Nm"
+          ]
+        },
+        {
+          "id": "22-转速",
+          "subject": "Rotor-923",
+          "field": "转速",
+          "values": [
+            "32 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 24
+            }
+          },
+          "required_literals": [
+            "Rotor-923",
+            "32 rpm"
+          ]
+        },
+        {
+          "id": "22-扭矩",
+          "subject": "Rotor-923",
+          "field": "扭矩",
+          "values": [
+            "44 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 24
+            }
+          },
+          "required_literals": [
+            "Rotor-923",
+            "44 Nm"
+          ]
+        },
+        {
+          "id": "23-转速",
+          "subject": "Rotor-924",
+          "field": "转速",
+          "values": [
+            "33 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 25
+            }
+          },
+          "required_literals": [
+            "Rotor-924",
+            "33 rpm"
+          ]
+        },
+        {
+          "id": "23-扭矩",
+          "subject": "Rotor-924",
+          "field": "扭矩",
+          "values": [
+            "46 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 25
+            }
+          },
+          "required_literals": [
+            "Rotor-924",
+            "46 Nm"
+          ]
+        },
+        {
+          "id": "24-转速",
+          "subject": "Rotor-925",
+          "field": "转速",
+          "values": [
+            "34 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 26
+            }
+          },
+          "required_literals": [
+            "Rotor-925",
+            "34 rpm"
+          ]
+        },
+        {
+          "id": "24-扭矩",
+          "subject": "Rotor-925",
+          "field": "扭矩",
+          "values": [
+            "48 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 26
+            }
+          },
+          "required_literals": [
+            "Rotor-925",
+            "48 Nm"
+          ]
+        },
+        {
+          "id": "25-转速",
+          "subject": "Rotor-926",
+          "field": "转速",
+          "values": [
+            "35 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 27
+            }
+          },
+          "required_literals": [
+            "Rotor-926",
+            "35 rpm"
+          ]
+        },
+        {
+          "id": "25-扭矩",
+          "subject": "Rotor-926",
+          "field": "扭矩",
+          "values": [
+            "50 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 27
+            }
+          },
+          "required_literals": [
+            "Rotor-926",
+            "50 Nm"
+          ]
+        },
+        {
+          "id": "26-转速",
+          "subject": "Rotor-927",
+          "field": "转速",
+          "values": [
+            "36 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 28
+            }
+          },
+          "required_literals": [
+            "Rotor-927",
+            "36 rpm"
+          ]
+        },
+        {
+          "id": "26-扭矩",
+          "subject": "Rotor-927",
+          "field": "扭矩",
+          "values": [
+            "52 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 28
+            }
+          },
+          "required_literals": [
+            "Rotor-927",
+            "52 Nm"
+          ]
+        },
+        {
+          "id": "27-转速",
+          "subject": "Rotor-928",
+          "field": "转速",
+          "values": [
+            "37 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 29
+            }
+          },
+          "required_literals": [
+            "Rotor-928",
+            "37 rpm"
+          ]
+        },
+        {
+          "id": "27-扭矩",
+          "subject": "Rotor-928",
+          "field": "扭矩",
+          "values": [
+            "54 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 29
+            }
+          },
+          "required_literals": [
+            "Rotor-928",
+            "54 Nm"
+          ]
+        },
+        {
+          "id": "28-转速",
+          "subject": "Rotor-929",
+          "field": "转速",
+          "values": [
+            "38 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 30
+            }
+          },
+          "required_literals": [
+            "Rotor-929",
+            "38 rpm"
+          ]
+        },
+        {
+          "id": "28-扭矩",
+          "subject": "Rotor-929",
+          "field": "扭矩",
+          "values": [
+            "56 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 30
+            }
+          },
+          "required_literals": [
+            "Rotor-929",
+            "56 Nm"
+          ]
+        },
+        {
+          "id": "29-转速",
+          "subject": "Rotor-930",
+          "field": "转速",
+          "values": [
+            "39 rpm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 31
+            }
+          },
+          "required_literals": [
+            "Rotor-930",
+            "39 rpm"
+          ]
+        },
+        {
+          "id": "29-扭矩",
+          "subject": "Rotor-930",
+          "field": "扭矩",
+          "values": [
+            "58 Nm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "rotors.csv",
+            "file_sha256": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104",
+            "location": {
+              "kind": "csv_record",
+              "record": 31
+            }
+          },
+          "required_literals": [
+            "Rotor-930",
+            "58 Nm"
+          ]
+        }
+      ],
+      "strategy": "exhaustive",
+      "batch_mode": "adaptive",
+      "batch_size": 6,
+      "output_tokens": 2400,
+      "expected_fields": 2,
+      "paired": false,
+      "read_to_end": true,
+      "max_calls": 32,
+      "budget": 50000,
+      "arm": "new"
+    },
+    {
+      "id": "whole_docx-new",
+      "files": [
+        "plates.docx"
+      ],
+      "query": "整理所选DOCX中全部试片的厚度，字段名用厚度，保留零值、未知及来源。",
+      "expected_rows": [
+        {
+          "id": "0",
+          "subject": "Plate-Acorn",
+          "field": "厚度",
+          "values": [
+            "0 mm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "plates.docx",
+            "file_sha256": "bbf0527d6b8a4e0f69e5e01ae84f029ebd298810401de52a5f68108e92cb1766",
+            "location": {
+              "kind": "table_row",
+              "table": 1,
+              "row": 2
+            }
+          },
+          "required_literals": [
+            "Plate-Acorn",
+            "0 mm"
+          ]
+        },
+        {
+          "id": "1",
+          "subject": "Plate-Bloom",
+          "field": "厚度",
+          "values": [
+            "4 mm"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "plates.docx",
+            "file_sha256": "bbf0527d6b8a4e0f69e5e01ae84f029ebd298810401de52a5f68108e92cb1766",
+            "location": {
+              "kind": "table_row",
+              "table": 1,
+              "row": 3
+            }
+          },
+          "required_literals": [
+            "Plate-Bloom",
+            "4 mm"
+          ]
+        },
+        {
+          "id": "2",
+          "subject": "Plate-Cedar",
+          "field": "厚度",
+          "values": [
+            null,
+            ""
+          ],
+          "status": "unknown",
+          "source": {
+            "name": "plates.docx",
+            "file_sha256": "bbf0527d6b8a4e0f69e5e01ae84f029ebd298810401de52a5f68108e92cb1766",
+            "location": {
+              "kind": "table_row",
+              "table": 1,
+              "row": 4
+            }
+          },
+          "required_literals": [
+            "Plate-Cedar",
+            "尚未确定"
+          ]
+        }
+      ],
+      "strategy": "exhaustive",
+      "output_tokens": 1200,
+      "expected_fields": 1,
+      "paired": false,
+      "read_to_end": true,
+      "max_calls": 8,
+      "arm": "new"
+    }
+  ],
+  "runtime_sha256": {
+    "folder_assistant/__init__.py": "36656300506ebee15611b11a8eec4d2ba51af2278e92d74a5226fa32a1dd6277",
+    "folder_assistant/__main__.py": "493f6bac8826b6edff5219b89f4133bb32d0b47c119cc00428ca26b50df624bb",
+    "folder_assistant/answers.py": "40e8994604467d7cb69cee1b071c63e3659cac9a426ddcbadf884a2cf4ec9b77",
+    "folder_assistant/batching.py": "87936b69ccbb6b2d5e4c027de9f68265393e24c037fc57fa783b513bb97800a2",
+    "folder_assistant/contracts.py": "9e4d1cce46aa40d9296ad153b19a564237fb5198639fed9081b7a8afb8b56797",
+    "folder_assistant/exhaustive.py": "c6383a49257e7152beb1ed237b0a122b2b626a7b3a5d4e7793f193d687e0c1e7",
+    "folder_assistant/exports.py": "5ee3b1005fd92807ca035cfd485e2878abc244b0760a8bf85dec57c14f93fb63",
+    "folder_assistant/full_reading.py": "306299d2bd611809009a503d49438178a8d2a32fb25fe8d9cd1a13c3583bd83b",
+    "folder_assistant/index.py": "6c70d3975f5918bd76d2149f5938e5aaf6a369caff6af5feca3e5af7bc133db3",
+    "folder_assistant/jobs.py": "246294d443ff67bb35c6c1333e4b2d283cd020ed1f8236500821b8f7e9916672",
+    "folder_assistant/output_diagnostics.py": "e4f8a66e5b14517a69e2fb45c37ac9153d0c920960ad1f37d70a7c93185ae08d",
+    "folder_assistant/parse_worker.py": "e1603c813ea3ed124e4f744af7db7fabb13343c09ab570a651722338cbf49387",
+    "folder_assistant/parsing.py": "474dd43160b91025576f4bbd802f2fe3a1122818ce6a8536ba194564722a0acf",
+    "folder_assistant/project_context.py": "adb947ccd27de18d873c046117f5a83ea325a480dc2868894a1d2c6ef94fdc4d",
+    "folder_assistant/project_exports.py": "0f296a8f699722299d191acb00940d95267bd986cc94d49ae5e9c62c2109acbc",
+    "folder_assistant/projects.py": "172d3af54f498bea2489c47e5291804fe0144544cdd5e891f5455b87ae0af374",
+    "folder_assistant/reading.py": "54febef7b0313bd16517d4f5882c7054100c8e4b75e51c8310d9ec92b22d9b8f",
+    "folder_assistant/scope.py": "a1b40e34a62c7fe3593bc2b10dd721b07a71794f34f0ca8f5bd5edb2067a9c8c",
+    "folder_assistant/store.py": "27a5f165119ef621715db67cfcfcecd9d494272cd5cae3f5b6de828ab7d3390d",
+    "folder_assistant/usage.py": "bf86177a3397159586053bbc7e4431d45b37e3121678e04ad6ee42069db2d240",
+    "folder_assistant/verification.py": "0b99ecd41d37dbe809dcdae3836285600b6c7f4c4e8a57e924765b2190a633b7",
+    "knowledge/__init__.py": "5fcbc38c72e9f0e4c0938373622ff86daadbe7389238d3003d9a73d3acfb1533",
+    "knowledge/__main__.py": "fc231000c92128f2dacd50c8e4a2131c197130af52b5c13500673af31e4dec43",
+    "knowledge/documents.py": "4c2372f461f357cce017e9704392571c1d1bd1cf7e8f601867e6aa5eeb9305e2",
+    "knowledge/embedding.py": "7cfc277bf79b51205bff5c1447bb7165d73189a1773bfb7e013696349bdd2c43",
+    "knowledge/large_probe.py": "497c734fde900ff464eea06b736979fc52ccaa964bba28f21ebd3a1464c0c630",
+    "knowledge/locking.py": "c2f87541b323e39f8d080067aab7c15f7870f9a50b522ca9bcb596a4b89002ee",
+    "knowledge/long_probe.py": "824878c533475b0d48cca92f538fe00228108ede3274cf4bd43996ada91bb403",
+    "knowledge/probe.py": "564fc1190358d125bdd7d1c7d0fbe2bc1a998258e1dbe4f0b268585552e5666a",
+    "knowledge/recall_probe.py": "fb5657819c94b93083d3a11e6e546342345f3d35ac14fe70c662449f40143ca9",
+    "knowledge/report_probe.py": "486c955ce7368a5beb181b9def74546fc3b3ad9188c013105d643570102ac7df",
+    "knowledge/rerank_probe.py": "4c49f1e3a7f0e8dcd50edb647ba9beb521398ea05c01da538b25f1c99b9b75bc",
+    "knowledge/reranking.py": "8118a7613b87909571050ad1b6d6d3bee2a9beb8aa68b0dbc4ab60570cf384ec",
+    "knowledge/store.py": "3fc3b7c28d42baf9aee644f9edcd25ab12c547a5b8de37552ae399ce8d5d6837",
+    "knowledge/vectors.py": "520aff951c342401e1f1c4fcf5a532bd8f3ae859f6c01eb920414f8d2fdafd1b",
+    "agent/config.py": "30f8a3e63d4919113bdc09dc9954623440c18ee399448abd6e5da66ba7d2c60e",
+    "agent/llm.py": "bc58280e4c9663f4cc7f2fdf16041f11358e7b5b3e74b0fb4ce50b2232118867",
+    "agent/context.py": "097c931099e9b28a5222a10f02b03085f76f8aec61b33a02eb57393f7361f76f",
+    "agent/strength.py": "2dc6a5891255eb5e8da1c792e14acd3e39ab170bbd8493469432fd811035d1b1",
+    "workspace/stage30_live.py": "efc023a912e1929a87f8ff4d1f5509674edd905f190c2c44fbc9889f5f31b09c"
+  },
+  "source_sha256": {
+    "compatible-0.txt": "bb84fa51ad9070af899706c5adb287db11424b7e9e93d4d00bf9e2ac5952c94e",
+    "compatible-1.txt": "f471af926113f355554d546ab23ba5019ea15bb048a5f785ee30a5f97d217449",
+    "conditions-0.txt": "1a123442993e9b9e7c566a06663c4a6d42d2cb22c5ba252db504ff8642876640",
+    "conditions-1.txt": "85c9ea771607357df48d935113b24a812a5f7cdc8c193d6f4f41be4a51aceb5c",
+    "dates-0.txt": "d97138e5fa1fd76f22696b8cbe735a5b252ae4751b5785e633f93f693dc92863",
+    "dates-1.txt": "b4fd9ac549ea3bd620d45dc2f78a8291599a48a1577f5b1265385bf02f32b6c9",
+    "exclusive-0.txt": "528b1e1c77b6e52009626844666dc2e6f65c02e93d673c520e131fd59db6c5dc",
+    "exclusive-1.txt": "7fe7ee770a383dbff339cd314d2560263d95bc13fb23df60204f3b40642f3db1",
+    "gauges.csv": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+    "measurement-0.txt": "efbbb520338ba7cb2de1bb829e611f2efb1bc43243903e53f1dc18b1342f070a",
+    "measurement-1.txt": "01991dab26cf47834557d55c49faeea65c4f399266212def0feae7d109cbca68",
+    "missing_scope-0.txt": "e553fdca7b5f614b1ba3d91f76b42244e5f2e176850be332c46b4a0c9056be14",
+    "missing_scope-1.txt": "838ac709768ccf1a809720efd67c3f213d3c9ba5571bef4e4e00890d346f6ca3",
+    "plates.docx": "bbf0527d6b8a4e0f69e5e01ae84f029ebd298810401de52a5f68108e92cb1766",
+    "rotors.csv": "a9d170c096296518d5b53381e37a41e10d5fee19e7fbdf07997080ee7b47d104"
+  },
+  "guide_sha256": {
+    "old": "3ed37ba9182c28ca9fb7bb82690ac93db0242174eb1ef4413d197fa71c08754a",
+    "new": "3fb16e68e9e0ffd92bb05d25da6677f6302477b458601f45fe95e48880fab965"
+  },
+  "configuration": {
+    "provider": "deepseek",
+    "model": "deepseek-flash",
+    "base_url": "https://api.deepseek.com",
+    "thinking": "disabled",
+    "strength": "default",
+    "retries": 0,
+    "timeout": 40,
+    "embedding_model": "Pro/BAAI/bge-m3"
+  },
+  "limits": {
+    "chat_calls": 40,
+    "embedding_calls": 8,
+    "known_tokens": 150000
+  },
+  "rules": [
+    "Criteria and both guide strings fixed before first embedding. No output repair, no retry, no revised expected values.",
+    "Continue across structurally valid batches within one total operation budget and explicit call limit only.",
+    "Any unknown usage or global limit stops subsequent cases. Independent known failures retained.",
+    "All paired cases use identical files, query, model, output cap, fixed batches and budget; only guide changes.",
+    "Long table and full DOCX are new-guide workflow checks only, not paired quality evidence.",
+    "Relation expectations are diagnostic expectations, never sent to the model. Not independent human review or Stage12 acceptance."
+  ]
+}

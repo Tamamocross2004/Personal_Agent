@@ -7,7 +7,7 @@ from .contracts import GUIDE_VERSION,instruction
 from .reading import ReadingPlan
 
 
-CONTROLS=('budget','max_batches','output_tokens','batch_mode','batch_size','expected_fields')
+CONTROLS=('budget','max_batches','output_tokens','batch_mode','batch_size','expected_fields','read_to_end','max_calls')
 
 
 def plan_hash(inputs):
@@ -34,6 +34,7 @@ def preview_full_reading(jobs,jid,controls):
     return {**plan.summary(),'source_job_id':jid,'query':inputs['query'],'strength':inputs['strength'],
             'plan_hash':plan_hash(inputs),'cloud_calls':False,'services':['llm'] if batch else [],
             'budget':inputs['budget'],'max_batches':inputs['max_batches'],'output_tokens':inputs['output_tokens'],
+            'read_to_end':inputs['read_to_end'],'batch_call_limit':inputs['batch_call_limit'],
             'model':inputs['model'],'decision':decision,'first_batch_end':batch['next_offset'] if batch else 0,
             'first_batch':(batch or {}).get('hits',[]),
             'source_usage_unknown':any(e.get('input_tokens') is None or
