@@ -45,6 +45,16 @@ def test_native_grant_sync_answer_citation_export_revoke_and_read_only_history(t
         assert client.get(url+'/scope',headers=headers).json()['mode']=='limited_retrieval'
         assert client.get(url+'/scope?limit=101',headers=headers).status_code==400
         assert (len(embedding.calls),len(chat.calls))==calls
+        assert client.post(url+'/full-reading-preview',json={}).status_code==401
+        assert client.post(url+'/full-reading-preview',headers=headers,json={'max_batches':9}).status_code==422
+        full_preview=client.post(url+'/full-reading-preview',headers=headers,json={}).json()
+        assert full_preview['cloud_calls'] is False and full_preview['generation']==job['inputs']['generation']
+        assert client.post(url+'/full-reading',headers=headers,json={}).status_code==422
+        assert client.post(url+'/full-reading',headers=headers,json={'budget':11000,'plan_hash':full_preview['plan_hash']}).status_code==400
+        assert (len(embedding.calls),len(chat.calls))==calls
+        whole=wait(client.post(url+'/full-reading',headers=headers,json={'plan_hash':full_preview['plan_hash']}).json()['id'])
+        assert whole['inputs']['full_reading_from']==job['id'] and whole['coverage']['input_coverage_complete']
+        assert client.get(url,headers=headers).json()==job
         citation=client.get(url+'/citations/C1',headers=headers)
         assert citation.status_code==200 and citation.json()['delivered']['text']=='alpha original'
         assert client.get(url+'/citations/C999',headers=headers).status_code==404
@@ -69,6 +79,8 @@ def test_native_grant_sync_answer_citation_export_revoke_and_read_only_history(t
         calls=(len(embedding.calls),len(chat.calls))
         assert client.get(base+'/index',headers=headers).status_code==400
         assert client.post(base+'/questions',headers=headers,json={'query':'alpha'}).status_code==400
+        assert client.post(url+'/full-reading-preview',headers=headers,json={}).status_code==400
+        assert client.post(url+'/full-reading',headers=headers,json={'plan_hash':full_preview['plan_hash']}).status_code==400
         assert client.get(base+'/files/'+scan['entries'][0]['id'],headers=headers,params={'scan_id':scan['id']}).status_code==400
         assert client.get(base+'/jobs',headers=headers).status_code==200
         assert client.get(url+'/citations/C1',headers=headers).status_code==200

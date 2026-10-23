@@ -77,6 +77,10 @@ class FolderQuestion(FolderControls):
     strength:ModelStrength='default'
 
 
+class FullReadingStart(FolderControls):
+    plan_hash:str=Field(min_length=64,max_length=64)
+
+
 class FolderReading(BaseModel):
     generation:str=Field(min_length=1,max_length=64)
     file_ids:list[str]|None=Field(default=None,max_length=50)
@@ -247,6 +251,14 @@ def create_app(manager:Manager,token:str,ui_dir:Path|None=None,*,folder_grant_to
         return redact(preview_next(folder_jobs,jid,body.model_dump()))
     @app.post('/api/folder-jobs/{jid}/stop')
     def folder_job_stop(jid:str):return redact(folder_jobs.stop(jid))
+    @app.post('/api/folder-jobs/{jid}/full-reading-preview')
+    def folder_full_reading_preview(jid:str,body:FolderControls):
+        from folder_assistant.full_reading import preview_full_reading
+        return redact(preview_full_reading(folder_jobs,jid,body.model_dump()))
+    @app.post('/api/folder-jobs/{jid}/full-reading')
+    def folder_full_reading(jid:str,body:FullReadingStart):
+        from folder_assistant.full_reading import start_full_reading
+        return redact(start_full_reading(folder_jobs,jid,body.model_dump(),body.plan_hash))
     @app.post('/api/folders/{fid}/questions')
     def folder_question(fid:str,body:FolderQuestion):return redact(folder_jobs.start(fid,'answer',body.model_dump()))
     @app.post('/api/folders/{fid}/reading')

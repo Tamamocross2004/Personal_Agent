@@ -92,6 +92,19 @@ class FolderJobs:
         """Resolve an operation locally; shared by preview and start, without saving/calling."""
         inputs=dict(inputs)
         from agent.config import load_llm_config
+        if inputs.get('full_reading_from'):
+            # An explicit new operation, never continuation of retrieval evidence.
+            if inputs.get('strategy')!='exhaustive' or inputs.get('resume_from') or inputs.get('retry_split'):
+                raise ValueError('全量整理须新建顺序任务，不能与续读或拆小重做混用')
+            self.folders.authorized(fid)
+            source=self.get(inputs['full_reading_from'])
+            if (source['folder_id']!=fid or source['kind']!='answer'
+                or source['status'] in ('queued','running')
+                or source['inputs'].get('strategy','retrieval')!='retrieval'):
+                raise ValueError('请选择已结束的局部问答作为全量整理来源')
+            for key in ('generation','file_ids','query','mode'):
+                inputs[key]=source['inputs'][key]
+            inputs['strength']=source['inputs'].get('strength','default')
         strategy=inputs.setdefault('strategy','retrieval')
         if strategy not in ('retrieval','exhaustive'):raise ValueError('读取策略无效')
         for key,default,low,high in [('output_tokens',1200,128,4096),('batch_size',6,1,6),('expected_fields',1,1,12)]:
@@ -157,6 +170,10 @@ class FolderJobs:
         inputs['model']={'provider':config.provider,'model':config.model,'base_url':config.base_url,'retries':0,
                          'thinking':config.thinking,'reasoning_effort':config.reasoning_effort}
         if self.pricing:inputs['pricing']=self.pricing.get(config.provider,config.model)
+        if inputs.get('full_reading_plan_hash'):
+            from .full_reading import plan_hash
+            if inputs['full_reading_plan_hash']!=plan_hash(inputs):
+                raise ValueError('全量整理计划已变化，请重新预览后开始')
         return inputs
 
     def start(self,fid,kind,inputs):
@@ -168,7 +185,10 @@ class FolderJobs:
             elif kind=='sync':
                 manifest=self.folders.manifest(fid,inputs['scan_id'])
                 if not manifest['complete']: raise ValueError('清单不完整，请重新扫描')
-            elif kind=='answer':inputs=self.prepare_answer(fid,inputs)
+            elif kind=='answer':
+                if inputs.get('full_reading_from') and not inputs.get('full_reading_plan_hash'):
+                    raise ValueError('请先预览全量整理计划')
+                inputs=self.prepare_answer(fid,inputs)
             else: raise ValueError('操作类型无效')
             jid=uuid4().hex
             holder=lease(self.folders.root/(jid+'.job.lock'));holder.__enter__()

@@ -1,0 +1,125 @@
+{
+  "stage": 29,
+  "date": "2026-10-23",
+  "base_commit": "8b1383c",
+  "reviewer": "coding_assistant",
+  "independent_review": false,
+  "engineering_checks_passed": true,
+  "content_acceptance_passed": false,
+  "stage12_accepted": false,
+  "paid_provider_calls": {
+    "llm": 0,
+    "embedding": 0,
+    "rerank": 0
+  },
+  "provider_tests": "deterministic fakes only",
+  "tests": {
+    "full": "1156 passed in 890.34s",
+    "new_boundary_cases": 11,
+    "initial_targeted": "1 failed, 11 passed; misplaced pre-revoke assertion corrected",
+    "desktop_build": true,
+    "isolated_desktop_attempts": [
+      {
+        "attempt": "attempt1",
+        "fixture": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\agent-folders-XoKdzX",
+        "checks": [
+          "local-full-reading-preview",
+          "changed-controls-invalidate-preview",
+          "pinned-original-query-and-scope",
+          "explicit-new-paid-operation",
+          "original-answer-and-usage-unchanged",
+          "native-picker-capability",
+          "scan",
+          "excluded-secret",
+          "renderer-cannot-grant",
+          "revoke",
+          "source-unchanged",
+          "sync",
+          "keyword-preview",
+          "answer",
+          "pinned-citation"
+        ],
+        "record": "workspace/stage29-ui-records-attempt1-20261023.json"
+      },
+      {
+        "attempt": "final",
+        "fixture": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\agent-folders-I47nee",
+        "checks": [
+          "local-full-reading-preview",
+          "changed-controls-invalidate-preview",
+          "pinned-original-query-and-scope",
+          "explicit-new-paid-operation",
+          "original-answer-and-usage-unchanged",
+          "native-picker-capability",
+          "scan",
+          "excluded-secret",
+          "renderer-cannot-grant",
+          "revoke",
+          "source-unchanged",
+          "sync",
+          "keyword-preview",
+          "answer",
+          "pinned-citation"
+        ],
+        "record": "workspace/stage29-ui-records-final-20261023.json"
+      }
+    ],
+    "cli_help": true
+  },
+  "checks": {
+    "historical_artifacts_unchanged": 1248,
+    "generation_and_validation_unchanged": true,
+    "retrieval_batching_limits_unchanged": true,
+    "old_source_files_not_reused_or_regraded": true,
+    "keys_checked": 2,
+    "secret_matches": 0,
+    "files_scanned": 27
+  },
+  "delivery_check": {
+    "new_docx_main_segments": 10,
+    "new_docx_sent_main_segments": 10,
+    "fake_comparison_rows": 5,
+    "all_delivery_is_not_full_content_extraction": true,
+    "new_text_main_segments": 12,
+    "bounded_sent_main_segments": 2,
+    "bounded_remaining_segments": 10
+  },
+  "remaining": [
+    "semantic unknown markers",
+    "mutually incompatible same-scope claims",
+    "complete field extraction",
+    "budget/output/batch limits may leave unsent content",
+    "parsed text only, no OCR"
+  ],
+  "source_sha256": {
+    "README.md": "5e8428656b5b7c4640e2b98b3ed99951fba8f942d06f7a36568b9e4b11935eaa",
+    "ROADMAP.md": "28695dd7e55bb81c9b6ce6c40e4e90a6140e60bd84c5098a03b5ba6d17eea04e",
+    "desktop/scripts/folder-workflow-smoke.cjs": "16e973899110619dc088d7b3ae607130943cf549b051ea51952df9473f7512c0",
+    "desktop/src/folder-full-reading.tsx": "2d3b0cb84210543fd9ded60d935f8f26bc4586a8c88c63119ddbed1e2ef2d5f8",
+    "desktop/src/folder-questions.tsx": "6def536165d8a75cadc583bf3ad4a81399e58bff8ae872300a4aed78f5a627a8",
+    "desktop/src/style.css": "051248cbba0674b7215b9228b34549b8fbcc4bfca32c6cee5c92661d1cbac314",
+    "desktop_app/server.py": "bf4fbea06af0aef3fd283e3fd62ec869480a8a882f3b7ca496543c117eb56214",
+    "docs/folder-assistant.md": "11d45aa3f2c750ce1a42b8b4dc7c74f9b09fd130739efe15927d12a1c4e0515d",
+    "docs/stage29-verification-20261023.md": "fb723a037041e7b7421c951072b8f55e29d9a2b4bb9de28465eb230286f6589f",
+    "folder_assistant/__main__.py": "c831e2796755f1ba247c7559f0c4d4bce16fb063c6dacd622fb74629f4a6948a",
+    "folder_assistant/full_reading.py": "f8d0187aa1b57f6c2bc77a54faba36a1bc7f03ca636f51e9fdf0f4b45337a894",
+    "folder_assistant/jobs.py": "3ee4829ed462c6f92da88d112ffee657eb96079cad4059da2caaaa2482efb9a1",
+    "tests/test_folder_full_reading.py": "611ae377a2ab1eb4d43ebabb5dadc9948bdfd5b6009ac802fd3a86b91df8d7e8",
+    "tests/test_folder_workflow_api.py": "d3e43cec3358d1c5430a1656b503efa58624e99f771f5155e657a2b5ee18d319"
+  },
+  "artifact_sha256": {
+    "workspace/stage29-build-20261023.log": "8d1fa5ac79d07ecc3c381b29bd3362c9d2afa5d7c149762508b84e20c260f9d8",
+    "workspace/stage29-build-final-20261023.log": "129678437740e124af3f2057e6ab29087bb1682e625f57679a8208f3503e5e21",
+    "workspace/stage29-folder-workflow-20261023.png": "ee5185d43d13f97c0b0896064b3bfca0e315a768a87ce622dbd1bde6d5f4875f",
+    "workspace/stage29-folder-workflow-attempt1-20261023.png": "c6ac1e425d3702fb69ab1bf8682011ccaa9886a3233d9e5e7b82a1c6b204806c",
+    "workspace/stage29-full-20261023.log": "a02bb96a78db12358117bbcf6263e08ba28356978b55165b1cd5dcccece2129b",
+    "workspace/stage29-full-reading-preview-20261023.png": "e8a98837c8f9c439eac9776e89f1d70168020519d624cb53f20f4d00334afa66",
+    "workspace/stage29-full-reading-preview-attempt1-20261023.png": "d602f73a91ce7136bf5129613ed786d9e71a0c2eac278bd1219994635b4c95d0",
+    "workspace/stage29-targeted-20261023.log": "10256ef694a54d122c7578ceac623ff47163efe274b28e9b94e0e985b656e964",
+    "workspace/stage29-ui-20261023.log": "5a5d4a95a6830e41cfa541dfe4511d7b7ba6919858b4c1bd81b4e77778b4692c",
+    "workspace/stage29-ui-final-20261023.log": "2ecc88caf15ab882070049821c7705b7ec4e6f5f908133d5b55dda61f00f1c30",
+    "workspace/stage29-ui-records-attempt1-20261023.json": "dc7fc76eb8a2158a3887749fc21d7f9b605a22f391344e2c74eaa3ea140e1b8a",
+    "workspace/stage29-ui-records-final-20261023.json": "18de0179340e5581aacffdf99350db6c50db2e5a205952b8deb251a1b472efdc",
+    "workspace/stage29_audit.py": "a00bde4d38351f5a1aa075856bf8b450f8b0c743b81d190a96703deaa8b066c3"
+  }
+}

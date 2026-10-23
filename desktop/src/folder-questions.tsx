@@ -5,6 +5,7 @@ import { ModelStrength, strengthLabel } from "./model-strength";
 import { FolderScope } from "./folder-scope";
 import { FolderOutputDiagnostics } from "./folder-output-diagnostics";
 import { FolderTransmission } from "./folder-transmission";
+import { FolderFullReading } from "./folder-full-reading";
 
 export function FolderQuestions({
   api,
@@ -464,6 +465,45 @@ export function FolderQuestions({
       {current && (
         <div className="folder-answer">
           <h4>回答 · 未正式审稿</h4>
+          {saved.inputs?.full_reading_from && (
+            <p>
+              从局部问答 {saved.inputs.full_reading_from}{" "}
+              新建的全量整理；从固定文件范围起点读取，原短答及费用独立保留。
+            </p>
+          )}
+          {(saved.inputs?.strategy || "retrieval") === "retrieval" &&
+            !["queued", "running"].includes(saved.status) && (
+              <FolderFullReading
+                api={api}
+                saved={saved}
+                controls={{
+                  budget,
+                  max_batches: maxBatches,
+                  output_tokens: outputTokens,
+                  batch_mode: batchMode,
+                  batch_size: batchSize,
+                  expected_fields: expectedFields,
+                }}
+                valid={
+                  !invalidLimits &&
+                  Number.isInteger(budget) &&
+                  budget >= 256 &&
+                  budget <= 50000 &&
+                  Number.isInteger(maxBatches) &&
+                  maxBatches >= 1 &&
+                  maxBatches <= 8
+                }
+                busy={busy}
+                act={act}
+                setMaxBatches={setMaxBatches}
+                onStarted={(value: any) => {
+                  setView(null);
+                  setCitation(null);
+                  turn.current++;
+                  setJob(value);
+                }}
+              />
+            )}
           <FolderScope
             api={api}
             saved={saved}

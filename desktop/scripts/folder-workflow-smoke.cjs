@@ -19,6 +19,7 @@ const scopeMode = process.argv.includes("--scope");
 const projectMode = process.argv.includes("--projects");
 const diagnosticsMode = process.argv.includes("--diagnostics");
 const contextMode = process.argv.includes("--context");
+const fullReadingMode = process.argv.includes("--full-reading");
 const parseMode = process.argv.includes("--parse");
 if (parseMode)
   require("node:child_process").execFileSync(
@@ -446,6 +447,94 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         .getByText("本地资料原文。", { exact: true })
         .first()
         .waitFor();
+      if (fullReadingMode) {
+        const connection = await page.evaluate(() =>
+          window.desktop.connection(),
+        );
+        const get = async (url) =>
+          (
+            await fetch(connection.url + "/api" + url, {
+              headers: { Authorization: "Bearer " + connection.token },
+            })
+          ).json();
+        const parentId = await page
+          .getByRole("combobox", { name: "历史资料问答" })
+          .inputValue();
+        const parent = await get("/folder-jobs/" + parentId);
+        const region = page.getByLabel("从局部问答创建全量整理", {
+          exact: true,
+        });
+        const previewButton = region.getByRole("button", {
+          name: "预览原范围的全量整理（本地）",
+          exact: true,
+        });
+        const startButton = region.getByRole("button", {
+          name: "按原范围新建全量整理（调用模型）",
+          exact: true,
+        });
+        await previewButton.click();
+        await startButton.waitFor();
+        assert.match(await region.innerText(), /原问题：本地资料是什么/);
+        assert.deepEqual(await get("/folder-jobs/" + parentId), parent);
+        assert.equal(
+          (await get("/folders/" + parent.folder_id + "/jobs")).filter(
+            (j) => j.kind === "answer",
+          ).length,
+          1,
+        );
+        await region
+          .getByLabel("新建全量整理最多批数", { exact: true })
+          .fill("2");
+        await startButton.waitFor({ state: "detached" });
+        await page
+          .getByRole("textbox", { name: "文件夹资料问题" })
+          .fill("新草稿不替换保存的原问题");
+        await previewButton.click();
+        await startButton.waitFor();
+        await region.getByText(/固定索引/).waitFor();
+        await app.evaluate(({ BrowserWindow }) =>
+          BrowserWindow.getAllWindows().forEach((w) =>
+            w.webContents.invalidate(),
+          ),
+        );
+        await region.screenshot({
+          path: path.join(
+            project,
+            "workspace/stage29-full-reading-preview-20261023.png",
+          ),
+        });
+        await startButton.click();
+        await page
+          .locator(".folder-answer")
+          .getByText(/从局部问答 .* 新建的全量整理/)
+          .waitFor();
+        await page
+          .locator(".folder-coverage")
+          .getByText(/该范围提取文字已全部送达/)
+          .waitFor();
+        const nextId = await page
+          .getByRole("combobox", { name: "历史资料问答" })
+          .inputValue();
+        const next = await get("/folder-jobs/" + nextId);
+        assert.notEqual(nextId, parentId);
+        assert.equal(next.inputs.full_reading_from, parentId);
+        assert.equal(next.inputs.query, parent.inputs.query);
+        assert.equal(next.inputs.generation, parent.inputs.generation);
+        assert.deepEqual(next.inputs.file_ids, parent.inputs.file_ids);
+        assert.equal(next.inputs.max_batches, 2);
+        assert.equal(next.inputs.output_tokens, 1200);
+        assert.equal(next.inputs.budget, 10000);
+        assert.equal(
+          next.usage_events.filter((e) => e.operation === "llm").length,
+          1,
+        );
+        assert.deepEqual(await get("/folder-jobs/" + parentId), parent);
+        fs.writeFileSync(
+          path.join(fixture, "full-reading-records.json"),
+          JSON.stringify({ parent, next }, null, 2),
+          { flag: "wx" },
+        );
+      }
     }
     if (process.argv.includes("--export")) {
       await page
@@ -790,25 +879,27 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
       path: path.join(
         project,
         "workspace",
-        contextMode
-          ? "stage27-folder-projects-20261023.png"
-          : diagnosticsMode
-            ? "stage26-folder-workflow-20261023.png"
-            : projectMode
-              ? "stage25-folder-projects-20261022.png"
-              : scopeMode
-                ? "stage24-folder-workflow-20261022.png"
-                : batchingMode
-                  ? "stage23-folder-workflow-20261022.png"
-                  : parseMode
-                    ? "folder-workflow-current-multiformat.png"
-                    : process.argv.includes("--strength")
-                      ? "model-strength-folder-20261022.png"
-                      : process.argv.includes("--reading")
-                        ? "stage22-folder-workflow.png"
-                        : process.argv.includes("--experience")
-                          ? "stage21-folder-workflow.png"
-                          : "folder-workflow-current.png",
+        fullReadingMode
+          ? "stage29-folder-workflow-20261023.png"
+          : contextMode
+            ? "stage27-folder-projects-20261023.png"
+            : diagnosticsMode
+              ? "stage26-folder-workflow-20261023.png"
+              : projectMode
+                ? "stage25-folder-projects-20261022.png"
+                : scopeMode
+                  ? "stage24-folder-workflow-20261022.png"
+                  : batchingMode
+                    ? "stage23-folder-workflow-20261022.png"
+                    : parseMode
+                      ? "folder-workflow-current-multiformat.png"
+                      : process.argv.includes("--strength")
+                        ? "model-strength-folder-20261022.png"
+                        : process.argv.includes("--reading")
+                          ? "stage22-folder-workflow.png"
+                          : process.argv.includes("--experience")
+                            ? "stage21-folder-workflow.png"
+                            : "folder-workflow-current.png",
       ),
     });
     await page
@@ -906,6 +997,15 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
                 "explicit-dialogue-opt-in",
                 "update-no-history",
                 "saved-request-manifest",
+              ]
+            : []),
+          ...(fullReadingMode
+            ? [
+                "local-full-reading-preview",
+                "changed-controls-invalidate-preview",
+                "pinned-original-query-and-scope",
+                "explicit-new-paid-operation",
+                "original-answer-and-usage-unchanged",
               ]
             : []),
           "native-picker-capability",

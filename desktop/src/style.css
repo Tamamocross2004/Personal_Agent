@@ -1492,6 +1492,9 @@ small {
 .folder-index-panel { border: 1px solid var(--border); padding: 16px; margin-top: 16px; border-radius: 8px; }
 .folder-cta { background: #284c48; border: 1px solid #57978a; color: #e2fff5; padding: 10px 14px; border-radius: 6px; }
 .folder-cta:disabled { opacity: .45; }
+.folder-full-reading { margin: 14px 0; padding: 14px; border: 1px solid var(--border); border-radius: 8px; overflow-wrap: anywhere; }
+.folder-full-reading input { max-width: 140px; }
+.folder-full-reading button { margin: 8px 0; white-space: normal; }
 .folder-retrieval { max-height: 40vh; overflow: auto; }
 .folder-retrieval article { padding: 12px; border-bottom: 1px solid var(--border); }
 .folder-retrieval pre { white-space: pre-wrap; overflow-wrap: anywhere; }
