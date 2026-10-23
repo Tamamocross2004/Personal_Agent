@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 
 VERSION=3
-GUIDE_VERSION=3
+GUIDE_VERSION=4
 
 
 def record_key(evidence):
@@ -218,8 +218,11 @@ def request_schema():
     return schema
 
 
-def instruction():
+def instruction(field_specs=None):
     """Versioned generation guide, with no answer-specific examples or answer repair."""
     concise='\n逐项字段放在comparison；findings简洁概述所问内容，避免逐行重复同一张对照表。完整闭合JSON，不以省略已有依据的字段来满足长度；空间不足由程序保留未完成状态。'
     consistency='\n输出前逐项核对同一来源、同一对象、同一字段的状态：若摘要或unknowns说明其具体属性值尚不明确，comparison也须表达unknown，不能同时把缺失说明作为stated的值。文字摘录例外只作用于用户要求摘录的字段；不同来源的值和状态分别保留。核对不添加原文事实、改写原值或放宽任何Schema/引用要求。仅输出本次最终JSON。'
-    return SYSTEM+concise+consistency+SCHEMA_MARKER+json.dumps(request_schema(),ensure_ascii=False,separators=(',',':'))
+    intent=''
+    if field_specs:
+        intent='\n本请求另附field_intents，它们仅解释用户问题，不是资料证据。对mode=verbatim的字段，用户要的是该字段文字本身：有原文文字就逐字摘录并标stated，即使该文字在别的语境可能表示不确定；只有该字段本身未提供才unknown，实际空白才blank。对mode=attribute的字段，用户要的是属性事实：缺少实际属性值时用unknown，不把缺失说明当作属性值。逐字段采用指定模式，不能把一个字段的模式扩散到同一行其他字段。引用仍必须来自evidence，意图规划及用户问题不能当作字段值的证据。'
+    return SYSTEM+concise+consistency+intent+SCHEMA_MARKER+json.dumps(request_schema(),ensure_ascii=False,separators=(',',':'))

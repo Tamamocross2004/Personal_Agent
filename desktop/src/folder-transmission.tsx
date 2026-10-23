@@ -6,6 +6,7 @@ export function FolderTransmission({ value, label = "发送构成" }: any) {
     evidence: "本次原文证据",
     reading_scope: "读取范围说明",
     project_context: "项目要求与历史背景",
+    field_intents: "字段意图（来自问题，不是证据）",
   };
   const history = value.project_history;
   return (

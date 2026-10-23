@@ -8,7 +8,8 @@ const project = path.resolve(__dirname, "../.."),
 const docs = path.join(fixture, "资料 空间");
 fs.mkdirSync(docs);
 fs.writeFileSync(path.join(docs, "readme.txt"), "本地资料原文。");
-const completionMode = process.argv.includes("--completion");
+const fieldPlanMode = process.argv.includes("--field-plan");
+const completionMode = process.argv.includes("--completion") || fieldPlanMode;
 if (completionMode)
   fs.appendFileSync(
     path.join(docs, "readme.txt"),
@@ -412,7 +413,11 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
       }
       await page
         .getByRole("textbox", { name: "文件夹资料问题" })
-        .fill("本地资料是什么？");
+        .fill(
+          fieldPlanMode
+            ? "本地资料是什么？按字段摘录整理。"
+            : "本地资料是什么？",
+        );
       await page
         .getByRole("button", { name: "开始资料短答（调用模型）", exact: true })
         .click();
@@ -513,6 +518,13 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
               exact: true,
             })
             .check();
+          if (!fieldPlanMode)
+            await region
+              .getByRole("checkbox", {
+                name: "原范围先规划字段意图",
+                exact: true,
+              })
+              .uncheck();
           await region
             .getByRole("spinbutton", {
               name: "原范围持续整理调用上限",
@@ -531,9 +543,11 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         await region.screenshot({
           path: path.join(
             project,
-            completionMode
-              ? "workspace/stage30-full-reading-preview-20261023.png"
-              : "workspace/stage29-full-reading-preview-20261023.png",
+            fieldPlanMode
+              ? "workspace/stage31-full-reading-preview-20261023.png"
+              : completionMode
+                ? "workspace/stage30-full-reading-preview-20261023.png"
+                : "workspace/stage29-full-reading-preview-20261023.png",
           ),
         });
         await startButton.click();
@@ -559,7 +573,7 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
         assert.equal(next.inputs.budget, 10000);
         assert.equal(
           next.usage_events.filter((e) => e.operation === "llm").length,
-          completionMode ? 15 : 1,
+          fieldPlanMode ? 16 : completionMode ? 15 : 1,
         );
         if (completionMode) {
           assert.equal(next.inputs.read_to_end, true);
@@ -567,6 +581,26 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
           assert.equal(next.coverage.stop_reason, "end_of_extraction");
           assert.equal(next.coverage.next_offset, 15);
           assert.equal(next.inputs.budget, 10000);
+        }
+        if (fieldPlanMode) {
+          assert.equal(next.inputs.plan_fields, true);
+          assert.equal(next.field_plan.status, "ready");
+          assert.equal(next.inputs.field_specs[0].mode, "verbatim");
+          assert.deepEqual(
+            JSON.parse(next.field_plan.request.messages[1].content),
+            { question: parent.inputs.query },
+          );
+          const planView = page.getByLabel("已保存的字段意图规划", {
+            exact: true,
+          });
+          await planView.locator("summary").first().click();
+          await planView
+            .getByText("摘录：原样摘录文字", { exact: true })
+            .waitFor();
+          assert.equal(
+            next.usage_events.filter((e) => e.purpose === "field_plan").length,
+            1,
+          );
         }
         assert.deepEqual(await get("/folder-jobs/" + parentId), parent);
         fs.writeFileSync(
@@ -919,29 +953,31 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
       path: path.join(
         project,
         "workspace",
-        completionMode
-          ? "stage30-folder-workflow-20261023.png"
-          : fullReadingMode
-            ? "stage29-folder-workflow-20261023.png"
-            : contextMode
-              ? "stage27-folder-projects-20261023.png"
-              : diagnosticsMode
-                ? "stage26-folder-workflow-20261023.png"
-                : projectMode
-                  ? "stage25-folder-projects-20261022.png"
-                  : scopeMode
-                    ? "stage24-folder-workflow-20261022.png"
-                    : batchingMode
-                      ? "stage23-folder-workflow-20261022.png"
-                      : parseMode
-                        ? "folder-workflow-current-multiformat.png"
-                        : process.argv.includes("--strength")
-                          ? "model-strength-folder-20261022.png"
-                          : process.argv.includes("--reading")
-                            ? "stage22-folder-workflow.png"
-                            : process.argv.includes("--experience")
-                              ? "stage21-folder-workflow.png"
-                              : "folder-workflow-current.png",
+        fieldPlanMode
+          ? "stage31-folder-workflow-20261023.png"
+          : completionMode
+            ? "stage30-folder-workflow-20261023.png"
+            : fullReadingMode
+              ? "stage29-folder-workflow-20261023.png"
+              : contextMode
+                ? "stage27-folder-projects-20261023.png"
+                : diagnosticsMode
+                  ? "stage26-folder-workflow-20261023.png"
+                  : projectMode
+                    ? "stage25-folder-projects-20261022.png"
+                    : scopeMode
+                      ? "stage24-folder-workflow-20261022.png"
+                      : batchingMode
+                        ? "stage23-folder-workflow-20261022.png"
+                        : parseMode
+                          ? "folder-workflow-current-multiformat.png"
+                          : process.argv.includes("--strength")
+                            ? "model-strength-folder-20261022.png"
+                            : process.argv.includes("--reading")
+                              ? "stage22-folder-workflow.png"
+                              : process.argv.includes("--experience")
+                                ? "stage21-folder-workflow.png"
+                                : "folder-workflow-current.png",
       ),
     });
     await page
@@ -1056,6 +1092,14 @@ require(${JSON.stringify(path.join(project, "desktop/electron/main.cjs"))});`,
                 "fifteen-calls-one-budget",
                 "batch-limit-replaced-by-explicit-call-limit",
                 "source-and-old-answer-unchanged",
+              ]
+            : []),
+          ...(fieldPlanMode
+            ? [
+                "query-only-field-planning",
+                "planning-counts-in-total-calls-and-budget",
+                "saved-intents-and-source-quotes",
+                "field-plan-not-evidence",
               ]
             : []),
           "native-picker-capability",

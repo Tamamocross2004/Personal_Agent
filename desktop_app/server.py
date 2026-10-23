@@ -70,6 +70,7 @@ class FolderControls(BaseModel):
 class FolderReadingControls(FolderControls):
     read_to_end:bool=False
     max_calls:int=Field(default=16,ge=1,le=64)
+    plan_fields:bool=False
 
 
 class FolderQuestion(FolderReadingControls):

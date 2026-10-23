@@ -14,7 +14,18 @@ from test_folder_answers import Chat
 from folder_assistant.jobs import FolderJobs
 from agent.llm import LLMClient
 _original_jobs_init=FolderJobs.__init__
-class BatchLimitChat(Chat):
+class FieldPlanChat(Chat):
+    def chat(self,messages,**kwargs):
+        if messages[0]['content'].startswith('只规划用户问题要求整理的字段'):
+            from types import SimpleNamespace as NS
+            query=json.loads(messages[1]['content'])['question']
+            fields=[{'name':'摘录','mode':'verbatim','instruction_quote':'摘录'}] if '摘录' in query else []
+            return NS(model='fake',usage=NS(prompt_tokens=80,completion_tokens=40),
+                      choices=[NS(message=NS(content=json.dumps({'fields':fields})),finish_reason='stop')])
+        return super().chat(messages,**kwargs)
+
+
+class BatchLimitChat(FieldPlanChat):
     """Test-only truncation above three main segments, independent of questions."""
     def chat(self,messages,**kwargs):
         result=super().chat(messages,**kwargs)
@@ -24,7 +35,7 @@ class BatchLimitChat(Chat):
         return result
 
 def jobs_init(self,index,**kw):
-    fake=BatchLimitChat if '--batching' in sys.argv else Chat
+    fake=BatchLimitChat if '--batching' in sys.argv else FieldPlanChat
     _original_jobs_init(self,index,llm_factory=lambda c:fake())
 FolderJobs.__init__=jobs_init
 

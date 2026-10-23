@@ -1,0 +1,1268 @@
+{
+  "stage": 31,
+  "base_commit": "d38f1ec",
+  "date": "2026-10-23",
+  "cases": [
+    {
+      "id": "known_regression",
+      "role": "known development regression, not independent holdout",
+      "files": [
+        "gauges.csv"
+      ],
+      "query": "逐项整理全部传感器的读数和分类标签。读数按物理测量值整理；分类标签要求摘录标签文字本身。字段名分别用读数、分类标签。保留原文、零、空白、不确定性和引用，不添加字段。",
+      "expected_rows": [
+        {
+          "id": "0-reading",
+          "subject": "Gauge-Willow",
+          "field": "读数",
+          "values": [
+            "0 Pa"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 2
+            }
+          },
+          "required_literals": [
+            "Gauge-Willow",
+            "0 Pa"
+          ]
+        },
+        {
+          "id": "0-label",
+          "subject": "Gauge-Willow",
+          "field": "分类标签",
+          "values": [
+            "未知"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 2
+            }
+          },
+          "required_literals": [
+            "Gauge-Willow",
+            "未知"
+          ]
+        },
+        {
+          "id": "1-reading",
+          "subject": "Gauge-Maple",
+          "field": "读数",
+          "values": [
+            null,
+            ""
+          ],
+          "status": "unknown",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 3
+            }
+          },
+          "required_literals": [
+            "Gauge-Maple",
+            "未测得"
+          ]
+        },
+        {
+          "id": "1-label",
+          "subject": "Gauge-Maple",
+          "field": "分类标签",
+          "values": [
+            "待核"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 3
+            }
+          },
+          "required_literals": [
+            "Gauge-Maple",
+            "待核"
+          ]
+        },
+        {
+          "id": "2-reading",
+          "subject": "Gauge-Spruce",
+          "field": "读数",
+          "values": [
+            null,
+            ""
+          ],
+          "status": "unknown",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 4
+            }
+          },
+          "required_literals": [
+            "Gauge-Spruce",
+            "不详"
+          ]
+        },
+        {
+          "id": "2-label",
+          "subject": "Gauge-Spruce",
+          "field": "分类标签",
+          "values": [
+            "正常"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 4
+            }
+          },
+          "required_literals": [
+            "Gauge-Spruce",
+            "正常"
+          ]
+        },
+        {
+          "id": "3-reading",
+          "subject": "Gauge-Hazel",
+          "field": "读数",
+          "values": [
+            null,
+            ""
+          ],
+          "status": "blank",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 5
+            }
+          },
+          "required_literals": [
+            "Gauge-Hazel"
+          ]
+        },
+        {
+          "id": "3-label",
+          "subject": "Gauge-Hazel",
+          "field": "分类标签",
+          "values": [
+            "待录"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 5
+            }
+          },
+          "required_literals": [
+            "Gauge-Hazel",
+            "待录"
+          ]
+        },
+        {
+          "id": "4-reading",
+          "subject": "Gauge-Fir",
+          "field": "读数",
+          "values": [
+            "7 Pa"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 6
+            }
+          },
+          "required_literals": [
+            "Gauge-Fir",
+            "7 Pa"
+          ]
+        },
+        {
+          "id": "4-label",
+          "subject": "Gauge-Fir",
+          "field": "分类标签",
+          "values": [
+            "未定"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "gauges.csv",
+            "file_sha256": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+            "location": {
+              "kind": "csv_record",
+              "record": 6
+            }
+          },
+          "required_literals": [
+            "Gauge-Fir",
+            "未定"
+          ]
+        }
+      ],
+      "plan_fields": true,
+      "batch_size": 3,
+      "output_tokens": 2400,
+      "max_calls": 4,
+      "budget": 16000,
+      "parent_plan_sha256": "55a0d74aadfb161918018f7c0b417065a4debc9bb7b599479faaa3b533bcd992"
+    },
+    {
+      "id": "new_fields-plain",
+      "role": "paired new material",
+      "files": [
+        "readouts.csv"
+      ],
+      "query": "逐台整理全部读出器的输出电压和标记文本。输出电压按实际属性值整理；标记文本要求逐字摘录标签本身。字段名用输出电压、标记文本，保留零、空白、不确定性和来源引用，不添加字段。",
+      "expected_rows": [
+        {
+          "id": "0-voltage",
+          "subject": "Readout-Atlas",
+          "field": "输出电压",
+          "values": [
+            "0 mV"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 2
+            }
+          },
+          "required_literals": [
+            "Readout-Atlas",
+            "0 mV"
+          ]
+        },
+        {
+          "id": "0-label",
+          "subject": "Readout-Atlas",
+          "field": "标记文本",
+          "values": [
+            "未定"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 2
+            }
+          },
+          "required_literals": [
+            "Readout-Atlas",
+            "未定"
+          ]
+        },
+        {
+          "id": "1-voltage",
+          "subject": "Readout-Boreal",
+          "field": "输出电压",
+          "values": [
+            null,
+            ""
+          ],
+          "status": "unknown",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 3
+            }
+          },
+          "required_literals": [
+            "Readout-Boreal",
+            "尚无读数"
+          ]
+        },
+        {
+          "id": "1-label",
+          "subject": "Readout-Boreal",
+          "field": "标记文本",
+          "values": [
+            "未知"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 3
+            }
+          },
+          "required_literals": [
+            "Readout-Boreal",
+            "未知"
+          ]
+        },
+        {
+          "id": "2-voltage",
+          "subject": "Readout-Citrine",
+          "field": "输出电压",
+          "values": [
+            null,
+            ""
+          ],
+          "status": "unknown",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 4
+            }
+          },
+          "required_literals": [
+            "Readout-Citrine",
+            "数据未提供"
+          ]
+        },
+        {
+          "id": "2-label",
+          "subject": "Readout-Citrine",
+          "field": "标记文本",
+          "values": [
+            "正常"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 4
+            }
+          },
+          "required_literals": [
+            "Readout-Citrine",
+            "正常"
+          ]
+        },
+        {
+          "id": "3-voltage",
+          "subject": "Readout-Dune",
+          "field": "输出电压",
+          "values": [
+            null,
+            ""
+          ],
+          "status": "blank",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 5
+            }
+          },
+          "required_literals": [
+            "Readout-Dune"
+          ]
+        },
+        {
+          "id": "3-label",
+          "subject": "Readout-Dune",
+          "field": "标记文本",
+          "values": [
+            "未测得"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 5
+            }
+          },
+          "required_literals": [
+            "Readout-Dune",
+            "未测得"
+          ]
+        },
+        {
+          "id": "4-voltage",
+          "subject": "Readout-Echo",
+          "field": "输出电压",
+          "values": [
+            "9 mV"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 6
+            }
+          },
+          "required_literals": [
+            "Readout-Echo",
+            "9 mV"
+          ]
+        },
+        {
+          "id": "4-label",
+          "subject": "Readout-Echo",
+          "field": "标记文本",
+          "values": [
+            "暂无"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 6
+            }
+          },
+          "required_literals": [
+            "Readout-Echo",
+            "暂无"
+          ]
+        },
+        {
+          "id": "5-voltage",
+          "subject": "Readout-Fjord",
+          "field": "输出电压",
+          "values": [
+            null,
+            ""
+          ],
+          "status": "unknown",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 7
+            }
+          },
+          "required_literals": [
+            "Readout-Fjord",
+            "无法确认"
+          ]
+        },
+        {
+          "id": "5-label",
+          "subject": "Readout-Fjord",
+          "field": "标记文本",
+          "values": [
+            "可用"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 7
+            }
+          },
+          "required_literals": [
+            "Readout-Fjord",
+            "可用"
+          ]
+        },
+        {
+          "id": "6-voltage",
+          "subject": "Readout-Grove",
+          "field": "输出电压",
+          "values": [
+            "12 mV"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 8
+            }
+          },
+          "required_literals": [
+            "Readout-Grove",
+            "12 mV"
+          ]
+        },
+        {
+          "id": "6-label",
+          "subject": "Readout-Grove",
+          "field": "标记文本",
+          "values": [
+            "不详"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 8
+            }
+          },
+          "required_literals": [
+            "Readout-Grove",
+            "不详"
+          ]
+        },
+        {
+          "id": "7-voltage",
+          "subject": "Readout-Harbor",
+          "field": "输出电压",
+          "values": [
+            null,
+            ""
+          ],
+          "status": "unknown",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 9
+            }
+          },
+          "required_literals": [
+            "Readout-Harbor",
+            "待采集"
+          ]
+        },
+        {
+          "id": "7-label",
+          "subject": "Readout-Harbor",
+          "field": "标记文本",
+          "values": [
+            "尚待确认"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 9
+            }
+          },
+          "required_literals": [
+            "Readout-Harbor",
+            "尚待确认"
+          ]
+        }
+      ],
+      "plan_fields": false,
+      "batch_size": 3,
+      "output_tokens": 2400,
+      "max_calls": 5,
+      "budget": 22000
+    },
+    {
+      "id": "new_fields-planned",
+      "role": "paired new material",
+      "files": [
+        "readouts.csv"
+      ],
+      "query": "逐台整理全部读出器的输出电压和标记文本。输出电压按实际属性值整理；标记文本要求逐字摘录标签本身。字段名用输出电压、标记文本，保留零、空白、不确定性和来源引用，不添加字段。",
+      "expected_rows": [
+        {
+          "id": "0-voltage",
+          "subject": "Readout-Atlas",
+          "field": "输出电压",
+          "values": [
+            "0 mV"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 2
+            }
+          },
+          "required_literals": [
+            "Readout-Atlas",
+            "0 mV"
+          ]
+        },
+        {
+          "id": "0-label",
+          "subject": "Readout-Atlas",
+          "field": "标记文本",
+          "values": [
+            "未定"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 2
+            }
+          },
+          "required_literals": [
+            "Readout-Atlas",
+            "未定"
+          ]
+        },
+        {
+          "id": "1-voltage",
+          "subject": "Readout-Boreal",
+          "field": "输出电压",
+          "values": [
+            null,
+            ""
+          ],
+          "status": "unknown",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 3
+            }
+          },
+          "required_literals": [
+            "Readout-Boreal",
+            "尚无读数"
+          ]
+        },
+        {
+          "id": "1-label",
+          "subject": "Readout-Boreal",
+          "field": "标记文本",
+          "values": [
+            "未知"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 3
+            }
+          },
+          "required_literals": [
+            "Readout-Boreal",
+            "未知"
+          ]
+        },
+        {
+          "id": "2-voltage",
+          "subject": "Readout-Citrine",
+          "field": "输出电压",
+          "values": [
+            null,
+            ""
+          ],
+          "status": "unknown",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 4
+            }
+          },
+          "required_literals": [
+            "Readout-Citrine",
+            "数据未提供"
+          ]
+        },
+        {
+          "id": "2-label",
+          "subject": "Readout-Citrine",
+          "field": "标记文本",
+          "values": [
+            "正常"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 4
+            }
+          },
+          "required_literals": [
+            "Readout-Citrine",
+            "正常"
+          ]
+        },
+        {
+          "id": "3-voltage",
+          "subject": "Readout-Dune",
+          "field": "输出电压",
+          "values": [
+            null,
+            ""
+          ],
+          "status": "blank",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 5
+            }
+          },
+          "required_literals": [
+            "Readout-Dune"
+          ]
+        },
+        {
+          "id": "3-label",
+          "subject": "Readout-Dune",
+          "field": "标记文本",
+          "values": [
+            "未测得"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 5
+            }
+          },
+          "required_literals": [
+            "Readout-Dune",
+            "未测得"
+          ]
+        },
+        {
+          "id": "4-voltage",
+          "subject": "Readout-Echo",
+          "field": "输出电压",
+          "values": [
+            "9 mV"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 6
+            }
+          },
+          "required_literals": [
+            "Readout-Echo",
+            "9 mV"
+          ]
+        },
+        {
+          "id": "4-label",
+          "subject": "Readout-Echo",
+          "field": "标记文本",
+          "values": [
+            "暂无"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 6
+            }
+          },
+          "required_literals": [
+            "Readout-Echo",
+            "暂无"
+          ]
+        },
+        {
+          "id": "5-voltage",
+          "subject": "Readout-Fjord",
+          "field": "输出电压",
+          "values": [
+            null,
+            ""
+          ],
+          "status": "unknown",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 7
+            }
+          },
+          "required_literals": [
+            "Readout-Fjord",
+            "无法确认"
+          ]
+        },
+        {
+          "id": "5-label",
+          "subject": "Readout-Fjord",
+          "field": "标记文本",
+          "values": [
+            "可用"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 7
+            }
+          },
+          "required_literals": [
+            "Readout-Fjord",
+            "可用"
+          ]
+        },
+        {
+          "id": "6-voltage",
+          "subject": "Readout-Grove",
+          "field": "输出电压",
+          "values": [
+            "12 mV"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 8
+            }
+          },
+          "required_literals": [
+            "Readout-Grove",
+            "12 mV"
+          ]
+        },
+        {
+          "id": "6-label",
+          "subject": "Readout-Grove",
+          "field": "标记文本",
+          "values": [
+            "不详"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 8
+            }
+          },
+          "required_literals": [
+            "Readout-Grove",
+            "不详"
+          ]
+        },
+        {
+          "id": "7-voltage",
+          "subject": "Readout-Harbor",
+          "field": "输出电压",
+          "values": [
+            null,
+            ""
+          ],
+          "status": "unknown",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 9
+            }
+          },
+          "required_literals": [
+            "Readout-Harbor",
+            "待采集"
+          ]
+        },
+        {
+          "id": "7-label",
+          "subject": "Readout-Harbor",
+          "field": "标记文本",
+          "values": [
+            "尚待确认"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "readouts.csv",
+            "file_sha256": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+            "location": {
+              "kind": "csv_record",
+              "record": 9
+            }
+          },
+          "required_literals": [
+            "Readout-Harbor",
+            "尚待确认"
+          ]
+        }
+      ],
+      "plan_fields": true,
+      "batch_size": 3,
+      "output_tokens": 2400,
+      "max_calls": 5,
+      "budget": 22000
+    },
+    {
+      "id": "exclusive",
+      "role": "new relationship control",
+      "files": [
+        "exclusive-0.txt",
+        "exclusive-1.txt"
+      ],
+      "query": "比较两份资料中Valve-Neroli的通流状态，逐来源列出通流状态原值及依据，说明共同条件、可比性和双方能否同时成立；不要补条件。字段名用通流状态。",
+      "expected_rows": [
+        {
+          "id": "0",
+          "subject": "Valve-Neroli",
+          "field": "通流状态",
+          "values": [
+            "通流"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "exclusive-0.txt",
+            "file_sha256": "d63a022269165954b2d767466ee38b9da664d8f579b56a0fa4f34ffcb1e7ab54",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Valve-Neroli",
+            "通流"
+          ]
+        },
+        {
+          "id": "1",
+          "subject": "Valve-Neroli",
+          "field": "通流状态",
+          "values": [
+            "截断"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "exclusive-1.txt",
+            "file_sha256": "a7f28a15a538580d83f77dceee66df44536cd7bd44f8dcdd8e41a6b9c8f86861",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Valve-Neroli",
+            "截断"
+          ]
+        }
+      ],
+      "plan_fields": true,
+      "batch_size": 2,
+      "output_tokens": 1200,
+      "max_calls": 3,
+      "budget": 14000,
+      "relation_expectation_not_sent": {
+        "kind": "conflict",
+        "comparability": "established"
+      }
+    },
+    {
+      "id": "measurement",
+      "role": "new relationship control",
+      "files": [
+        "measurement-0.txt",
+        "measurement-1.txt"
+      ],
+      "query": "比较两份资料中Probe-Oriel的电压，逐来源列出电压原值及依据，说明共同条件、可比性和双方能否同时成立；不要补条件。字段名用电压。",
+      "expected_rows": [
+        {
+          "id": "0",
+          "subject": "Probe-Oriel",
+          "field": "电压",
+          "values": [
+            "3 V"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "measurement-0.txt",
+            "file_sha256": "909806836241aec9b0e8efe7ef1a637991e29d057add490c11e51417f10046d2",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Probe-Oriel",
+            "3 V"
+          ]
+        },
+        {
+          "id": "1",
+          "subject": "Probe-Oriel",
+          "field": "电压",
+          "values": [
+            "4 V"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "measurement-1.txt",
+            "file_sha256": "963df68b384779167dfcfec1aafad0d6466d87e02d1cbf59a1e71f9b6298698a",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Probe-Oriel",
+            "4 V"
+          ]
+        }
+      ],
+      "plan_fields": true,
+      "batch_size": 2,
+      "output_tokens": 1200,
+      "max_calls": 3,
+      "budget": 14000,
+      "relation_expectation_not_sent": {
+        "kind": "conflict",
+        "comparability": "established"
+      }
+    },
+    {
+      "id": "compatible",
+      "role": "new relationship control",
+      "files": [
+        "compatible-0.txt",
+        "compatible-1.txt"
+      ],
+      "query": "比较两份资料中Codec-Pearl的支持压缩格式，逐来源列出支持压缩格式原值及依据，说明共同条件、可比性和双方能否同时成立；不要补条件。字段名用支持压缩格式。",
+      "expected_rows": [
+        {
+          "id": "0",
+          "subject": "Codec-Pearl",
+          "field": "支持压缩格式",
+          "values": [
+            "ZIP"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "compatible-0.txt",
+            "file_sha256": "c56751e8b134ccd5b7e33e3cdce4977d5a4ce75088b29d844f727dee2084aa0f",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Codec-Pearl",
+            "ZIP"
+          ]
+        },
+        {
+          "id": "1",
+          "subject": "Codec-Pearl",
+          "field": "支持压缩格式",
+          "values": [
+            "GZIP"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "compatible-1.txt",
+            "file_sha256": "b457dff1081c16871cbfe51f5ade644e946220102c08bca5149a353c124777d4",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Codec-Pearl",
+            "GZIP"
+          ]
+        }
+      ],
+      "plan_fields": true,
+      "batch_size": 2,
+      "output_tokens": 1200,
+      "max_calls": 3,
+      "budget": 14000,
+      "relation_expectation_not_sent": {
+        "kind": "difference",
+        "comparability": "established"
+      }
+    },
+    {
+      "id": "dates",
+      "role": "new relationship control",
+      "files": [
+        "dates-0.txt",
+        "dates-1.txt"
+      ],
+      "query": "比较两份资料中Tank-Quartz的液位，逐来源列出液位原值及依据，说明共同条件、可比性和双方能否同时成立；不要补条件。字段名用液位。",
+      "expected_rows": [
+        {
+          "id": "0",
+          "subject": "Tank-Quartz",
+          "field": "液位",
+          "values": [
+            "2 m"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "dates-0.txt",
+            "file_sha256": "3c749c47152aafa33f5e0e001b869c28c54d17ffb3268de0e59510886f5a4d3e",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Tank-Quartz",
+            "2 m"
+          ]
+        },
+        {
+          "id": "1",
+          "subject": "Tank-Quartz",
+          "field": "液位",
+          "values": [
+            "3 m"
+          ],
+          "status": "stated",
+          "source": {
+            "name": "dates-1.txt",
+            "file_sha256": "e8b251c9632076bf663d48a30cef307037fa35c1e06ae7975734443b452dab19",
+            "location": {
+              "kind": "line",
+              "line": 1
+            }
+          },
+          "required_literals": [
+            "Tank-Quartz",
+            "3 m"
+          ]
+        }
+      ],
+      "plan_fields": true,
+      "batch_size": 2,
+      "output_tokens": 1200,
+      "max_calls": 3,
+      "budget": 14000,
+      "relation_expectation_not_sent": {
+        "kind": "difference",
+        "comparability": "not_established"
+      }
+    }
+  ],
+  "runtime_sha256": {
+    "folder_assistant/__init__.py": "36656300506ebee15611b11a8eec4d2ba51af2278e92d74a5226fa32a1dd6277",
+    "folder_assistant/__main__.py": "fd9ad3f8dfa19b0a3305039acab08b71c1fc83fab09d2c1125a4e1777f959f23",
+    "folder_assistant/answers.py": "db3bdda91ba5200a7b32115a61a151af65291b5ae22cf8579f06c733bd675d3c",
+    "folder_assistant/batching.py": "87936b69ccbb6b2d5e4c027de9f68265393e24c037fc57fa783b513bb97800a2",
+    "folder_assistant/contracts.py": "73dd22fc935693b1fc5478f6f4aa087ac1c21d097df16721e7dcc207d2078bc7",
+    "folder_assistant/exhaustive.py": "5a534a03a23137ec9047bbd5ae9eac672de579bdb332d3305f2246483303b1b0",
+    "folder_assistant/exports.py": "5ee3b1005fd92807ca035cfd485e2878abc244b0760a8bf85dec57c14f93fb63",
+    "folder_assistant/field_plan.py": "8d7f67f2f28d36432d7bb7636ed02d5e1d9d52314309c1fe0dca563f111dea29",
+    "folder_assistant/full_reading.py": "c577bd60e13dec88621f62684d66491d0912675231bf33408bcf4d83218f7b04",
+    "folder_assistant/index.py": "6c70d3975f5918bd76d2149f5938e5aaf6a369caff6af5feca3e5af7bc133db3",
+    "folder_assistant/jobs.py": "07dc78c49343b9fed98fdbf10b71efc367acf75e71934092cf9f487d81e45b05",
+    "folder_assistant/output_diagnostics.py": "e4f8a66e5b14517a69e2fb45c37ac9153d0c920960ad1f37d70a7c93185ae08d",
+    "folder_assistant/parse_worker.py": "e1603c813ea3ed124e4f744af7db7fabb13343c09ab570a651722338cbf49387",
+    "folder_assistant/parsing.py": "474dd43160b91025576f4bbd802f2fe3a1122818ce6a8536ba194564722a0acf",
+    "folder_assistant/project_context.py": "adb947ccd27de18d873c046117f5a83ea325a480dc2868894a1d2c6ef94fdc4d",
+    "folder_assistant/project_exports.py": "0f296a8f699722299d191acb00940d95267bd986cc94d49ae5e9c62c2109acbc",
+    "folder_assistant/projects.py": "172d3af54f498bea2489c47e5291804fe0144544cdd5e891f5455b87ae0af374",
+    "folder_assistant/reading.py": "54febef7b0313bd16517d4f5882c7054100c8e4b75e51c8310d9ec92b22d9b8f",
+    "folder_assistant/scope.py": "0d54cb310c432aaad45530df511180944fc5b5f1c96438d55e58e39d0e107c84",
+    "folder_assistant/store.py": "27a5f165119ef621715db67cfcfcecd9d494272cd5cae3f5b6de828ab7d3390d",
+    "folder_assistant/usage.py": "bf86177a3397159586053bbc7e4431d45b37e3121678e04ad6ee42069db2d240",
+    "folder_assistant/verification.py": "0b99ecd41d37dbe809dcdae3836285600b6c7f4c4e8a57e924765b2190a633b7",
+    "knowledge/__init__.py": "5fcbc38c72e9f0e4c0938373622ff86daadbe7389238d3003d9a73d3acfb1533",
+    "knowledge/__main__.py": "fc231000c92128f2dacd50c8e4a2131c197130af52b5c13500673af31e4dec43",
+    "knowledge/documents.py": "4c2372f461f357cce017e9704392571c1d1bd1cf7e8f601867e6aa5eeb9305e2",
+    "knowledge/embedding.py": "7cfc277bf79b51205bff5c1447bb7165d73189a1773bfb7e013696349bdd2c43",
+    "knowledge/large_probe.py": "497c734fde900ff464eea06b736979fc52ccaa964bba28f21ebd3a1464c0c630",
+    "knowledge/locking.py": "c2f87541b323e39f8d080067aab7c15f7870f9a50b522ca9bcb596a4b89002ee",
+    "knowledge/long_probe.py": "824878c533475b0d48cca92f538fe00228108ede3274cf4bd43996ada91bb403",
+    "knowledge/probe.py": "564fc1190358d125bdd7d1c7d0fbe2bc1a998258e1dbe4f0b268585552e5666a",
+    "knowledge/recall_probe.py": "fb5657819c94b93083d3a11e6e546342345f3d35ac14fe70c662449f40143ca9",
+    "knowledge/report_probe.py": "486c955ce7368a5beb181b9def74546fc3b3ad9188c013105d643570102ac7df",
+    "knowledge/rerank_probe.py": "4c49f1e3a7f0e8dcd50edb647ba9beb521398ea05c01da538b25f1c99b9b75bc",
+    "knowledge/reranking.py": "8118a7613b87909571050ad1b6d6d3bee2a9beb8aa68b0dbc4ab60570cf384ec",
+    "knowledge/store.py": "3fc3b7c28d42baf9aee644f9edcd25ab12c547a5b8de37552ae399ce8d5d6837",
+    "knowledge/vectors.py": "520aff951c342401e1f1c4fcf5a532bd8f3ae859f6c01eb920414f8d2fdafd1b",
+    "agent/config.py": "30f8a3e63d4919113bdc09dc9954623440c18ee399448abd6e5da66ba7d2c60e",
+    "agent/llm.py": "bc58280e4c9663f4cc7f2fdf16041f11358e7b5b3e74b0fb4ce50b2232118867",
+    "agent/context.py": "097c931099e9b28a5222a10f02b03085f76f8aec61b33a02eb57393f7361f76f",
+    "agent/strength.py": "2dc6a5891255eb5e8da1c792e14acd3e39ab170bbd8493469432fd811035d1b1",
+    "workspace/stage31_live.py": "f847cecc0bff81d97a1143e84c6eea4e9dbd8c5c2817e07f4fb5784a8c93f0cf"
+  },
+  "source_sha256": {
+    "compatible-0.txt": "c56751e8b134ccd5b7e33e3cdce4977d5a4ce75088b29d844f727dee2084aa0f",
+    "compatible-1.txt": "b457dff1081c16871cbfe51f5ade644e946220102c08bca5149a353c124777d4",
+    "dates-0.txt": "3c749c47152aafa33f5e0e001b869c28c54d17ffb3268de0e59510886f5a4d3e",
+    "dates-1.txt": "e8b251c9632076bf663d48a30cef307037fa35c1e06ae7975734443b452dab19",
+    "exclusive-0.txt": "d63a022269165954b2d767466ee38b9da664d8f579b56a0fa4f34ffcb1e7ab54",
+    "exclusive-1.txt": "a7f28a15a538580d83f77dceee66df44536cd7bd44f8dcdd8e41a6b9c8f86861",
+    "gauges.csv": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+    "measurement-0.txt": "909806836241aec9b0e8efe7ef1a637991e29d057add490c11e51417f10046d2",
+    "measurement-1.txt": "963df68b384779167dfcfec1aafad0d6466d87e02d1cbf59a1e71f9b6298698a",
+    "readouts.csv": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6"
+  },
+  "limits": {
+    "chat_calls": 20,
+    "embedding_calls": 4,
+    "known_tokens": 70000
+  },
+  "configuration": {
+    "provider": "deepseek",
+    "model": "deepseek-flash",
+    "thinking": "disabled",
+    "strength": "default",
+    "guide_version": 4,
+    "retries": 0
+  },
+  "rules": [
+    "Known regression copied byte-for-byte and labelled as development, not holdout. Original plans and outputs unchanged.",
+    "New paired cases use same query, files, fixed batch size, output cap and total budget; field planning is the intervention, including its added input and cost.",
+    "Planner sees only query; fields must occur verbatim in query. Quote checks do not prove intent semantics.",
+    "Same total budget and call cap include planner. No repairs or failed-call retries. Unknown usage stops all subsequent work.",
+    "Relation criteria not sent to model. No aggregate semantic pass, no stage12 acceptance."
+  ]
+}

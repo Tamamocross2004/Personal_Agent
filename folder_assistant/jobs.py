@@ -111,6 +111,8 @@ class FolderJobs:
         limit=inputs.setdefault('max_calls',16)
         if type(limit) is not int or not 1<=limit<=64:raise ValueError('持续整理最多调用须为1至64的整数')
         if inputs['read_to_end'] and strategy!='exhaustive':raise ValueError('持续整理仅用于显式全量读取')
+        if type(inputs.setdefault('plan_fields',False)) is not bool:raise ValueError('plan_fields须为布尔值')
+        if inputs['plan_fields'] and not inputs['read_to_end']:raise ValueError('字段规划仅用于显式持续整理')
         for key,default,low,high in [('output_tokens',1200,128,4096),('batch_size',6,1,6),('expected_fields',1,1,12)]:
             value=inputs.setdefault(key,default)
             if type(value) is not int or not low<=value<=high:raise ValueError(f'{key}须为{low}至{high}的整数')
@@ -135,6 +137,9 @@ class FolderJobs:
                 if next_offset>=coverage['total_segments']:raise ValueError('已到提取范围末尾；没有剩余内容')
                 for key in ('generation','file_ids','query','mode'):inputs[key]=previous['inputs'][key]
                 inputs['strength']=previous['inputs'].get('strength','default')
+                if inputs['plan_fields'] and 'field_specs' in previous['inputs']:
+                    inputs['field_specs']=previous['inputs']['field_specs']
+                    inputs['field_plan_source_job_id']=previous['inputs'].get('field_plan_source_job_id',previous['id'])
                 inputs.update(start_offset=next_offset,previous_structured_segments=coverage['structured_segments'],
                               previous_returned_until=coverage['returned_until'])
                 values=[e.get('reasoning_tokens') for e in previous.get('usage_events',[]) if e.get('status')=='returned']
@@ -172,6 +177,10 @@ class FolderJobs:
             inputs['reading_plan']=plan.signature
             if not inputs['retry_split']:inputs['range_end']=len(plan.segments)
             inputs['batch_call_limit']=inputs['max_calls'] if inputs['read_to_end'] else inputs['max_batches']
+            if inputs['plan_fields']:
+                from .field_plan import VERSION as PLAN_VERSION,instruction as plan_instruction
+                from knowledge.documents import sha
+                inputs.update(field_plan_version=PLAN_VERSION,field_plan_prompt_sha256=sha(plan_instruction()))
         inputs['model']={'provider':config.provider,'model':config.model,'base_url':config.base_url,'retries':0,
                          'thinking':config.thinking,'reasoning_effort':config.reasoning_effort}
         if self.pricing:inputs['pricing']=self.pricing.get(config.provider,config.model)

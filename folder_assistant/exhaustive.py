@@ -20,11 +20,17 @@ def answer_exhaustive(jobs,jid):
               'operation_end':end,'operation_remaining':end-offset,
               'read_to_end':inputs.get('read_to_end',False),'batch_call_limit':call_limit}
     jobs.patch(jid,coverage=coverage,batches=[],batch_decisions=[])
+    if inputs.get('plan_fields') and offset<end:
+        from .field_plan import plan_fields
+        plan_fields(jobs,jid)
+        inputs=jobs.get(jid)['inputs']
     decisions=[]
     reason=limit_reason
     for number in range(call_limit):
         jobs.check(jid)
         if offset==end:reason='end_of_extraction' if end==len(plan.segments) else 'retry_range_finished';break
+        if sum(e.get('operation')=='llm' for e in jobs.get(jid).get('usage_events',[]))>=call_limit:
+            reason=limit_reason;break
         batch,decision=select_batch(plan,inputs,offset,number+1,inputs['budget']-jobs.used_tokens(jid),
                                     jobs.get(jid).get('usage_events',[]),jobs.index.settings.agent_call_max_tokens)
         decisions.append(decision);jobs.patch(jid,batch_decisions=decisions)

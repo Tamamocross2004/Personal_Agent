@@ -1495,8 +1495,8 @@ small {
 .folder-full-reading { margin: 14px 0; padding: 14px; border: 1px solid var(--border); border-radius: 8px; overflow-wrap: anywhere; }
 .folder-full-reading input { max-width: 140px; }
 .folder-full-reading button { margin: 8px 0; white-space: normal; }
-.folder-completion-option { display: flex; flex-direction: row; align-items: center; gap: 8px; }
-.folder-completion-option input[type="checkbox"] { width: auto; }
+.folder-questions label.folder-completion-option { display: flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 8px; }
+.folder-questions label.folder-completion-option input[type="checkbox"] { width: auto; flex: 0 0 auto; margin: 0; }
 .folder-retrieval { max-height: 40vh; overflow: auto; }
 .folder-retrieval article { padding: 12px; border-bottom: 1px solid var(--border); }
 .folder-retrieval pre { white-space: pre-wrap; overflow-wrap: anywhere; }

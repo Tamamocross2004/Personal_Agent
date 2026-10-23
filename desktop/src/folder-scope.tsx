@@ -233,8 +233,14 @@ export function FolderScope({
                   {p.retry_split ? "拆小重做" : "继续整理"}：本次待处理区间 [
                   {p.operation_start}, {p.operation_end})，最多
                   {p.batch_call_limit ?? p.max_batches}
-                  批；首批预计 [{p.operation_start}, {p.first_batch_end})。
+                  次模型调用；首批预计 [{p.operation_start}, {p.first_batch_end}
+                  )。
                 </p>
+                {p.plan_fields && (
+                  <p>
+                    使用字段意图规划；已有规划会复用，首次规划计入调用上限和同一预算，随后重新估算资料批次。
+                  </p>
+                )}
                 <p>
                   服务：
                   {p.services.length

@@ -7,6 +7,7 @@ import { FolderOutputDiagnostics } from "./folder-output-diagnostics";
 import { FolderTransmission } from "./folder-transmission";
 import { FolderFullReading } from "./folder-full-reading";
 import { FolderCompletion } from "./folder-completion";
+import { FolderFieldPlan } from "./folder-field-plan";
 
 export function FolderQuestions({
   api,
@@ -38,6 +39,7 @@ export function FolderQuestions({
     [maxBatches, setMaxBatches] = useState(3);
   const [readToEnd, setReadToEnd] = useState(false),
     [maxCalls, setMaxCalls] = useState(16);
+  const [planFields, setPlanFields] = useState(true);
   const [reading, setReading] = useState<any>(null),
     [neighbors, setNeighbors] = useState<any>(null),
     [batchNumber, setBatchNumber] = useState(0);
@@ -111,6 +113,7 @@ export function FolderQuestions({
           max_batches: maxBatches,
           read_to_end: readToEnd,
           max_calls: readToEnd ? maxCalls : 16,
+          plan_fields: readToEnd && planFields,
           resume_from: saved.id,
           strength: saved.inputs.strength || "default",
           output_tokens: outputTokens,
@@ -266,6 +269,8 @@ export function FolderQuestions({
           onChange={setReadToEnd}
           maxCalls={maxCalls}
           setMaxCalls={setMaxCalls}
+          planFields={planFields}
+          setPlanFields={setPlanFields}
         />
       )}
       <details
@@ -433,7 +438,10 @@ export function FolderQuestions({
                 strength,
                 max_batches: maxBatches,
                 read_to_end: strategy === "exhaustive" && readToEnd,
-                max_calls: strategy === "exhaustive" && readToEnd ? maxCalls : 16,
+                max_calls:
+                  strategy === "exhaustive" && readToEnd ? maxCalls : 16,
+                plan_fields:
+                  strategy === "exhaustive" && readToEnd && planFields,
                 output_tokens: outputTokens,
                 batch_mode: batchMode,
                 batch_size: batchSize,
@@ -486,6 +494,7 @@ export function FolderQuestions({
       {current && (
         <div className="folder-answer">
           <h4>回答 · 未正式审稿</h4>
+          <FolderFieldPlan plan={saved.field_plan} />
           {saved.inputs?.full_reading_from && (
             <p>
               从局部问答 {saved.inputs.full_reading_from}{" "}
@@ -502,6 +511,7 @@ export function FolderQuestions({
                   max_batches: maxBatches,
                   read_to_end: readToEnd,
                   max_calls: readToEnd ? maxCalls : 16,
+                  plan_fields: readToEnd && planFields,
                   output_tokens: outputTokens,
                   batch_mode: batchMode,
                   batch_size: batchSize,
@@ -521,6 +531,7 @@ export function FolderQuestions({
                 setMaxBatches={setMaxBatches}
                 setReadToEnd={setReadToEnd}
                 setMaxCalls={setMaxCalls}
+                setPlanFields={setPlanFields}
                 onStarted={(value: any) => {
                   setView(null);
                   setCitation(null);
@@ -537,6 +548,7 @@ export function FolderQuestions({
               max_batches: maxBatches,
               read_to_end: readToEnd,
               max_calls: readToEnd ? maxCalls : 16,
+              plan_fields: readToEnd && planFields,
               output_tokens: outputTokens,
               batch_mode: batchMode,
               batch_size: batchSize,

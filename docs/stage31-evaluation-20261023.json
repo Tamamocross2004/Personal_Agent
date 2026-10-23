@@ -1,0 +1,734 @@
+{
+  "stage": 31,
+  "base_commit": "d38f1ec",
+  "date": "2026-10-23",
+  "reviewer": "coding_assistant",
+  "independent_review": false,
+  "engineering_checks_passed": true,
+  "declared_diagnostic_cases_matched": true,
+  "content_acceptance_passed": false,
+  "stage12_accepted": false,
+  "tests": {
+    "full": "1184 passed in 1056.41s",
+    "initial_targeted": "38 passed in 114.24s",
+    "final_build": true,
+    "isolated_ui": [
+      {
+        "passed": true,
+        "multi_format_preview": false,
+        "fixture": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\agent-folders-SrX8NS",
+        "checks": [
+          "local-full-reading-preview",
+          "changed-controls-invalidate-preview",
+          "pinned-original-query-and-scope",
+          "explicit-new-paid-operation",
+          "original-answer-and-usage-unchanged",
+          "explicit-continuous-opt-in",
+          "fifteen-calls-one-budget",
+          "batch-limit-replaced-by-explicit-call-limit",
+          "source-and-old-answer-unchanged",
+          "query-only-field-planning",
+          "planning-counts-in-total-calls-and-budget",
+          "saved-intents-and-source-quotes",
+          "field-plan-not-evidence",
+          "native-picker-capability",
+          "scan",
+          "excluded-secret",
+          "renderer-cannot-grant",
+          "revoke",
+          "source-unchanged",
+          "sync",
+          "keyword-preview",
+          "answer",
+          "pinned-citation"
+        ],
+        "errors": []
+      },
+      {
+        "passed": true,
+        "multi_format_preview": false,
+        "fixture": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\agent-folders-G0yoOw",
+        "checks": [
+          "local-full-reading-preview",
+          "changed-controls-invalidate-preview",
+          "pinned-original-query-and-scope",
+          "explicit-new-paid-operation",
+          "original-answer-and-usage-unchanged",
+          "explicit-continuous-opt-in",
+          "fifteen-calls-one-budget",
+          "batch-limit-replaced-by-explicit-call-limit",
+          "source-and-old-answer-unchanged",
+          "query-only-field-planning",
+          "planning-counts-in-total-calls-and-budget",
+          "saved-intents-and-source-quotes",
+          "field-plan-not-evidence",
+          "native-picker-capability",
+          "scan",
+          "excluded-secret",
+          "renderer-cannot-grant",
+          "revoke",
+          "source-unchanged",
+          "sync",
+          "keyword-preview",
+          "answer",
+          "pinned-citation"
+        ],
+        "errors": []
+      }
+    ],
+    "build_warning": "main JS chunk exceeds 500 kB; build succeeded",
+    "cli_help": true
+  },
+  "usage": {
+    "calls_by_operation": {
+      "embedding": 2,
+      "llm": 18
+    },
+    "known_tokens": 52838,
+    "unknown_usage_ids": [],
+    "cny_total": null,
+    "meaning": "按原事件ID去重；未知不是零，思考Token若已含在输出中不重复相加。人民币账单未据此认证。"
+  },
+  "job_usage_and_plans": [
+    {
+      "case": "known_regression",
+      "chat_calls": 3,
+      "planning_calls": 1,
+      "known_tokens": 8878,
+      "field_plan": [
+        {
+          "name": "读数",
+          "mode": "attribute",
+          "instruction_quote": "读数按物理测量值整理"
+        },
+        {
+          "name": "分类标签",
+          "mode": "verbatim",
+          "instruction_quote": "分类标签要求摘录标签文字本身"
+        }
+      ]
+    },
+    {
+      "case": "new_fields-plain",
+      "chat_calls": 3,
+      "planning_calls": 0,
+      "known_tokens": 12233,
+      "field_plan": null
+    },
+    {
+      "case": "new_fields-planned",
+      "chat_calls": 4,
+      "planning_calls": 1,
+      "known_tokens": 13601,
+      "field_plan": [
+        {
+          "name": "输出电压",
+          "mode": "attribute",
+          "instruction_quote": "输出电压按实际属性值整理"
+        },
+        {
+          "name": "标记文本",
+          "mode": "verbatim",
+          "instruction_quote": "标记文本要求逐字摘录标签本身"
+        }
+      ]
+    },
+    {
+      "case": "exclusive",
+      "chat_calls": 2,
+      "planning_calls": 1,
+      "known_tokens": 4391,
+      "field_plan": [
+        {
+          "name": "通流状态",
+          "mode": "attribute",
+          "instruction_quote": "比较两份资料中Valve-Neroli的通流状态，逐来源列出通流状态原值及依据，说明共同条件、可比性和双方能否同时成立；不要补条件。字段名用通流状态。"
+        }
+      ]
+    },
+    {
+      "case": "measurement",
+      "chat_calls": 2,
+      "planning_calls": 1,
+      "known_tokens": 4406,
+      "field_plan": [
+        {
+          "name": "电压",
+          "mode": "attribute",
+          "instruction_quote": "比较两份资料中Probe-Oriel的电压，逐来源列出电压原值及依据，说明共同条件、可比性和双方能否同时成立；不要补条件。字段名用电压。"
+        }
+      ]
+    },
+    {
+      "case": "compatible",
+      "chat_calls": 2,
+      "planning_calls": 1,
+      "known_tokens": 4429,
+      "field_plan": [
+        {
+          "name": "支持压缩格式",
+          "mode": "verbatim",
+          "instruction_quote": "逐来源列出支持压缩格式原值及依据"
+        }
+      ]
+    },
+    {
+      "case": "dates",
+      "chat_calls": 2,
+      "planning_calls": 1,
+      "known_tokens": 4356,
+      "field_plan": [
+        {
+          "name": "液位",
+          "mode": "attribute",
+          "instruction_quote": "比较两份资料中Tank-Quartz的液位，逐来源列出液位原值及依据，说明共同条件、可比性和双方能否同时成立；不要补条件。字段名用液位。"
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "id": "exclusive",
+      "expectation": {
+        "kind": "conflict",
+        "comparability": "established"
+      },
+      "matches_declared_classification": true,
+      "findings": [
+        {
+          "statement": "exclusive-0.txt记载Valve-Neroli在2026-10-23 09:00的通流状态为“通流”。",
+          "kind": "direct",
+          "citations": [
+            "B1C1"
+          ],
+          "support": [
+            {
+              "citation_id": "B1C1",
+              "quote": "Valve-Neroli，检测号H-307，时刻2026-10-23 09:00，同一瞬时的唯一状态，通流状态通流。"
+            }
+          ],
+          "assumptions": [],
+          "limitations": [],
+          "relation": null
+        },
+        {
+          "statement": "exclusive-1.txt记载Valve-Neroli在2026-10-23 09:00的通流状态为“截断”。",
+          "kind": "direct",
+          "citations": [
+            "B1C2"
+          ],
+          "support": [
+            {
+              "citation_id": "B1C2",
+              "quote": "Valve-Neroli，检测号H-307，时刻2026-10-23 09:00，同一瞬时的唯一状态，通流状态截断。"
+            }
+          ],
+          "assumptions": [],
+          "limitations": [],
+          "relation": null
+        },
+        {
+          "statement": "两份资料对Valve-Neroli通流状态的记载分别为“通流”和“截断”，不能同时成立。",
+          "kind": "conflict",
+          "citations": [
+            "B1C1",
+            "B1C2"
+          ],
+          "support": [
+            {
+              "citation_id": "B1C1",
+              "quote": "Valve-Neroli，检测号H-307，时刻2026-10-23 09:00，同一瞬时的唯一状态，通流状态通流。"
+            },
+            {
+              "citation_id": "B1C2",
+              "quote": "Valve-Neroli，检测号H-307，时刻2026-10-23 09:00，同一瞬时的唯一状态，通流状态截断。"
+            }
+          ],
+          "assumptions": [],
+          "limitations": [],
+          "relation": {
+            "field": "通流状态",
+            "common_scope": "Valve-Neroli，检测号H-307，时刻2026-10-23 09:00，同一瞬时的唯一状态",
+            "comparability": "established",
+            "reason": "两份资料均记载同一对象Valve-Neroli、同一检测号H-307、同一时刻2026-10-23 09:00，且均称该瞬时为唯一状态；在此条件下“通流”与“截断”不能同时成立。"
+          }
+        }
+      ],
+      "reviewer": "coding_assistant"
+    },
+    {
+      "id": "measurement",
+      "expectation": {
+        "kind": "conflict",
+        "comparability": "established"
+      },
+      "matches_declared_classification": true,
+      "findings": [
+        {
+          "statement": "measurement-0.txt记载Probe-Oriel在采样编号N-215、时刻2026-10-23 10:00的同一瞬时单一读数为电压3 V。",
+          "kind": "direct",
+          "citations": [
+            "B1C1"
+          ],
+          "support": [
+            {
+              "citation_id": "B1C1",
+              "quote": "Probe-Oriel，采样编号N-215，时刻2026-10-23 10:00，同一瞬时单一读数，电压3 V。"
+            }
+          ],
+          "assumptions": [],
+          "limitations": [],
+          "relation": null
+        },
+        {
+          "statement": "measurement-1.txt记载Probe-Oriel在采样编号N-215、时刻2026-10-23 10:00的同一瞬时单一读数为电压4 V。",
+          "kind": "direct",
+          "citations": [
+            "B1C2"
+          ],
+          "support": [
+            {
+              "citation_id": "B1C2",
+              "quote": "Probe-Oriel，采样编号N-215，时刻2026-10-23 10:00，同一瞬时单一读数，电压4 V。"
+            }
+          ],
+          "assumptions": [],
+          "limitations": [],
+          "relation": null
+        },
+        {
+          "statement": "两份资料对Probe-Oriel电压的记载分别为3 V和4 V；两者对象、采样编号、时刻及“同一瞬时单一读数”条件均相同，但数值不同，不能同时成立。",
+          "kind": "conflict",
+          "citations": [
+            "B1C1",
+            "B1C2"
+          ],
+          "support": [
+            {
+              "citation_id": "B1C1",
+              "quote": "Probe-Oriel，采样编号N-215，时刻2026-10-23 10:00，同一瞬时单一读数，电压3 V。"
+            },
+            {
+              "citation_id": "B1C2",
+              "quote": "Probe-Oriel，采样编号N-215，时刻2026-10-23 10:00，同一瞬时单一读数，电压4 V。"
+            }
+          ],
+          "assumptions": [],
+          "limitations": [],
+          "relation": {
+            "field": "电压",
+            "common_scope": "Probe-Oriel，采样编号N-215，时刻2026-10-23 10:00，同一瞬时单一读数",
+            "comparability": "established",
+            "reason": "两份原文均明确同一对象Probe-Oriel、同一采样编号N-215、同一时刻2026-10-23 10:00，且均称同一瞬时单一读数；在相同条件下分别记载3 V和4 V，两个数值不能同时成立。"
+          }
+        }
+      ],
+      "reviewer": "coding_assistant"
+    },
+    {
+      "id": "compatible",
+      "expectation": {
+        "kind": "difference",
+        "comparability": "established"
+      },
+      "matches_declared_classification": true,
+      "findings": [
+        {
+          "statement": "compatible-0.txt记载Codec-Pearl（版本R-5，记录日期2026-10-23）支持压缩格式ZIP，并说明这只是部分列举。",
+          "kind": "direct",
+          "citations": [
+            "B1C1"
+          ],
+          "support": [
+            {
+              "citation_id": "B1C1",
+              "quote": "Codec-Pearl，版本R-5，记录日期2026-10-23，可以同时支持多种格式，以下为部分列举，支持压缩格式ZIP。"
+            }
+          ],
+          "assumptions": [],
+          "limitations": [],
+          "relation": null
+        },
+        {
+          "statement": "compatible-1.txt记载Codec-Pearl（版本R-5，记录日期2026-10-23）支持压缩格式GZIP，并说明这只是部分列举。",
+          "kind": "direct",
+          "citations": [
+            "B1C2"
+          ],
+          "support": [
+            {
+              "citation_id": "B1C2",
+              "quote": "Codec-Pearl，版本R-5，记录日期2026-10-23，可以同时支持多种格式，以下为部分列举，支持压缩格式GZIP。"
+            }
+          ],
+          "assumptions": [],
+          "limitations": [],
+          "relation": null
+        },
+        {
+          "statement": "两份来源对Codec-Pearl支持压缩格式所列原值不同：compatible-0.txt为ZIP，compatible-1.txt为GZIP；两者对象、版本和记录日期相同，且均声明为部分列举，因此不能确认二者互斥，不能判定为冲突。",
+          "kind": "difference",
+          "citations": [
+            "B1C1",
+            "B1C2"
+          ],
+          "support": [
+            {
+              "citation_id": "B1C1",
+              "quote": "Codec-Pearl，版本R-5，记录日期2026-10-23，可以同时支持多种格式，以下为部分列举，支持压缩格式ZIP。"
+            },
+            {
+              "citation_id": "B1C2",
+              "quote": "Codec-Pearl，版本R-5，记录日期2026-10-23，可以同时支持多种格式，以下为部分列举，支持压缩格式GZIP。"
+            }
+          ],
+          "assumptions": [],
+          "limitations": [],
+          "relation": {
+            "field": "支持压缩格式",
+            "common_scope": "Codec-Pearl，版本R-5，记录日期2026-10-23",
+            "comparability": "established",
+            "reason": "两份来源对同一对象、同一版本和同一记录日期分别列出ZIP与GZIP，且均说明为部分列举；由于列举不完整，两个值可以同时成立，故为差异而非冲突。"
+          }
+        }
+      ],
+      "reviewer": "coding_assistant"
+    },
+    {
+      "id": "dates",
+      "expectation": {
+        "kind": "difference",
+        "comparability": "not_established"
+      },
+      "matches_declared_classification": true,
+      "findings": [
+        {
+          "statement": "dates-0.txt记载Tank-Quartz在采样日期2026-10-20的液位为2 m。",
+          "kind": "direct",
+          "citations": [
+            "B1C1"
+          ],
+          "support": [
+            {
+              "citation_id": "B1C1",
+              "quote": "Tank-Quartz，采样日期2026-10-20，液位2 m。"
+            }
+          ],
+          "assumptions": [],
+          "limitations": [],
+          "relation": null
+        },
+        {
+          "statement": "dates-1.txt记载Tank-Quartz在采样日期2026-10-21的液位为3 m。",
+          "kind": "direct",
+          "citations": [
+            "B1C2"
+          ],
+          "support": [
+            {
+              "citation_id": "B1C2",
+              "quote": "Tank-Quartz，采样日期2026-10-21，液位3 m。"
+            }
+          ],
+          "assumptions": [],
+          "limitations": [],
+          "relation": null
+        },
+        {
+          "statement": "两份资料的对象均为Tank-Quartz，字段均为液位，但采样日期分别为2026-10-20和2026-10-21，时间条件不同；在未补充条件的情况下，不能确认两者处于同一时间口径，因此不能判定为同一条件下的互斥冲突，仅按不同来源分别保留原值。",
+          "kind": "difference",
+          "citations": [
+            "B1C1",
+            "B1C2"
+          ],
+          "support": [
+            {
+              "citation_id": "B1C1",
+              "quote": "Tank-Quartz，采样日期2026-10-20，液位2 m。"
+            },
+            {
+              "citation_id": "B1C2",
+              "quote": "Tank-Quartz，采样日期2026-10-21，液位3 m。"
+            }
+          ],
+          "assumptions": [],
+          "limitations": [],
+          "relation": {
+            "field": "液位",
+            "common_scope": "对象Tank-Quartz；采样日期分别为2026-10-20与2026-10-21，未提供相同时间条件",
+            "comparability": "not_established",
+            "reason": "两份资料的对象和字段相同，但采样日期不同，缺少可确认二者处于同一时间及适用条件的依据；不能仅因液位数值不同就判定矛盾，也不能确认双方在同一条件下能否同时成立。"
+          }
+        }
+      ],
+      "reviewer": "coding_assistant"
+    }
+  ],
+  "checks": {
+    "historical_artifacts_unchanged": 1749,
+    "v3_types_acceptance_quote_validation_unchanged": true,
+    "export_roundtrips": 7,
+    "all_original_source_and_runtime_hashes_match": true,
+    "query_only_planning": true,
+    "same_budget_and_call_limit_include_planning": true,
+    "project_keys_checked": 2,
+    "secret_matches": 0
+  },
+  "post_diagnostic_runtime_changes": {
+    "files": {
+      "folder_assistant/exhaustive.py": {
+        "snapshot": "5a534a03a23137ec9047bbd5ae9eac672de579bdb332d3305f2246483303b1b0",
+        "final": "5e81aa7611669f48ca62ab1dbaa87c2935e18ca875c413156d1c6c9b87648455"
+      },
+      "folder_assistant/field_plan.py": {
+        "snapshot": "8d7f67f2f28d36432d7bb7636ed02d5e1d9d52314309c1fe0dca563f111dea29",
+        "final": "aa8cc0e4d585589663922c77e86f26f64fc622a95572a897569cdcf4882b9868"
+      }
+    },
+    "reason": "stop checks before/after planner; skip planning when extraction range empty; prompts and validators unchanged"
+  },
+  "literal_summaries": [
+    {
+      "case": "known_regression",
+      "expected": 10,
+      "delivered": 10,
+      "matched": 10
+    },
+    {
+      "case": "new_fields-plain",
+      "expected": 16,
+      "delivered": 16,
+      "matched": 16
+    },
+    {
+      "case": "new_fields-planned",
+      "expected": 16,
+      "delivered": 16,
+      "matched": 16
+    },
+    {
+      "case": "exclusive",
+      "expected": 2,
+      "delivered": 2,
+      "matched": 2
+    },
+    {
+      "case": "measurement",
+      "expected": 2,
+      "delivered": 2,
+      "matched": 2
+    },
+    {
+      "case": "compatible",
+      "expected": 2,
+      "delivered": 2,
+      "matched": 2
+    },
+    {
+      "case": "dates",
+      "expected": 2,
+      "delivered": 2,
+      "matched": 2
+    }
+  ],
+  "boundaries": [
+    "Known regression is not holdout",
+    "Paired new material matches 16/16 with and without planning; no universal quality uplift claim",
+    "Planner interpretation is not semantically certified",
+    "Total budget/call caps may still leave unsent content",
+    "No stage12 acceptance"
+  ],
+  "source_sha256": {
+    "README.md": "bc808645c6da4d937e2d2c51327b879e9755b4822fbd694070f392e90c2cbbff",
+    "ROADMAP.md": "4812524e0f5ae3e535fcbfb3d61c007b760adebe59224b2a11d248db9287816a",
+    "desktop/scripts/folder-workflow-smoke.cjs": "2863cde963948d2556d2246175fb14d0a5e7c995df9b47a00170c792e4e46ed1",
+    "desktop/src/folder-completion.tsx": "52a8470686e2a56a07a738718ffdd097ca4e5b6e0a2ce66ef619e06ae2f3a11f",
+    "desktop/src/folder-field-plan.tsx": "56cfaad429dccf7f2c27edc47cdb67e0c7a4334b249aaa780ed7025417cd1daa",
+    "desktop/src/folder-full-reading.tsx": "dad378e83e0befc278c70cf5b941ae20558783b2582a30913b06ad5c4c746e0b",
+    "desktop/src/folder-questions.tsx": "e96f6700a3d486f6c47bf791a9b034ea69a69db2fa260dca3682586e655df591",
+    "desktop/src/folder-scope.tsx": "b5ea064f0f607482acdaeefe1a02d422d4f9a15eac0c3978b3ec97040b2b75ad",
+    "desktop/src/folder-transmission.tsx": "70fd5da7609b5fcb248a852a3e3e723d27f31ddd9924d1e1457663cd411c43f4",
+    "desktop/src/style.css": "d2de79ef8e8d158cc608e80676c14ad0b5def441b89c460756e7310a42a30503",
+    "desktop_app/server.py": "7185a8f6032539101999f96da6cffee15bedc87aa6c7210fcaf37d2acd6384ad",
+    "docs/folder-assistant.md": "db7443153b7de2ab5223275ff1d58ebfcceb02099359f89568af7bcb52e88732",
+    "docs/stage31-live-plan-20261023.json": "6a08abab9d4ef6d9b9504866906c42c235c690dea19985c9ec0f5cec066516eb",
+    "docs/stage31-verification-20261023.md": "acbbb04258dd1542c20fcb3941ce96de71511da98c43240e3cd364e3a5cc171c",
+    "folder_assistant/__main__.py": "fd9ad3f8dfa19b0a3305039acab08b71c1fc83fab09d2c1125a4e1777f959f23",
+    "folder_assistant/answers.py": "db3bdda91ba5200a7b32115a61a151af65291b5ae22cf8579f06c733bd675d3c",
+    "folder_assistant/contracts.py": "73dd22fc935693b1fc5478f6f4aa087ac1c21d097df16721e7dcc207d2078bc7",
+    "folder_assistant/exhaustive.py": "5e81aa7611669f48ca62ab1dbaa87c2935e18ca875c413156d1c6c9b87648455",
+    "folder_assistant/field_plan.py": "aa8cc0e4d585589663922c77e86f26f64fc622a95572a897569cdcf4882b9868",
+    "folder_assistant/full_reading.py": "c577bd60e13dec88621f62684d66491d0912675231bf33408bcf4d83218f7b04",
+    "folder_assistant/jobs.py": "07dc78c49343b9fed98fdbf10b71efc367acf75e71934092cf9f487d81e45b05",
+    "folder_assistant/scope.py": "0d54cb310c432aaad45530df511180944fc5b5f1c96438d55e58e39d0e107c84",
+    "tests/folder_workflow_server.py": "8195f4f64ebfa1813091a08de506a1a78bad885c4fbb164a89de57e5387edf10",
+    "tests/test_folder_field_plan.py": "63d5aca5ac586ae28706070c089d5738c52868569d151f5ba97d614d899b4fd7"
+  },
+  "artifact_sha256": {
+    "workspace/stage31-live-20261023/attempt.json": "63bb85dd5d01648a69d66bd083883093aab9d29b7acd148e6bb4f1a302fe76da",
+    "workspace/stage31-live-20261023/bundle.json": "78752e6a9321809726c38724261af8f65a53100d009912aed4ed8b401e8accd5",
+    "workspace/stage31-live-20261023/literal-report.json": "2590d68ad03538a97e0f096ae4dbb1ee660532b5cdfe42d7f0c5edb90863b081",
+    "workspace/stage31-live-20261023/relation-report.json": "c5c6e8638533713616d36912c78e16524008cc026079708561811fa64a1e2161",
+    "workspace/stage31-live-20261023/documents/compatible-0.txt": "c56751e8b134ccd5b7e33e3cdce4977d5a4ce75088b29d844f727dee2084aa0f",
+    "workspace/stage31-live-20261023/documents/compatible-1.txt": "b457dff1081c16871cbfe51f5ade644e946220102c08bca5149a353c124777d4",
+    "workspace/stage31-live-20261023/documents/dates-0.txt": "3c749c47152aafa33f5e0e001b869c28c54d17ffb3268de0e59510886f5a4d3e",
+    "workspace/stage31-live-20261023/documents/dates-1.txt": "e8b251c9632076bf663d48a30cef307037fa35c1e06ae7975734443b452dab19",
+    "workspace/stage31-live-20261023/documents/exclusive-0.txt": "d63a022269165954b2d767466ee38b9da664d8f579b56a0fa4f34ffcb1e7ab54",
+    "workspace/stage31-live-20261023/documents/exclusive-1.txt": "a7f28a15a538580d83f77dceee66df44536cd7bd44f8dcdd8e41a6b9c8f86861",
+    "workspace/stage31-live-20261023/documents/gauges.csv": "7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133",
+    "workspace/stage31-live-20261023/documents/measurement-0.txt": "909806836241aec9b0e8efe7ef1a637991e29d057add490c11e51417f10046d2",
+    "workspace/stage31-live-20261023/documents/measurement-1.txt": "963df68b384779167dfcfec1aafad0d6466d87e02d1cbf59a1e71f9b6298698a",
+    "workspace/stage31-live-20261023/documents/readouts.csv": "19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6",
+    "workspace/stage31-live-20261023/jobs/compatible.json": "8137e5ea41059e7c217eff143aaf21ff170511a791816a566494223995ef9908",
+    "workspace/stage31-live-20261023/jobs/dates.json": "0d21b775b9b7b2ebe414e4d9649dcf515591819224ae72437452e61cc98c77e3",
+    "workspace/stage31-live-20261023/jobs/exclusive.json": "f40728abe17b4ec826047648d6161f4d3a115aae8bd764f7ccc8fabd94a4e0aa",
+    "workspace/stage31-live-20261023/jobs/known_regression.json": "1714488d92449404f6f213191dcefcb97eb4229fcc656ffcf8f94099e7af7fb7",
+    "workspace/stage31-live-20261023/jobs/measurement.json": "dc4a832aa9813f9c96c4c0fc453f7275e4856f43075ce27707d4063f50c07609",
+    "workspace/stage31-live-20261023/jobs/new_fields-plain.json": "0d06f29492331771903570570c59a00cc4e93e12d674b5f0613c42a86d49d610",
+    "workspace/stage31-live-20261023/jobs/new_fields-planned.json": "423c1b97ae72b565e1cbab987bc5d7e94a6925f10cb770f459ecc16942d66558",
+    "workspace/stage31-live-20261023/runtime/agent/config.py": "30f8a3e63d4919113bdc09dc9954623440c18ee399448abd6e5da66ba7d2c60e",
+    "workspace/stage31-live-20261023/runtime/agent/context.py": "097c931099e9b28a5222a10f02b03085f76f8aec61b33a02eb57393f7361f76f",
+    "workspace/stage31-live-20261023/runtime/agent/llm.py": "bc58280e4c9663f4cc7f2fdf16041f11358e7b5b3e74b0fb4ce50b2232118867",
+    "workspace/stage31-live-20261023/runtime/agent/strength.py": "2dc6a5891255eb5e8da1c792e14acd3e39ab170bbd8493469432fd811035d1b1",
+    "workspace/stage31-live-20261023/runtime/folder_assistant/answers.py": "db3bdda91ba5200a7b32115a61a151af65291b5ae22cf8579f06c733bd675d3c",
+    "workspace/stage31-live-20261023/runtime/folder_assistant/batching.py": "87936b69ccbb6b2d5e4c027de9f68265393e24c037fc57fa783b513bb97800a2",
+    "workspace/stage31-live-20261023/runtime/folder_assistant/contracts.py": "73dd22fc935693b1fc5478f6f4aa087ac1c21d097df16721e7dcc207d2078bc7",
+    "workspace/stage31-live-20261023/runtime/folder_assistant/exhaustive.py": "5a534a03a23137ec9047bbd5ae9eac672de579bdb332d3305f2246483303b1b0",
+    "workspace/stage31-live-20261023/runtime/folder_assistant/exports.py": "5ee3b1005fd92807ca035cfd485e2878abc244b0760a8bf85dec57c14f93fb63",
+    "workspace/stage31-live-20261023/runtime/folder_assistant/field_plan.py": "8d7f67f2f28d36432d7bb7636ed02d5e1d9d52314309c1fe0dca563f111dea29",
+    "workspace/stage31-live-20261023/runtime/folder_assistant/full_reading.py": "c577bd60e13dec88621f62684d66491d0912675231bf33408bcf4d83218f7b04",
+    "workspace/stage31-live-20261023/runtime/folder_assistant/index.py": "6c70d3975f5918bd76d2149f5938e5aaf6a369caff6af5feca3e5af7bc133db3",
+    "workspace/stage31-live-20261023/runtime/folder_assistant/jobs.py": "07dc78c49343b9fed98fdbf10b71efc367acf75e71934092cf9f487d81e45b05",
+    "workspace/stage31-live-20261023/runtime/folder_assistant/output_diagnostics.py": "e4f8a66e5b14517a69e2fb45c37ac9153d0c920960ad1f37d70a7c93185ae08d",
+    "workspace/stage31-live-20261023/runtime/folder_assistant/parse_worker.py": "e1603c813ea3ed124e4f744af7db7fabb13343c09ab570a651722338cbf49387",
+    "workspace/stage31-live-20261023/runtime/folder_assistant/parsing.py": "474dd43160b91025576f4bbd802f2fe3a1122818ce6a8536ba194564722a0acf",
+    "workspace/stage31-live-20261023/runtime/folder_assistant/projects.py": "172d3af54f498bea2489c47e5291804fe0144544cdd5e891f5455b87ae0af374",
+    "workspace/stage31-live-20261023/runtime/folder_assistant/project_context.py": "adb947ccd27de18d873c046117f5a83ea325a480dc2868894a1d2c6ef94fdc4d",
+    "workspace/stage31-live-20261023/runtime/folder_assistant/project_exports.py": "0f296a8f699722299d191acb00940d95267bd986cc94d49ae5e9c62c2109acbc",
+    "workspace/stage31-live-20261023/runtime/folder_assistant/reading.py": "54febef7b0313bd16517d4f5882c7054100c8e4b75e51c8310d9ec92b22d9b8f",
+    "workspace/stage31-live-20261023/runtime/folder_assistant/scope.py": "0d54cb310c432aaad45530df511180944fc5b5f1c96438d55e58e39d0e107c84",
+    "workspace/stage31-live-20261023/runtime/folder_assistant/store.py": "27a5f165119ef621715db67cfcfcecd9d494272cd5cae3f5b6de828ab7d3390d",
+    "workspace/stage31-live-20261023/runtime/folder_assistant/usage.py": "bf86177a3397159586053bbc7e4431d45b37e3121678e04ad6ee42069db2d240",
+    "workspace/stage31-live-20261023/runtime/folder_assistant/verification.py": "0b99ecd41d37dbe809dcdae3836285600b6c7f4c4e8a57e924765b2190a633b7",
+    "workspace/stage31-live-20261023/runtime/folder_assistant/__init__.py": "36656300506ebee15611b11a8eec4d2ba51af2278e92d74a5226fa32a1dd6277",
+    "workspace/stage31-live-20261023/runtime/folder_assistant/__main__.py": "fd9ad3f8dfa19b0a3305039acab08b71c1fc83fab09d2c1125a4e1777f959f23",
+    "workspace/stage31-live-20261023/runtime/knowledge/documents.py": "4c2372f461f357cce017e9704392571c1d1bd1cf7e8f601867e6aa5eeb9305e2",
+    "workspace/stage31-live-20261023/runtime/knowledge/embedding.py": "7cfc277bf79b51205bff5c1447bb7165d73189a1773bfb7e013696349bdd2c43",
+    "workspace/stage31-live-20261023/runtime/knowledge/large_probe.py": "497c734fde900ff464eea06b736979fc52ccaa964bba28f21ebd3a1464c0c630",
+    "workspace/stage31-live-20261023/runtime/knowledge/locking.py": "c2f87541b323e39f8d080067aab7c15f7870f9a50b522ca9bcb596a4b89002ee",
+    "workspace/stage31-live-20261023/runtime/knowledge/long_probe.py": "824878c533475b0d48cca92f538fe00228108ede3274cf4bd43996ada91bb403",
+    "workspace/stage31-live-20261023/runtime/knowledge/probe.py": "564fc1190358d125bdd7d1c7d0fbe2bc1a998258e1dbe4f0b268585552e5666a",
+    "workspace/stage31-live-20261023/runtime/knowledge/recall_probe.py": "fb5657819c94b93083d3a11e6e546342345f3d35ac14fe70c662449f40143ca9",
+    "workspace/stage31-live-20261023/runtime/knowledge/report_probe.py": "486c955ce7368a5beb181b9def74546fc3b3ad9188c013105d643570102ac7df",
+    "workspace/stage31-live-20261023/runtime/knowledge/reranking.py": "8118a7613b87909571050ad1b6d6d3bee2a9beb8aa68b0dbc4ab60570cf384ec",
+    "workspace/stage31-live-20261023/runtime/knowledge/rerank_probe.py": "4c49f1e3a7f0e8dcd50edb647ba9beb521398ea05c01da538b25f1c99b9b75bc",
+    "workspace/stage31-live-20261023/runtime/knowledge/store.py": "3fc3b7c28d42baf9aee644f9edcd25ab12c547a5b8de37552ae399ce8d5d6837",
+    "workspace/stage31-live-20261023/runtime/knowledge/vectors.py": "520aff951c342401e1f1c4fcf5a532bd8f3ae859f6c01eb920414f8d2fdafd1b",
+    "workspace/stage31-live-20261023/runtime/knowledge/__init__.py": "5fcbc38c72e9f0e4c0938373622ff86daadbe7389238d3003d9a73d3acfb1533",
+    "workspace/stage31-live-20261023/runtime/knowledge/__main__.py": "fc231000c92128f2dacd50c8e4a2131c197130af52b5c13500673af31e4dec43",
+    "workspace/stage31-live-20261023/runtime/workspace/stage31_live.py": "f847cecc0bff81d97a1143e84c6eea4e9dbd8c5c2817e07f4fb5784a8c93f0cf",
+    "workspace/stage31-live-20261023/state/.jobs-start.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage31-live-20261023/state/0366037e574145d79e375272cdf9abf2.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage31-live-20261023/state/52583c4b9f5a40bfa88d57ecef7569a0.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage31-live-20261023/state/53c7bd00360840b5ae0a1270255605e8.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage31-live-20261023/state/5dbdb089f03f420fa113f334945e8ccc.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage31-live-20261023/state/94c516ab2957479790dc9d7999408e2a.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage31-live-20261023/state/974cd5b5da674a0883baa84bf656b8f2.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage31-live-20261023/state/c47526539e494ce4910380ae2d17a324.job.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage31-live-20261023/state/catalog.sqlite3": "1d3ccc540f6520c9b8d2bd931a009c58d3a484725de8b10843cd9732a75f7b3c",
+    "workspace/stage31-live-20261023/state/indexes/37959a146658450185b802536a881684/.build.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage31-live-20261023/state/indexes/37959a146658450185b802536a881684/.sync.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage31-live-20261023/state/indexes/37959a146658450185b802536a881684/.vectors.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage31-live-20261023/state/indexes/37959a146658450185b802536a881684/knowledge.sqlite3": "47935fb024f4ec838da412b4ab59593cc34adf5291b185bb8d5fb6a3f52fe87e",
+    "workspace/stage31-live-20261023/state/indexes/37959a146658450185b802536a881684/vectors/a8cb8c230f3e4a0591664b19f3a44b63.db/LOCK": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workspace/stage31-live-20261023/state/indexes/37959a146658450185b802536a881684/vectors/a8cb8c230f3e4a0591664b19f3a44b63.db/collections/chunks/manifest.json": "1a9fe0ef1e24355f05649ed6356586198f39250055f0826852a9b0289ed7522f",
+    "workspace/stage31-live-20261023/state/indexes/37959a146658450185b802536a881684/vectors/a8cb8c230f3e4a0591664b19f3a44b63.db/collections/chunks/manifest.json.prev": "439bced4db104c9bc364e111da83cd0486ba478d9e84a87f4a8b6156ece9130c",
+    "workspace/stage31-live-20261023/state/indexes/37959a146658450185b802536a881684/vectors/a8cb8c230f3e4a0591664b19f3a44b63.db/collections/chunks/schema.json": "091a94653bffaee066311202f1db0c0e9850fe8749840a67e6189920344759ce",
+    "workspace/stage31-live-20261023/state/indexes/37959a146658450185b802536a881684/vectors/a8cb8c230f3e4a0591664b19f3a44b63.db/collections/chunks/partitions/_default/data/data_000001_000023.parquet": "a9f34411b67023b7fed19f5229ce1c84b832d485f4c46cc2b1484a3fef898118",
+    "workspace/stage31-live-20261023/state/indexes/37959a146658450185b802536a881684/vectors/a8cb8c230f3e4a0591664b19f3a44b63.db/collections/chunks/partitions/_default/indexes/data_000001_000023.vector.autoindex.idx": "3407bf20e7d495d94a759f2073df29f214444a12609a263a4b07b8a860740179",
+    "workspace/stage31-live-20261023/state/outputs/0366037e574145d79e375272cdf9abf2/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage31-live-20261023/state/outputs/0366037e574145d79e375272cdf9abf2/comparison.csv": "831ccf696e4dce467ac991785592bf9c6c082c6d083986e1c9746a2c408aec71",
+    "workspace/stage31-live-20261023/state/outputs/0366037e574145d79e375272cdf9abf2/comparison.xlsx": "af5bd10861a25695dcdef8e5af71711b9245f88a9ea72da65f328e4bc913c371",
+    "workspace/stage31-live-20261023/state/outputs/0366037e574145d79e375272cdf9abf2/export.json": "648066c162798ba57480b45976995dcbce9d15be6716631760ce7b1647c9e665",
+    "workspace/stage31-live-20261023/state/outputs/0366037e574145d79e375272cdf9abf2/record.json": "0ddd56e6eca52f03c93fef959e708015e27bf0f10dac5e78472d40a6c98bc8fc",
+    "workspace/stage31-live-20261023/state/outputs/0366037e574145d79e375272cdf9abf2/sources.csv": "d09b1a330f4761a29ee318272a8bb378006e6068990d7624984c5d276674661a",
+    "workspace/stage31-live-20261023/state/outputs/0366037e574145d79e375272cdf9abf2/sources.json": "cae0ea59f99e639c1f5f15aa375e4f71d9f767fda7ac57ea17ad5f04be82bfb0",
+    "workspace/stage31-live-20261023/state/outputs/0366037e574145d79e375272cdf9abf2/summary.md": "fbe8594d596561174d310c2439e179ae6bc0fcc686586252f6d245aa373780e9",
+    "workspace/stage31-live-20261023/state/outputs/52583c4b9f5a40bfa88d57ecef7569a0/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage31-live-20261023/state/outputs/52583c4b9f5a40bfa88d57ecef7569a0/comparison.csv": "6f69af7d3951d881dc4ab5ee40dfa1cd2360f98f54a8d93ada9f610e64f41328",
+    "workspace/stage31-live-20261023/state/outputs/52583c4b9f5a40bfa88d57ecef7569a0/comparison.xlsx": "e0813001960b806d5bb7d6c36534c3c3606329c325f80f0b510c2d22cb202f94",
+    "workspace/stage31-live-20261023/state/outputs/52583c4b9f5a40bfa88d57ecef7569a0/export.json": "9402eff1c6f66853296bb307dac3767ba1ba27d41c5f715860629c757b43f7d6",
+    "workspace/stage31-live-20261023/state/outputs/52583c4b9f5a40bfa88d57ecef7569a0/record.json": "9c11050f25e63bb383dd636bb47128027615b118f63d3b31ad10a07b8d1cb806",
+    "workspace/stage31-live-20261023/state/outputs/52583c4b9f5a40bfa88d57ecef7569a0/sources.csv": "d0605e565a1a27415a3e2ff3208a4dacc5961c7fa8c38474c9e8d7845c9150cd",
+    "workspace/stage31-live-20261023/state/outputs/52583c4b9f5a40bfa88d57ecef7569a0/sources.json": "1e4a4f433a410bfb79e301aa13fa2bfc5293d74e29b395b03f0fe415ef6a5a09",
+    "workspace/stage31-live-20261023/state/outputs/52583c4b9f5a40bfa88d57ecef7569a0/summary.md": "6ff3f37a8d80073e3cfd667c13ddc8e306f4b360fcaa467988418c12330dbdc8",
+    "workspace/stage31-live-20261023/state/outputs/53c7bd00360840b5ae0a1270255605e8/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage31-live-20261023/state/outputs/53c7bd00360840b5ae0a1270255605e8/comparison.csv": "0d6902e7d1920f1efe56e360ebcf3b1437b493459e971697c035ec1992add72e",
+    "workspace/stage31-live-20261023/state/outputs/53c7bd00360840b5ae0a1270255605e8/comparison.xlsx": "4809c71970ef547d4e26775ca4efdad501d157525a2be27563550e6cb02418c0",
+    "workspace/stage31-live-20261023/state/outputs/53c7bd00360840b5ae0a1270255605e8/export.json": "3f47eaee177716f14bf8657156f77339121d23a20b03f7d6acd3baa8f7922acf",
+    "workspace/stage31-live-20261023/state/outputs/53c7bd00360840b5ae0a1270255605e8/record.json": "1bc561e7d7820bbee9725a52cd00998265ae79cc1660b2ab98493be38d0e6410",
+    "workspace/stage31-live-20261023/state/outputs/53c7bd00360840b5ae0a1270255605e8/sources.csv": "30e7d4171a6c22adefa4839095a571ffde054dd98b8e1abd3e8b0cdc712fd873",
+    "workspace/stage31-live-20261023/state/outputs/53c7bd00360840b5ae0a1270255605e8/sources.json": "bc4206e4682c7353bec7aa1709ab13e76b2d8c641d72754d4ee0908d1a8eaaa6",
+    "workspace/stage31-live-20261023/state/outputs/53c7bd00360840b5ae0a1270255605e8/summary.md": "139a812ee9a7ab9f604f3a3b1ec57de2c56d0aeff87eadc6906d1f8edc3ca95e",
+    "workspace/stage31-live-20261023/state/outputs/5dbdb089f03f420fa113f334945e8ccc/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage31-live-20261023/state/outputs/5dbdb089f03f420fa113f334945e8ccc/comparison.csv": "5b96000e3eacfabea32f698526b4ab2414d02906389517b7242465833225dc73",
+    "workspace/stage31-live-20261023/state/outputs/5dbdb089f03f420fa113f334945e8ccc/comparison.xlsx": "e0753a409cf83fe0837d6a30aa2ffc5509be71cfac9e9bdf4ec2f6026b30093a",
+    "workspace/stage31-live-20261023/state/outputs/5dbdb089f03f420fa113f334945e8ccc/export.json": "363e03e15adabe22ec929fd63e8684c3ae20c846c668e39ffd7e5988e5956a28",
+    "workspace/stage31-live-20261023/state/outputs/5dbdb089f03f420fa113f334945e8ccc/record.json": "e9d55b73ff3c87dd935a3447d3c9720dbe12a584e2e6d8d00f208fe0c3431f37",
+    "workspace/stage31-live-20261023/state/outputs/5dbdb089f03f420fa113f334945e8ccc/sources.csv": "09a6b5f8f6502fccb4020e4c487df6c7e8ba8aeb84554af61b33fb5ec4a43acf",
+    "workspace/stage31-live-20261023/state/outputs/5dbdb089f03f420fa113f334945e8ccc/sources.json": "a7d0c976968057c96098fc79290793d9dd15c7369c3f1c0b22421577d9cc6d39",
+    "workspace/stage31-live-20261023/state/outputs/5dbdb089f03f420fa113f334945e8ccc/summary.md": "e1df246fa40db46cfa0f746c9b1cf038c8a705a9ed27bf922e69895187867c23",
+    "workspace/stage31-live-20261023/state/outputs/94c516ab2957479790dc9d7999408e2a/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage31-live-20261023/state/outputs/94c516ab2957479790dc9d7999408e2a/comparison.csv": "b35f1a7a8b121c87eb2a20d6fc82ead11af64f2e0daabd3b2fc5eff0bdca1442",
+    "workspace/stage31-live-20261023/state/outputs/94c516ab2957479790dc9d7999408e2a/comparison.xlsx": "656f64bb7bba270b008a81cafa1abd2b2c07515eee9ce6f62804fed92d74ea49",
+    "workspace/stage31-live-20261023/state/outputs/94c516ab2957479790dc9d7999408e2a/export.json": "920c98fbb60ba58a3da2eec3a2bf32045e39afd18375da88c840bc356e6cf56f",
+    "workspace/stage31-live-20261023/state/outputs/94c516ab2957479790dc9d7999408e2a/record.json": "802eaaa45464f4548ca94ab4740513c3c74e34b3c834a010ae5b97656489bf44",
+    "workspace/stage31-live-20261023/state/outputs/94c516ab2957479790dc9d7999408e2a/sources.csv": "59e297264ec733ff7f305ba25287e530129f5fe19863e2f1679333a735d2d76f",
+    "workspace/stage31-live-20261023/state/outputs/94c516ab2957479790dc9d7999408e2a/sources.json": "d47b566db0dfb8222e9eb71804b15751edf110e43f8e46660c11fdb6102084ae",
+    "workspace/stage31-live-20261023/state/outputs/94c516ab2957479790dc9d7999408e2a/summary.md": "48c220baa2bcbaf7cf779932228137151948b20f6a3446b22e9a1e64ada9d84a",
+    "workspace/stage31-live-20261023/state/outputs/974cd5b5da674a0883baa84bf656b8f2/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage31-live-20261023/state/outputs/974cd5b5da674a0883baa84bf656b8f2/comparison.csv": "1e0e8b13a89da83164e898acde3a07b9a122cda30fa10b1b905dee8dcf57bf69",
+    "workspace/stage31-live-20261023/state/outputs/974cd5b5da674a0883baa84bf656b8f2/comparison.xlsx": "b7e590dfc1b6bf2f8c8e21a26d384d7f91227c119f14f77bbbf80aa0ac3bfed0",
+    "workspace/stage31-live-20261023/state/outputs/974cd5b5da674a0883baa84bf656b8f2/export.json": "87398fda39e6fa28e0b8e1a3928e4f9593dc41f2a2af68bb708814cc68a386e3",
+    "workspace/stage31-live-20261023/state/outputs/974cd5b5da674a0883baa84bf656b8f2/record.json": "397afa9f48e77a139b342159687687ffc444ab0bb21c4948014636d5b919969a",
+    "workspace/stage31-live-20261023/state/outputs/974cd5b5da674a0883baa84bf656b8f2/sources.csv": "14c487ea739b9b7636db77dad6db6177b2d26996912846550b168ef18b244b54",
+    "workspace/stage31-live-20261023/state/outputs/974cd5b5da674a0883baa84bf656b8f2/sources.json": "61f1b7328d107b370499342f679f7251b7e1204551f5d4e0f65948820837c30c",
+    "workspace/stage31-live-20261023/state/outputs/974cd5b5da674a0883baa84bf656b8f2/summary.md": "5a9761b51f2f5dbb1b0d8bb8cb9175d4d9447c72d7110bd09918d34ab96d5576",
+    "workspace/stage31-live-20261023/state/outputs/c47526539e494ce4910380ae2d17a324/.export.lock": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "workspace/stage31-live-20261023/state/outputs/c47526539e494ce4910380ae2d17a324/comparison.csv": "1b24afd169e5b3b6590c85cf91668af8bad310f9f1da03ea6967d15c1bc723ca",
+    "workspace/stage31-live-20261023/state/outputs/c47526539e494ce4910380ae2d17a324/comparison.xlsx": "21e76fd028a3166f91b5711c334b95d080bff98e93d3b0e41ddf82c212414c54",
+    "workspace/stage31-live-20261023/state/outputs/c47526539e494ce4910380ae2d17a324/export.json": "8f930f34335eb41fa3972910ee36c9ce73bcd1c04d6b8058bf86975f68b4fa70",
+    "workspace/stage31-live-20261023/state/outputs/c47526539e494ce4910380ae2d17a324/record.json": "a4f4c5c58476ce44743d135142ce4d1569698e6e0f1cd61c285f3ef05f9a0a44",
+    "workspace/stage31-live-20261023/state/outputs/c47526539e494ce4910380ae2d17a324/sources.csv": "30e7d4171a6c22adefa4839095a571ffde054dd98b8e1abd3e8b0cdc712fd873",
+    "workspace/stage31-live-20261023/state/outputs/c47526539e494ce4910380ae2d17a324/sources.json": "906acb8ec2cacaf97f262a3a4e4e214ef181d9850be7c644a5d60f1e41e3a5c2",
+    "workspace/stage31-live-20261023/state/outputs/c47526539e494ce4910380ae2d17a324/summary.md": "598a1bf70498dc1436db689075f2155f8517b988c9f9ceb69120c597f0775554",
+    "workspace/stage31-live-20261023/state/parsed/19b038d0f006af8bdcc734eb71ee08f42babe91bd52f82d4dcff1f00a66b2dc6-1.csv.json": "af3c9e1d028c22a8de5a9922006a5d46b56ccadede235003dbbc73359aad998c",
+    "workspace/stage31-live-20261023/state/parsed/3c749c47152aafa33f5e0e001b869c28c54d17ffb3268de0e59510886f5a4d3e-1.txt.json": "8e3e3ec32d73a8c00fafb15e5d350b4ed7b8a1094f671945adea79c05c3eb8f7",
+    "workspace/stage31-live-20261023/state/parsed/7a85b6d94d61d0112e9d7b002a4564aa4e415cfc430a7836d59075043d53e133-1.csv.json": "7f22e53d2252c803643ddc2ec8e51e36b34e8335abf06210f1c39cd48bf7a1d8",
+    "workspace/stage31-live-20261023/state/parsed/909806836241aec9b0e8efe7ef1a637991e29d057add490c11e51417f10046d2-1.txt.json": "41cbf3d891f530a536944d20f441816bddb2cfbbe6d53fa1b222a2560fad18eb",
+    "workspace/stage31-live-20261023/state/parsed/963df68b384779167dfcfec1aafad0d6466d87e02d1cbf59a1e71f9b6298698a-1.txt.json": "e0ec3d38798159231a0a5a635d76186e9beeedf19f725ec689b940d9fbe4cef1",
+    "workspace/stage31-live-20261023/state/parsed/a7f28a15a538580d83f77dceee66df44536cd7bd44f8dcdd8e41a6b9c8f86861-1.txt.json": "76ff88ddc13ec6816cea3b0cd4a123a7ef6b17a929e5b8f8bcb900101cc6de1b",
+    "workspace/stage31-live-20261023/state/parsed/b457dff1081c16871cbfe51f5ade644e946220102c08bca5149a353c124777d4-1.txt.json": "45b27fbd87cd3b17906729e6edee5118cf7eb465cf10c039847f681c4fe1fd19",
+    "workspace/stage31-live-20261023/state/parsed/c56751e8b134ccd5b7e33e3cdce4977d5a4ce75088b29d844f727dee2084aa0f-1.txt.json": "f0b631cf5998f2f5b52886a94b05401c0190a7394cddbd301fe484dad46076b5",
+    "workspace/stage31-live-20261023/state/parsed/d63a022269165954b2d767466ee38b9da664d8f579b56a0fa4f34ffcb1e7ab54-1.txt.json": "01a6f8e709209a6f921b7ca92330acbbde9859c7f07e8ed080fe4c5a3a8e59f5",
+    "workspace/stage31-live-20261023/state/parsed/e8b251c9632076bf663d48a30cef307037fa35c1e06ae7975734443b452dab19-1.txt.json": "6c4a3a3daf9fa8935d6935eb1ef0cad1bda6f1be76b409cd79ce2e43eefce187",
+    "workspace/stage31-build-20261023.log": "a9e43a5e611de21a2669a804f2f1469c7ae92289d2449f240737e3c8e41eaa30",
+    "workspace/stage31-build-final-20261023.log": "2a8e3368e17f9afddf8250891d4cab7be69589b3cff14bde36f790356a4ac690",
+    "workspace/stage31-build-final2-20261023.log": "eaa3490149c416e29157d8d0430e6a0c123c2ed1da0bec318a386ac3dcd07cb5",
+    "workspace/stage31-cli-help-20261023.log": "157af2b85bbaa0645c41e5014c90b1419b4c6440b08cc47870cec50dace59454",
+    "workspace/stage31-folder-workflow-20261023.png": "b6694418e4ea35ea94943e43e9bda9dc0f0de2e1ac0eb1593482d712d5cacfcf",
+    "workspace/stage31-folder-workflow-attempt1-20261023.png": "3c9387e5e0229f034a0c9301d67c60c3316e0ebd5ad0e707f52fe3341e75154c",
+    "workspace/stage31-full-20261023.log": "cfc1f21fc69dbd0dd38b88d4a0edd44f9317f3fdf757b571f519710fd580d03f",
+    "workspace/stage31-full-reading-preview-20261023.png": "be582d186a30560fb532882081996c142623747c93fb96bfbf2a686f0b43f7f7",
+    "workspace/stage31-full-reading-preview-attempt1-20261023.png": "810fb01cb7f5ee1a174699f178725e57adf3be9a3dad3d52023adb764b6bb29b",
+    "workspace/stage31-live-20261023.log": "a694a507ff0c18c5e0df3b2c07ebb6506afb67ff57f0ea7a68d16556e0c2439d",
+    "workspace/stage31-targeted-20261023.log": "619d1753c0643421c0388f04d2b0fcb4b94651bbfeabc520aacb0dbb73375a54",
+    "workspace/stage31-ui-20261023.log": "ef0b5b5c1fd912ff5ead530b6abc8af96a769a1f5467cef60d95e05a7e2bae6e",
+    "workspace/stage31-ui-final-20261023.log": "e65378c7cbfb98da695d95bdb7e5119a196e0cfa7ef453b114fce96912df25db",
+    "workspace/stage31-ui-records-attempt1-20261023.json": "d8d8dfd7b01117b311aa8c7158c7076dd9a8fef5494e601fd9cffc35ba5a27a6",
+    "workspace/stage31-ui-records-final-20261023.json": "256eccf06324c2583754f1cd128525d3070524056c518c081a70774d9342cfcc",
+    "workspace/stage31_audit.py": "7bac2e7a4c9bf0dec482c2ee580a05a84b4034acd72ed655aecd1029f8112b41",
+    "workspace/stage31_field_plan_draft.py": "8d7f67f2f28d36432d7bb7636ed02d5e1d9d52314309c1fe0dca563f111dea29",
+    "workspace/stage31_live.py": "f847cecc0bff81d97a1143e84c6eea4e9dbd8c5c2817e07f4fb5784a8c93f0cf"
+  }
+}

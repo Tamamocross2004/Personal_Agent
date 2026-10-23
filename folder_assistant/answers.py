@@ -70,12 +70,16 @@ def prepare_messages(inputs,evidence,reading_scope=None):
     supplied=[{k:e[k] for k in ('citation_id','name','file_sha256','source_location','text')} for e in evidence]
     if reading_scope is not None:
         supplied=[{**s,'role':e['role'],'block_start':e['start'],'block_end':e['end']} for s,e in zip(supplied,evidence)]
-    messages=[{'role':'system','content':instruction()},
+    specs=inputs.get('field_specs',[])
+    messages=[{'role':'system','content':instruction(specs) if specs else instruction()},
               {'role':'user','content':json.dumps({'question':inputs['query'],'evidence':supplied},ensure_ascii=False)}]
     if reading_scope is not None:
         messages[1]['content']=json.dumps({'question':inputs['query'],'reading_scope':reading_scope,'evidence':supplied},ensure_ascii=False)
     if inputs.get('project_context') is not None:
         content=json.loads(messages[1]['content']);content['project_context']=select_project_context(inputs['project_context'],evidence)[0]
+        messages[1]['content']=json.dumps(content,ensure_ascii=False)
+    if specs:
+        content=json.loads(messages[1]['content']);content['field_intents']=specs
         messages[1]['content']=json.dumps(content,ensure_ascii=False)
     return messages
 

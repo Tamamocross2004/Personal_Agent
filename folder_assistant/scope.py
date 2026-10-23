@@ -104,6 +104,7 @@ def preview_next(jobs,jid,controls):
     return {'cloud_calls':False,'generation':inputs['generation'],'parent_id':jid,'operation_start':start,'operation_end':end,
             'first_batch_end':batch['next_offset'] if batch else start,'max_batches':inputs['max_batches'],
             'read_to_end':inputs['read_to_end'],'batch_call_limit':inputs['batch_call_limit'],
+            'plan_fields':inputs['plan_fields'],
             'budget':inputs['budget'],'output_tokens':inputs['output_tokens'],'strength':inputs['strength'],
             'retry_split':inputs['retry_split'],'decision':decision,'services':['llm'] if batch else [],
             'model':inputs['model'],'first_batch':[ {k:h[k] for k in ('segment','name','source_location','start','end','role')} for h in (batch or {}).get('hits',[])],
